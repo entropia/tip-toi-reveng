@@ -34,6 +34,11 @@ getXor off = do
 magic :: B.ByteString
 magic = B.pack $ map (fromIntegral . ord) "OggS"
 
+decypher :: Word8 -> B.ByteString -> B.ByteString 
+decypher x = B.map go
+    where go 0 = 0
+          go n = xor x n
+
 main = do
     args <- getArgs
     file <- case args of
@@ -56,6 +61,7 @@ main = do
     printf "Ogg magic: %s\n" (show (B.take 4 ogg))
     printf "Ogg magic xored: %s\n" (show (B.map (xor x) (B.take 4 ogg)))
     let filename = file ++ printf "_%08x" oo ++ ".ogg"
-    B.writeFile filename (B.map (xor x) ogg)
+    B.writeFile filename (decypher x ogg)
+    printf "Dumped decyphered ogg file to %s\n" filename
 
 
