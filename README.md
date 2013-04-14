@@ -19,6 +19,8 @@ What we have
 
 OGG files with correct OGG header, Vorbis metadata, but do not play, and has “holes”. Encryption scheme incomplete?
 
+Some OGG files have the XOR value in the header and still have a correct checksum, so the scheme above seems to be on the right track.
+
 
 XOR-Values:
 ===========
@@ -28,3 +30,8 @@ XOR-Values:
  * WWW_Bauernhof.gme: 0xAD
  * WWW_Feuerwehr.gme: 0x3B
  * Leserabe_een.gme: 0xDD
+
+Firmware decoding
+=================
+
+Running `arm-linux-gnueabi-objdump --architecture=arm -b binary -D Update3202.upd` disassembles the ARM firmware. At 0x6db0 begins a function that *might* do the XOR decoding. Another candidate is 0x29518.
