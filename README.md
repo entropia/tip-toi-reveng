@@ -12,3 +12,4 @@ XOR-Values:
 
  * WWW_Bauernhof.gme: 0xAD
  * WWW_Feuerwehr.gme: 0x3B
+ * Leserabe_een.gme: 0xDD
