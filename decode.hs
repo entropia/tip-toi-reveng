@@ -75,5 +75,7 @@ main = do
         let filename = "oggs/" ++ file ++ printf "_%08x" oo ++ ".ogg"
         B.writeFile filename (decypher x ogg)
         printf "Dumped decyphered ogg file to %s\n" filename
+        when (x `B.elem` (B.take 58 ogg)) $
+            printf "Found XOR magic %02X in %s\n" x filename
 
 
