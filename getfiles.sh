@@ -1,10 +1,39 @@
 #!/bin/bash
 
-# From http://www.ravensburger.de/start/problembehebung/downloads/buecher/index.html
+#get all firmwarefiles and gamefiles from static.tiptoi.com
 
-wget -c 'http://static.tiptoi.com/db/applications/WWW%20Feuerwehr.gme' -O 'WWW_Feuerwehr.gme'
-wget -c 'http://static.tiptoi.com/db/applications/WWW%20Bauernhof.gme' -O 'WWW_Bauernhof.gme'
-wget -c 'http://static.tiptoi.com/db/applications/Leserabe%20Feen.gme' -O 'Leserabe_een.gme'
+baseurl="http://static.tiptoi.com/db/"
+basexmlname="tiptoi_%LANGUAGE%.xml"
+languages="de_de fr_fr nl_nl"
+xmldir="xml"
+upddir="upd"
+gmedir="gme"
 
-wget -c http://static.tiptoi.com/db/firmware/update.upd
-wget -c http://static.tiptoi.com/db/firmware/Update3202.upd
+for language in $languages
+do
+  IFS=$'\n'
+  #create xml-filename for $language
+  xmlfile=${basexmlname/"%LANGUAGE%"/$language}
+
+  #download xml-file for $language if newer
+  wget -N -P $xmldir $baseurl$xmlfile
+
+  #find firmware-files for $language
+  updfiles=`grep -o 'http://.*\.upd' $xmldir/$xmlfile`
+
+  #download firmware-files for $language if newer
+  for updfile in $updfiles
+  do
+    wget -N -P $upddir/$language $updfile
+  done
+
+  #find game-files for $language
+  gmefiles=`grep -o 'http://.*\.gme' $xmldir/$xmlfile`
+
+  #download game-files for $language if newer
+  for gmefile in $gmefiles
+  do
+    wget -N -P $gmedir/$language $gmefile
+  done
+
+done
