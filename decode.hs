@@ -17,18 +17,19 @@ oggTableOffset = do
     skip 4
     getWord32le
 
-oggTable :: Word32 -> Get [(Word32, Word32)]
+oggTable :: Word32 -> Get [(Word32, Word32, Int)]
 oggTable offset = do
     skip (fromIntegral offset)
     until <- lookAhead getWord32le
     let n_entries = fromIntegral ((until - offset) `div` 8)
-    replicateM n_entries $ do
+    sequence [ do
         ptr <- getWord32le
         len <- getWord32le
-        return (ptr, len)
+        return (ptr, len, n)
+        | n <- [0..n_entries-1] ]
 
-checkOT :: B.ByteString -> ((Word32, Word32), Int) -> IO Bool
-checkOT ogg ((off, len), n) =
+checkOT :: B.ByteString -> (Word32, Word32, Int) -> IO Bool
+checkOT ogg (off, len, n) =
     if fromIntegral off > B.length ogg
     then do
         printf "    Entry %d: Offset %d > File size %d\n"
@@ -91,7 +92,7 @@ main = do
 
     let oto = runGet oggTableOffset bytes
         ot = runGet (oggTable oto) bytes
-        (oo,ol) = head ot
+        (oo,ol,_) = head ot
         ogg = runGet (extract oo ol) bytes
         x = runGet (getXor oo) bytes
 
@@ -102,12 +103,12 @@ main = do
     printf "First Ogg magic xored: %s\n" (show (B.map (xor x) (B.take 4 ogg)))
     printf "Table entries: %d\n" (length ot)
 
-    ot_fixed <- map fst <$> filterM (checkOT bytes) (zip ot [0..])
+    ot_fixed <- filterM (checkOT bytes) ot
 
     createDirectoryIfMissing False "oggs"
-    forM_ ot_fixed $ \(oo,ol) -> do
+    forM_ ot_fixed $ \(oo,ol,n) -> do
         let rawogg = runGet (extract oo ol) bytes
-        let filename = "oggs/" ++ file ++ printf "_%08x" oo ++ ".ogg"
+        let filename = "oggs/" ++ file ++ printf "_%03d" n ++ ".ogg"
         let ogg = decypher x rawogg
         if B.null ogg
         then do
@@ -125,7 +126,7 @@ main = do
             [ (0, 0, "Beginning of file") ] ++
             [ (4, 4, "Ogg table address") ] ++
             [ (oto, fromIntegral (8 * length ot), "Ogg table") ] ++
-            [ (o, fromIntegral l, "Ogg file" ) | (o,l) <- ot ]++
+            [ (o, fromIntegral l, "Ogg file " ++ show n ) | (o,l,n) <- ot ]++
             [ (fromIntegral (B.length bytes), 0, "End of file") ]
     let unknown_segments =
             filter (\(o,l) -> l > 0) $
