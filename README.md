@@ -26,9 +26,8 @@ Some files are successfully decoded. Known so far:
 Open issues
 -----------
 
-The last entry of the ogg file table seems to be broken (offset larger than
-file size). Why? Or is there a way to find the number of table entries
-elsewhere? Where?
+ * What is the meaning of the bytes before the OGG file table?
+ * The last four bytes are likely some kind of checksum. Which checksum?
 
 XOR-Values
 ----------
