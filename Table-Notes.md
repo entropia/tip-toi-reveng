@@ -5,6 +5,15 @@ Rough notes from reading the hexdump of the stuff before the ogg file.
 
 Consider `WWW_Feuerwehr.gme`. Everything up to `00026C59` is unknown.
 
+Tables
+------
+
+After some header information and lots of zeros, there are obvious offset tables at `0x200`,`0x2e0`, `0x380`, `0x438`, `0x500`, `0x5c8`, `0x690`, `0x6a4`, `0x700`, `0x768`, `0x7e0`, possibly separated by streaks of `0xffff` (or are these just invalid entries?).
+
+The beginnig of these tables (`0x0200`) is also the first byte of the file!
+
+The tables end at `0x0828`, which is the begin of the first instance of the following pattern. This is also the third entry in the first offset table. (Confirmed in WWW_Bauernhof.gme)
+
 Patterns
 --------
 
