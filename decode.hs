@@ -27,6 +27,19 @@ oggTable offset = skip (fromIntegral offset) >> go
             ((ptr, len) :) <$> go
         else return []
 
+checkOT :: B.ByteString -> ((Word32, Word32), Int) -> IO Bool
+checkOT ogg ((off, len), n) =
+    if fromIntegral off > B.length ogg
+    then do
+        printf "    Entry %d: Offset %d > File size %d\n"
+            n off (B.length ogg)
+        return False
+    else if fromIntegral (off + len) > B.length ogg
+         then do
+            printf "    Entry %d: Offset %d + Lengths %d > File size %d\n"
+                n off len (B.length ogg)
+            return False
+         else return True
 
 extract :: Word32 -> Word32 -> Get (B.ByteString)
 extract off len = do
@@ -88,6 +101,9 @@ main = do
     printf "First Ogg magic: %s\n" (show (B.take 4 ogg))
     printf "First Ogg magic xored: %s\n" (show (B.map (xor x) (B.take 4 ogg)))
     printf "Table entries: %d\n" (length ot)
+
+    ot_fixed <- filterM (checkOT bytes) (zip ot [0..])
+
     createDirectoryIfMissing False "oggs"
     forM_ ot $ \(oo,ol) -> do
         let rawogg = runGet (extract oo ol) bytes
