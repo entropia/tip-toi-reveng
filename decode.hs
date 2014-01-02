@@ -46,7 +46,9 @@ magic = B.pack $ map (fromIntegral . ord) "OggS"
 decypher :: Word8 -> B.ByteString -> B.ByteString 
 decypher x = B.map go
     where go 0 = 0
+          go 255 = 255
           go n | n == x    = n
+               | n == xor x 255 = n
                | otherwise = xor x n
 
 checkOgg :: B.ByteString -> IO ()
