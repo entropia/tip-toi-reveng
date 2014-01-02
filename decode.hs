@@ -121,4 +121,19 @@ main = do
 
             -- checkOgg ogg
 
+    let known_segments =
+            [ (0, 0, "Beginning of file") ] ++
+            [ (4, 4, "Ogg table address") ] ++
+            [ (oto, fromIntegral (8 * length ot), "Ogg table") ] ++
+            [ (o, fromIntegral l, "Ogg file" ) | (o,l) <- ot ]++
+            [ (fromIntegral (B.length bytes), 0, "End of file") ]
+    let unknown_segments =
+            filter (\(o,l) -> l > 0) $
+            zipWith (\(o1,l1,_) (o2,_,_) -> (o1+l1, o2-(o1+l1)))
+            known_segments (tail known_segments)
+    printf "Unknown file segments: %d (%d bytes total)\n"
+        (length unknown_segments) (sum (map snd unknown_segments))
+    forM_ unknown_segments $ \(o,l) ->
+        printf "   Offset: %08X Size %d\n" o l
+
 
