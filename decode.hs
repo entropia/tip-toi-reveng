@@ -10,7 +10,7 @@ import Data.Functor
 import Control.Monad
 import System.Directory
 
-import Codec.Container.Ogg.Page
+--import Codec.Container.Ogg.Page
 
 oggTableOffset :: Get Word32
 oggTableOffset = do
@@ -51,6 +51,7 @@ decypher x = B.map go
                | n == xor x 255 = n
                | otherwise = xor x n
 
+{-
 checkOgg :: B.ByteString -> IO ()
 checkOgg ogg = do
     let (tracks, pages, rest) = pageScan ogg
@@ -63,7 +64,7 @@ checkPageCRC ogg page =
                    B.drop (fromIntegral (pageOffset page)) $ ogg
         raw_page' = pageWrite page
     in raw_page == raw_page'
-
+-}
 
 main = do
     args <- getArgs
@@ -98,8 +99,10 @@ main = do
         else do
             B.writeFile filename ogg
             printf "Dumped decyphered ogg file to %s\n" filename
+
             -- when (x `B.elem` (B.take 58 rawogg)) $
             --    printf "Found XOR magic %02X in %s\n" x filename
-            checkOgg ogg
+
+            -- checkOgg ogg
 
 
