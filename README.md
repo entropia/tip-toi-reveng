@@ -17,10 +17,11 @@ All offsets are from the beginning of the file.
 What we have
 ============
 
-OGG files with correct OGG header, Vorbis metadata, but do not play, and has “holes”. Encryption scheme incomplete?
+Some files are successfully decoded. Known so far:
+ * `WWW_Feuerwehr.gme` (MD5 sum `19812ec9a96e09326a27173b28d6671d`)
+ * `Leserabe_een.gme` (MD5s sum `f16660fb7ee59bb4deb5390bb78f8860`), but playback is too fast
 
-Some OGG files have the XOR value in the header and still have a correct checksum, so the scheme above seems to be on the right track.
-
+Other files are not played, despite a correct CRC header.
 
 XOR-Values
 ==========
