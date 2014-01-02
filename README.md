@@ -4,7 +4,7 @@ tip-toi-reveng
 Trying to understand the file format of Tip Toi
 
 What we know
-============
+------------
 
 All offsets are from the beginning of the file.
  * At offset 4 is a 32bit offset of an ogg file table
@@ -15,7 +15,7 @@ All offsets are from the beginning of the file.
  * This is verified by checking the CRC header of the OGG files
 
 What we have
-============
+------------
 
 Some files are successfully decoded. Known so far:
  * `WWW_Feuerwehr.gme` (MD5 sum `19812ec9a96e09326a27173b28d6671d`)
@@ -24,7 +24,7 @@ Some files are successfully decoded. Known so far:
 Other files are not played, despite a correct CRC header.
 
 XOR-Values
-==========
+----------
 
 (Find with `findxor.hs`, or `decode.hs`)
 
@@ -33,7 +33,7 @@ XOR-Values
  * Leserabe_een.gme: `0xDD`
 
 Tools
-=====
+-----
 
  * `decode.hs`: Decodes the OGG files from the `.gme` files. To run, run
 
@@ -44,7 +44,7 @@ Tools
         ./decode foo.gme
 
 Firmware
-========
+--------
 
 Running `arm-linux-gnueabi-objdump --architecture=arm -b binary -D Update3202.upd` disassembles the ARM firmware. At 0x6db0 begins a function that *might* do the XOR decoding. Another candidate is 0x29518.
 
@@ -59,7 +59,7 @@ The Flash ICs are accessed via an MTD subsystem ("MtdLib").
 
 
 Books
-=====
+-----
 
 Code fragments which look like written in C can be found at the end of various GME files.
 Here is an example from the book "Weltatlas":
@@ -77,6 +77,6 @@ Here is an example from the book "Weltatlas":
 
 
 Summary
-=======
+-------
 
 All this indicates that the pen is a sophisticated Embedded Linux system with abilities far beyond a simple "read OID & play Ogg file" function!
