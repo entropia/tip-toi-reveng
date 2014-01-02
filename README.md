@@ -9,10 +9,10 @@ What we know
 All offsets are from the beginning of the file.
  * At offset 4 is a 32bit offset of an ogg file table
  * The ogg file table consists of pairs of offsets and length, and ends with zeros
- * The ogg file is encrypted using a simple scheme, using a magic XOR value:
-   - 0 is left alone
-   - the XOR value is left alone
-   - everything else is XORed bytewise by the value
+ * The ogg file is encrypted using a simple scheme, using a magic XOR value (`x`):
+   - The values `0x00`, `0xFF`, `x` and `x XOR 0xFF` are left alone
+   - Everything else is XORed bytewise by x.
+ * This is verified by checking the CRC header of the OGG files
 
 What we have
 ============
@@ -25,11 +25,22 @@ Some OGG files have the XOR value in the header and still have a correct checksu
 XOR-Values
 ==========
 
-(Find with findxor.hs)
+(Find with `findxor.hs`, or `decode.hs`)
 
- * WWW_Bauernhof.gme: 0xAD
- * WWW_Feuerwehr.gme: 0x3B
- * Leserabe_een.gme: 0xDD
+ * WWW_Bauernhof.gme: `0xAD`
+ * WWW_Feuerwehr.gme: `0x3B`
+ * Leserabe_een.gme: `0xDD`
+
+Tools
+=====
+
+ * `decode.hs`: Decodes the OGG files from the `.gme` files. To run, run
+
+        apt-get install haskell-platform
+        cabal update
+        cabal install hogg
+        ghc --make -O2 decode.hs
+        ./decode foo.gme
 
 Firmware
 ========
@@ -52,16 +63,16 @@ Books
 Code fragments which look like written in C can be found at the end of various GME files.
 Here is an example from the book "Weltatlas":
 
-AnswerIndex=%d.
-right oid founded:%d. total right oid:%d.
-pGame->SuccessPercentage:%d.
-pGame->CurQuestionNum=%d.
-A:/game8.bin
-Play times =%d, Voicenum=%d, addr =0x%X, len = %d, pGame = 0x%X.
-Abnormal termination   Arithmetic exception:  Illegal instruction 
-Interrupt received     Illegal address        Termination request Stack 
-overflow         Redirect: can't open:  Out of heap memory User-defined 
-signal 1  User-defined signal 2  Pure virtual fn called C++ library  exception
+    AnswerIndex=%d.
+    right oid founded:%d. total right oid:%d.
+    pGame->SuccessPercentage:%d.
+    pGame->CurQuestionNum=%d.
+    A:/game8.bin
+    Play times =%d, Voicenum=%d, addr =0x%X, len = %d, pGame = 0x%X.
+    Abnormal termination   Arithmetic exception:  Illegal instruction 
+    Interrupt received     Illegal address        Termination request Stack 
+    overflow         Redirect: can't open:  Out of heap memory User-defined 
+    signal 1  User-defined signal 2  Pure virtual fn called C++ library  exception
 
 
 Summary
