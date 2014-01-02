@@ -23,6 +23,13 @@ Some files are successfully decoded. Known so far:
 
 Other files are not played, despite a correct CRC header.
 
+Open issues
+-----------
+
+The last entry of the ogg file table seems to be broken (offset larger than
+file size). Why? Or is there a way to find the number of table entries
+elsewhere? Where?
+
 XOR-Values
 ----------
 
