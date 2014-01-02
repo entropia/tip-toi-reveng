@@ -26,7 +26,7 @@ Some files are successfully decoded. Known so far:
 Open issues
 -----------
 
- * What is the meaning of the bytes before the OGG file table?
+ * What is the meaning of the bytes before the OGG file table? Some ideas in Table-Notes.md.
  * The last four bytes are likely some kind of checksum. Which checksum?
 
 Links
