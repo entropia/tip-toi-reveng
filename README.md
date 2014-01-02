@@ -18,10 +18,9 @@ What we have
 ------------
 
 Some files are successfully decoded. Known so far:
+ * `WWW_Bauernhof.gme` (MD5 sum `9e4a8bfcb33346dd4dcdc888ee6e20ba`)
  * `WWW_Feuerwehr.gme` (MD5 sum `19812ec9a96e09326a27173b28d6671d`)
  * `Leserabe_een.gme` (MD5s sum `f16660fb7ee59bb4deb5390bb78f8860`), but playback is too fast
-
-Other files are not played, despite a correct CRC header.
 
 Open issues
 -----------
