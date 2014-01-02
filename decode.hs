@@ -18,14 +18,14 @@ oggTableOffset = do
     getWord32le
 
 oggTable :: Word32 -> Get [(Word32, Word32)]
-oggTable offset = skip (fromIntegral offset) >> go
-  where
-    go = do
+oggTable offset = do
+    skip (fromIntegral offset)
+    until <- lookAhead getWord32le
+    let n_entries = fromIntegral ((until - offset) `div` 8)
+    replicateM n_entries $ do
         ptr <- getWord32le
-        if ptr /= 0 then do
-            len <- getWord32le
-            ((ptr, len) :) <$> go
-        else return []
+        len <- getWord32le
+        return (ptr, len)
 
 checkOT :: B.ByteString -> ((Word32, Word32), Int) -> IO Bool
 checkOT ogg ((off, len), n) =
