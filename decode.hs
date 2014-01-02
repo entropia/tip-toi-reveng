@@ -92,10 +92,14 @@ main = do
         let rawogg = runGet (extract oo ol) bytes
         let filename = "oggs/" ++ file ++ printf "_%08x" oo ++ ".ogg"
         let ogg = decypher x rawogg
-        B.writeFile filename ogg
-        printf "Dumped decyphered ogg file to %s\n" filename
-        when (x `B.elem` (B.take 58 rawogg)) $
-            printf "Found XOR magic %02X in %s\n" x filename
-        checkOgg ogg
+        if B.null ogg
+        then do
+            printf "File %s would be empty...\n" filename
+        else do
+            B.writeFile filename ogg
+            printf "Dumped decyphered ogg file to %s\n" filename
+            -- when (x `B.elem` (B.take 58 rawogg)) $
+            --    printf "Found XOR magic %02X in %s\n" x filename
+            checkOgg ogg
 
 
