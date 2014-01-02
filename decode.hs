@@ -102,10 +102,10 @@ main = do
     printf "First Ogg magic xored: %s\n" (show (B.map (xor x) (B.take 4 ogg)))
     printf "Table entries: %d\n" (length ot)
 
-    ot_fixed <- filterM (checkOT bytes) (zip ot [0..])
+    ot_fixed <- map fst <$> filterM (checkOT bytes) (zip ot [0..])
 
     createDirectoryIfMissing False "oggs"
-    forM_ ot $ \(oo,ol) -> do
+    forM_ ot_fixed $ \(oo,ol) -> do
         let rawogg = runGet (extract oo ol) bytes
         let filename = "oggs/" ++ file ++ printf "_%08x" oo ++ ".ogg"
         let ogg = decypher x rawogg
