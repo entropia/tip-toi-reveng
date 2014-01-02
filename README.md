@@ -29,14 +29,11 @@ Open issues
  * What is the meaning of the bytes before the OGG file table?
  * The last four bytes are likely some kind of checksum. Which checksum?
 
-XOR-Values
-----------
+Links
+-----
 
-(Find with `findxor.hs`, or `decode.hs`)
-
- * WWW_Bauernhof.gme: `0xAD`
- * WWW_Feuerwehr.gme: `0x3B`
- * Leserabe_een.gme: `0xDD`
+ * Discussion about Tip-Toi: http://www.quadrierer.de/geekythinking/blog/?itemid=368
+ * Discussion about Tip-Toi and the related TING pen: http://www.mikrocontroller.net/topic/214479
 
 Tools
 -----
