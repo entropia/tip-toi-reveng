@@ -47,6 +47,23 @@ getJumpTable bytes offset =
                 runGet (extract from (to - from)) bytes
         Nothing -> []
 
+-- Length correlation for 0100 jump table lines
+hyp1 :: B.ByteString -> Bool
+hyp1 b =
+    if not (B.null b) && b `B.index` 0 == 0x01
+    then B.length b == 16 + fromIntegral (b `B.index` 10) * 9
+    else True
+
+hyp2 :: B.ByteString -> Bool
+hyp2 b =
+    if not (B.null b) && b `B.index` 0 == 0x01
+    then B.pack [0x01,0x00,0x00,0x00,0x00,0xF9,0xFF,0x01] `B.isPrefixOf` b
+    else True
+
+hyps = [ (hyp1, "01 line length")
+       , (hyp2, "01 prefix") ]
+
+
 audioTableOffset :: Get Word32
 audioTableOffset = do
     skip 4
@@ -122,7 +139,7 @@ checkPageCRC ogg page =
 -}
 
 prettyPrint :: B.ByteString -> String
-prettyPrint = concat . map (flip showHex "") . B.unpack
+prettyPrint = concat . map (printf "%02X") . B.unpack
 
 main = do
     args <- getArgs
@@ -185,6 +202,14 @@ main = do
         printf "Jump table at %08X:\n" o
         forM_ jt $ \line ->
             printf "    %s\n" (prettyPrint line)
+
+    forM_ hyps $ \(hyp, desc) -> do
+        let wrong = filter (not. hyp) (concat jts)
+        if null wrong
+        then printf "All lines do satisfy hypothesis \"%s\"!\n" desc
+        else do
+            printf "These lines do not satisfy hypothesis \"%s\":\n" desc
+            forM_ wrong $ \line -> printf "    %s\n" (prettyPrint line)
 
     let known_segments =
             [ (0, 4, "Main table address") ] ++

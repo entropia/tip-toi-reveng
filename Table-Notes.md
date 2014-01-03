@@ -60,4 +60,13 @@ In `WWW_Feuerwehr.gme`, this pattern is for example found at `0x00025e4`
 
   * This is likely the end, because the next two bytes (at`0x27b2`, `1000`) begin another round of this pattern.
 
+Jump table lines
+----------------
+
+Jump table lines seem to come in two varieties:
+ * Starting with `0200`
+ * Starting with `0100`.
+  - The 11th byte seems to correlate with the length of the line, but a simple formula does not fit all lines.
+  - Always of the form `0100 0000 00F9 FF01` followed by a byte (often increasing within one table), followed by the supposed length byte. Verified for all but one line in `Bauernhof`!
+
 
