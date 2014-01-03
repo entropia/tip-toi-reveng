@@ -139,7 +139,9 @@ checkPageCRC ogg page =
 -}
 
 prettyPrint :: B.ByteString -> String
-prettyPrint = concat . map (printf "%02X") . B.unpack
+prettyPrint = spaceout . map (printf "%02X") . B.unpack
+  where spaceout (a:b:c:d:r) = a ++ b ++ c ++ d ++ " " ++ spaceout r
+        spaceout r = concat r
 
 main = do
     args <- getArgs
