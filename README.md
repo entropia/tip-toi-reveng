@@ -7,12 +7,13 @@ What we know
 ------------
 
 All offsets are from the beginning of the file.
- * At offset 4 is a 32bit offset of an ogg file table
- * The ogg file table consists of pairs of offsets and length, and ends at the position
+ * At offset 4 is a 32bit offset of an audio file table
+ * The audio file table consists of pairs of offsets and length, and ends at the position
    of the first entry. (No explicit length found).
- * The ogg file is encrypted using a simple scheme, using a magic XOR value (`x`):
+ * The audio file is encrypted using a simple scheme, using a magic XOR value (`x`):
    - The values `0x00`, `0xFF`, `x` and `x XOR 0xFF` are left alone
    - Everything else is XORed bytewise by x.
+ * Usually, thes are OGG files, sometimes these are RIFF (i.e. wav) files.
  * This is verified by checking the CRC header of the OGG files
 
 What we have
