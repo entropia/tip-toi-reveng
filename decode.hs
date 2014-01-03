@@ -32,7 +32,7 @@ mainTable offset = do
     replicateM n_entries getWord32le
 
 getJumpTable :: B.ByteString -> Word32 -> [B.ByteString]
-getJumpTable bytes offset = 
+getJumpTable bytes offset =
     let mboffs = flip runGet bytes $ do
         skip (fromIntegral offset)
         -- Check if we have the pattern described in Table-Notes.md
@@ -73,72 +73,104 @@ hyp4 b =
     then b `B.index` 0 == 0x02
     else True
 
-hyp5 :: B.ByteString -> Bool
-hyp5 = runGet ff
+data Command
+    = A Word16 [Word16]
+    | B Word16 [Word16]
+    | C [Word16]
+    | D B.ByteString
+    | E B.ByteString
+    | F1 Word16 Word8
+    | F2 Word16 Word8 Word16
+    | G
+    | Z
+
+data Line = Line Word16 [Command]
+
+prettyPrintLine :: Line -> String
+prettyPrintLine (Line t cs) = show t ++ ": " ++ intercalate " " (map prettyPrintCommand cs)
+
+prettyPrintCommand :: Command -> String
+prettyPrintCommand (A n xs) = printf "A(%d,[%s])" n (intercalate "," (map (printf "%d") xs))
+prettyPrintCommand (B n xs) = printf "B(%d,[%s])" n (intercalate "," (map (printf "%d") xs))
+prettyPrintCommand (C xs) = printf "C([%s])" (intercalate "," (map (printf "%d") xs))
+prettyPrintCommand (D b) = printf "D(%s)" (prettyPrint b)
+prettyPrintCommand (E b) = printf "D(%s)" (prettyPrint b)
+prettyPrintCommand (F1 n x) = printf "F1(%d,%d)" n x
+prettyPrintCommand (F2 n x y) = printf "F1(%d,%d,%d)" n x y
+prettyPrintCommand (G) = printf "G"
+prettyPrintCommand (Z) = printf "0x00"
+
+parseLine :: B.ByteString -> Maybe Line
+parseLine = runGet begin
  where
-    headers = [ -- (B.pack [0xF9,0xFF,0x01], format1)
-                (B.pack [0xFD,0x01], formatFD)
-              , (B.pack [0xE8,0xFF,0x01], format2)
-              , (B.pack [0xFF,0xFA,0x01,0xFF,0xFF], format2)
-              , (B.pack [0x00,0xFC,0x01], format2)
-              ]
+    headers =
+        [ (B.pack [0xE8,0xFF,0x01], format2 A)
+        , (B.pack [0x00,0xFC,0x01], format2 B)
+        , (B.pack [0xFF,0xFA,0x01,0xFF,0xFF], format2 (const C))
+        , (B.pack [0x00,0xFD,0x01], skipFormat 3 D)
+        , (B.pack [0xF0,0xFF,0x01], skipFormat 4 E)
+        , (B.pack [0xF9,0xFF,0x01], formatF9)
+        , (B.pack [0xFB,0xFF,0x01], skipFormat 6 (const G))
+        , (B.pack [0x00], zero)
+        ]
     -- Find the occurrence of a header
-    ff = do
+    begin = do
         done <- isEmpty
-        if done then return True else do
-        r <- getRemainingLazyByteString
-        if any (\(h,f) -> h `B.isPrefixOf` r) headers
-        then go
-        else skip 1 >> ff
+        if done
+        then return Nothing
+        else do
+            tag <- getWord16le
+            b <- getLazyByteString 3
+            unless (b == B.pack [0,0,0]) $ do
+                fail "Not 0x000000 after line tag"
+            cs <- getCmds
+            return $ Just (Line tag cs)
 
-    format0 = do
-        skip 1
-        return True
-
-    format1 = do
-        r <- remaining
-        if (r < 7) then return False else do
-        skip 7
-        return True
-
-    formatFD = do
-        r <- remaining
-        if (r < 5) then return False else do
-        skip 5
-        return True
-
-    format2 = do
-        skip 5
-        n <- getWord16le
-
-        r <- remaining
-        if (n > 0 && r < fromIntegral n * 2) then return False else do
-
-        replicateM (fromIntegral n) getWord16le
-        return True
-
-    go = do
+    getCmds = do
         done <- isEmpty
-        if done then return True else do
+        if done then return [] else do
 
         r <- getRemainingLazyByteString
         case find (\(h,f) -> h `B.isPrefixOf` r) headers of
           Just (h,f) -> do
-            ok <- f
-            if ok
-                then go
-                else return False
-          Nothing -> do
-            if B.pack [0x00] `B.isPrefixOf` r
-                then skip 1 >> go
-                else return False
+            c <- f
+            cs <- getCmds
+            return $ c:cs
+          Nothing -> fail $ "unexpected command: " ++ prettyPrint r
+
+    skipFormat n con = do
+        skip 3
+        bs <- getLazyByteString n
+        return $ con bs
+
+    zero = do
+        skip 1
+        return Z
+
+    formatF9 = do
+        skip 3
+        n <- getWord16le
+        y <- getWord8
+        if (y == 0)
+        then do
+            x <- getWord8
+            return $ F1 n x
+        else do
+            x <- getWord16le
+            return $ F2 n y x
+
+    format2 con = do
+        skip 3
+        m <- getWord16le
+        n <- getWord16le
+        xs <- replicateM (fromIntegral n) getWord16le
+        return $ con m xs
 
 
 hyps = [ -- (hyp1, "01 line length")
          (hyp2, "01 fixed prefix")
        , (hyp3, "00F9 FF01 at bytes 4-7")
        , (hyp4, "00F9 FF01 at bytes 12-15 only in 0200-lines")
-       , (hyp5, "E8 FF 01 format known!")
        ]
 
 
@@ -271,17 +303,22 @@ main = do
         mt  = runGet (mainTable mto) bytes
     printf "Main table offset: %08X\n" mto
     printf "Main table entries: %d\n" (length mt)
-    printf "Invalid main table entries: %d\n" (length (filter (== 0xFFFFFFFF) mt))
+    printf "Invalid main table entries: %d\n " (length (filter (== 0xFFFFFFFF) mt))
+    printf "Large main table entries: %d\n" (length (filter (> ato) mt))
     printf "First two entries: %08X %08X\n" (mt !! 0) (mt !! 1)
 
-    let jtos = filter (/= 0xFFFFFFFF) (drop 2 mt)
+    let jtos = filter (< ato) $
+               filter (/= 0xFFFFFFFF) (drop 2 mt)
     let jts = map (getJumpTable bytes) jtos
 
     printf "%d Jump tables follow:\n" (length jts)
     forM_ (zip jtos jts) $ \(o, jt) -> do
         printf "Jump table at %08X:\n" o
-        forM_ jt $ \line ->
-            printf "    %s\n" (prettyPrint line)
+        forM_ jt $ \line -> do
+            maybe
+                (printf "    --\n")
+                (printf "    %s\n" . prettyPrintLine)
+                (parseLine line)
 
     forM_ hyps $ \(hyp, desc) -> do
         let wrong = filter (not. hyp) (concat jts)

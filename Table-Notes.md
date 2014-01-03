@@ -70,13 +70,15 @@ Jump table lines seem to come in two varieties:
   - Always of the form `0100 0000 00F9 FF01` followed by a byte (often increasing within one table), followed by the supposed length byte. Verified for all but one line in `Bauernhof`, which starts with `0100001E00F9FF01`!
 
 For both holds:
- * At bytes 4-7, there is always `00F9 FF01`. Sometimes, this squence also appears at bytes 12-15, but only for lines starting with `0200`.
- * Command `E8FF01` is
-   - followed by a 16-bit number (often `0000`), and then followed by either
-   - a 16 bit number (often zero), followed by a list of that many rather small 16 bit numbers (media file indices?), with an additional `0000` at the end.
- * Command `FFFa01` has the same format, alsways followed by `FFFF`
- * Command `00FC01` has the same format.
- * Command `FD01` is followed three more bytes
- * `00` can appear in between
- * `F9 FF01` is sometimes followed by 4 and sometimes by 6 bytes.
+ * After 5 bytes, there is a sequence of these possible commands:
+ * **A**: Command `E8FF01 mmmm nnnn xs...`, where `m` and `n` are 16-bit numbers, and `xs` a sequence of `n` 16-bit numbers (rather small, media file indices?)
+ * **B**: Command `00FC01 mmmm nnnn xs` has the same format.
+ * **C**: Command `FFFA01 FFFF nnnn xs` has the same format, with always `m = FFFF`
+ * **D**: Command `00FD01` is followed by three more bytes
+ * **E**: Command `F0FF01` is followed by four more bytes
+ * Command `F9FF01` comes in two variants of differing lengths:
+   - **F1**: `F9 FF01 nnnn 00xx` where `n` is a 16-bit number, and `xx` one byte
+   - **F2**: `F9 FF01 nnnn yy xxxxx` where `n` and `x` is a 16-bit number, and `y` is not zero
+ * **G**: Command `FB FF01 0300 0200 0300` occurs once
+ * `00` can appear in between (which makes it likely that our understanding is not complete).
 
