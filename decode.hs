@@ -140,7 +140,7 @@ checkPageCRC ogg page =
 
 prettyPrint :: B.ByteString -> String
 prettyPrint = spaceout . map (printf "%02X") . B.unpack
-  where spaceout (a:b:c:d:r) = a ++ b ++ c ++ d ++ " " ++ spaceout r
+  where spaceout (a:b:r) = a ++ b ++ " " ++ spaceout r
         spaceout r = concat r
 
 main = do
