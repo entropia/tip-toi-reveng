@@ -60,8 +60,15 @@ hyp2 b =
     then B.pack [0x01,0x00,0x00,0x00,0x00,0xF9,0xFF,0x01] `B.isPrefixOf` b
     else True
 
+hyp3 :: B.ByteString -> Bool
+hyp3 b =
+    if not (B.null b)
+    then B.pack [0x00,0xF9,0xFF,0x01] `B.isPrefixOf` (B.drop 4 b)
+    else True
+
 hyps = [ (hyp1, "01 line length")
-       , (hyp2, "01 prefix") ]
+       , (hyp2, "01 prefix")
+       , (hyp3, "00F9 FF01 at bytes 4-7") ]
 
 
 audioTableOffset :: Get Word32

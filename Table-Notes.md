@@ -66,7 +66,10 @@ Jump table lines
 Jump table lines seem to come in two varieties:
  * Starting with `0200`
  * Starting with `0100`.
-  - The 11th byte seems to correlate with the length of the line, but a simple formula does not fit all lines.
+  - The 11th byte seems to correlate with the length of the line, but a simple formula does not fit all lines. In WWW_Feuerwehr, it it at least 16 bytes long, in Bauernhof only 14.
   - Always of the form `0100 0000 00F9 FF01` followed by a byte (often increasing within one table), followed by the supposed length byte. Verified for all but one line in `Bauernhof`, which starts with `0100001E00F9FF01`!
+
+For both holds:
+ *  At bytes 4-7, there is always `00F9 FF01`. Sometimes, this squence also appears at bytes 12-15, but only for lines starting with `0200`.
 
 
