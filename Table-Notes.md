@@ -12,10 +12,12 @@ After some header information and lots of zeros, there are obvious offset tables
 
 The beginnig of these tables (`0x0200`) is also the first byte of the file!
 
-The tables end at `0x0828`, which is the begin of the first instance of the following pattern. This is also the third entry in the first offset table. (Confirmed in WWW_Bauernhof.gme)
+ * The first two entries point somewhere in the table.
+ * All other entries are either `0xFFFFFFFF`, or point somewhere that follows the jump table pattern below.
+ * Not all jump tables are referenced from the main table.
 
-Patterns
---------
+Jump table pattern
+------------------
 
 There is a pattern, consisting of
  * A number,  16 bit. Commonly 16 or 17.

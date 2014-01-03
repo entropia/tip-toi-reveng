@@ -9,8 +9,41 @@ import Data.Char
 import Data.Functor
 import Control.Monad
 import System.Directory
+import Numeric (showHex)
 
 --import Codec.Container.Ogg.Page
+
+mainTableOffset :: Get Word32
+mainTableOffset = do
+    getWord32le
+
+mainTable :: Word32 -> Get [Word32]
+mainTable offset = do
+    skip (fromIntegral offset)
+    -- It seems that the third entry points to the end of the table
+    until <- lookAhead $ do
+        skip 4
+        skip 4
+        getWord32le
+    let n_entries = fromIntegral ((until - offset) `div` 8)
+    replicateM n_entries getWord32le
+
+getJumpTable :: B.ByteString -> Word32 -> [B.ByteString]
+getJumpTable bytes offset = 
+    let mboffs = flip runGet bytes $ do
+        skip (fromIntegral offset)
+        -- Check if we have the pattern described in Table-Notes.md
+        n <- getWord16le
+        first <- lookAhead getWord32le
+        if (offset + 2 + fromIntegral n * 4 == first) then do
+            Just <$> replicateM (fromIntegral n) getWord32le
+        else return Nothing
+    in case mboffs of
+        Just offs -> do
+            -- Ignore the last one for now, until we know how it is terminated
+            flip map (zip offs (tail offs ++ [last offs])) $ \(from, to) -> do
+                runGet (extract from (to - from)) bytes
+        Nothing -> []
 
 oggTableOffset :: Get Word32
 oggTableOffset = do
@@ -80,6 +113,9 @@ checkPageCRC ogg page =
     in raw_page == raw_page'
 -}
 
+prettyPrint :: B.ByteString -> String
+prettyPrint = concat . map (flip showHex "") . B.unpack
+
 main = do
     args <- getArgs
     file <- case args of
@@ -90,6 +126,7 @@ main = do
             exitFailure
     bytes <- B.readFile file
 
+    -- Ogg file stuff
     let oto = runGet oggTableOffset bytes
         ot = runGet (oggTable oto) bytes
         (oo,ol,_) = head ot
@@ -101,10 +138,11 @@ main = do
     printf "XOR value: %02X\n" x
     printf "First Ogg magic: %s\n" (show (B.take 4 ogg))
     printf "First Ogg magic xored: %s\n" (show (B.map (xor x) (B.take 4 ogg)))
-    printf "Table entries: %d\n" (length ot)
+    printf "Ogg Table entries: %d\n" (length ot)
 
     ot_fixed <- filterM (checkOT bytes) ot
 
+    {-
     createDirectoryIfMissing False "oggs"
     forM_ ot_fixed $ \(oo,ol,n) -> do
         let rawogg = runGet (extract oo ol) bytes
@@ -121,10 +159,31 @@ main = do
             --    printf "Found XOR magic %02X in %s\n" x filename
 
             -- checkOgg ogg
+    -}
+
+    -- Other stuff
+
+    let mto = runGet mainTableOffset bytes
+        mt  = runGet (mainTable mto) bytes
+    printf "Main table offset: %08X\n" mto
+    printf "Main table entries: %d\n" (length mt)
+    printf "Invalid main table entries: %d\n" (length (filter (== 0xFFFFFFFF) mt))
+    printf "First two entries: %08X %08X\n" (mt !! 0) (mt !! 1)
+
+    let jtos = filter (/= 0xFFFFFFFF) (drop 2 mt)
+    let jts = map (getJumpTable bytes) jtos
+
+    printf "%d Jump tables follow:\n" (length jts)
+    forM_ (zip jtos jts) $ \(o, jt) -> do
+        printf "Jump table at %08X:\n" o
+        forM_ jt $ \line ->
+            printf "    %s\n" (prettyPrint line)
 
     let known_segments =
-            [ (0, 0, "Beginning of file") ] ++
+            [ (0, 4, "Main table address") ] ++
             [ (4, 4, "Ogg table address") ] ++
+            [ (mto, fromIntegral (4 * length mt), "Main table") ] ++
+            -- Add jump tables here. But how long are they?
             [ (oto, fromIntegral (8 * length ot), "Ogg table") ] ++
             [ (o, fromIntegral l, "Ogg file " ++ show n ) | (o,l,n) <- ot ]++
             [ (fromIntegral (B.length bytes), 0, "End of file") ]
