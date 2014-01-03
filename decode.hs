@@ -6,6 +6,7 @@ import Data.Binary.Get
 import Data.Word
 import Text.Printf
 import Data.Bits
+import Data.List
 import Data.Char
 import Data.Functor
 import Data.Maybe
@@ -66,9 +67,79 @@ hyp3 b =
     then B.pack [0x00,0xF9,0xFF,0x01] `B.isPrefixOf` (B.drop 4 b)
     else True
 
-hyps = [ (hyp1, "01 line length")
-       , (hyp2, "01 prefix")
-       , (hyp3, "00F9 FF01 at bytes 4-7") ]
+hyp4 :: B.ByteString -> Bool
+hyp4 b =
+    if B.pack [0x00,0xF9,0xFF,0x01] `B.isPrefixOf` (B.drop 12 b)
+    then b `B.index` 0 == 0x02
+    else True
+
+hyp5 :: B.ByteString -> Bool
+hyp5 = runGet ff
+ where
+    headers = [ -- (B.pack [0xF9,0xFF,0x01], format1)
+                (B.pack [0xFD,0x01], formatFD)
+              , (B.pack [0xE8,0xFF,0x01], format2)
+              , (B.pack [0xFF,0xFA,0x01,0xFF,0xFF], format2)
+              , (B.pack [0x00,0xFC,0x01], format2)
+              ]
+    -- Find the occurrence of a header
+    ff = do
+        done <- isEmpty
+        if done then return True else do
+        r <- getRemainingLazyByteString
+        if any (\(h,f) -> h `B.isPrefixOf` r) headers
+        then go
+        else skip 1 >> ff
+
+    format0 = do
+        skip 1
+        return True
+
+    format1 = do
+        r <- remaining
+        if (r < 7) then return False else do
+        skip 7
+        return True
+
+    formatFD = do
+        r <- remaining
+        if (r < 5) then return False else do
+        skip 5
+        return True
+
+    format2 = do
+        skip 5
+        n <- getWord16le
+
+        r <- remaining
+        if (n > 0 && r < fromIntegral n * 2) then return False else do
+
+        replicateM (fromIntegral n) getWord16le
+        return True
+
+    go = do
+        done <- isEmpty
+        if done then return True else do
+
+        r <- getRemainingLazyByteString
+        case find (\(h,f) -> h `B.isPrefixOf` r) headers of
+          Just (h,f) -> do
+            ok <- f
+            if ok
+                then go
+                else return False
+          Nothing -> do
+            if B.pack [0x00] `B.isPrefixOf` r
+                then skip 1 >> go
+                else return False
+
+
+hyps = [ -- (hyp1, "01 line length")
+         (hyp2, "01 fixed prefix")
+       , (hyp3, "00F9 FF01 at bytes 4-7")
+       , (hyp4, "00F9 FF01 at bytes 12-15 only in 0200-lines")
+       , (hyp5, "E8 FF 01 format known!")
+       ]
 
 
 audioTableOffset :: Get Word32
