@@ -73,6 +73,24 @@ hyp4 b =
     then b `B.index` 0 == 0x02
     else True
 
+{- Not true
+hyp5 :: B.ByteString -> Bool
+hyp5 b = case parseLine b of
+    Just l -> case l of
+        Line _ _ (F2 _ n _ : cmds) -> case last cmds of
+            A _ xs -> fromIntegral n == length xs
+            _ -> False
+        _ -> True
+    Nothing -> True
+-}
+
+hyps = [ -- (hyp1, "01 line length")
+         (hyp2, "01 fixed prefix")
+       , (hyp3, "00F9 FF01 at bytes 4-7")
+       , (hyp4, "00F9 FF01 at bytes 12-15 only in 0200-lines")
+       -- , (hyp5, "F2(_,n,_) indicates number of arguments to A(...)")
+       ]
+
 data Command
     = A Word16 [Word16]
     | B Word16 [Word16]
@@ -98,7 +116,7 @@ prettyPrintCommand (C xs) = printf "C([%s])" (intercalate "," (map (printf "%d")
 prettyPrintCommand (D b) = printf "D(%s)" (prettyHex b)
 prettyPrintCommand (E b) = printf "D(%s)" (prettyHex b)
 prettyPrintCommand (F1 n x) = printf "F1(%d,%d)" n x
-prettyPrintCommand (F2 n x y) = printf "F1(%d,%d,%d)" n x y
+prettyPrintCommand (F2 n x y) = printf "F2(%d,%d,%d)" n x y
 prettyPrintCommand (G) = printf "G"
 prettyPrintCommand (Z) = printf "0x00"
 
@@ -166,12 +184,6 @@ parseLine = runGet begin
         xs <- replicateM (fromIntegral n) getWord16le
         return $ con m xs
 
-
-hyps = [ -- (hyp1, "01 line length")
-         (hyp2, "01 fixed prefix")
-       , (hyp3, "00F9 FF01 at bytes 4-7")
-       , (hyp4, "00F9 FF01 at bytes 12-15 only in 0200-lines")
-       ]
 
 checkLine :: Int -> Line -> [String]
 checkLine n_audio (Line _ _ cmds) =
@@ -345,7 +357,12 @@ main = do
         then printf "All lines do satisfy hypothesis \"%s\"!\n" desc
         else do
             printf "These lines do not satisfy hypothesis \"%s\":\n" desc
-            forM_ wrong $ \line -> printf "    %s\n" (prettyHex line)
+            forM_ wrong $ \line -> case parseLine line of
+                Nothing -> do
+                    printf "    --\n"
+                Just l -> do
+                    printf "    %s\n" (prettyHex line)
+                    printf "    %s\n" (prettyPrintLine l)
 
     let known_segments =
             [ (0, 4, "Main table address") ] ++
