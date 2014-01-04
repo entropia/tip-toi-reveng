@@ -88,8 +88,8 @@ data Line = Line Word8 B.ByteString [Command]
 
 prettyPrintLine :: Line -> String
 prettyPrintLine (Line t b cs) = show t ++ extra ++ ": " ++ intercalate " " (map prettyPrintCommand cs)
-  where extra | B.null b  = ""
-              | otherwise = "[" ++ prettyHex b ++ "]"
+  where extra | b == B.pack [0,0,0,0]  = ""
+              | otherwise              = "[" ++ prettyHex b ++ "]"
 
 prettyPrintCommand :: Command -> String
 prettyPrintCommand (A n xs) = printf "A(%d,[%s])" n (intercalate "," (map (printf "%d") xs))
@@ -172,6 +172,22 @@ hyps = [ -- (hyp1, "01 line length")
        , (hyp3, "00F9 FF01 at bytes 4-7")
        , (hyp4, "00F9 FF01 at bytes 12-15 only in 0200-lines")
        ]
+
+checkLine :: Int -> Line -> [String]
+checkLine n_audio (Line _ _ cmds) =
+    concatMap (checkCommand n_audio) cmds
+
+checkCommand :: Int -> Command -> [String]
+checkCommand n_audio c@(A _ xs)
+    | any (>= fromIntegral n_audio) xs
+    = return $ "Invalid audio index in command " ++ prettyPrintCommand c
+checkCommand n_audio c@(B _ xs)
+    | any (>= fromIntegral n_audio) xs
+    = return $ "Invalid audio index in command " ++ prettyPrintCommand c
+checkCommand n_audio c@(C xs)
+    | any (>= fromIntegral n_audio) xs
+    = return $ "Invalid audio index in command " ++ prettyPrintCommand c
+checkCommand n_audio c = []
 
 
 audioTableOffset :: Get Word32
@@ -315,12 +331,13 @@ main = do
     printf "%d Jump tables follow:\n" (length jts)
     forM_ (zip jtos jts) $ \(o, jt) -> do
         printf "Jump table at %08X:\n" o
-        forM_ jt $ \line -> do
-            --printf "    %s\n" (prettyHex line)
-            maybe
-                (printf "    --\n")
-                (printf "    %s\n" . prettyPrintLine)
-                (parseLine line)
+        forM_ jt $ \line -> case parseLine line of
+            Nothing -> do
+                printf "    --\n"
+            Just l -> do
+                -- printf "    %s\n" (prettyHex line)
+                printf "    %s\n" (prettyPrintLine l)
+                mapM_  (printf "     * %s\n") (checkLine (length at) l)
 
     forM_ hyps $ \(hyp, desc) -> do
         let wrong = filter (not. hyp) (concat jts)

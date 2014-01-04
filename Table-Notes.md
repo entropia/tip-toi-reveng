@@ -75,7 +75,7 @@ Command lines have the form
 The first command is always command **F1** or **F2**.
 
 This list of commands is exhaustive, but may nevertheless be wrong:
- * **A**: Command `E8FF01 mmmm nnnn xs...`, where `m` and `n` are 16-bit numbers, and `xs` a sequence of `n` 16-bit numbers (rather small, media file indices?)
+ * **A**: Command `E8FF01 mmmm nnnn xs...`, where `m` and `n` are 16-bit numbers, and `xs` a sequence of `n` 16-bit numbers. These 16-bit numbers seem to be media indicies (never too large, the referenced audio files are related in some way).
  * **B**: Command `00FC01 mmmm nnnn xs` has the same format.
  * **C**: Command `FFFA01 FFFF nnnn xs` has the same format, with always `m = FFFF`
  * **D**: Command `00FD01` is followed by three more bytes
