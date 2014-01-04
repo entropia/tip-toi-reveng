@@ -72,9 +72,9 @@ Command lines have the form
  * `0200 0000 00` followed by commands, or
  * `0100 0000 00` followed by commands, or (precisely once so far)
  * `0100 001E 00`
-The first command is always command **F1** or **F2**.
+The first command is always command **F1** or **F2**. There is at most one **F2** command per line.
 
-Commands are terminated by either `0x00`, or a **A**, **B**, or **C** command with a non-empty argument list. Before the terminating command, such commands to *not* occur.
+Commands are terminated by either `0x00`, or a **A**, **B**, or **C** command with a non-empty argument list. Before the terminating command, such commands to *not* occur. **C** only occurs in the last position.
 
 This list of commands is exhaustive, but may nevertheless be wrong:
  * **A**: Command `E8FF01 mmmm nnnn xs...`, where `m` and `n` are 16-bit numbers, and `xs` a sequence of `n` 16-bit numbers. These 16-bit numbers are media indicies. The `m` number seems to play that file.
@@ -86,5 +86,5 @@ This list of commands is exhaustive, but may nevertheless be wrong:
  * Command `F9FF01` comes in two variants of differing lengths:
    - **F1**: `F9 FF01 nnnn 00xx` where `n` is a 16-bit number, and `xx` one byte
      If this is the first command in the line, it is followed by `0x00`, otherwise not. (huh?)
-   - **F2**: `F9 FF01 nnnn yy xxxxx 00` where `n` and `x` is a 16-bit number, and `y` is not zero. In that case, `y` indicates the number of commands in this line.
+   - **F2**: `F9 FF01 nnnn yy 00 bb 00` where `n` is a 16-bit numbers, and `y` is not zero, and `a` is an 8-bit-number. In that case, `y` indicates the number of following commands in this line.
  * **G**: Command `FB FF01 0300 0200 0300` occurs once

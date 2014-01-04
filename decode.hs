@@ -107,6 +107,18 @@ hyp7 b = case parseLine b of
         _ -> True
     Nothing -> True
 
+hyp8 :: B.ByteString -> Bool
+hyp8 b = case parseLine b of
+    Just l -> case l of
+        Line _ _ cmds -> 
+            test cmds ||
+            -- Special casing: For some files, we have extra 0x00 00 at the end of every line
+            (if [Z,Z] `isSuffixOf` cmds then test (take (length cmds - 2) cmds) else False)
+    Nothing -> True
+    where isC (C {}) = True
+          isC _ = False
+          test cmds = all (not . isC) (init cmds)
+
 hyps = [ -- (hyp1, "01 line length")
          (hyp2, "01 fixed prefix")
        , (hyp3, "00F9 FF01 at bytes 4-7")
@@ -114,6 +126,7 @@ hyps = [ -- (hyp1, "01 line length")
        -- , (hyp5, "F2(_,n,_) indicates number of arguments to A(...)")
        , (hyp6, "0x00 or non-empty A,B,C terminate commands")
        , (hyp7, "F2 indicates number of commands")
+       , (hyp8, "C is last command in line")
        ]
 
 data Command
@@ -123,7 +136,7 @@ data Command
     | D B.ByteString
     | E B.ByteString
     | F1 Word16 Word8
-    | F2 Word16 Word8 Word16
+    | F2 Word16 Word8 Word8
     | G
     | Z
     deriving Eq
@@ -142,7 +155,7 @@ prettyPrintCommand (C xs) = printf "C([%s])" (intercalate "," (map (printf "%d")
 prettyPrintCommand (D b) = printf "D(%s)" (prettyHex b)
 prettyPrintCommand (E b) = printf "D(%s)" (prettyHex b)
 prettyPrintCommand (F1 n x) = printf "F1(%d,%d)" n x
-prettyPrintCommand (F2 n x y) = printf "F2(%d,%d,%d)" n x y
+prettyPrintCommand (F2 n x b) = printf "F2(%d,%d,%d)" n x b
 prettyPrintCommand (G) = printf "G"
 prettyPrintCommand (Z) = printf "0x00"
 
@@ -203,9 +216,10 @@ parseLine = runGet begin
                 return ()
             return $ F1 n x
         else do
-            x <- getWord16le
             0 <- getWord8
-            return $ F2 n y x
+            b <- getWord8
+            0 <- getWord8
+            return $ F2 n y b
 
     format2 con _ = do
         skip 3
