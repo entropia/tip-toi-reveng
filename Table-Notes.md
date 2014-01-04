@@ -72,7 +72,7 @@ Command lines have the form
  * `0200 0000 00` followed by commands, or
  * `0100 0000 00` followed by commands, or (precisely once so far)
  * `0100 001E 00`
-The first command is always command **F1** or **F2**. There is at most one **F2** command per line.
+The first command is always command **F1** or **F2**. There is at most one **F2** or **G** command per line. **F2** or **G** gives the number of commands, but what if **F2** is not the first command? Then it follows one **F1** with non-zero `x`.
 
 Commands are terminated by either `0x00`, or a **A**, **B**, or **C** command with a non-empty argument list. Before the terminating command, such commands to *not* occur. **C** only occurs in the last position.
 
@@ -87,4 +87,10 @@ This list of commands is exhaustive, but may nevertheless be wrong:
    - **F1**: `F9 FF01 nnnn 00xx` where `n` is a 16-bit number, and `xx` one byte
      If this is the first command in the line, it is followed by `0x00`, otherwise not. (huh?)
    - **F2**: `F9 FF01 nnnn yy 00 bb 00` where `n` is a 16-bit numbers, and `y` is not zero, and `a` is an 8-bit-number. In that case, `y` indicates the number of following commands in this line.
- * **G**: Command `FB FF01 aaaa bbbb cccc`
+ * **G**: Command `FB FF01 aaaa bbbb cccc`. Seems to be simliar to **F2**, as `b` is the number of commands following.
+
+Is maybe **A** actually `0000 E8FF01`, and without `nnnn xs`? There is always `0000` in front... The only commands that do not end with `0000` are:
+ * **G**. Is always followed by **E**.
+ * **F1** with non-zero `x`. Is followed by **F2**, **G**
+ * **F2** with non-zero `b`. Is followed by **E** or **F1**
+
