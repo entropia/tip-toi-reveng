@@ -81,10 +81,10 @@ This list of commands is exhaustive, but may nevertheless be wrong:
  * **C**: Command `FFFA01 FFFF nnnn xs` has the same format, with always `m = FFFF`
  * **B**: Command `00FC01 aa bb nnnn xs`: Here `a` and `b` are 8-bit-values. This seems to be playing things in an alternating order.
  has the same format.
- * **D**: Command `00FD01` is followed by three more bytes
- * **E**: Command `F0FF01` is followed by four more bytes
+ * **D**: Command `00FD01 nn 0000`
+ * **E**: Command `F0FF01` is followed by four more bytes (so far only `0100 0000`).
  * Command `F9FF01` comes in two variants of differing lengths:
    - **F1**: `F9 FF01 nnnn 00xx` where `n` is a 16-bit number, and `xx` one byte
      If this is the first command in the line, it is followed by `0x00`, otherwise not. (huh?)
    - **F2**: `F9 FF01 nnnn yy 00 bb 00` where `n` is a 16-bit numbers, and `y` is not zero, and `a` is an 8-bit-number. In that case, `y` indicates the number of following commands in this line.
- * **G**: Command `FB FF01 0300 0200 0300` occurs once
+ * **G**: Command `FB FF01 aaaa bbbb cccc`

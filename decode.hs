@@ -133,11 +133,11 @@ data Command
     = A Word16 [Word16]
     | B Word8 Word8 [Word16]
     | C [Word16]
-    | D B.ByteString
-    | E B.ByteString
+    | D Word8
+    | E
     | F1 Word16 Word8
     | F2 Word16 Word8 Word8
-    | G
+    | G Word16 Word16 Word16
     | Z
     deriving Eq
 
@@ -152,11 +152,11 @@ prettyPrintCommand :: Command -> String
 prettyPrintCommand (A n xs) = printf "A(%d,[%s])" n (intercalate "," (map (printf "%d") xs))
 prettyPrintCommand (B a b xs) = printf "B(%d,%d,[%s])" a b (intercalate "," (map (printf "%d") xs))
 prettyPrintCommand (C xs) = printf "C([%s])" (intercalate "," (map (printf "%d") xs))
-prettyPrintCommand (D b) = printf "D(%s)" (prettyHex b)
-prettyPrintCommand (E b) = printf "D(%s)" (prettyHex b)
+prettyPrintCommand (D b) = printf "D(%d)" b
+prettyPrintCommand E = printf "E"
 prettyPrintCommand (F1 n x) = printf "F1(%d,%d)" n x
 prettyPrintCommand (F2 n x b) = printf "F2(%d,%d,%d)" n x b
-prettyPrintCommand (G) = printf "G"
+prettyPrintCommand (G a b c) = printf "G(%d,%d,%d)" a b c
 prettyPrintCommand (Z) = printf "0x00"
 
 parseLine :: B.ByteString -> Maybe Line
@@ -166,10 +166,10 @@ parseLine = runGet begin
         [ (B.pack [0xE8,0xFF,0x01], format2 A)
         , (B.pack [0x00,0xFC,0x01], formatB)
         , (B.pack [0xFF,0xFA,0x01,0xFF,0xFF], format2 (const C))
-        , (B.pack [0x00,0xFD,0x01], skipFormat 3 D)
-        , (B.pack [0xF0,0xFF,0x01], skipFormat 4 E)
+        , (B.pack [0x00,0xFD,0x01], formatD)
+        , (B.pack [0xF0,0xFF,0x01,0x01,0x00,0x00,0x00], const (skip 7 >> return E))
         , (B.pack [0xF9,0xFF,0x01], formatF9)
-        , (B.pack [0xFB,0xFF,0x01], skipFormat 6 (const G))
+        , (B.pack [0xFB,0xFF,0x01], formatG)
         , (B.pack [0x00], zero)
         ]
     -- Find the occurrence of a header
@@ -194,11 +194,6 @@ parseLine = runGet begin
             cs <- getCmds False
             return $ c:cs
           Nothing -> fail $ "unexpected command: " ++ prettyHex r
-
-    skipFormat n con _ = do
-        skip 3
-        bs <- getLazyByteString n
-        return $ con bs
 
     zero _ = do
         skip 1
@@ -235,6 +230,19 @@ parseLine = runGet begin
         n <- getWord16le
         xs <- replicateM (fromIntegral n) getWord16le
         return $ B a b xs
+
+    formatD _ = do
+        skip 3
+        b <- getWord8
+        0 <- getWord16le
+        return $ D b
+
+    formatG _ = do
+        skip 3
+        a <- getWord16le
+        b <- getWord16le
+        c <- getWord16le
+        return $ G a b c
 
 
 checkLine :: Int -> Line -> [String]
@@ -395,11 +403,12 @@ main = do
     printf "%d Jump tables follow:\n" (length jts)
     forM_ (zip jtos jts) $ \(o, jt) -> do
         printf "Jump table at %08X:\n" o
-        forM_ jt $ \line -> case parseLine line of
-            Nothing -> do
+        forM_ jt $ \line -> do
+            -- printf "    %s\n" (prettyHex line)
+            case parseLine line of
+              Nothing -> do
                 printf "    --\n"
-            Just l -> do
-                -- printf "    %s\n" (prettyHex line)
+              Just l -> do
                 printf "    %s\n" (prettyPrintLine l)
                 mapM_  (printf "     * %s\n") (checkLine (length at) l)
 
