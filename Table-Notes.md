@@ -72,6 +72,7 @@ Command lines have the form
  * `0200 0000 00` followed by commands, or
  * `0100 0000 00` followed by commands, or (precisely once so far)
  * `0100 001E 00`
+
 The first command is always command **F1** or **F2**. There is at most one **F2** or **G** command per line. **F2** or **G** gives the number of commands, but what if **F2** is not the first command? Then it follows one **F1** with non-zero `x`.
 
 Commands are terminated by either `0x00`, or a **A**, **B**, or **C** command with a non-empty argument list. Before the terminating command, such commands to *not* occur. **C** only occurs in the last position.
