@@ -8,20 +8,23 @@ Consider `WWW_Feuerwehr.gme`. Everything up to `00026C59` is unknown.
 Tables
 ------
 
-After some header information and lots of zeros, there are obvious offset tables at `0x200`,`0x2e0`, `0x380`, `0x438`, `0x500`, `0x5c8`, `0x690`, `0x6a4`, `0x700`, `0x768`, `0x7e0`, possibly separated by streaks of `0xffff` (or are these just invalid entries?).
+The first 32-bit-word is an offset into the file.
 
-The beginnig of these tables (`0x0200`) is also the first byte of the file!
+At that position, there is a sequence of of more offsets (32-bits). I call this the *main table*.
 
- * The first two entries point somewhere in the table.
- * All other entries are either `0xFFFFFFFF`, or point somewhere that follows the jump table pattern below.
- * Not all jump tables are referenced from the main table.
+For most files, the main table consists of
+ * At first, two 32-bit numbers that do not seem to be offsets. (What are they?)
+ * Then, 32-bit offsets that point to (what I call) *jump tables* (see below).
+ * In between these offsets, there are streaks of 0xFFFFFFFF.
 
 Jump table pattern
 ------------------
 
-There is a pattern, consisting of
+Thre are many jump tables, and they seem to be important. some are referneced from the main table, but not all. (where the others referenced from?)
+
+The table consists of
  * A number,  16 bit. Commonly 16 or 17.
- * That many offsets, the first one commonly pointing directly after the list
+ * That many offsets, the first one commonly pointing directly after the list. These point to what I call *command lines*.
 
 In `WWW_Feuerwehr.gme`, this pattern is for example found at `0x00025e4`
  * First two bytes `1100` (= 17)
@@ -45,7 +48,7 @@ In `WWW_Feuerwehr.gme`, this pattern is for example found at `0x00025e4`
         16. 9227 0000
         17. a227 0000
 
- * These are always at least 16 bytes apart, but can have odd lengths. The data pointed to is
+ * These point to these *command lines*:
 
          1. 0200 0000 00f9 ff01 0100 0005 00f9 ff01 0000 0200 0500 f0ff 0101 0000 00e8 ff01 0000 0100 2900 0000
          2. 0200 0000 00f9 ff01 0100 0005 00f9 ff01 0100 0500 0500 f9ff 0100 0000 00e8 ff01 0000 0000 e8ff 0101 0000 00e8 ff01 0200 0000 e8ff 0103 0004 002a 002b 002c 002d 0000 00
@@ -58,19 +61,17 @@ In `WWW_Feuerwehr.gme`, this pattern is for example found at `0x00025e4`
         16. 0100 0000 00f9 ff01 0f00 0000 0000 0000
         17. 0100 0000 00f9 ff01 1000 0000 0000 0000
 
-  * This is likely the end, because the next two bytes (at`0x27b2`, `1000`) begin another round of this pattern.
+  * This is likely the end, because the next two bytes (at`0x27b2`, `1000`) begin another round of this pattern. But in general it is not clear how the command lines are terminated.
 
-Jump table lines
-----------------
+Command lines
+-------------
 
-Jump table lines seem to come in two varieties:
- * Starting with `0200`
- * Starting with `0100`.
-  - The 11th byte seems to correlate with the length of the line, but a simple formula does not fit all lines. In WWW_Feuerwehr, it it at least 16 bytes long, in Bauernhof only 14.
-  - Always of the form `0100 0000 00F9 FF01` followed by a byte (often increasing within one table), followed by the supposed length byte. Verified for all but one line in `Bauernhof`, which starts with `0100001E00F9FF01`!
+Command lines have the form
+ * `0200 000 00` followed by commands, or
+ * `0100 000 00` followed by commands.
+The first command is always command **F1** or **F2**.
 
-For both holds:
- * After 5 bytes, there is a sequence of these possible commands:
+This list of commands is exhaustive, but may nevertheless be wrong:
  * **A**: Command `E8FF01 mmmm nnnn xs...`, where `m` and `n` are 16-bit numbers, and `xs` a sequence of `n` 16-bit numbers (rather small, media file indices?)
  * **B**: Command `00FC01 mmmm nnnn xs` has the same format.
  * **C**: Command `FFFA01 FFFF nnnn xs` has the same format, with always `m = FFFF`

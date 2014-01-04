@@ -93,8 +93,8 @@ prettyPrintCommand :: Command -> String
 prettyPrintCommand (A n xs) = printf "A(%d,[%s])" n (intercalate "," (map (printf "%d") xs))
 prettyPrintCommand (B n xs) = printf "B(%d,[%s])" n (intercalate "," (map (printf "%d") xs))
 prettyPrintCommand (C xs) = printf "C([%s])" (intercalate "," (map (printf "%d") xs))
-prettyPrintCommand (D b) = printf "D(%s)" (prettyPrint b)
-prettyPrintCommand (E b) = printf "D(%s)" (prettyPrint b)
+prettyPrintCommand (D b) = printf "D(%s)" (prettyHex b)
+prettyPrintCommand (E b) = printf "D(%s)" (prettyHex b)
 prettyPrintCommand (F1 n x) = printf "F1(%d,%d)" n x
 prettyPrintCommand (F2 n x y) = printf "F1(%d,%d,%d)" n x y
 prettyPrintCommand (G) = printf "G"
@@ -136,7 +136,7 @@ parseLine = runGet begin
             c <- f
             cs <- getCmds
             return $ c:cs
-          Nothing -> fail $ "unexpected command: " ++ prettyPrint r
+          Nothing -> fail $ "unexpected command: " ++ prettyHex r
 
     skipFormat n con = do
         skip 3
@@ -248,9 +248,10 @@ checkPageCRC ogg page =
     in raw_page == raw_page'
 -}
 
-prettyPrint :: B.ByteString -> String
-prettyPrint = spaceout . map (printf "%02X") . B.unpack
-  where spaceout (a:b:r) = a ++ b ++ " " ++ spaceout r
+prettyHex :: B.ByteString -> String
+prettyHex = spaceout . map (printf "%02X") . B.unpack
+  where spaceout (a:b:[]) = a ++ b
+        spaceout (a:b:r) = a ++ b ++ " " ++ spaceout r
         spaceout r = concat r
 
 main = do
@@ -326,7 +327,7 @@ main = do
         then printf "All lines do satisfy hypothesis \"%s\"!\n" desc
         else do
             printf "These lines do not satisfy hypothesis \"%s\":\n" desc
-            forM_ wrong $ \line -> printf "    %s\n" (prettyPrint line)
+            forM_ wrong $ \line -> printf "    %s\n" (prettyHex line)
 
     let known_segments =
             [ (0, 4, "Main table address") ] ++
