@@ -74,6 +74,8 @@ Command lines have the form
  * `0100 001E 00`
 The first command is always command **F1** or **F2**.
 
+Commands are terminated by either `0x00`, or a **A**, **B**, or **C** command with a non-empty argument list. Before the terminating command, such commands to *not* occur.
+
 This list of commands is exhaustive, but may nevertheless be wrong:
  * **A**: Command `E8FF01 mmmm nnnn xs...`, where `m` and `n` are 16-bit numbers, and `xs` a sequence of `n` 16-bit numbers. These 16-bit numbers seem to be media indicies (never too large, the referenced audio files are related in some way).
  * **B**: Command `00FC01 mmmm nnnn xs` has the same format.
@@ -82,7 +84,6 @@ This list of commands is exhaustive, but may nevertheless be wrong:
  * **E**: Command `F0FF01` is followed by four more bytes
  * Command `F9FF01` comes in two variants of differing lengths:
    - **F1**: `F9 FF01 nnnn 00xx` where `n` is a 16-bit number, and `xx` one byte
-   - **F2**: `F9 FF01 nnnn yy xxxxx` where `n` and `x` is a 16-bit number, and `y` is not zero
+     If this is the first command in the line, it is followed by `0x00`, otherwise not. (huh?)
+   - **F2**: `F9 FF01 nnnn yy xxxxx 00` where `n` and `x` is a 16-bit number, and `y` is not zero
  * **G**: Command `FB FF01 0300 0200 0300` occurs once
- * `00` can appear in between (which makes it likely that our understanding is not complete).
-

@@ -98,6 +98,7 @@ hyp6 b = case parseLine b of
         non_empty_list _ = False
         test cmds = (last cmds == Z || non_empty_list (last cmds))
                     && all (not . non_empty_list) (init cmds)
+                    && all (/= Z) (init cmds)
 
 
 hyps = [ -- (hyp1, "01 line length")
@@ -159,43 +160,47 @@ parseLine = runGet begin
         else do
             tag <- getWord8
             b <- getLazyByteString 4
-            cs <- getCmds
+            cs <- getCmds True
             return $ Just (Line tag b cs)
 
-    getCmds = do
+    getCmds first = do
         done <- isEmpty
         if done then return [] else do
 
         r <- getRemainingLazyByteString
         case find (\(h,f) -> h `B.isPrefixOf` r) headers of
           Just (h,f) -> do
-            c <- f
-            cs <- getCmds
+            c <- f first
+            cs <- getCmds False
             return $ c:cs
           Nothing -> fail $ "unexpected command: " ++ prettyHex r
 
-    skipFormat n con = do
+    skipFormat n con _ = do
         skip 3
         bs <- getLazyByteString n
         return $ con bs
 
-    zero = do
+    zero _ = do
         skip 1
         return Z
 
-    formatF9 = do
+    formatF9 first = do
         skip 3
         n <- getWord16le
         y <- getWord8
         if (y == 0)
         then do
             x <- getWord8
+            when first $ do
+                0 <- getWord8
+                return ()
             return $ F1 n x
         else do
             x <- getWord16le
+            0 <- getWord8
             return $ F2 n y x
 
-    format2 con = do
+    format2 con _ = do
         skip 3
         m <- getWord16le
         n <- getWord16le
