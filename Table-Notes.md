@@ -77,9 +77,10 @@ The first command is always command **F1** or **F2**.
 Commands are terminated by either `0x00`, or a **A**, **B**, or **C** command with a non-empty argument list. Before the terminating command, such commands to *not* occur.
 
 This list of commands is exhaustive, but may nevertheless be wrong:
- * **A**: Command `E8FF01 mmmm nnnn xs...`, where `m` and `n` are 16-bit numbers, and `xs` a sequence of `n` 16-bit numbers. These 16-bit numbers seem to be media indicies (never too large, the referenced audio files are related in some way).
- * **B**: Command `00FC01 mmmm nnnn xs` has the same format.
+ * **A**: Command `E8FF01 mmmm nnnn xs...`, where `m` and `n` are 16-bit numbers, and `xs` a sequence of `n` 16-bit numbers. These 16-bit numbers are media indicies. The `m` number seems to play that file.
  * **C**: Command `FFFA01 FFFF nnnn xs` has the same format, with always `m = FFFF`
+ * **B**: Command `00FC01 aa bb nnnn xs`: Here `a` and `b` are 8-bit-values. This seems to be playing things in an alternating order.
+ has the same format.
  * **D**: Command `00FD01` is followed by three more bytes
  * **E**: Command `F0FF01` is followed by four more bytes
  * Command `F9FF01` comes in two variants of differing lengths:

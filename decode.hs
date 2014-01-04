@@ -93,7 +93,7 @@ hyp6 b = case parseLine b of
             (if [Z,Z] `isSuffixOf` cmds then test (take (length cmds - 2) cmds) else False)
     Nothing -> True
   where non_empty_list (A _ (_:_)) = True
-        non_empty_list (B _ (_:_)) = True
+        non_empty_list (B _ _ (_:_)) = True
         non_empty_list (C (_:_)) = True
         non_empty_list _ = False
         test cmds = (last cmds == Z || non_empty_list (last cmds))
@@ -111,7 +111,7 @@ hyps = [ -- (hyp1, "01 line length")
 
 data Command
     = A Word16 [Word16]
-    | B Word16 [Word16]
+    | B Word8 Word8 [Word16]
     | C [Word16]
     | D B.ByteString
     | E B.ByteString
@@ -130,7 +130,7 @@ prettyPrintLine (Line t b cs) = show t ++ extra ++ ": " ++ intercalate " " (map 
 
 prettyPrintCommand :: Command -> String
 prettyPrintCommand (A n xs) = printf "A(%d,[%s])" n (intercalate "," (map (printf "%d") xs))
-prettyPrintCommand (B n xs) = printf "B(%d,[%s])" n (intercalate "," (map (printf "%d") xs))
+prettyPrintCommand (B a b xs) = printf "B(%d,%d,[%s])" a b (intercalate "," (map (printf "%d") xs))
 prettyPrintCommand (C xs) = printf "C([%s])" (intercalate "," (map (printf "%d") xs))
 prettyPrintCommand (D b) = printf "D(%s)" (prettyHex b)
 prettyPrintCommand (E b) = printf "D(%s)" (prettyHex b)
@@ -144,7 +144,7 @@ parseLine = runGet begin
  where
     headers =
         [ (B.pack [0xE8,0xFF,0x01], format2 A)
-        , (B.pack [0x00,0xFC,0x01], format2 B)
+        , (B.pack [0x00,0xFC,0x01], formatB)
         , (B.pack [0xFF,0xFA,0x01,0xFF,0xFF], format2 (const C))
         , (B.pack [0x00,0xFD,0x01], skipFormat 3 D)
         , (B.pack [0xF0,0xFF,0x01], skipFormat 4 E)
@@ -207,6 +207,14 @@ parseLine = runGet begin
         xs <- replicateM (fromIntegral n) getWord16le
         return $ con m xs
 
+    formatB _ = do
+        skip 3
+        b <- getWord8
+        a <- getWord8
+        n <- getWord16le
+        xs <- replicateM (fromIntegral n) getWord16le
+        return $ B a b xs
+
 
 checkLine :: Int -> Line -> [String]
 checkLine n_audio (Line _ _ cmds) =
@@ -216,7 +224,7 @@ checkCommand :: Int -> Command -> [String]
 checkCommand n_audio c@(A _ xs)
     | any (>= fromIntegral n_audio) xs
     = return $ "Invalid audio index in command " ++ prettyPrintCommand c
-checkCommand n_audio c@(B _ xs)
+checkCommand n_audio c@(B _ _ xs)
     | any (>= fromIntegral n_audio) xs
     = return $ "Invalid audio index in command " ++ prettyPrintCommand c
 checkCommand n_audio c@(C xs)
