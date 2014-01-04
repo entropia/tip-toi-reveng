@@ -84,11 +84,28 @@ hyp5 b = case parseLine b of
     Nothing -> True
 -}
 
+hyp6 :: B.ByteString -> Bool
+hyp6 b = case parseLine b of
+    Just l -> case l of
+        Line _ _ cmds ->
+            test cmds ||
+            -- Special casing: For some files, we have extra 0x00 00 at the end of every line
+            (if [Z,Z] `isSuffixOf` cmds then test (take (length cmds - 2) cmds) else False)
+    Nothing -> True
+  where non_empty_list (A _ (_:_)) = True
+        non_empty_list (B _ (_:_)) = True
+        non_empty_list (C (_:_)) = True
+        non_empty_list _ = False
+        test cmds = (last cmds == Z || non_empty_list (last cmds))
+                    && all (not . non_empty_list) (init cmds)
+
+
 hyps = [ -- (hyp1, "01 line length")
          (hyp2, "01 fixed prefix")
        , (hyp3, "00F9 FF01 at bytes 4-7")
        , (hyp4, "00F9 FF01 at bytes 12-15 only in 0200-lines")
        -- , (hyp5, "F2(_,n,_) indicates number of arguments to A(...)")
+       , (hyp6, "0x00 or non-empty A,B,C terminate commands")
        ]
 
 data Command
@@ -101,6 +118,7 @@ data Command
     | F2 Word16 Word8 Word16
     | G
     | Z
+    deriving Eq
 
 data Line = Line Word8 B.ByteString [Command]
 
