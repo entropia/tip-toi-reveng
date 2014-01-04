@@ -17,6 +17,8 @@ For most files, the main table consists of
  * Then, 32-bit offsets that point to (what I call) *jump tables* (see below).
  * In between these offsets, there are streaks of 0xFFFFFFFF.
 
+Unclear: When does the main table end?
+
 Jump table pattern
 ------------------
 
