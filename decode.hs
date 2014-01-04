@@ -84,10 +84,12 @@ data Command
     | G
     | Z
 
-data Line = Line Word16 [Command]
+data Line = Line Word8 B.ByteString [Command]
 
 prettyPrintLine :: Line -> String
-prettyPrintLine (Line t cs) = show t ++ ": " ++ intercalate " " (map prettyPrintCommand cs)
+prettyPrintLine (Line t b cs) = show t ++ extra ++ ": " ++ intercalate " " (map prettyPrintCommand cs)
+  where extra | B.null b  = ""
+              | otherwise = "[" ++ prettyHex b ++ "]"
 
 prettyPrintCommand :: Command -> String
 prettyPrintCommand (A n xs) = printf "A(%d,[%s])" n (intercalate "," (map (printf "%d") xs))
@@ -119,12 +121,10 @@ parseLine = runGet begin
         if done
         then return Nothing
         else do
-            tag <- getWord16le
-            b <- getLazyByteString 3
-            unless (b == B.pack [0,0,0]) $ do
-                fail "Not 0x000000 after line tag"
+            tag <- getWord8
+            b <- getLazyByteString 4
             cs <- getCmds
-            return $ Just (Line tag cs)
+            return $ Just (Line tag b cs)
 
     getCmds = do
         done <- isEmpty
@@ -316,6 +316,7 @@ main = do
     forM_ (zip jtos jts) $ \(o, jt) -> do
         printf "Jump table at %08X:\n" o
         forM_ jt $ \line -> do
+            --printf "    %s\n" (prettyHex line)
             maybe
                 (printf "    --\n")
                 (printf "    %s\n" . prettyPrintLine)

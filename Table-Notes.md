@@ -67,8 +67,9 @@ Command lines
 -------------
 
 Command lines have the form
- * `0200 000 00` followed by commands, or
- * `0100 000 00` followed by commands.
+ * `0200 0000 00` followed by commands, or
+ * `0100 0000 00` followed by commands, or (precisely once so far)
+ * `0100 001E 00`
 The first command is always command **F1** or **F2**.
 
 This list of commands is exhaustive, but may nevertheless be wrong:
