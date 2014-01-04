@@ -86,5 +86,5 @@ This list of commands is exhaustive, but may nevertheless be wrong:
  * Command `F9FF01` comes in two variants of differing lengths:
    - **F1**: `F9 FF01 nnnn 00xx` where `n` is a 16-bit number, and `xx` one byte
      If this is the first command in the line, it is followed by `0x00`, otherwise not. (huh?)
-   - **F2**: `F9 FF01 nnnn yy xxxxx 00` where `n` and `x` is a 16-bit number, and `y` is not zero
+   - **F2**: `F9 FF01 nnnn yy xxxxx 00` where `n` and `x` is a 16-bit number, and `y` is not zero. In that case, `y` indicates the number of commands in this line.
  * **G**: Command `FB FF01 0300 0200 0300` occurs once

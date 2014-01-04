@@ -100,6 +100,12 @@ hyp6 b = case parseLine b of
                     && all (not . non_empty_list) (init cmds)
                     && all (/= Z) (init cmds)
 
+hyp7 :: B.ByteString -> Bool
+hyp7 b = case parseLine b of
+    Just l -> case l of
+        Line _ _ (F2 _ n _ : cmds) -> fromIntegral n == length (filter (/= Z) cmds)
+        _ -> True
+    Nothing -> True
 
 hyps = [ -- (hyp1, "01 line length")
          (hyp2, "01 fixed prefix")
@@ -107,6 +113,7 @@ hyps = [ -- (hyp1, "01 line length")
        , (hyp4, "00F9 FF01 at bytes 12-15 only in 0200-lines")
        -- , (hyp5, "F2(_,n,_) indicates number of arguments to A(...)")
        , (hyp6, "0x00 or non-empty A,B,C terminate commands")
+       , (hyp7, "F2 indicates number of commands")
        ]
 
 data Command
