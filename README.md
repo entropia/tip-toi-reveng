@@ -15,6 +15,7 @@ All offsets are from the beginning of the file.
    - Everything else is XORed bytewise by x.
  * Usually, thes are OGG files, sometimes these are RIFF (i.e. wav) files.
  * This is verified by checking the CRC header of the OGG files
+ * In `Leserabe_een.gme*`, the audio table is repeated right after itself. Why?
 
 What we have
 ------------

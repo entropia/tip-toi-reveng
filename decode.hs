@@ -31,7 +31,7 @@ mainTable offset = do
     let n_entries = fromIntegral ((until - offset) `div` 8)
     replicateM n_entries getWord32le
 
-getJumpTable :: B.ByteString -> Word32 -> [B.ByteString]
+getJumpTable :: B.ByteString -> Word32 -> Maybe [B.ByteString]
 getJumpTable bytes offset =
     let mboffs = flip runGet bytes $ do
         skip (fromIntegral offset)
@@ -42,11 +42,11 @@ getJumpTable bytes offset =
             Just <$> replicateM (fromIntegral n) getWord32le
         else return Nothing
     in case mboffs of
-        Just offs -> do
+        Just offs -> Just $ do
             flip map offs $ \from -> do
                 let (_,_,to) = runGetState (skip (fromIntegral from) >> lineParser) bytes 0
                 runGet (extract from (fromIntegral to - from)) bytes
-        Nothing -> []
+        Nothing -> Nothing
 
 -- Length correlation for 0100 jump table lines
 hyp1 :: B.ByteString -> Bool
@@ -189,7 +189,7 @@ lineParser = begin
         -- Commands are separated by 0x0000
         cmds <- padded (fromIntegral y) getCmd
 
-        -- Media links
+        -- Audio links
         n <- getWord16le
         xs <- replicateM (fromIntegral n) getWord16le
 
@@ -347,11 +347,22 @@ main = do
         audio = runGet (extract oo ol) bytes
         x = runGet (getXor oo) bytes
 
+
     printf "Audio table offset: %08X\n" ato
     printf "First Audio table offset entry: %08X %d\n" oo ol
     printf "XOR value: %02X\n" x
     printf "First Audio magic: %s\n" (show (B.take 4 audio))
     printf "First Audio magic xored: %s\n" (show (B.map (xor x) (B.take 4 audio)))
+
+    at <-
+        if map (\(a,b,_)->(a,b)) (take (length at `div` 2) at)
+           == map (\(a,b,_)->(a,b)) (drop (length at `div` 2) at)
+        then do
+            printf "Audio table repeats itself! Ignoring first half.\n"
+            return $ take (length at `div` 2) at
+        else
+            return at
+
     printf "Audio Table entries: %d\n" (length at)
 
     at_fixed <- filterM (checkAT bytes) at
@@ -361,7 +372,7 @@ main = do
         let rawaudio = runGet (extract oo ol) bytes
         let audio = decypher x rawaudio
         let audiotype = fromMaybe "raw" $ lookup (B.take 4 audio) fileMagics
-        let filename = printf "oggs/%s_%03d.%s" file n audiotype
+        let filename = printf "oggs/%s_%04d.%s" file n audiotype
         if B.null audio
         then do
             printf "File %s would be empty...\n" filename
@@ -386,7 +397,7 @@ main = do
 
     let jtos = filter (< ato) $
                filter (/= 0xFFFFFFFF) (drop 2 mt)
-    let jts = map (getJumpTable bytes) jtos
+    let jts = mapMaybe (getJumpTable bytes) jtos
 
     printf "%d Jump tables follow:\n" (length jts)
     forM_ (zip jtos jts) $ \(o, jt) -> do
@@ -408,18 +419,26 @@ main = do
                 printf "    %s\n" (prettyHex line)
                 printf "    %s\n" (prettyPrintLine l)
 
-    let known_segments =
+    let known_segments = sort $
             [ (0, 4, "Main table address") ] ++
-            [ (4, 4, "Media table address") ] ++
+            [ (4, 4, "Audio table address") ] ++
             [ (mto, fromIntegral (4 * length mt), "Main table") ] ++
             -- Add jump tables here. But how long are they?
-            [ (ato, fromIntegral (8 * length at), "Media table") ] ++
-            [ (o, fromIntegral l, "Media file " ++ show n ) | (o,l,n) <- at ]++
+            [ (ato, fromIntegral (8 * length at), "Audio table") ] ++
+            [ (o, fromIntegral l, "Audio file " ++ show n ) | (o,l,n) <- at ]++
             [ (fromIntegral (B.length bytes), 0, "End of file") ]
+    let overlapping_segments =
+            filter (\((o1,l1,_),(o2,l2,_)) -> o1+l1 > o2) $
+            zip known_segments (tail known_segments)
     let unknown_segments =
             filter (\(o,l) -> l > 0) $
             zipWith (\(o1,l1,_) (o2,_,_) -> (o1+l1, o2-(o1+l1)))
             known_segments (tail known_segments)
+    printf "Overlapping segments: %d\n"
+        (length overlapping_segments)
+    forM_ overlapping_segments $ \((o1,l1,d1),(o2,l2,d2)) ->
+        printf "   Offset %08X Size %d (%s) and Offset %08X Size %d (%s)\n"
+            o1 l1 d1 o2 l2 d2
     printf "Unknown file segments: %d (%d bytes total)\n"
         (length unknown_segments) (sum (map snd unknown_segments))
     forM_ unknown_segments $ \(o,l) ->

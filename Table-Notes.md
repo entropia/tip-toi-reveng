@@ -115,4 +115,4 @@ The play comands are:
  * **E**: `F0FF01 0100`
  * **F**: `F9FF01 nnnn` where `n` is a 16-bit number
 
-If **C** or **D** occurs, then as the last entry. If **E** or **F** occurs, then as the first entry. **D** only occurs alone or with **F1** before. 
+If **D** occurs, then as the last entry. If **E** or **F** occurs, then as the first entry. **D** only occurs alone or with **F1** before. 
