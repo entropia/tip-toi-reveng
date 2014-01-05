@@ -255,19 +255,18 @@ audioTableOffset = do
     skip 4
     getWord32le
 
-audioTable :: Word32 -> Get [(Word32, Word32, Int)]
+audioTable :: Word32 -> Get [(Word32, Word32)]
 audioTable offset = do
     skip (fromIntegral offset)
     until <- lookAhead getWord32le
     let n_entries = fromIntegral ((until - offset) `div` 8)
-    sequence [ do
+    replicateM n_entries $ do
         ptr <- getWord32le
         len <- getWord32le
-        return (ptr, len, n)
-        | n <- [0..n_entries-1] ]
+        return (ptr, len)
 
-checkAT :: B.ByteString -> (Word32, Word32, Int) -> IO Bool
-checkAT bytes (off, len, n) =
+checkAT :: B.ByteString -> Int -> (Word32, Word32) -> IO Bool
+checkAT bytes n (off, len) =
     if fromIntegral off > B.length bytes
     then do
         printf "    Entry %d: Offset %d > File size %d\n"
@@ -330,6 +329,9 @@ prettyHex = spaceout . map (printf "%02X") . B.unpack
         spaceout (a:b:r) = a ++ b ++ " " ++ spaceout r
         spaceout r = concat r
 
+forMn_ :: Monad m => [a] -> (Int -> a -> m b) -> m ()
+forMn_ l f = forM_ (zip l [0..]) $ \(x,n) -> f n x
+
 main = do
     args <- getArgs
     file <- case args of
@@ -343,7 +345,7 @@ main = do
     -- Ogg file stuff
     let ato = runGet audioTableOffset bytes
         at = runGet (audioTable ato) bytes
-        (oo,ol,_) = head at
+        (oo,ol) = head at
         audio = runGet (extract oo ol) bytes
         x = runGet (getXor oo) bytes
 
@@ -355,8 +357,7 @@ main = do
     printf "First Audio magic xored: %s\n" (show (B.map (xor x) (B.take 4 audio)))
 
     at <-
-        if map (\(a,b,_)->(a,b)) (take (length at `div` 2) at)
-           == map (\(a,b,_)->(a,b)) (drop (length at `div` 2) at)
+        if take (length at `div` 2) at == drop (length at `div` 2) at
         then do
             printf "Audio table repeats itself! Ignoring first half.\n"
             return $ take (length at `div` 2) at
@@ -365,10 +366,10 @@ main = do
 
     printf "Audio Table entries: %d\n" (length at)
 
-    at_fixed <- filterM (checkAT bytes) at
+    forMn_ at (checkAT bytes)
 
     createDirectoryIfMissing False "oggs"
-    forM_ at_fixed $ \(oo,ol,n) -> do
+    forMn_ at $ \n (oo,ol) -> do
         let rawaudio = runGet (extract oo ol) bytes
         let audio = decypher x rawaudio
         let audiotype = fromMaybe "raw" $ lookup (B.take 4 audio) fileMagics
@@ -425,7 +426,7 @@ main = do
             [ (mto, fromIntegral (4 * length mt), "Main table") ] ++
             -- Add jump tables here. But how long are they?
             [ (ato, fromIntegral (8 * length at), "Audio table") ] ++
-            [ (o, fromIntegral l, "Audio file " ++ show n ) | (o,l,n) <- at ]++
+            [ (o, fromIntegral l, "Audio file " ++ show n ) | (n,(o,l)) <- zip [0..] at ]++
             [ (fromIntegral (B.length bytes), 0, "End of file") ]
     let overlapping_segments =
             filter (\((o1,l1,_),(o2,l2,_)) -> o1+l1 > o2) $
