@@ -267,16 +267,16 @@ audioTable offset = do
         | n <- [0..n_entries-1] ]
 
 checkAT :: B.ByteString -> (Word32, Word32, Int) -> IO Bool
-checkAT audio (off, len, n) =
-    if fromIntegral off > B.length audio
+checkAT bytes (off, len, n) =
+    if fromIntegral off > B.length bytes
     then do
         printf "    Entry %d: Offset %d > File size %d\n"
-            n off (B.length audio)
+            n off (B.length bytes)
         return False
-    else if fromIntegral (off + len) > B.length audio
+    else if fromIntegral (off + len) > B.length bytes
          then do
             printf "    Entry %d: Offset %d + Lengths %d > File size %d\n"
-                n off len (B.length audio)
+                n off len (B.length bytes)
             return False
          else return True
 
