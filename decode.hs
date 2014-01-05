@@ -226,8 +226,8 @@ lineParser = begin
 
     formatB = do
         skip 3
-        b <- getWord8
         a <- getWord8
+        b <- getWord8
         return $ B a b
 
     formatD = do
