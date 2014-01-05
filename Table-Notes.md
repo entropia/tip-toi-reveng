@@ -38,7 +38,7 @@ There is more data contained at the beginning of the file:
 Jump table pattern
 ------------------
 
-Thre are many jump tables, and they seem to be important. some are referneced from the main table, but not all. (where the others referenced from?)
+Thre are many jump tables, and they seem to be important. Some are referenced from the main table, but not all. (where the others referenced from?)
 
 The table consists of
  * A number,  16 bit. Commonly 16 or 17.
