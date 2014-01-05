@@ -355,7 +355,11 @@ main = do
         x = runGet (getXor oo) bytes
 
 
-    printf "Filename %s" file
+    printf "Filename %s\n" file
+    printf "File size: %08X (%d)\n" (B.length bytes) (B.length bytes)
+    printf "Checksum found %08X, calculated %08X\n"
+        (runGet (skip (fromIntegral (B.length bytes) - 4) >> getWord32le) bytes)
+        (foldl' (+) 0 (map fromIntegral (B.unpack (B.take (B.length bytes -4) bytes))) :: Word32)
     printf "Audio table offset: %08X\n" ato
     printf "First Audio table offset entry: %08X %d\n" oo ol
     printf "XOR value: %02X\n" x
