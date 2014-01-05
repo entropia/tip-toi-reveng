@@ -469,6 +469,6 @@ main = do
     printf "Unknown file segments: %d (%d bytes total)\n"
         (length unknown_segments) (sum (map snd unknown_segments))
     forM_ unknown_segments $ \(o,l) ->
-        printf "   Offset: %08X Size %d\n" o l
+        printf "   Offset: %08X to %08X (%d bytes)\n" o (o+l) l
 
 

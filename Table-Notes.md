@@ -1,9 +1,7 @@
 The first few KBytes
 ====================
 
-Rough notes from reading the hexdump of the stuff before the ogg file.
-
-Consider `WWW_Feuerwehr.gme`. Everything up to `00026C59` is unknown.
+Rough notes from reading the hexdump of the stuff before the ogg files.
 
 Tables
 ------
@@ -23,8 +21,9 @@ There is more data contained at the beginning of the file:
  * The second 32-bit-words is a pointer to the media table.
  * The forth 32-bit-word (`0x0001703b`) is an offset into the file. There is a
    number (32-bit, `0x000 000c` = 12) followed by that many offsets right after
-   the list. Some of these offsets are right after the list, some far away.
-   Their data does not seem to be commands.
+   the list. These offsets begin are right the list and spread out towards the
+   next known block (the media file table), so its objects are relatively large
+   (~1k). The objects themselves contains numbers and offsets.
  * The fifth 32-bit-word is the same offset as the forth in WWW_Bauernhof.gme,
    but different in WWW_Feuerwehr.gme. There, the offset is `0x103ff`, which
    points in the middle of some jump table commands
@@ -38,7 +37,7 @@ There is more data contained at the beginning of the file:
 Jump table pattern
 ------------------
 
-Thre are many jump tables, and they seem to be important. Some are referenced from the main table, but not all. (where the others referenced from?)
+Thre are many jump tables, and they seem to be important. Some are referenced from the main table, but not all.
 
 The table consists of
  * A number,  16 bit. Commonly 16 or 17.
@@ -116,3 +115,10 @@ The play comands are:
  * **F**: `F9FF01 nnnn` where `n` is a 16-bit number
 
 If **D** occurs, then as the last entry. If **E** or **F** occurs, then as the first entry. **D** only occurs alone or with **F1** before. 
+
+Jump table locations
+--------------------
+
+Where are the others referenced from?
+
+For example there is a (very small, one line with one **F1** command) jump-table at `0x35C0` in `WWW_Bauernhof.gme`, but that offset does not occur in the file.
