@@ -19,6 +19,22 @@ For most files, the main table consists of
 
 Unclear: When does the main table end?
 
+There is more data contained at the beginning of the file:
+ * The second 32-bit-words is a pointer to the media table.
+ * The forth 32-bit-word (`0x0001703b`) is an offset into the file. There is a
+   number (32-bit, `0x000 000c` = 12) followed by that many offsets right after
+   the list. Some of these offsets are right after the list, some far away.
+   Their data does not seem to be commands.
+ * The fifth 32-bit-word is the same offset as the forth in WWW_Bauernhof.gme,
+   but different in WWW_Feuerwehr.gme. There, the offset is `0x103ff`, which
+   points in the middle of some jump table commands
+ * The sixth 32-bit-word seems to be a small number.
+ * The seventh 32-bit-word is a large number, but points in the middle of the
+   media file area, so probably not an offset.
+ * The eigth 32-bit-word is a small number.
+ * Then follows the string `0CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.5.090820111024`
+ * there is another number at `0x70` or `0x71`. If read from `0x71` on, it is similar to the seventh 32-bit-word of the header.
+
 Jump table pattern
 ------------------
 
