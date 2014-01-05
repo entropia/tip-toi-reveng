@@ -89,44 +89,30 @@ Command lines have the form
  * `0100 0000 00` followed by commands, or (precisely once so far)
  * `0100 001E 00`
 
-The first command is always command **F1** or **F2**. There is at most one **F2** or **G** command per line. **F2** or **G** gives the number of commands, but what if **F2** is not the first command? Then it follows one **F1** with non-zero `x`.
+There are three kind of start commands, which occur in these five combinations:
+ * **S1**
+ * **S2**
+ * **S1** **S2**
+ * **S1** **S3**
 
-Commands are terminated by either `0x00`, or a **A**, **B**, or **C** command with a non-empty argument list. Before the terminating command, such commands to *not* occur. **C** only occurs in the last position.
+Their shape is
+ * **S1**: `F9 FF01 nnnn 00xx` where `n` is a 16-bit number, and `x` one byte. If `x` is zero, then nothing follows, otherwise **S2** or **S3** must follow.
+ * **S2**: `F9 FF01 nnnn yy 00 aa 00 pc... mmmm xs...` where
+    - `n` is a 16-bit number
+    - `y` is not zero
+    - `a` is an 8-bit-number
+    - `y` indicates the number of following play command (`pc`) which always have `0000` in between
+    - `mmmm` indicates the number of media file indices in `xs`, which is a list of 16-bit-numbers.
+ * **S3** is like **S2**, but starts with `FB` instead of `F9`.
 
-This list of commands is exhaustive, but may nevertheless be wrong:
- * **A**: Command `E8FF01 mmmm nnnn xs...`, where `m` and `n` are 16-bit numbers, and `xs` a sequence of `n` 16-bit numbers. These 16-bit numbers are media indicies. The `m` number seems to play that file.
- * **C**: Command `FFFA01 FFFF nnnn xs` has the same format, with always `n = FFFF`
- * **B**: Command `00FC01 aa bb nnnn xs`: Here `a` and `b` are 8-bit-values. This seems to be playing things in an alternating order.
- has the same format.
- * **D**: Command `00FD01 nn 0000`
- * **E**: Command `F0FF01` is followed by four more bytes (so far only `0100 0000`).
- * Command `F9FF01` comes in two variants of differing lengths:
-   - **F1**: `F9 FF01 nnnn 00xx` where `n` is a 16-bit number, and `xx` one byte
-     If this is the first command in the line, it is followed by `0x00`, otherwise not. (huh?)
-   - **F2**: `F9 FF01 nnnn yy 00 bb 00` where `n` is a 16-bit numbers, and `y` is not zero, and `a` is an 8-bit-number. In that case, `y` indicates the number of following commands in this line.
- * **G**: Command `FB FF01 aaaa bbbb cccc`. Seems to be simliar to **F2**, as `b` is the number of commands following.
+If we have **S1 S2**, then **S1**’s x is equal to **S2**’s a.
 
-Is maybe **A** actually `0000 E8FF01`, and without `nnnn xs`? There is always `0000` in front... The only commands that do not end with `0000` are:
- * **G**. Is always followed by **E**.
- * **F1** with non-zero `x`. Is followed by **F2**, **G**
- * **F2** with non-zero `b`. Is followed by **E** or **F1**
+The play comands are:
+ * **A**: `E8FF01 mmmm`, where `m` is a 16-bit number, the number of the media file to play.
+ * **B**: `00FC01 aa bb`: Here `a` and `b` are 8-bit-values. This seems to be playing things in an alternating order.
+ * **C**: `FFFA01 FFFF`
+ * **D**: `00FD01 nn`
+ * **E**: `F0FF01 0100`
+ * **F**: `F9FF01 nnnn` where `n` is a 16-bit number
 
-Possible line beginning up to the first **F2** or **G**:
- * **G**
- * **F2**
- * **F1** **F2**
- * **F1** **G**
-
-Possible sequences after the **F2** or **G**:
- * ( **A** | **B** ) +
- * **F1** **A**+
- * **F1** **A** **B**
- * **F1** **A** **C**
- * **F1** **A** **B** **C**
- * **F1** **D**
- * **D**
- * **E** ( **A** | **B** )+
-
-Lines without a **F2** or **G**:
- * **F1**
-
+If **C** or **D** occurs, then as the last entry. If **E** or **F** occurs, then as the first entry. **D** only occurs alone or with **F1** before. 

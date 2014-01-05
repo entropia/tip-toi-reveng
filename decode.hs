@@ -84,20 +84,28 @@ hyp5 b = case parseLine b of
     Nothing -> True
 -}
 
+hyp6 :: B.ByteString -> Bool
+hyp6 b = case parseLine b of
+    Just l -> case l of
+        Line _ _ [S1 _ n1, S2 _ n2 _ _] -> n1 == n2
+        _ -> True
+    Nothing -> True
+
 hyps = [ -- (hyp1, "01 line length")
          (hyp2, "01 fixed prefix")
        , (hyp3, "00F9 FF01 at bytes 4-7")
        , (hyp4, "00F9 FF01 at bytes 12-15 only in 0200-lines")
        -- , (hyp5, "F2(_,n,_) indicates number of arguments to A(...)")
+       , (hyp6, "S1(_,x1) S2(_,x2) ==> x == x2")
        ]
 
 data Command
-    = S1 Word16 Word8
-    | S2 Word16 Word16 [S2Command] [Word16]
-    | S3 Word16 Word16 [S2Command] [Word16]
+    = S1 Word16 Word16
+    | S2 Word16 Word16 [PCommand] [Word16]
+    | S3 Word16 Word16 [PCommand] [Word16]
     deriving Eq
 
-data S2Command
+data PCommand
     = A Word16
     | B Word8 Word8
     | C
@@ -113,23 +121,23 @@ prettyPrintLine (Line t b cs) = show t ++ extra ++ ": " ++ intercalate " " (map 
   where extra | b == B.pack [0,0,0,0]  = ""
               | otherwise              = "[" ++ prettyHex b ++ "]"
 
-ppS2Command :: S2Command -> String
-ppS2Command (A n) = printf "A(%d)" n
-ppS2Command (B a b) = printf "B(%d-%d)" a b
-ppS2Command (C) = printf "C"
-ppS2Command (D b) = printf "D(%d)" b
-ppS2Command E = printf "E"
-ppS2Command (F n) = printf "F(%d)" n
+ppPCommand :: PCommand -> String
+ppPCommand (A n) = printf "A(%d)" n
+ppPCommand (B a b) = printf "B(%d-%d)" a b
+ppPCommand (C) = printf "C"
+ppPCommand (D b) = printf "D(%d)" b
+ppPCommand E = printf "E"
+ppPCommand (F n) = printf "F(%d)" n
 
 ppCommand :: Command -> String
 ppCommand (S1 n x)
     = printf "S1(%d,%d)" n x
 ppCommand (S2 n b cs xs)
-    = printf "S2(%d,%d,%s,[%s])" n b (spaces (map ppS2Command cs)) (commas (map (printf "%d") xs))
+    = printf "S2(%d,%d,%s,[%s])" n b (spaces (map ppPCommand cs)) (commas (map (printf "%d") xs))
 ppCommand (S3 a b cs xs)
-    = printf "S3(%d,%d,%s,[%s])" a b (spaces (map ppS2Command cs)) (commas (map (printf "%d") xs))
+    = printf "S3(%d,%d,%s,[%s])" a b (spaces (map ppPCommand cs)) (commas (map (printf "%d") xs))
 
-spaces = intercalate ","
+spaces = intercalate " "
 commas = intercalate ","
 
 parseLine :: B.ByteString -> Maybe Line
@@ -164,8 +172,7 @@ parseLine = runGet begin
             skip 3
             n <- getWord16le
             0 <- getWord8
-            y <- getWord8
-            0 <- getWord8
+            y <- getWord16le
             let c = S1 n y
             if y == 0
             then do
@@ -186,7 +193,7 @@ parseLine = runGet begin
         -- Commands are separated by 0x0000
         cmds <- padded (fromIntegral y) getCmd
 
-        -- Media links 
+        -- Media links
         n <- getWord16le
         xs <- replicateM (fromIntegral n) getWord16le
 
@@ -389,7 +396,7 @@ main = do
     forM_ (zip jtos jts) $ \(o, jt) -> do
         printf "Jump table at %08X:\n" o
         forM_ jt $ \line -> do
-            printf "    %s\n" (prettyHex line)
+            -- printf "    %s\n" (prettyHex line)
             case parseLine line of
               Nothing -> do
                 printf "    --\n"
