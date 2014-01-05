@@ -84,76 +84,53 @@ hyp5 b = case parseLine b of
     Nothing -> True
 -}
 
-hyp6 :: B.ByteString -> Bool
-hyp6 b = case parseLine b of
-    Just l -> case l of
-        Line _ _ [F1 {}] -> True
-        Line _ _ cmds -> test cmds
-    Nothing -> True
-  where ok (A _ (_:_)) = True
-        ok (B _ _ (_:_)) = True
-        ok (C (_:_)) = True
-        ok (D _) = True
-        ok _ = False
-        test cmds = (last cmds == Z || ok (last cmds))
-                    && all (not . ok) (init cmds)
-                    && all (/= Z) (init cmds)
-
-hyp7 :: B.ByteString -> Bool
-hyp7 b = case parseLine b of
-    Just l -> case l of
-        Line _ _ (F2 _ n _ : cmds) -> fromIntegral n == length (filter (/= Z) cmds)
-        _ -> True
-    Nothing -> True
-
-hyp8 :: B.ByteString -> Bool
-hyp8 b = case parseLine b of
-    Just l -> case l of
-        Line _ _ cmds -> test cmds
-    Nothing -> True
-    where isC (C {}) = True
-          isC _ = False
-          test cmds = all (not . isC) (init cmds)
-
 hyps = [ -- (hyp1, "01 line length")
          (hyp2, "01 fixed prefix")
        , (hyp3, "00F9 FF01 at bytes 4-7")
        , (hyp4, "00F9 FF01 at bytes 12-15 only in 0200-lines")
        -- , (hyp5, "F2(_,n,_) indicates number of arguments to A(...)")
-       , (hyp6, "A,B,C,D terminate commands")
-       , (hyp7, "F2 indicates number of commands")
-       , (hyp8, "C is last command in line")
        ]
 
 data Command
-    = A Word16 [Word16]
-    | B Word8 Word8 [Word16]
-    | C [Word16]
+    = S1 Word16 Word8
+    | S2 Word16 Word16 [S2Command] [Word16]
+    | S3 Word16 Word16 [S2Command] [Word16]
+    deriving Eq
+
+data S2Command
+    = A Word16
+    | B Word8 Word8
+    | C
     | D Word8
     | E
-    | F1 Word16 Word8
-    | F2 Word16 Word16 Word16
-    | G Word16 Word16 Word16
-    | Z
+    | F Word16
     deriving Eq
 
 data Line = Line Word8 B.ByteString [Command]
 
 prettyPrintLine :: Line -> String
-prettyPrintLine (Line t b cs) = show t ++ extra ++ ": " ++ intercalate " " (map prettyPrintCommand cs)
+prettyPrintLine (Line t b cs) = show t ++ extra ++ ": " ++ intercalate " " (map ppCommand cs)
   where extra | b == B.pack [0,0,0,0]  = ""
               | otherwise              = "[" ++ prettyHex b ++ "]"
 
-prettyPrintCommand :: Command -> String
-prettyPrintCommand (A n xs) = printf "A(%d,[%s])" n (intercalate "," (map (printf "%d") xs))
-prettyPrintCommand (B a b xs) = printf "B(%d,%d,[%s])" a b (intercalate "," (map (printf "%d") xs))
-prettyPrintCommand (C xs) = printf "C([%s])" (intercalate "," (map (printf "%d") xs))
-prettyPrintCommand (D b) = printf "D(%d)" b
-prettyPrintCommand E = printf "E"
-prettyPrintCommand (F1 n x) = printf "F1(%d,%d)" n x
-prettyPrintCommand (F2 n x b) = printf "F2(%d,%d,%d)" n x b
-prettyPrintCommand (G a b c) = printf "G(%d,%d,%d)" a b c
-prettyPrintCommand (Z) = printf "0x00"
+ppS2Command :: S2Command -> String
+ppS2Command (A n) = printf "A(%d)" n
+ppS2Command (B a b) = printf "B(%d-%d)" a b
+ppS2Command (C) = printf "C"
+ppS2Command (D b) = printf "D(%d)" b
+ppS2Command E = printf "E"
+ppS2Command (F n) = printf "F(%d)" n
+
+ppCommand :: Command -> String
+ppCommand (S1 n x)
+    = printf "S1(%d,%d)" n x
+ppCommand (S2 n b cs xs)
+    = printf "S2(%d,%d,%s,[%s])" n b (spaces (map ppS2Command cs)) (commas (map (printf "%d") xs))
+ppCommand (S3 a b cs xs)
+    = printf "S3(%d,%d,%s,[%s])" a b (spaces (map ppS2Command cs)) (commas (map (printf "%d") xs))
+
+spaces = intercalate ","
+commas = intercalate ","
 
 parseLine :: B.ByteString -> Maybe Line
 parseLine = runGet begin
@@ -163,9 +140,8 @@ parseLine = runGet begin
         , (B.pack [0x00,0xFC,0x01], formatB)
         , (B.pack [0xFF,0xFA,0x01,0xFF,0xFF], format2 (const C))
         , (B.pack [0x00,0xFD,0x01], formatD)
-        , (B.pack [0xF0,0xFF,0x01,0x01,0x00,0x00,0x00], skip 7 >> return E)
-        , (B.pack [0xF9,0xFF,0x01], formatF1)
-        , (B.pack [0x00], skip 1 >> return Z)
+        , (B.pack [0xF0,0xFF,0x01,0x01,0x00], skip 5 >> return E)
+        , (B.pack [0xF9,0xFF,0x01], formatF)
         ]
     -- Find the occurrence of a header
     begin = do
@@ -176,17 +152,12 @@ parseLine = runGet begin
             tag <- getWord8
             b <- getLazyByteString 4
 
-            cs <- maybeF1
+            cs <- maybeS1
 
-            -- fixup for WWW_Feuerwehr:
-            let cs' = case splitAt (length cs - 2) cs of
-                    (cs', [Z,Z]) -> cs'
-                    _ -> cs
+            return $ Just (Line tag b cs)
 
-            return $ Just (Line tag b cs')
-
-    -- check if there is a F1-like command at the beginning
-    maybeF1 = do
+    -- check if there is a S1-like command at the beginning
+    maybeS1 = do
         r <- getRemainingLazyByteString
         if (B.pack [0xF9,0xFF,0x01] `B.isPrefixOf` r) && 0x00 == r `B.index` 5
         then do
@@ -195,13 +166,15 @@ parseLine = runGet begin
             0 <- getWord8
             y <- getWord8
             0 <- getWord8
-            let c = F1 n y
+            let c = S1 n y
             if y == 0
             then do
                 0 <- getWord8
                 return [c] -- nothing follows
-            else (c:) <$> getF2
-        else getF2
+            else do
+                cs <- getF2
+                return [c,cs]
+        else (:[]) <$> getF2
 
     getF2 = do
         a <- getWord8
@@ -210,74 +183,67 @@ parseLine = runGet begin
         n <- getWord16le
         y <- getWord16le
         b <- getWord16le
-        let c | a == 0xFB = G n y b
-              | a == 0xF9 = F2 n y b
-        (c:) <$> getCmds
+        -- Commands are separated by 0x0000
+        cmds <- padded (fromIntegral y) getCmd
 
-    getCmds = do
-        done <- isEmpty
-        if done then return [] else do
+        -- Media links 
+        n <- getWord16le
+        xs <- replicateM (fromIntegral n) getWord16le
 
+        let c | a == 0xFB = S3 n b cmds xs
+              | a == 0xF9 = S2 n b cmds xs
+        return c
+
+
+    padded 0 a = fail "padded: 0"
+    padded 1 a = (:[]) <$> a
+    padded n a = do
+        x <- a
+        0 <- getWord16le
+        (x:) <$> padded (n-1) a
+
+
+    getCmd = do
         r <- getRemainingLazyByteString
         case find (\(h,f) -> h `B.isPrefixOf` r) cmds of
-          Just (h,f) -> do
-            c <- f
-            cs <- getCmds
-            return $ c:cs
+          Just (h,f) -> f
           Nothing -> fail $ "unexpected command: " ++ prettyHex r
 
-    formatF1 = do
+    formatF = do
         skip 3
         n <- getWord16le
-        0 <- getWord8
-        x <- getWord8
-        return $ F1 n x
+        return $ F n
 
     format2 con = do
         skip 3
         m <- getWord16le
-        n <- getWord16le
-        xs <- replicateM (fromIntegral n) getWord16le
-        return $ con m xs
+        return $ con m
 
     formatB = do
         skip 3
         b <- getWord8
         a <- getWord8
-        n <- getWord16le
-        xs <- replicateM (fromIntegral n) getWord16le
-        return $ B a b xs
+        return $ B a b
 
     formatD = do
         skip 3
         b <- getWord8
         0 <- getWord8
-        0 <- getWord8
-        0 <- getWord8
         return $ D b
-
-    formatG = do
-        skip 3
-        a <- getWord16le
-        b <- getWord16le
-        c <- getWord16le
-        return $ G a b c
 
 
 checkLine :: Int -> Line -> [String]
 checkLine n_audio (Line _ _ cmds) =
     concatMap (checkCommand n_audio) cmds
 
+
 checkCommand :: Int -> Command -> [String]
-checkCommand n_audio c@(A _ xs)
+checkCommand n_audio c@(S2 _ _ _ xs)
     | any (>= fromIntegral n_audio) xs
-    = return $ "Invalid audio index in command " ++ prettyPrintCommand c
-checkCommand n_audio c@(B _ _ xs)
+    = return $ "Invalid audio index in command " ++ ppCommand c
+checkCommand n_audio c@(S3 _ _ _ xs)
     | any (>= fromIntegral n_audio) xs
-    = return $ "Invalid audio index in command " ++ prettyPrintCommand c
-checkCommand n_audio c@(C xs)
-    | any (>= fromIntegral n_audio) xs
-    = return $ "Invalid audio index in command " ++ prettyPrintCommand c
+    = return $ "Invalid audio index in command " ++ ppCommand c
 checkCommand n_audio c = []
 
 
