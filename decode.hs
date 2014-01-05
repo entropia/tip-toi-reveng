@@ -149,9 +149,12 @@ prettyPrintLine (Line t b cs) = show t ++ extra ++ ": " ++ intercalate " " (map 
               | otherwise              = "[" ++ prettyHex b ++ "]"
 
 prettyPrintCommand :: Command -> String
-prettyPrintCommand (A n xs) = printf "A(%d,[%s])" n (intercalate "," (map (printf "%d") xs))
-prettyPrintCommand (B a b xs) = printf "B(%d,%d,[%s])" a b (intercalate "," (map (printf "%d") xs))
-prettyPrintCommand (C xs) = printf "C([%s])" (intercalate "," (map (printf "%d") xs))
+prettyPrintCommand (A n []) = printf "Play(%d)" n
+prettyPrintCommand (A n xs) = printf "Play(%d) [%s]" n (intercalate "," (map (printf "%d") xs))
+prettyPrintCommand (B a b []) = printf "PlayOneFromSublist(%d..%d)" a b
+prettyPrintCommand (B a b xs) = printf "PlayOneFromSublist(%d..%d) [%s]" a b (intercalate "," (map (printf "%d") xs))
+prettyPrintCommand (C []) = printf "C()"
+prettyPrintCommand (C xs) = printf "C() [%s]" (intercalate "," (map (printf "%d") xs))
 prettyPrintCommand (D b) = printf "D(%d)" b
 prettyPrintCommand E = printf "E"
 prettyPrintCommand (F1 n x) = printf "F1(%d,%d)" n x
@@ -225,8 +228,8 @@ parseLine = runGet begin
 
     formatB _ = do
         skip 3
-        b <- getWord8
         a <- getWord8
+        b <- getWord8
         n <- getWord16le
         xs <- replicateM (fromIntegral n) getWord16le
         return $ B a b xs
