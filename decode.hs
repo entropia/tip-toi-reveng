@@ -75,17 +75,6 @@ hyp4 b =
     then b `B.index` 0 == 0x02
     else True
 
-{- Not true
-hyp5 :: B.ByteString -> Bool
-hyp5 b = case parseLine b of
-    Just l -> case l of
-        Line _ _ (F2 _ n _ : cmds) -> case last cmds of
-            A _ xs -> fromIntegral n == length xs
-            _ -> False
-        _ -> True
-    Nothing -> True
--}
-
 hyp6 :: B.ByteString -> Bool
 hyp6 b = case l of
         Line _ _ [S1 _ n1, S2 _ n2 _ _] -> n1 == n2
@@ -96,7 +85,6 @@ hyps = [ -- (hyp1, "01 line length")
          (hyp2, "01 fixed prefix")
        , (hyp3, "00F9 FF01 at bytes 4-7")
        , (hyp4, "00F9 FF01 at bytes 12-15 only in 0200-lines")
-       -- , (hyp5, "F2(_,n,_) indicates number of arguments to A(...)")
        , (hyp6, "S1(_,x1) S2(_,x2) ==> x == x2")
        ]
 
