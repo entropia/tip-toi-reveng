@@ -68,20 +68,23 @@ In `WWW_Feuerwehr.gme`, this pattern is for example found at `0x00025e4`
 Command lines
 -------------
 
-Command lines have the form
- * `0200 0000 00` followed by commands, or
- * `0100 0000 00` followed by commands, or (precisely once so far)
- * `0100 001E 00`
+Command lines have the form 'ss uuuuuuuu' followed by commands.
 
-The first command is always command **F1** or **F2**. There is at most one **F2** or **G** command per line. **F2** or **G** gives the number of commands, but what if **F2** is not the first command? Then it follows one **F1** with non-zero `x`.
+ss is an 8bit value for the section where this line applies.  
+ * 01 for "Wissen" (Knowledge)
+ * 02 for "Entdecken" (Explore)
+ * 03 for "Spielen" (Play) (assumption, currently not verified)
+
+uuuuuuuu is a currently unknown value that is 0 most of the time, we have seen the value 00001E00 precisely once so far.
+
+The first command is always command **F1** or **F2**. There is at most one **F2** or **G** command per line. **F2** or **G** gives the number of commands, but what if **F2** is not the first command? Then it follows one **F1** with non-zero `x`. Maybe this is some kind of jump label.
 
 Commands are terminated by either `0x00`, or a **A**, **B**, or **C** command with a non-empty argument list. Before the terminating command, such commands to *not* occur. **C** only occurs in the last position.
 
 This list of commands is exhaustive, but may nevertheless be wrong:
  * **A**: Command `E8FF01 mmmm nnnn xs...`, where `m` and `n` are 16-bit numbers, and `xs` a sequence of `n` 16-bit numbers. These 16-bit numbers are media indicies. The `m` number seems to play that file.
  * **C**: Command `FFFA01 FFFF nnnn xs` has the same format, with always `m = FFFF`
- * **B**: Command `00FC01 aa bb nnnn xs`: Here `a` and `b` are 8-bit-values. This seems to be playing things in an alternating order.
- has the same format.
+ * **B**: Command `00FC01 aa bb nnnn xs`: Here `a` and `b` are 8-bit-values. This seems to be playing things in an alternating order from sample a to sample b for each execution of this command. 
  * **D**: Command `00FD01 nn 0000`
  * **E**: Command `F0FF01` is followed by four more bytes (so far only `0100 0000`).
  * Command `F9FF01` comes in two variants of differing lengths:
@@ -95,3 +98,4 @@ Is maybe **A** actually `0000 E8FF01`, and without `nnnn xs`? There is always `0
  * **F1** with non-zero `x`. Is followed by **F2**, **G**
  * **F2** with non-zero `b`. Is followed by **E** or **F1**
 
+Maybe **A** also uses 8bit indices to the sample array.
