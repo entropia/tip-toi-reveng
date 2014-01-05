@@ -88,6 +88,8 @@ Command lines have the form
  * `0100 0000 00` followed by commands, or (precisely once so far)
  * `0100 001E 00`
 
+The first byte seems to indicate the mode (*Wissen* or *Entdecken*). But where is *Spielen*?
+
 There are three kind of start commands, which occur in these five combinations:
  * **S1**
  * **S2**
@@ -108,7 +110,7 @@ If we have **S1 S2**, then **S1**’s x is equal to **S2**’s a.
 
 The play comands are:
  * **A**: `E8FF01 mmmm`, where `m` is a 16-bit number, the number of the media file to play.
- * **B**: `00FC01 aa bb`: Here `a` and `b` are 8-bit-values. This seems to be playing things in an alternating order.
+ * **B**: `00FC01 aa bb`: Here `a` and `b` are 8-bit-values. This seems to be playing one of the samples from `a` to `b`, beginning with `a` and cycling through the list.
  * **C**: `FFFA01 FFFF`
  * **D**: `00FD01 nn`
  * **E**: `F0FF01 0100`
