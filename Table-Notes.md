@@ -83,18 +83,17 @@ In `WWW_Feuerwehr.gme`, this pattern is for example found at `0x00025e4`
 Command lines
 -------------
 
-Command lines have the form
- * `0200 0000 00` followed by commands, or
- * `0100 0000 00` followed by commands, or (precisely once so far)
- * `0100 001E 00`
+Command lines are of the form `tt nnnn nnnn cmds... nnnn ids..`:
+ * the *tag* `tt` is either 1 or 2, it seems to indicate the mode (*Wissen* or *Entdecken*) - But where is *Spielen*?
+ * `n` is amost always `0000 0000`.
+ * the commands are explained below, and
+ * `ids` is a list of `n` 16-bit numbers, which references the media table (0-based).
 
-The first byte seems to indicate the mode (*Wissen* or *Entdecken*). But where is *Spielen*?
-
-There are three kind of start commands, which occur in these five combinations:
+The list of commands start with one of these sequences:
  * **S1**
  * **S2**
- * **S1** **S2**
- * **S1** **S3**
+ * **S1** **S2** (only with tag 2)
+ * **S1** **S3** (only with tag 2)
 
 Their shape is
  * **S1**: `F9 FF01 nnnn 00xx` where `n` is a 16-bit number, and `x` one byte. If `x` is zero, then nothing follows, otherwise **S2** or **S3** must follow.
@@ -104,7 +103,7 @@ Their shape is
     - `a` is an 8-bit-number
     - `y` indicates the number of following play command (`pc`) which always have `0000` in between
     - `mmmm` indicates the number of media file indices in `xs`, which is a list of 16-bit-numbers.
- * **S3** is like **S2**, but starts with `FB` instead of `F9`.
+ * **S3** is like **S2**, but starts with `FB` instead of `F9`. So maybe the byte is not really part of the command.
 
 If we have **S1 S2**, then **S1**’s x is equal to **S2**’s a.
 
@@ -114,13 +113,13 @@ The play comands are:
  * **C**: `FFFA01 FFFF`
  * **D**: `00FD01 nn`
  * **E**: `F0FF01 0100`
- * **F**: `F9FF01 nnnn` where `n` is a 16-bit number
+ * **F**: `F9FF01 nnnn` where `n` is a 16-bit number. This is very similar to `S1`.
 
-If **D** occurs, then as the last entry. If **E** or **F** occurs, then as the first entry. **D** only occurs alone or with **F1** before. 
+If **D** occurs, then as the last entry. If **E** or **F** occurs, then as the first entry. **D** only occurs alone or with **F** before.
 
 Jump table locations
 --------------------
 
 Where are the others referenced from?
 
-For example there is a (very small, one line with one **F1** command) jump-table at `0x35C0` in `WWW_Bauernhof.gme`, but that offset does not occur in the file.
+For example there is a (very small, one line with one **F** command) jump-table at `0x35C0` in `WWW_Bauernhof.gme`, but that offset does not occur in the file.

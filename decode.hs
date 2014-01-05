@@ -50,48 +50,33 @@ getJumpTable bytes offset = flip map offs $ \from ->
   where
     offs = getJumpTableOffsets bytes offset
 
--- Length correlation for 0100 jump table lines
-hyp1 :: B.ByteString -> Bool
-hyp1 b =
-    if not (B.null b) && b `B.index` 0 == 0x01
-    then B.length b == 16 + fromIntegral (b `B.index` 10) * 9
-    else True
-
 hyp2 :: B.ByteString -> Bool
 hyp2 b =
-    if not (B.null b) && b `B.index` 0 == 0x01
+    if b `B.index` 0 == 0x01
     then B.pack [0x01,0x00,0x00,0x00,0x00,0xF9,0xFF,0x01] `B.isPrefixOf` b
     else True
 
-hyp3 :: B.ByteString -> Bool
-hyp3 b =
-    if not (B.null b)
-    then B.pack [0x00,0xF9,0xFF,0x01] `B.isPrefixOf` (B.drop 4 b)
-    else True
-
 hyp4 :: B.ByteString -> Bool
-hyp4 b =
-    if B.pack [0x00,0xF9,0xFF,0x01] `B.isPrefixOf` (B.drop 12 b)
-    then b `B.index` 0 == 0x02
-    else True
+hyp4 b = case l of
+        Line t _ [S1 _ _, S2 _ _ _] _ -> t == 2
+        _ -> True
+    where l = parseLine b
 
 hyp6 :: B.ByteString -> Bool
 hyp6 b = case l of
-        Line _ _ [S1 _ n1, S2 _ n2 _ _] -> n1 == n2
+        Line _ _ [S1 _ n1, S2 _ n2 _] _ -> n1 == fromIntegral n2
         _ -> True
-    where l = parseLine b 
+    where l = parseLine b
 
-hyps = [ -- (hyp1, "01 line length")
-         (hyp2, "01 fixed prefix")
-       , (hyp3, "00F9 FF01 at bytes 4-7")
-       , (hyp4, "00F9 FF01 at bytes 12-15 only in 0200-lines")
+hyps = [ (hyp2, "01 fixed prefix")
+       , (hyp4, "S1 S2 only occurs in lines with tag 2")
        , (hyp6, "S1(_,x1) S2(_,x2) ==> x == x2")
        ]
 
 data Command
-    = S1 Word16 Word16
-    | S2 Word16 Word16 [PCommand] [Word16]
-    | S3 Word16 Word16 [PCommand] [Word16]
+    = S1 Word16 Word8
+    | S2 Word16 Word16 [PCommand]
+    | S3 Word16 Word16 [PCommand]
     deriving Eq
 
 data PCommand
@@ -103,10 +88,10 @@ data PCommand
     | F Word16
     deriving Eq
 
-data Line = Line Word8 B.ByteString [Command]
+data Line = Line Word8 B.ByteString [Command] [Word16]
 
-prettyPrintLine :: Line -> String
-prettyPrintLine (Line t b cs) = show t ++ extra ++ ": " ++ intercalate " " (map ppCommand cs)
+ppLine :: Line -> String
+ppLine (Line t b cs xs) = show t ++ extra ++ ": " ++ spaces (map ppCommand cs) ++ " [" ++ commas (map show xs) ++ "]"
   where extra | b == B.pack [0,0,0,0]  = ""
               | otherwise              = "[" ++ prettyHex b ++ "]"
 
@@ -121,10 +106,10 @@ ppPCommand (F n) = printf "F(%d)" n
 ppCommand :: Command -> String
 ppCommand (S1 n x)
     = printf "S1(%d,%d)" n x
-ppCommand (S2 n b cs xs)
-    = printf "S2(%d,%d,%s,[%s])" n b (spaces (map ppPCommand cs)) (commas (map (printf "%d") xs))
-ppCommand (S3 a b cs xs)
-    = printf "S3(%d,%d,%s,[%s])" a b (spaces (map ppPCommand cs)) (commas (map (printf "%d") xs))
+ppCommand (S2 n b cs)
+    = printf "S2(%d,%d,%s)" n b (spaces (map ppPCommand cs))
+ppCommand (S3 a b cs)
+    = printf "S3(%d,%d,%s)" a b (spaces (map ppPCommand cs))
 
 spaces = intercalate " "
 commas = intercalate ","
@@ -148,7 +133,11 @@ lineParser = begin
         tag <- getWord8
         b <- getLazyByteString 4
         cs <- maybeS1
-        return $ Line tag b cs
+        -- Audio links
+        n <- getWord16le
+        xs <- replicateM (fromIntegral n) getWord16le
+
+        return $ Line tag b cs xs
 
     -- check if there is a S1-like command at the beginning
     maybeS1 = do
@@ -158,13 +147,13 @@ lineParser = begin
             skip 3
             n <- getWord16le
             0 <- getWord8
-            y <- getWord16le
+            y <- getWord8
             let c = S1 n y
             if y == 0
             then do
-                0 <- getWord8
                 return [c] -- nothing follows
             else do
+                0 <- getWord8
                 cs <- getF2
                 return [c,cs]
         else (:[]) <$> getF2
@@ -179,12 +168,8 @@ lineParser = begin
         -- Commands are separated by 0x0000
         cmds <- padded (fromIntegral y) getCmd
 
-        -- Audio links
-        n <- getWord16le
-        xs <- replicateM (fromIntegral n) getWord16le
-
-        let c | a == 0xFB = S3 n b cmds xs
-              | a == 0xF9 = S2 n b cmds xs
+        let c | a == 0xFB = S3 n b cmds
+              | a == 0xF9 = S2 n b cmds
         return c
 
 
@@ -226,19 +211,10 @@ lineParser = begin
 
 
 checkLine :: Int -> Line -> [String]
-checkLine n_audio (Line _ _ cmds) =
-    concatMap (checkCommand n_audio) cmds
-
-
-checkCommand :: Int -> Command -> [String]
-checkCommand n_audio c@(S2 _ _ _ xs)
+checkLine n_audio l@(Line _ _ _ xs)
     | any (>= fromIntegral n_audio) xs
-    = return $ "Invalid audio index in command " ++ ppCommand c
-checkCommand n_audio c@(S3 _ _ _ xs)
-    | any (>= fromIntegral n_audio) xs
-    = return $ "Invalid audio index in command " ++ ppCommand c
-checkCommand n_audio c = []
-
+    = return $ "Invalid audio index in line " ++ ppLine l
+checkLine n_audio _ = []
 
 audioTableOffset :: Get Word32
 audioTableOffset = do
@@ -409,9 +385,9 @@ main = do
     forM_ (zip jtos jts) $ \(o, jt) -> do
         printf "Jump table at %08X:\n" o
         forM_ jt $ \line -> do
-            -- printf "    %s\n" (prettyHex line)
+            printf "    %s\n" (prettyHex line)
             let l = parseLine line
-            printf "    %s\n" (prettyPrintLine l)
+            printf "    %s\n" (ppLine l)
             mapM_  (printf "     * %s\n") (checkLine (length at) l)
 
     forM_ hyps $ \(hyp, desc) -> do
@@ -423,7 +399,7 @@ main = do
             forM_ wrong $ \line -> do
                 let l = parseLine line
                 printf "    %s\n" (prettyHex line)
-                printf "    %s\n" (prettyPrintLine l)
+                printf "    %s\n" (ppLine l)
 
     let known_segments = sort $
             [ (0, 4, "Main table address") ] ++
