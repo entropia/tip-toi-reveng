@@ -28,25 +28,27 @@ mainTable offset = do
         skip 4
         skip 4
         getWord32le
-    let n_entries = fromIntegral ((until - offset) `div` 8)
+    let n_entries = fromIntegral ((until - offset) `div` 4)
     replicateM n_entries getWord32le
 
-getJumpTable :: B.ByteString -> Word32 -> Maybe [B.ByteString]
-getJumpTable bytes offset =
-    let mboffs = flip runGet bytes $ do
-        skip (fromIntegral offset)
-        -- Check if we have the pattern described in Table-Notes.md
-        n <- getWord16le
-        first <- lookAhead getWord32le
-        if (offset + 2 + fromIntegral n * 4 == first) then do
-            Just <$> replicateM (fromIntegral n) getWord32le
-        else return Nothing
-    in case mboffs of
-        Just offs -> Just $ do
-            flip map offs $ \from -> do
-                let (_,_,to) = runGetState (skip (fromIntegral from) >> lineParser) bytes 0
-                runGet (extract from (fromIntegral to - from)) bytes
-        Nothing -> Nothing
+getJumpTableOffsets :: B.ByteString -> Word32 -> [Word32]
+getJumpTableOffsets bytes offset = flip runGet bytes $ do
+    skip (fromIntegral offset)
+    n <- getWord16le
+    first <- lookAhead getWord32le
+    replicateM (fromIntegral n) getWord32le
+
+getJumpTableLineLength :: B.ByteString -> Word32 -> Word32
+getJumpTableLineLength bytes offset =
+    let (_,_,to) = runGetState (skip (fromIntegral offset) >> lineParser) bytes 0
+    in fromIntegral to - offset
+
+getJumpTable :: B.ByteString -> Word32 -> [B.ByteString]
+getJumpTable bytes offset = flip map offs $ \from ->
+    let to = from + getJumpTableLineLength bytes from
+    in runGet (extract from (fromIntegral to - from)) bytes
+  where
+    offs = getJumpTableOffsets bytes offset
 
 -- Length correlation for 0100 jump table lines
 hyp1 :: B.ByteString -> Bool
@@ -332,6 +334,9 @@ prettyHex = spaceout . map (printf "%02X") . B.unpack
 forMn_ :: Monad m => [a] -> (Int -> a -> m b) -> m ()
 forMn_ l f = forM_ (zip l [0..]) $ \(x,n) -> f n x
 
+forMn :: Monad m => [a] -> (Int -> a -> m b) -> m [b]
+forMn l f = forM (zip l [0..]) $ \(x,n) -> f n x
+
 main = do
     args <- getArgs
     file <- case args of
@@ -350,6 +355,7 @@ main = do
         x = runGet (getXor oo) bytes
 
 
+    printf "Filename %s" file
     printf "Audio table offset: %08X\n" ato
     printf "First Audio table offset entry: %08X %d\n" oo ol
     printf "XOR value: %02X\n" x
@@ -392,13 +398,20 @@ main = do
         mt  = runGet (mainTable mto) bytes
     printf "Main table offset: %08X\n" mto
     printf "Main table entries: %d\n" (length mt)
-    printf "Invalid main table entries: %d\n " (length (filter (== 0xFFFFFFFF) mt))
-    printf "Large main table entries: %d\n" (length (filter (> ato) mt))
+    let fl = (findIndex (\x -> x /= 0xFFFFFFFF && x > ato) mt)
+    mt <- case fl of
+        Nothing -> return mt
+        Just n -> do
+            printf "First obviously wrong entry: %d, truncating\n" n
+            return $ take n mt
+    printf "Invalid main table entries: %d\n" (length (filter (== 0xFFFFFFFF) mt))
+    -- printf "Large main table entries: %d\n" (length (filter (> ato) mt))
     printf "First two entries: %08X %08X\n" (mt !! 0) (mt !! 1)
+    printf "Last entry: %08X\n" (last mt)
 
     let jtos = filter (< ato) $
                filter (/= 0xFFFFFFFF) (drop 2 mt)
-    let jts = mapMaybe (getJumpTable bytes) jtos
+    let jts = map (getJumpTable bytes) jtos
 
     printf "%d Jump tables follow:\n" (length jts)
     forM_ (zip jtos jts) $ \(o, jt) -> do
@@ -424,22 +437,32 @@ main = do
             [ (0, 4, "Main table address") ] ++
             [ (4, 4, "Audio table address") ] ++
             [ (mto, fromIntegral (4 * length mt), "Main table") ] ++
-            -- Add jump tables here. But how long are they?
+            [ (jto, 2 + fromIntegral n * 4, "Jump table header") |
+                jto <- jtos,
+                let n = runGet (skip (fromIntegral jto) >> getWord16le) bytes
+            ] ++
+            [ (lo, n, "Jump table line") |
+                jto <- jtos,
+                lo <- getJumpTableOffsets bytes jto,
+                let n = getJumpTableLineLength bytes lo
+            ] ++
             [ (ato, fromIntegral (8 * length at), "Audio table") ] ++
             [ (o, fromIntegral l, "Audio file " ++ show n ) | (n,(o,l)) <- zip [0..] at ]++
             [ (fromIntegral (B.length bytes), 0, "End of file") ]
     let overlapping_segments =
             filter (\((o1,l1,_),(o2,l2,_)) -> o1+l1 > o2) $
             zip known_segments (tail known_segments)
-    let unknown_segments =
-            filter (\(o,l) -> l > 0) $
-            zipWith (\(o1,l1,_) (o2,_,_) -> (o1+l1, o2-(o1+l1)))
-            known_segments (tail known_segments)
     printf "Overlapping segments: %d\n"
         (length overlapping_segments)
     forM_ overlapping_segments $ \((o1,l1,d1),(o2,l2,d2)) ->
         printf "   Offset %08X Size %d (%s) and Offset %08X Size %d (%s)\n"
             o1 l1 d1 o2 l2 d2
+    let unknown_segments =
+            filter (\(o,l) -> not
+                (l == 2 && runGet (skip (fromIntegral o) >> getWord16le) bytes == 0)) $
+            filter (\(o,l) -> l > 0) $
+            zipWith (\(o1,l1,_) (o2,_,_) -> (o1+l1, o2-(o1+l1)))
+            known_segments (tail known_segments)
     printf "Unknown file segments: %d (%d bytes total)\n"
         (length unknown_segments) (sum (map snd unknown_segments))
     forM_ unknown_segments $ \(o,l) ->
