@@ -95,7 +95,7 @@ Commands are terminated by either `0x00`, or a **A**, **B**, or **C** command wi
 
 This list of commands is exhaustive, but may nevertheless be wrong:
  * **A**: Command `E8FF01 mmmm nnnn xs...`, where `m` and `n` are 16-bit numbers, and `xs` a sequence of `n` 16-bit numbers. These 16-bit numbers are media indicies. The `m` number seems to play that file.
- * **C**: Command `FFFA01 FFFF nnnn xs` has the same format, with always `m = FFFF`
+ * **C**: Command `FFFA01 FFFF nnnn xs` has the same format, with always `n = FFFF`
  * **B**: Command `00FC01 aa bb nnnn xs`: Here `a` and `b` are 8-bit-values. This seems to be playing things in an alternating order.
  has the same format.
  * **D**: Command `00FD01 nn 0000`
@@ -110,4 +110,23 @@ Is maybe **A** actually `0000 E8FF01`, and without `nnnn xs`? There is always `0
  * **G**. Is always followed by **E**.
  * **F1** with non-zero `x`. Is followed by **F2**, **G**
  * **F2** with non-zero `b`. Is followed by **E** or **F1**
+
+Possible line beginning up to the first **F2** or **G**:
+ * **G**
+ * **F2**
+ * **F1** **F2**
+ * **F1** **G**
+
+Possible sequences after the **F2** or **G**:
+ * ( **A** | **B** ) +
+ * **F1** **A**+
+ * **F1** **A** **B**
+ * **F1** **A** **C**
+ * **F1** **A** **B** **C**
+ * **F1** **D**
+ * **D**
+ * **E** ( **A** | **B** )+
+
+Lines without a **F2** or **G**:
+ * **F1**
 

@@ -87,17 +87,16 @@ hyp5 b = case parseLine b of
 hyp6 :: B.ByteString -> Bool
 hyp6 b = case parseLine b of
     Just l -> case l of
-        Line _ _ cmds ->
-            test cmds ||
-            -- Special casing: For some files, we have extra 0x00 00 at the end of every line
-            (if [Z,Z] `isSuffixOf` cmds then test (take (length cmds - 2) cmds) else False)
+        Line _ _ [F1 {}] -> True
+        Line _ _ cmds -> test cmds
     Nothing -> True
-  where non_empty_list (A _ (_:_)) = True
-        non_empty_list (B _ _ (_:_)) = True
-        non_empty_list (C (_:_)) = True
-        non_empty_list _ = False
-        test cmds = (last cmds == Z || non_empty_list (last cmds))
-                    && all (not . non_empty_list) (init cmds)
+  where ok (A _ (_:_)) = True
+        ok (B _ _ (_:_)) = True
+        ok (C (_:_)) = True
+        ok (D _) = True
+        ok _ = False
+        test cmds = (last cmds == Z || ok (last cmds))
+                    && all (not . ok) (init cmds)
                     && all (/= Z) (init cmds)
 
 hyp7 :: B.ByteString -> Bool
@@ -110,10 +109,7 @@ hyp7 b = case parseLine b of
 hyp8 :: B.ByteString -> Bool
 hyp8 b = case parseLine b of
     Just l -> case l of
-        Line _ _ cmds -> 
-            test cmds ||
-            -- Special casing: For some files, we have extra 0x00 00 at the end of every line
-            (if [Z,Z] `isSuffixOf` cmds then test (take (length cmds - 2) cmds) else False)
+        Line _ _ cmds -> test cmds
     Nothing -> True
     where isC (C {}) = True
           isC _ = False
@@ -124,7 +120,7 @@ hyps = [ -- (hyp1, "01 line length")
        , (hyp3, "00F9 FF01 at bytes 4-7")
        , (hyp4, "00F9 FF01 at bytes 12-15 only in 0200-lines")
        -- , (hyp5, "F2(_,n,_) indicates number of arguments to A(...)")
-       , (hyp6, "0x00 or non-empty A,B,C terminate commands")
+       , (hyp6, "A,B,C,D terminate commands")
        , (hyp7, "F2 indicates number of commands")
        , (hyp8, "C is last command in line")
        ]
@@ -136,7 +132,7 @@ data Command
     | D Word8
     | E
     | F1 Word16 Word8
-    | F2 Word16 Word8 Word8
+    | F2 Word16 Word16 Word16
     | G Word16 Word16 Word16
     | Z
     deriving Eq
@@ -162,15 +158,14 @@ prettyPrintCommand (Z) = printf "0x00"
 parseLine :: B.ByteString -> Maybe Line
 parseLine = runGet begin
  where
-    headers =
+    cmds =
         [ (B.pack [0xE8,0xFF,0x01], format2 A)
         , (B.pack [0x00,0xFC,0x01], formatB)
         , (B.pack [0xFF,0xFA,0x01,0xFF,0xFF], format2 (const C))
         , (B.pack [0x00,0xFD,0x01], formatD)
-        , (B.pack [0xF0,0xFF,0x01,0x01,0x00,0x00,0x00], const (skip 7 >> return E))
-        , (B.pack [0xF9,0xFF,0x01], formatF9)
-        , (B.pack [0xFB,0xFF,0x01], formatG)
-        , (B.pack [0x00], zero)
+        , (B.pack [0xF0,0xFF,0x01,0x01,0x00,0x00,0x00], skip 7 >> return E)
+        , (B.pack [0xF9,0xFF,0x01], formatF1)
+        , (B.pack [0x00], skip 1 >> return Z)
         ]
     -- Find the occurrence of a header
     begin = do
@@ -180,50 +175,72 @@ parseLine = runGet begin
         else do
             tag <- getWord8
             b <- getLazyByteString 4
-            cs <- getCmds True
-            return $ Just (Line tag b cs)
 
-    getCmds first = do
+            cs <- maybeF1
+
+            -- fixup for WWW_Feuerwehr:
+            let cs' = case splitAt (length cs - 2) cs of
+                    (cs', [Z,Z]) -> cs'
+                    _ -> cs
+
+            return $ Just (Line tag b cs')
+
+    -- check if there is a F1-like command at the beginning
+    maybeF1 = do
+        r <- getRemainingLazyByteString
+        if (B.pack [0xF9,0xFF,0x01] `B.isPrefixOf` r) && 0x00 == r `B.index` 5
+        then do
+            skip 3
+            n <- getWord16le
+            0 <- getWord8
+            y <- getWord8
+            0 <- getWord8
+            let c = F1 n y
+            if y == 0
+            then do
+                0 <- getWord8
+                return [c] -- nothing follows
+            else (c:) <$> getF2
+        else getF2
+
+    getF2 = do
+        a <- getWord8
+        0xFF <- getWord8
+        0x01 <- getWord8
+        n <- getWord16le
+        y <- getWord16le
+        b <- getWord16le
+        let c | a == 0xFB = G n y b
+              | a == 0xF9 = F2 n y b
+        (c:) <$> getCmds
+
+    getCmds = do
         done <- isEmpty
         if done then return [] else do
 
         r <- getRemainingLazyByteString
-        case find (\(h,f) -> h `B.isPrefixOf` r) headers of
+        case find (\(h,f) -> h `B.isPrefixOf` r) cmds of
           Just (h,f) -> do
-            c <- f first
-            cs <- getCmds False
+            c <- f
+            cs <- getCmds
             return $ c:cs
           Nothing -> fail $ "unexpected command: " ++ prettyHex r
 
-    zero _ = do
-        skip 1
-        return Z
-
-    formatF9 first = do
+    formatF1 = do
         skip 3
         n <- getWord16le
-        y <- getWord8
-        if (y == 0)
-        then do
-            x <- getWord8
-            when first $ do
-                0 <- getWord8
-                return ()
-            return $ F1 n x
-        else do
-            0 <- getWord8
-            b <- getWord8
-            0 <- getWord8
-            return $ F2 n y b
+        0 <- getWord8
+        x <- getWord8
+        return $ F1 n x
 
-    format2 con _ = do
+    format2 con = do
         skip 3
         m <- getWord16le
         n <- getWord16le
         xs <- replicateM (fromIntegral n) getWord16le
         return $ con m xs
 
-    formatB _ = do
+    formatB = do
         skip 3
         b <- getWord8
         a <- getWord8
@@ -231,13 +248,15 @@ parseLine = runGet begin
         xs <- replicateM (fromIntegral n) getWord16le
         return $ B a b xs
 
-    formatD _ = do
+    formatD = do
         skip 3
         b <- getWord8
-        0 <- getWord16le
+        0 <- getWord8
+        0 <- getWord8
+        0 <- getWord8
         return $ D b
 
-    formatG _ = do
+    formatG = do
         skip 3
         a <- getWord16le
         b <- getWord16le
@@ -404,7 +423,7 @@ main = do
     forM_ (zip jtos jts) $ \(o, jt) -> do
         printf "Jump table at %08X:\n" o
         forM_ jt $ \line -> do
-            -- printf "    %s\n" (prettyHex line)
+            printf "    %s\n" (prettyHex line)
             case parseLine line of
               Nothing -> do
                 printf "    --\n"
