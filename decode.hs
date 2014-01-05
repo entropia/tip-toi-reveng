@@ -43,9 +43,9 @@ getJumpTable bytes offset =
         else return Nothing
     in case mboffs of
         Just offs -> do
-            -- Ignore the last one for now, until we know how it is terminated
-            flip map (zip offs (tail offs ++ [last offs])) $ \(from, to) -> do
-                runGet (extract from (to - from)) bytes
+            flip map offs $ \from -> do
+                let (_,_,to) = runGetState (skip (fromIntegral from) >> lineParser) bytes 0
+                runGet (extract from (fromIntegral to - from)) bytes
         Nothing -> []
 
 -- Length correlation for 0100 jump table lines
@@ -85,11 +85,10 @@ hyp5 b = case parseLine b of
 -}
 
 hyp6 :: B.ByteString -> Bool
-hyp6 b = case parseLine b of
-    Just l -> case l of
+hyp6 b = case l of
         Line _ _ [S1 _ n1, S2 _ n2 _ _] -> n1 == n2
         _ -> True
-    Nothing -> True
+    where l = parseLine b 
 
 hyps = [ -- (hyp1, "01 line length")
          (hyp2, "01 fixed prefix")
@@ -140,8 +139,11 @@ ppCommand (S3 a b cs xs)
 spaces = intercalate " "
 commas = intercalate ","
 
-parseLine :: B.ByteString -> Maybe Line
-parseLine = runGet begin
+parseLine :: B.ByteString -> Line
+parseLine = runGet lineParser
+
+lineParser :: Get Line
+lineParser = begin
  where
     cmds =
         [ (B.pack [0xE8,0xFF,0x01], format2 A)
@@ -153,16 +155,10 @@ parseLine = runGet begin
         ]
     -- Find the occurrence of a header
     begin = do
-        done <- isEmpty
-        if done
-        then return Nothing
-        else do
-            tag <- getWord8
-            b <- getLazyByteString 4
-
-            cs <- maybeS1
-
-            return $ Just (Line tag b cs)
+        tag <- getWord8
+        b <- getLazyByteString 4
+        cs <- maybeS1
+        return $ Line tag b cs
 
     -- check if there is a S1-like command at the beginning
     maybeS1 = do
@@ -397,12 +393,9 @@ main = do
         printf "Jump table at %08X:\n" o
         forM_ jt $ \line -> do
             -- printf "    %s\n" (prettyHex line)
-            case parseLine line of
-              Nothing -> do
-                printf "    --\n"
-              Just l -> do
-                printf "    %s\n" (prettyPrintLine l)
-                mapM_  (printf "     * %s\n") (checkLine (length at) l)
+            let l = parseLine line
+            printf "    %s\n" (prettyPrintLine l)
+            mapM_  (printf "     * %s\n") (checkLine (length at) l)
 
     forM_ hyps $ \(hyp, desc) -> do
         let wrong = filter (not. hyp) (concat jts)
@@ -410,12 +403,10 @@ main = do
         then printf "All lines do satisfy hypothesis \"%s\"!\n" desc
         else do
             printf "These lines do not satisfy hypothesis \"%s\":\n" desc
-            forM_ wrong $ \line -> case parseLine line of
-                Nothing -> do
-                    printf "    --\n"
-                Just l -> do
-                    printf "    %s\n" (prettyHex line)
-                    printf "    %s\n" (prettyPrintLine l)
+            forM_ wrong $ \line -> do
+                let l = parseLine line
+                printf "    %s\n" (prettyHex line)
+                printf "    %s\n" (prettyPrintLine l)
 
     let known_segments =
             [ (0, 4, "Main table address") ] ++
