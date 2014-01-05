@@ -362,13 +362,13 @@ main = do
     printf "First Audio magic: %s\n" (show (B.take 4 audio))
     printf "First Audio magic xored: %s\n" (show (B.map (xor x) (B.take 4 audio)))
 
-    at <-
+    (at, at_doubled) <-
         if take (length at `div` 2) at == drop (length at `div` 2) at
         then do
             printf "Audio table repeats itself! Ignoring first half.\n"
-            return $ take (length at `div` 2) at
+            return (take (length at `div` 2) at, True)
         else
-            return at
+            return (at, False)
 
     printf "Audio Table entries: %d\n" (length at)
 
@@ -447,6 +447,9 @@ main = do
                 let n = getJumpTableLineLength bytes lo
             ] ++
             [ (ato, fromIntegral (8 * length at), "Audio table") ] ++
+            [ (ato + fromIntegral (8 * length at), fromIntegral (8 * length at), "Duplicated audio table") |
+              at_doubled
+            ] ++
             [ (o, fromIntegral l, "Audio file " ++ show n ) | (n,(o,l)) <- zip [0..] at ]++
             [ (fromIntegral (B.length bytes), 0, "End of file") ]
     let overlapping_segments =
@@ -455,8 +458,8 @@ main = do
     printf "Overlapping segments: %d\n"
         (length overlapping_segments)
     forM_ overlapping_segments $ \((o1,l1,d1),(o2,l2,d2)) ->
-        printf "   Offset %08X Size %d (%s) and Offset %08X Size %d (%s)\n"
-            o1 l1 d1 o2 l2 d2
+        printf "   Offset %08X Size %d (%s) overlaps Offset %08X Size %d (%s) by %d\n"
+            o1 l1 d1 o2 l2 d2 (o1 + l1 - o2)
     let unknown_segments =
             filter (\(o,l) -> not
                 (l == 2 && runGet (skip (fromIntegral o) >> getWord16le) bytes == 0)) $
