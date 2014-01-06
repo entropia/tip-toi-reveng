@@ -28,270 +28,220 @@ mainTable offset = do
         skip 4
         skip 4
         getWord32le
-    let n_entries = fromIntegral ((until - offset) `div` 8)
+    let n_entries = fromIntegral ((until - offset) `div` 4)
     replicateM n_entries getWord32le
 
-getJumpTable :: B.ByteString -> Word32 -> [B.ByteString]
-getJumpTable bytes offset =
-    let mboffs = flip runGet bytes $ do
-        skip (fromIntegral offset)
-        -- Check if we have the pattern described in Table-Notes.md
-        n <- getWord16le
-        first <- lookAhead getWord32le
-        if (offset + 2 + fromIntegral n * 4 == first) then do
-            Just <$> replicateM (fromIntegral n) getWord32le
-        else return Nothing
-    in case mboffs of
-        Just offs -> do
-            -- Ignore the last one for now, until we know how it is terminated
-            flip map (zip offs (tail offs ++ [last offs])) $ \(from, to) -> do
-                runGet (extract from (to - from)) bytes
-        Nothing -> []
+getJumpTableOffsets :: B.ByteString -> Word32 -> [Word32]
+getJumpTableOffsets bytes offset = flip runGet bytes $ do
+    skip (fromIntegral offset)
+    n <- getWord16le
+    first <- lookAhead getWord32le
+    replicateM (fromIntegral n) getWord32le
 
--- Length correlation for 0100 jump table lines
-hyp1 :: B.ByteString -> Bool
-hyp1 b =
-    if not (B.null b) && b `B.index` 0 == 0x01
-    then B.length b == 16 + fromIntegral (b `B.index` 10) * 9
-    else True
+getJumpTableLineLength :: B.ByteString -> Word32 -> Word32
+getJumpTableLineLength bytes offset =
+    let (_,_,to) = runGetState (skip (fromIntegral offset) >> lineParser) bytes 0
+    in fromIntegral to - offset
+
+getJumpTable :: B.ByteString -> Word32 -> [B.ByteString]
+getJumpTable bytes offset = flip map offs $ \from ->
+    let to = from + getJumpTableLineLength bytes from
+    in runGet (extract from (fromIntegral to - from)) bytes
+  where
+    offs = getJumpTableOffsets bytes offset
 
 hyp2 :: B.ByteString -> Bool
 hyp2 b =
-    if not (B.null b) && b `B.index` 0 == 0x01
+    if b `B.index` 0 == 0x01
     then B.pack [0x01,0x00,0x00,0x00,0x00,0xF9,0xFF,0x01] `B.isPrefixOf` b
     else True
 
-hyp3 :: B.ByteString -> Bool
-hyp3 b =
-    if not (B.null b)
-    then B.pack [0x00,0xF9,0xFF,0x01] `B.isPrefixOf` (B.drop 4 b)
-    else True
-
 hyp4 :: B.ByteString -> Bool
-hyp4 b =
-    if B.pack [0x00,0xF9,0xFF,0x01] `B.isPrefixOf` (B.drop 12 b)
-    then b `B.index` 0 == 0x02
-    else True
-
-{- Not true
-hyp5 :: B.ByteString -> Bool
-hyp5 b = case parseLine b of
-    Just l -> case l of
-        Line _ _ (F2 _ n _ : cmds) -> case last cmds of
-            A _ xs -> fromIntegral n == length xs
-            _ -> False
+hyp4 b = case l of
+        Line t _ [S1 _ _, S2 _ _ _] _ -> t == 2
         _ -> True
-    Nothing -> True
--}
+    where l = parseLine b
 
 hyp6 :: B.ByteString -> Bool
-hyp6 b = case parseLine b of
-    Just l -> case l of
-        Line _ _ cmds ->
-            test cmds ||
-            -- Special casing: For some files, we have extra 0x00 00 at the end of every line
-            (if [Z,Z] `isSuffixOf` cmds then test (take (length cmds - 2) cmds) else False)
-    Nothing -> True
-  where non_empty_list (A _ (_:_)) = True
-        non_empty_list (B _ _ (_:_)) = True
-        non_empty_list (C (_:_)) = True
-        non_empty_list _ = False
-        test cmds = (last cmds == Z || non_empty_list (last cmds))
-                    && all (not . non_empty_list) (init cmds)
-                    && all (/= Z) (init cmds)
-
-hyp7 :: B.ByteString -> Bool
-hyp7 b = case parseLine b of
-    Just l -> case l of
-        Line _ _ (F2 _ n _ : cmds) -> fromIntegral n == length (filter (/= Z) cmds)
+hyp6 b = case l of
+        Line _ _ [S1 _ n1, S2 _ n2 _] _ -> n1 == fromIntegral n2
         _ -> True
-    Nothing -> True
+    where l = parseLine b
 
-hyp8 :: B.ByteString -> Bool
-hyp8 b = case parseLine b of
-    Just l -> case l of
-        Line _ _ cmds -> 
-            test cmds ||
-            -- Special casing: For some files, we have extra 0x00 00 at the end of every line
-            (if [Z,Z] `isSuffixOf` cmds then test (take (length cmds - 2) cmds) else False)
-    Nothing -> True
-    where isC (C {}) = True
-          isC _ = False
-          test cmds = all (not . isC) (init cmds)
-
-hyps = [ -- (hyp1, "01 line length")
-         (hyp2, "01 fixed prefix")
-       , (hyp3, "00F9 FF01 at bytes 4-7")
-       , (hyp4, "00F9 FF01 at bytes 12-15 only in 0200-lines")
-       -- , (hyp5, "F2(_,n,_) indicates number of arguments to A(...)")
-       , (hyp6, "0x00 or non-empty A,B,C terminate commands")
-       , (hyp7, "F2 indicates number of commands")
-       , (hyp8, "C is last command in line")
+hyps = [ (hyp2, "01 fixed prefix")
+       , (hyp4, "S1 S2 only occurs in lines with tag 2")
+       , (hyp6, "S1(_,x1) S2(_,x2) ==> x == x2")
        ]
 
 data Command
-    = A Word16 [Word16]
-    | B Word8 Word8 [Word16]
-    | C [Word16]
-    | D Word8
-    | E
-    | F1 Word16 Word8
-    | F2 Word16 Word8 Word8
-    | G Word16 Word16 Word16
-    | Z
+    = S1 Word16 Word8
+    | S2 Word16 Word16 [PCommand]
+    | S3 Word16 Word16 [PCommand]
     deriving Eq
 
-data Line = Line Word8 B.ByteString [Command]
+data PCommand
+    = A Word16
+    | B Word8 Word8
+    | C
+    | D Word8
+    | E
+    | F Word16
+    deriving Eq
 
-prettyPrintLine :: Line -> String
-prettyPrintLine (Line t b cs) = show t ++ extra ++ ": " ++ intercalate " " (map prettyPrintCommand cs)
+data Line = Line Word8 B.ByteString [Command] [Word16]
+
+ppLine :: Line -> String
+ppLine (Line t b cs xs) = show t ++ extra ++ ": " ++ spaces (map ppCommand cs) ++ " [" ++ commas (map show xs) ++ "]"
   where extra | b == B.pack [0,0,0,0]  = ""
               | otherwise              = "[" ++ prettyHex b ++ "]"
 
-prettyPrintCommand :: Command -> String
-prettyPrintCommand (A n []) = printf "Play(%d)" n
-prettyPrintCommand (A n xs) = printf "Play(%d) [%s]" n (intercalate "," (map (printf "%d") xs))
-prettyPrintCommand (B a b []) = printf "PlayOneFromSublist(%d..%d)" a b
-prettyPrintCommand (B a b xs) = printf "PlayOneFromSublist(%d..%d) [%s]" a b (intercalate "," (map (printf "%d") xs))
-prettyPrintCommand (C []) = printf "C()"
-prettyPrintCommand (C xs) = printf "C() [%s]" (intercalate "," (map (printf "%d") xs))
-prettyPrintCommand (D b) = printf "D(%d)" b
-prettyPrintCommand E = printf "E"
-prettyPrintCommand (F1 n x) = printf "F1(%d,%d)" n x
-prettyPrintCommand (F2 n x b) = printf "F2(%d,%d,%d)" n x b
-prettyPrintCommand (G a b c) = printf "G(%d,%d,%d)" a b c
-prettyPrintCommand (Z) = printf "0x00"
+ppPCommand :: PCommand -> String
+ppPCommand (A n) = printf "A(%d)" n
+ppPCommand (B a b) = printf "B(%d-%d)" a b
+ppPCommand (C) = printf "C"
+ppPCommand (D b) = printf "D(%d)" b
+ppPCommand E = printf "E"
+ppPCommand (F n) = printf "F(%d)" n
 
-parseLine :: B.ByteString -> Maybe Line
-parseLine = runGet begin
+ppCommand :: Command -> String
+ppCommand (S1 n x)
+    = printf "S1(%d,%d)" n x
+ppCommand (S2 n b cs)
+    = printf "S2(%d,%d,%s)" n b (spaces (map ppPCommand cs))
+ppCommand (S3 a b cs)
+    = printf "S3(%d,%d,%s)" a b (spaces (map ppPCommand cs))
+
+spaces = intercalate " "
+commas = intercalate ","
+
+parseLine :: B.ByteString -> Line
+parseLine = runGet lineParser
+
+lineParser :: Get Line
+lineParser = begin
  where
-    headers =
+    cmds =
         [ (B.pack [0xE8,0xFF,0x01], format2 A)
         , (B.pack [0x00,0xFC,0x01], formatB)
         , (B.pack [0xFF,0xFA,0x01,0xFF,0xFF], format2 (const C))
         , (B.pack [0x00,0xFD,0x01], formatD)
-        , (B.pack [0xF0,0xFF,0x01,0x01,0x00,0x00,0x00], const (skip 7 >> return E))
-        , (B.pack [0xF9,0xFF,0x01], formatF9)
-        , (B.pack [0xFB,0xFF,0x01], formatG)
-        , (B.pack [0x00], zero)
+        , (B.pack [0xF0,0xFF,0x01,0x01,0x00], skip 5 >> return E)
+        , (B.pack [0xF9,0xFF,0x01], formatF)
         ]
     -- Find the occurrence of a header
     begin = do
-        done <- isEmpty
-        if done
-        then return Nothing
-        else do
-            tag <- getWord8
-            b <- getLazyByteString 4
-            cs <- getCmds True
-            return $ Just (Line tag b cs)
-
-    getCmds first = do
-        done <- isEmpty
-        if done then return [] else do
-
-        r <- getRemainingLazyByteString
-        case find (\(h,f) -> h `B.isPrefixOf` r) headers of
-          Just (h,f) -> do
-            c <- f first
-            cs <- getCmds False
-            return $ c:cs
-          Nothing -> fail $ "unexpected command: " ++ prettyHex r
-
-    zero _ = do
-        skip 1
-        return Z
-
-    formatF9 first = do
-        skip 3
-        n <- getWord16le
-        y <- getWord8
-        if (y == 0)
-        then do
-            x <- getWord8
-            when first $ do
-                0 <- getWord8
-                return ()
-            return $ F1 n x
-        else do
-            0 <- getWord8
-            b <- getWord8
-            0 <- getWord8
-            return $ F2 n y b
-
-    format2 con _ = do
-        skip 3
-        m <- getWord16le
+        tag <- getWord8
+        b <- getLazyByteString 4
+        cs <- maybeS1
+        -- Audio links
         n <- getWord16le
         xs <- replicateM (fromIntegral n) getWord16le
-        return $ con m xs
 
-    formatB _ = do
+        return $ Line tag b cs xs
+
+    -- check if there is a S1-like command at the beginning
+    maybeS1 = do
+        r <- getRemainingLazyByteString
+        if (B.pack [0xF9,0xFF,0x01] `B.isPrefixOf` r) && 0x00 == r `B.index` 5
+        then do
+            skip 3
+            n <- getWord16le
+            0 <- getWord8
+            y <- getWord8
+            let c = S1 n y
+            if y == 0
+            then do
+                return [c] -- nothing follows
+            else do
+                0 <- getWord8
+                cs <- getF2
+                return [c,cs]
+        else (:[]) <$> getF2
+
+    getF2 = do
+        a <- getWord8
+        0xFF <- getWord8
+        0x01 <- getWord8
+        n <- getWord16le
+        y <- getWord16le
+        b <- getWord16le
+        -- Commands are separated by 0x0000
+        cmds <- padded (fromIntegral y) getCmd
+
+        let c | a == 0xFB = S3 n b cmds
+              | a == 0xF9 = S2 n b cmds
+        return c
+
+
+    padded 0 a = fail "padded: 0"
+    padded 1 a = (:[]) <$> a
+    padded n a = do
+        x <- a
+        0 <- getWord16le
+        (x:) <$> padded (n-1) a
+
+
+    getCmd = do
+        r <- getRemainingLazyByteString
+        case find (\(h,f) -> h `B.isPrefixOf` r) cmds of
+          Just (h,f) -> f
+          Nothing -> fail $ "unexpected command: " ++ prettyHex r
+
+    formatF = do
+        skip 3
+        n <- getWord16le
+        return $ F n
+
+    format2 con = do
+        skip 3
+        m <- getWord16le
+        return $ con m
+
+    formatB = do
         skip 3
         a <- getWord8
         b <- getWord8
-        n <- getWord16le
-        xs <- replicateM (fromIntegral n) getWord16le
-        return $ B a b xs
+        return $ B a b
 
-    formatD _ = do
+    formatD = do
         skip 3
         b <- getWord8
-        0 <- getWord16le
+        0 <- getWord8
         return $ D b
-
-    formatG _ = do
-        skip 3
-        a <- getWord16le
-        b <- getWord16le
-        c <- getWord16le
-        return $ G a b c
 
 
 checkLine :: Int -> Line -> [String]
-checkLine n_audio (Line _ _ cmds) =
-    concatMap (checkCommand n_audio) cmds
-
-checkCommand :: Int -> Command -> [String]
-checkCommand n_audio c@(A _ xs)
+checkLine n_audio l@(Line _ _ _ xs)
     | any (>= fromIntegral n_audio) xs
-    = return $ "Invalid audio index in command " ++ prettyPrintCommand c
-checkCommand n_audio c@(B _ _ xs)
-    | any (>= fromIntegral n_audio) xs
-    = return $ "Invalid audio index in command " ++ prettyPrintCommand c
-checkCommand n_audio c@(C xs)
-    | any (>= fromIntegral n_audio) xs
-    = return $ "Invalid audio index in command " ++ prettyPrintCommand c
-checkCommand n_audio c = []
-
+    = return $ "Invalid audio index in line " ++ ppLine l
+checkLine n_audio _ = []
 
 audioTableOffset :: Get Word32
 audioTableOffset = do
     skip 4
     getWord32le
 
-audioTable :: Word32 -> Get [(Word32, Word32, Int)]
+audioTable :: Word32 -> Get [(Word32, Word32)]
 audioTable offset = do
     skip (fromIntegral offset)
     until <- lookAhead getWord32le
     let n_entries = fromIntegral ((until - offset) `div` 8)
-    sequence [ do
+    replicateM n_entries $ do
         ptr <- getWord32le
         len <- getWord32le
-        return (ptr, len, n)
-        | n <- [0..n_entries-1] ]
+        return (ptr, len)
 
-checkAT :: B.ByteString -> (Word32, Word32, Int) -> IO Bool
-checkAT audio (off, len, n) =
-    if fromIntegral off > B.length audio
+checkAT :: B.ByteString -> Int -> (Word32, Word32) -> IO Bool
+checkAT bytes n (off, len) =
+    if fromIntegral off > B.length bytes
     then do
         printf "    Entry %d: Offset %d > File size %d\n"
-            n off (B.length audio)
+            n off (B.length bytes)
         return False
-    else if fromIntegral (off + len) > B.length audio
+    else if fromIntegral (off + len) > B.length bytes
          then do
             printf "    Entry %d: Offset %d + Lengths %d > File size %d\n"
-                n off len (B.length audio)
+                n off len (B.length bytes)
             return False
          else return True
 
@@ -345,6 +295,12 @@ prettyHex = spaceout . map (printf "%02X") . B.unpack
         spaceout (a:b:r) = a ++ b ++ " " ++ spaceout r
         spaceout r = concat r
 
+forMn_ :: Monad m => [a] -> (Int -> a -> m b) -> m ()
+forMn_ l f = forM_ (zip l [0..]) $ \(x,n) -> f n x
+
+forMn :: Monad m => [a] -> (Int -> a -> m b) -> m [b]
+forMn l f = forM (zip l [0..]) $ \(x,n) -> f n x
+
 main = do
     args <- getArgs
     file <- case args of
@@ -358,25 +314,40 @@ main = do
     -- Ogg file stuff
     let ato = runGet audioTableOffset bytes
         at = runGet (audioTable ato) bytes
-        (oo,ol,_) = head at
+        (oo,ol) = head at
         audio = runGet (extract oo ol) bytes
         x = runGet (getXor oo) bytes
 
+
+    printf "Filename %s\n" file
+    printf "File size: %08X (%d)\n" (B.length bytes) (B.length bytes)
+    printf "Checksum found %08X, calculated %08X\n"
+        (runGet (skip (fromIntegral (B.length bytes) - 4) >> getWord32le) bytes)
+        (foldl' (+) 0 (map fromIntegral (B.unpack (B.take (B.length bytes -4) bytes))) :: Word32)
     printf "Audio table offset: %08X\n" ato
     printf "First Audio table offset entry: %08X %d\n" oo ol
     printf "XOR value: %02X\n" x
     printf "First Audio magic: %s\n" (show (B.take 4 audio))
     printf "First Audio magic xored: %s\n" (show (B.map (xor x) (B.take 4 audio)))
+
+    (at, at_doubled) <-
+        if take (length at `div` 2) at == drop (length at `div` 2) at
+        then do
+            printf "Audio table repeats itself! Ignoring first half.\n"
+            return (take (length at `div` 2) at, True)
+        else
+            return (at, False)
+
     printf "Audio Table entries: %d\n" (length at)
 
-    at_fixed <- filterM (checkAT bytes) at
+    forMn_ at (checkAT bytes)
 
     createDirectoryIfMissing False "oggs"
-    forM_ at_fixed $ \(oo,ol,n) -> do
+    forMn_ at $ \n (oo,ol) -> do
         let rawaudio = runGet (extract oo ol) bytes
         let audio = decypher x rawaudio
         let audiotype = fromMaybe "raw" $ lookup (B.take 4 audio) fileMagics
-        let filename = printf "oggs/%s_%03d.%s" file n audiotype
+        let filename = printf "oggs/%s_%04d.%s" file n audiotype
         if B.null audio
         then do
             printf "File %s would be empty...\n" filename
@@ -395,9 +366,16 @@ main = do
         mt  = runGet (mainTable mto) bytes
     printf "Main table offset: %08X\n" mto
     printf "Main table entries: %d\n" (length mt)
-    printf "Invalid main table entries: %d\n " (length (filter (== 0xFFFFFFFF) mt))
-    printf "Large main table entries: %d\n" (length (filter (> ato) mt))
+    let fl = (findIndex (\x -> x /= 0xFFFFFFFF && x > ato) mt)
+    mt <- case fl of
+        Nothing -> return mt
+        Just n -> do
+            printf "First obviously wrong entry: %d, truncating\n" n
+            return $ take n mt
+    printf "Invalid main table entries: %d\n" (length (filter (== 0xFFFFFFFF) mt))
+    -- printf "Large main table entries: %d\n" (length (filter (> ato) mt))
     printf "First two entries: %08X %08X\n" (mt !! 0) (mt !! 1)
+    printf "Last entry: %08X\n" (last mt)
 
     let jtos = filter (< ato) $
                filter (/= 0xFFFFFFFF) (drop 2 mt)
@@ -408,12 +386,9 @@ main = do
         printf "Jump table at %08X:\n" o
         forM_ jt $ \line -> do
             -- printf "    %s\n" (prettyHex line)
-            case parseLine line of
-              Nothing -> do
-                printf "    --\n"
-              Just l -> do
-                printf "    %s\n" (prettyPrintLine l)
-                mapM_  (printf "     * %s\n") (checkLine (length at) l)
+            let l = parseLine line
+            printf "    %s\n" (ppLine l)
+            mapM_  (printf "     * %s\n") (checkLine (length at) l)
 
     forM_ hyps $ \(hyp, desc) -> do
         let wrong = filter (not. hyp) (concat jts)
@@ -421,28 +396,47 @@ main = do
         then printf "All lines do satisfy hypothesis \"%s\"!\n" desc
         else do
             printf "These lines do not satisfy hypothesis \"%s\":\n" desc
-            forM_ wrong $ \line -> case parseLine line of
-                Nothing -> do
-                    printf "    --\n"
-                Just l -> do
-                    printf "    %s\n" (prettyHex line)
-                    printf "    %s\n" (prettyPrintLine l)
+            forM_ wrong $ \line -> do
+                let l = parseLine line
+                printf "    %s\n" (prettyHex line)
+                printf "    %s\n" (ppLine l)
 
-    let known_segments =
+    let known_segments = sort $
             [ (0, 4, "Main table address") ] ++
-            [ (4, 4, "Media table address") ] ++
+            [ (4, 4, "Audio table address") ] ++
             [ (mto, fromIntegral (4 * length mt), "Main table") ] ++
-            -- Add jump tables here. But how long are they?
-            [ (ato, fromIntegral (8 * length at), "Media table") ] ++
-            [ (o, fromIntegral l, "Media file " ++ show n ) | (o,l,n) <- at ]++
+            [ (jto, 2 + fromIntegral n * 4, "Jump table header") |
+                jto <- jtos,
+                let n = runGet (skip (fromIntegral jto) >> getWord16le) bytes
+            ] ++
+            [ (lo, n, "Jump table line") |
+                jto <- jtos,
+                lo <- getJumpTableOffsets bytes jto,
+                let n = getJumpTableLineLength bytes lo
+            ] ++
+            [ (ato, fromIntegral (8 * length at), "Audio table") ] ++
+            [ (ato + fromIntegral (8 * length at), fromIntegral (8 * length at), "Duplicated audio table") |
+              at_doubled
+            ] ++
+            [ (o, fromIntegral l, "Audio file " ++ show n ) | (n,(o,l)) <- zip [0..] at ]++
             [ (fromIntegral (B.length bytes), 0, "End of file") ]
+    let overlapping_segments =
+            filter (\((o1,l1,_),(o2,l2,_)) -> o1+l1 > o2) $
+            zip known_segments (tail known_segments)
+    printf "Overlapping segments: %d\n"
+        (length overlapping_segments)
+    forM_ overlapping_segments $ \((o1,l1,d1),(o2,l2,d2)) ->
+        printf "   Offset %08X Size %d (%s) overlaps Offset %08X Size %d (%s) by %d\n"
+            o1 l1 d1 o2 l2 d2 (o1 + l1 - o2)
     let unknown_segments =
+            filter (\(o,l) -> not
+                (l == 2 && runGet (skip (fromIntegral o) >> getWord16le) bytes == 0)) $
             filter (\(o,l) -> l > 0) $
             zipWith (\(o1,l1,_) (o2,_,_) -> (o1+l1, o2-(o1+l1)))
             known_segments (tail known_segments)
     printf "Unknown file segments: %d (%d bytes total)\n"
         (length unknown_segments) (sum (map snd unknown_segments))
     forM_ unknown_segments $ \(o,l) ->
-        printf "   Offset: %08X Size %d\n" o l
+        printf "   Offset: %08X to %08X (%d bytes)\n" o (o+l) l
 
 

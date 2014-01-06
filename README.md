@@ -15,6 +15,8 @@ All offsets are from the beginning of the file.
    - Everything else is XORed bytewise by x.
  * Usually, thes are OGG files, sometimes these are RIFF (i.e. wav) files.
  * This is verified by checking the CRC header of the OGG files
+ * In `Leserabe_een.gme*`, the audio table is repeated right after itself. Why?
+ * The last 4 bytes of the file are a simple additive check-sum over the file.
 
 What we have
 ------------
@@ -28,7 +30,6 @@ Open issues
 -----------
 
  * What is the meaning of the bytes before the OGG file table? Some ideas in Table-Notes.md.
- * The last four bytes are likely some kind of checksum. Which checksum?
 
 Links
 -----

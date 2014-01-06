@@ -1,9 +1,7 @@
 The first few KBytes
 ====================
 
-Rough notes from reading the hexdump of the stuff before the ogg file.
-
-Consider `WWW_Feuerwehr.gme`. Everything up to `00026C59` is unknown.
+Rough notes from reading the hexdump of the stuff before the ogg files.
 
 Tables
 ------
@@ -18,15 +16,33 @@ For most files(?), the main table consists of
  * 32bit: last used code number
  * 32bit: first used code number
  * Then, 32-bit offsets that point to (what I call) *jump tables* (see below).
- * In between these offsets, there are streaks of 0xFFFFFFFF. These indicate that the corresponding code is not used within the book. 
- * the end of the offsets can be found at (maintable + 8 + 4*(last used code - first used code)   
+ * In between these offsets, there are streaks of 0xFFFFFFFF. These indicate that the corresponding code is not used within the book.
+ * These correspond linearly to the OID codes.
+   E.g. WWW_Bauernhof: The first piglet has OID-code 1499, the corresponding
+   jump table is at `0x766A`. This offset is the 400ths entry of the main table. So possibly `OID - 1099 = main table index`. Question: Is this 1099 the same for every book?
+ * The end of the offsets can be found at (maintable + 8 + 4*(last used code - first used code). Question: What is the first and last code used?
 
-Unclear: When does the main table end?
+There is more data contained at the beginning of the file:
+ * The second 32-bit-words is a pointer to the media table.
+ * The forth 32-bit-word (`0x0001703b`) is an offset into the file. There is a
+   number (32-bit, `0x000 000c` = 12) followed by that many offsets right after
+   the list. These offsets begin are right the list and spread out towards the
+   next known block (the media file table), so its objects are relatively large
+   (~1k). The objects themselves contains numbers and offsets.
+ * The fifth 32-bit-word is the same offset as the forth in WWW_Bauernhof.gme,
+   but different in WWW_Feuerwehr.gme. There, the offset is `0x103ff`, which
+   points in the middle of some jump table commands
+ * The sixth 32-bit-word seems to be a small number.
+ * The seventh 32-bit-word is a large number, but points in the middle of the
+   media file area, so probably not an offset.
+ * The eigth 32-bit-word is a small number.
+ * Then follows the string `0CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.5.090820111024`
+ * there is another number at `0x70` or `0x71`. If read from `0x71` on, it is similar to the seventh 32-bit-word of the header.
 
 Jump table pattern
 ------------------
 
-Thre are many jump tables, and they seem to be important. some are referneced from the main table, but not all. (where the others referenced from?)
+There are many jump tables, and they seem to be important. Some are referenced from the main table, but not all.
 
 The table consists of
  * A number,  16 bit. Commonly 16 or 17.
@@ -73,34 +89,45 @@ In `WWW_Feuerwehr.gme`, this pattern is for example found at `0x00025e4`
 Command lines
 -------------
 
-Command lines have the form 'ss uuuuuuuu' followed by commands.
+Command lines are of the form `tt nnnn nnnn cmds... nnnn ids..`:
+ * the *tag* `tt` is either 1 or 2.
+ * `n` is amost always `0000 0000`.
+ * the commands are explained below, and
+ * `ids` is a list of `n` 16-bit numbers, which references the media table (0-based).
 
-ss is an 8bit value for the section where this line applies.  
- * 01 for "Wissen" (Knowledge)
- * 02 for "Entdecken" (Explore)
- * 03 for "Spielen" (Play) (assumption, currently not verified)
+The list of commands start with one of these sequences:
+ * **S1**
+ * **S2**
+ * **S1** **S2** (only with tag 2)
+ * **S1** **S3** (only with tag 2)
 
-uuuuuuuu is a currently unknown value that is 0 most of the time, we have seen the value 00001E00 precisely once so far.
+Their shape is
+ * **S1**: `F9 FF01 nnnn 00xx` where `n` is a 16-bit number, and `x` one byte. If `x` is zero, then nothing follows, otherwise **S2** or **S3** must follow.
+ * **S2**: `F9 FF01 nnnn yy 00 aa 00 pc... mmmm xs...` where
+    - `n` is a 16-bit number
+    - `y` is not zero
+    - `a` is an 8-bit-number
+    - `y` indicates the number of following play command (`pc`) which always have `0000` in between
+    - `mmmm` indicates the number of media file indices in `xs`, which is a list of 16-bit-numbers.
+ * **S3** is like **S2**, but starts with `FB` instead of `F9`. So maybe the byte is not really part of the command.
 
-The first command is always command **F1** or **F2**. There is at most one **F2** or **G** command per line. **F2** or **G** gives the number of commands, but what if **F2** is not the first command? Then it follows one **F1** with non-zero `x`. Maybe this is some kind of jump label.
+If we have **S1 S2**, then **S1**’s x is equal to **S2**’s a.
 
-Commands are terminated by either `0x00`, or a **A**, **B**, or **C** command with a non-empty argument list. Before the terminating command, such commands to *not* occur. **C** only occurs in the last position.
+The first parameter of the first **S**-command is likely the mode (*Wissen*, *Entdecken*, *Spielen*, etc.).
 
-This list of commands is exhaustive, but may nevertheless be wrong:
- * **A**: Command `E8FF01 mmmm nnnn xs...`, where `m` and `n` are 16-bit numbers, and `xs` a sequence of `n` 16-bit numbers. These 16-bit numbers are media indicies. The `m` number seems to play that file.
- * **C**: Command `FFFA01 FFFF nnnn xs` has the same format, with always `m = FFFF`
- * **B**: Command `00FC01 aa bb nnnn xs`: Here `a` and `b` are 8-bit-values. This seems to be playing things in an alternating order from sample a to sample b for each execution of this command. 
- * **D**: Command `00FD01 nn 0000`
- * **E**: Command `F0FF01` is followed by four more bytes (so far only `0100 0000`).
- * Command `F9FF01` comes in two variants of differing lengths:
-   - **F1**: `F9 FF01 nnnn 00xx` where `n` is a 16-bit number, and `xx` one byte
-     If this is the first command in the line, it is followed by `0x00`, otherwise not. (huh?)
-   - **F2**: `F9 FF01 nnnn yy 00 bb 00` where `n` is a 16-bit numbers, and `y` is not zero, and `a` is an 8-bit-number. In that case, `y` indicates the number of following commands in this line.
- * **G**: Command `FB FF01 aaaa bbbb cccc`. Seems to be simliar to **F2**, as `b` is the number of commands following.
+The play comands are:
+ * **A**: `E8FF01 mmmm`, where `m` is a 16-bit number (or a 8-bit-number, no large numbers found so far), the number of the media file to play.
+ * **B**: `00FC01 aa bb`: Here `a` and `b` are 8-bit-values. This seems to be playing one of the samples from `a` to `b`, beginning with `a` and cycling through the list.
+ * **C**: `FFFA01 FFFF`
+ * **D**: `00FD01 nn`
+ * **E**: `F0FF01 0100`
+ * **F**: `F9FF01 nnnn` where `n` is a 16-bit number. This is very similar to `S1`.
 
-Is maybe **A** actually `0000 E8FF01`, and without `nnnn xs`? There is always `0000` in front... The only commands that do not end with `0000` are:
- * **G**. Is always followed by **E**.
- * **F1** with non-zero `x`. Is followed by **F2**, **G**
- * **F2** with non-zero `b`. Is followed by **E** or **F1**
+If **D** occurs, then as the last entry. If **E** or **F** occurs, then as the first entry. **D** only occurs alone or with **F** before.
 
-Maybe **A** also uses 8bit indices to the sample array.
+Jump table locations
+--------------------
+
+Where are the others referenced from?
+
+For example there is a (very small, one line with one **F** command) jump-table at `0x35C0` in `WWW_Bauernhof.gme`, but that offset does not occur in the file.
