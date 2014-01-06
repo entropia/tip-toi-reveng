@@ -100,7 +100,7 @@ Command lines come in three variants
     - `pc` is a sequence of `bb` play commands, which always have `0000` in between.
     - `mmmm` is the number of media file indices in `xs...`, a list of 16-bit-numbers
     - Sometimes, byte 12 is `FB` instead of `F9`
- * `01 0000 0000 F9FF1 mmmm bb00 pad pc... mmmm xs...` where
+ * `01 0000 0000 F9FF01 mmmm bb00 pad pc... mmmm xs...` where
     - `mmmm` indicates the mode (*Wissen*, *Entdecken*, etc.)
     - `bb` is the number of play commands in `pc...`
     - `pad` is empty if `bb=0`. Otherwise, it is usually, but not always `0000`.
@@ -108,8 +108,13 @@ Command lines come in three variants
     - `mmmm` is the number of media file indices in `xs...`, a list of 16-bit-numbers
     - In one instance, byte 3 is `1E` instead of `00`
 
+
 The first variant is used if there is more than one line for a mode within a
 table, so I call this a **ML** line, while the second variant is used if there is only one line, so I call this a **SL**. The variants are written **ML'** and **SL'**.
+
+I may seem strange to have the pad in **SL** depend on `b` without seeing
+something similar in **ML**. But we simply have no example of a **ML** with
+`b=0` yet... quite possibly the same mechanism works there.
 
 The play comands are:
  * **A**: `E8FF01 mmmm`, where `m` is a 16-bit number (or a 8-bit-number, no large numbers found so far), the number of the media file to play.
