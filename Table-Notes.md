@@ -37,6 +37,8 @@ There is more data contained at the beginning of the file:
    media file area, so probably not an offset.
  * The eigth 32-bit-word is a small number.
  * Then follows the string `0CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.5.090820111024`
+   - The Zero in front means 0x30 Byte long string so it ends after 0908 then the date 'YYYYMMDD' of the file follows
+   - see Wimmelbuch.gme for example there it is '1CHOMPTECH .... Ver2.10.090120130419'
  * there is another number at `0x70` or `0x71`. If read from `0x71` on, it is similar to the seventh 32-bit-word of the header.
 
 Jump table pattern
