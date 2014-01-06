@@ -32,13 +32,12 @@ There is more data contained at the beginning of the file:
  * The fifth 32-bit-word is the same offset as the forth in WWW_Bauernhof.gme,
    but different in WWW_Feuerwehr.gme. There, the offset is `0x103ff`, which
    points in the middle of some jump table commands
- * The sixth 32-bit-word seems to be a small number.
+ * The sixth 32-bit-word is a small number containing the product id code (== OID code of the power on symbol on page 1)? 
  * The seventh 32-bit-word is a large number, but points in the middle of the
    media file area, so probably not an offset.
  * The eigth 32-bit-word is a small number.
  * Then follows the string `0CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.5.090820111024`
  * there is another number at `0x70` or `0x71`. If read from `0x71` on, it is similar to the seventh 32-bit-word of the header.
- * Question: Where in that data can we find the product code (== OID code of the Power-On symbol on page 1)? 
 
 Jump table pattern
 ------------------
