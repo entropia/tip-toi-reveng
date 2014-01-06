@@ -385,7 +385,7 @@ main = do
     forM_ (zip jtos jts) $ \(o, jt) -> do
         printf "Jump table at %08X:\n" o
         forM_ jt $ \line -> do
-            printf "    %s\n" (prettyHex line)
+            -- printf "    %s\n" (prettyHex line)
             let l = parseLine line
             printf "    %s\n" (ppLine l)
             mapM_  (printf "     * %s\n") (checkLine (length at) l)
