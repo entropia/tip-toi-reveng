@@ -23,21 +23,43 @@ For most files(?), the main table consists of
  * The end of the offsets can be found at (maintable + 8 + 4*(last used OID code - first used OID code).
 
 There is more data contained at the beginning of the file:
- * The second 32-bit-words is a pointer to the media table.
- * The forth 32-bit-word (`0x0001703b`) is an offset into the file. There is a
+ * 0x0000 the first 32-bit word pointer to the main table
+ * 0x0004 The second 32-bit word is a pointer to the media table.
+ * 0x0008 unknown 32-bit word, value always 0x000238b 
+ * 0x000c points to a 16bit word that is alwaya 0x0000 (no exceptions found so far)
+ * 0x0010 32-bit-word (`0x0001703b`) is an offset into the file. This offset is always direcIts value is always 2 bytes after the There is a
    number (32-bit, `0x000 000c` = 12) followed by that many offsets right after
-   the list. These offsets begin are right the list and spread out towards the
+   the list. These offsets point to right after the list and spread out towards the
    next known block (the media file table), so its objects are relatively large
    (~1k). The objects themselves contains numbers and offsets.
- * The fifth 32-bit-word is the same offset as the forth in WWW_Bauernhof.gme,
-   but different in WWW_Feuerwehr.gme. There, the offset is `0x103ff`, which
-   points in the middle of some jump table commands
- * The sixth 32-bit-word is a small number containing the product id code (== OID code of the power on symbol on page 1)? 
- * The seventh 32-bit-word is a large number, but points in the middle of the
-   media file area, so probably not an offset.
- * The eigth 32-bit-word is a small number.
- * Then follows the string `0CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.5.090820111024`
- * there is another number at `0x70` or `0x71`. If read from `0x71` on, it is similar to the seventh 32-bit-word of the header.
+ * 0x0014 The sixth 32-bit-word is a small number containing the product id code (== OID code of the power on symbol on page 1) 
+ * 0x0018 The seventh 32-bit-word points to the data directly following the list of the welcome samples. Maybe this means something like "end of table data"?
+ * 0x001c The eighth 32-bit-word is a small number, differing between books.
+ * 0x0020 is a byte that contains the lenght of the Chomptech data format version string. 
+ * 0x0021 Then follows the string 'CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.5.0908' or similar, resembling the length given at 0x0020
+ * directly after that the is a version strings like '20111024' followed by zero bytes up to 0x005f
+ * 0x0060 For some books a 32bit address pointing to a place where another pointer can be found. Otherwise 0
+ * 0x0064 to 0x0070 are 0
+ * 0x0071 This points to a list that contains the address of the welcome samples played when the power on symbol is pointed at.
+ * 0x0075 to 0x008b are 0
+ * Beginning at 0x008c some books have more data (otherwise 0):
+   0x008c      oooooooo 32-bit offset 
+   0x0090      oooo 16-bit offset?
+   0x0092      nnnn 16-bit number
+   0x0094      oooo
+   0x0096      nnnn
+   0x0098      oooo
+   0x009a      nnnn
+   0x009c      0000
+   0x009e      0000
+   0x00a0      oooo
+   0x00a2      nnnn
+   0x00a4      0000 or 0001
+   0x00a6      0000
+   0x00a8      oooo
+   0x00aa      nnnn
+   * from 0x00ac to 0x01ff all bytes are 0
+
 
 Jump table pattern
 ------------------
@@ -88,41 +110,44 @@ In `WWW_Feuerwehr.gme`, this pattern is for example found at `0x00025e4`
 Command lines
 -------------
 
-Command lines are of the form `tt nnnn nnnn cmds... nnnn ids..`:
- * the *tag* `tt` is either 1 or 2.
- * `n` is almost always `0000 0000`.
- * the commands are explained below, and
- * `ids` is a list of `n` 16-bit numbers, which references the media table (0-based).
+Command lines come in three variants
+ * `02 0000 0000 F9FF01 mmmm 00 gg F9FF 01 aa00 bb00 gg00 pc... mmmm xs...` where
+    - `mmmm` indicates the mode (*Wissen*, *Entdecken*, etc.)
+    - `gg` is some number (a group of kinds), equal in both positions
+    - `aa` tends to count within the lines of one mode and table, nothing more known so far
+    - `bb` is the number of play commands in `pc...`
+    - `pc` is a sequence of `bb` play commands, which always have `0000` in between.
+    - `mmmm` is the number of media file indices in `xs...`, a list of 16-bit-numbers
+    - Sometimes, byte 12 is `FB` instead of `F9`
+ * `01 0000 0000 F9FF01 mmmm bb00 pad pc... mmmm xs...` where
+    - `mmmm` indicates the mode (*Wissen*, *Entdecken*, etc.)
+    - `bb` is the number of play commands in `pc...`
+    - `pad` is empty if `bb=0`. Otherwise, it is usually, but not always `0000`.
+    - `pc` is a sequence of `bb` play commands, which always have `0000` in between.
+    - `mmmm` is the number of media file indices in `xs...`, a list of 16-bit-numbers
+    - In one instance, byte 3 is `1E` instead of `00`
 
-The list of commands start with one of these sequences:
- * **S1**
- * **S2**
- * **S1** **S2** (only with tag 2)
- * **S1** **S3** (only with tag 2)
 
-Their shape is
- * **S1**: `F9 FF01 nnnn 00xx` where `n` is a 16-bit number, and `x` one byte. If `x` is zero, then nothing follows, otherwise **S2** or **S3** must follow.
- * **S2**: `F9 FF01 nnnn yy 00 aa 00 pc... mmmm xs...` where
-    - `n` is a 16-bit number
-    - `y` is not zero
-    - `a` is an 8-bit-number
-    - `y` indicates the number of following play commands (`pc`) which always have `0000` in between
-    - `mmmm` indicates the number of media file indices in `xs`, which is a list of 16-bit-numbers.
- * **S3** is like **S2**, but starts with `FB` instead of `F9`. So maybe the byte is not really part of the command. (note: FB and F9 differ only  in one bit)
+The first variant is used if there is more than one line for a mode within a
+table, so I call this a **ML** line, while the second variant is used if there is only one line, so I call this a **SL**. The variants are written **ML'** and **SL'**.
 
-If we have **S1 S2**, then **S1**’s x is equal to **S2**’s a.
+I may seem strange to have the pad in **SL** depend on `b` without seeing
+something similar in **ML**. But we simply have no example of a **ML** with
+`b=0` yet... quite possibly the same mechanism works there.
 
-The first parameter of the first **S**-command is likely the mode (*Wissen*, *Entdecken*, *Spielen*, etc.).
-
-The play commands are:
- * **A**: `E8FF01 mmmm`, where `m` is a 16-bit number (or a 8-bit-number, no large numbers found so far), the index of the media file to play (from the media list at the end).
+The play comands are:
+ * **A**: `E8FF01 mmmm`, where `m` is a 16-bit number (or a 8-bit-number, no large numbers found so far), the number of the media file to play.
  * **B**: `00FC01 aa bb`: Here `a` and `b` are 8-bit-values. This seems to be playing one of the samples from `a` to `b`, beginning with `a` and cycling through the list.
  * **C**: `FFFA01 FFFF`
  * **D**: `00FD01 nn`
  * **E**: `F0FF01 0100`
- * **F**: `F9FF01 nnnn` where `n` is a 16-bit number. This is very similar to `S1`.
+   - When activating this symbol again, execute the next line of this mode.
+ * **F**: `F9FF01 nnnn` where `n` is a 16-bit number.
+   - `n = 0`: When activating this symbol again, execute the first line of this mode.
+   - `n ≠ 0`: Change the mode to `n`
 
 (Note: ALL commands have F as the third nibble)
+The jump commands **F** and **E** only occur in **ML** lines.
 
 If **D** occurs, then as the last entry. If **E** or **F** occurs, then as the first entry. **D** only occurs alone or with **F** before. **C** only has been seen as the last command in mode 4 lines so far. 
 
