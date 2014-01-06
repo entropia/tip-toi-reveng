@@ -68,14 +68,18 @@ data Command
     | F Word16
     deriving Eq
 
-data Line = Line LineHeader [Command] [Word16]
+data Line = Line LineHeader (Maybe (Word8, [Command])) [Word16]
 
 data LineHeader
     = MultiLine Bool Word16 Word8 Word8
-    | SingeLine Bool Word16 
+    | SingeLine Bool Word16
 
 ppLine :: Line -> String
-ppLine (Line h cs xs) = ppLineHeader h ++ ": " ++ spaces (map ppCommand cs) ++ " [" ++ commas (map show xs) ++ "]"
+ppLine (Line h Nothing xs) = ppLineHeader h ++ ": " ++ " [" ++ commas (map show xs) ++ "]"
+ppLine (Line h (Just (g, cs)) xs) = ppLineHeader h ++ ": " ++ group ++ spaces (map ppCommand cs) ++ " [" ++ commas (map show xs) ++ "]"
+  where group = case g of 0 -> ""
+                          _ -> "(" ++ show g ++ ") "
+
 
 ppLineHeader :: LineHeader -> String
 ppLineHeader (MultiLine v m g a) = printf "ML%s(%d,%d,%d)" (quote v) m g a
@@ -111,11 +115,22 @@ lineParser = begin
         ]
     -- Find the occurrence of a header
     begin = do
-        (h,cs) <- getHeader
+        h <- getHeader
+        -- Commands
+        b <- getWord8
+        expectWord8 0
+        mc <- case b of
+            0 -> return Nothing
+            b -> do
+                g <- getWord8
+                expectWord8 0
+                -- Commands are separated by 0x0000
+                cmds <- padded (fromIntegral b) getCmd
+                return $ Just (g,cmds)
         -- Audio links
         n <- getWord16le
         xs <- replicateM (fromIntegral n) getWord16le
-        return $ Line h cs xs
+        return $ Line h mc xs
 
     expectWord8 n = do
         n' <- getWord8
@@ -138,15 +153,7 @@ lineParser = begin
                 expectWord8 0xFF
                 expectWord8 0x01
                 m <- getWord16le
-                b <- getWord8
-                expectWord8 0
-                when (b /= 0) $ do
-                    getWord8
-                    getWord8
-                    return ()
-                -- Commands are separated by 0x0000
-                cmds <- padded (fromIntegral b) getCmd
-                return (SingeLine v m, cmds)
+                return (SingeLine v m)
             2 -> do -- Multi-Line
                 expectWord8 0
                 expectWord8 0
@@ -167,13 +174,7 @@ lineParser = begin
                 expectWord8 0x01
                 a <- getWord8
                 expectWord8 0
-                b <- getWord8
-                expectWord8 0
-                g2 <- getWord8
-                unless (g == g2) $ fail "Values for g are not equal in multi line header"
-                expectWord8 0
-                cmds <- padded (fromIntegral b) getCmd
-                return (MultiLine v m g a, cmds)
+                return (MultiLine v m g a)
             n -> fail $ "Unknown line tag" ++ show n
 
     padded 0 a = return []
