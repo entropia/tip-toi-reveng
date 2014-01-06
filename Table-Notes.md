@@ -13,7 +13,7 @@ The first 32-bit-word is an offset into the file.
 At that position, there is a sequence of of more offsets (32-bits). I call this the *main table*.
 
 For most files, the main table consists of
- * At first, two 32-bit numbers that do not seem to be offsets. (What are they?)
+ * At first, two 32-bit numbers that do not seem to be offsets. The meaning of the first is unknown yet. The second one defines the lowest used code number. Every object in the book has a 16 bit code number. When the user points at any object the tiptoi identified its 16 bit code, subtracts the lowest used code number and takes the result as the offset to find the corresponding jump table. The base for this offset is the beginning of the maintable + 8 (ther first two 32bit words)      
  * Then, 32-bit offsets that point to (what I call) *jump tables* (see below).
  * In between these offsets, there are streaks of 0xFFFFFFFF.
 
@@ -64,6 +64,7 @@ In `WWW_Feuerwehr.gme`, this pattern is for example found at `0x00025e4`
         17. 0100 0000 00f9 ff01 1000 0000 0000 0000
 
   * This is likely the end, because the next two bytes (at`0x27b2`, `1000`) begin another round of this pattern. But in general it is not clear how the command lines are terminated.
+  * This table probably defines the pages in the book, setting defaults (unverified)
 
 Command lines
 -------------
