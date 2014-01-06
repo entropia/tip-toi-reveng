@@ -13,7 +13,10 @@ At that position, there is a sequence of of more offsets (32-bits). I call this 
 For most files, the main table consists of
  * At first, two 32-bit numbers that do not seem to be offsets. (What are they?)
  * Then, 32-bit offsets that point to (what I call) *jump tables* (see below).
- * In between these offsets, there are streaks of 0xFFFFFFFF.
+ * In between these offsets, there are streaks of `0xFFFFFFFF`
+ * These correspond linearly to the OID codes.
+   E.g. WWW_Bauernhof: The first piglet has OID-code 1499, the corresponding
+   jump table is at `0x766A`. This offset is the 400ths entry of the main table. So possibly `OID - 1099 = main table index`. Question: Is this 1099 the same for every book?
 
 Unclear: When does the main table end?
 
@@ -37,7 +40,7 @@ There is more data contained at the beginning of the file:
 Jump table pattern
 ------------------
 
-Thre are many jump tables, and they seem to be important. Some are referenced from the main table, but not all.
+There are many jump tables, and they seem to be important. Some are referenced from the main table, but not all.
 
 The table consists of
  * A number,  16 bit. Commonly 16 or 17.
