@@ -1,0 +1,5 @@
+Codes der Buecher, das ist der (aus dem chin. uebersetzte) Zahlencode des Einschaltsymbols:
+
+0001 Bauernhof
+0019 Wald
+0004 Welt der Musik
