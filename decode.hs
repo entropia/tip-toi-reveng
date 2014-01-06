@@ -56,30 +56,10 @@ hyp2 b =
     then B.pack [0x01,0x00,0x00,0x00,0x00,0xF9,0xFF,0x01] `B.isPrefixOf` b
     else True
 
-hyp4 :: B.ByteString -> Bool
-hyp4 b = case l of
-        Line t _ [S1 _ _, S2 _ _ _] _ -> t == 2
-        _ -> True
-    where l = parseLine b
-
-hyp6 :: B.ByteString -> Bool
-hyp6 b = case l of
-        Line _ _ [S1 _ n1, S2 _ n2 _] _ -> n1 == fromIntegral n2
-        _ -> True
-    where l = parseLine b
-
 hyps = [ (hyp2, "01 fixed prefix")
-       , (hyp4, "S1 S2 only occurs in lines with tag 2")
-       , (hyp6, "S1(_,x1) S2(_,x2) ==> x == x2")
        ]
 
 data Command
-    = S1 Word16 Word8
-    | S2 Word16 Word16 [PCommand]
-    | S3 Word16 Word16 [PCommand]
-    deriving Eq
-
-data PCommand
     = A Word16
     | B Word8 Word8
     | C
@@ -88,28 +68,29 @@ data PCommand
     | F Word16
     deriving Eq
 
-data Line = Line Word8 B.ByteString [Command] [Word16]
+data Line = Line LineHeader [Command] [Word16]
+
+data LineHeader
+    = MultiLine Bool Word16 Word8 Word8
+    | SingeLine Bool Word16 
 
 ppLine :: Line -> String
-ppLine (Line t b cs xs) = show t ++ extra ++ ": " ++ spaces (map ppCommand cs) ++ " [" ++ commas (map show xs) ++ "]"
-  where extra | b == B.pack [0,0,0,0]  = ""
-              | otherwise              = "[" ++ prettyHex b ++ "]"
+ppLine (Line h cs xs) = ppLineHeader h ++ ": " ++ spaces (map ppCommand cs) ++ " [" ++ commas (map show xs) ++ "]"
 
-ppPCommand :: PCommand -> String
-ppPCommand (A n) = printf "A(%d)" n
-ppPCommand (B a b) = printf "B(%d-%d)" a b
-ppPCommand (C) = printf "C"
-ppPCommand (D b) = printf "D(%d)" b
-ppPCommand E = printf "E"
-ppPCommand (F n) = printf "F(%d)" n
+ppLineHeader :: LineHeader -> String
+ppLineHeader (MultiLine v m g a) = printf "ML%s(%d,%d,%d)" (quote v) m g a
+ppLineHeader (SingeLine v m)     = printf "SL%s(%d)" (quote v) m
+
+quote True = "'"
+quote False= ""
 
 ppCommand :: Command -> String
-ppCommand (S1 n x)
-    = printf "S1(%d,%d)" n x
-ppCommand (S2 n b cs)
-    = printf "S2(%d,%d,%s)" n b (spaces (map ppPCommand cs))
-ppCommand (S3 a b cs)
-    = printf "S3(%d,%d,%s)" a b (spaces (map ppPCommand cs))
+ppCommand (A n) = printf "A(%d)" n
+ppCommand (B a b) = printf "B(%d-%d)" a b
+ppCommand (C) = printf "C"
+ppCommand (D b) = printf "D(%d)" b
+ppCommand E = printf "E"
+ppCommand (F n) = printf "F(%d)" n
 
 spaces = intercalate " "
 commas = intercalate ","
@@ -130,50 +111,72 @@ lineParser = begin
         ]
     -- Find the occurrence of a header
     begin = do
-        tag <- getWord8
-        b <- getLazyByteString 4
-        cs <- maybeS1
+        (h,cs) <- getHeader
         -- Audio links
         n <- getWord16le
         xs <- replicateM (fromIntegral n) getWord16le
+        return $ Line h cs xs
 
-        return $ Line tag b cs xs
+    expectWord8 n = do
+        n' <- getWord8
+        when (n /= n') $ do
+            b <- bytesRead
+            fail $ printf "At position %0X, expected %d/%02X, got %d/%02X" (b-1) n n n' n'
 
-    -- check if there is a S1-like command at the beginning
-    maybeS1 = do
-        r <- getRemainingLazyByteString
-        if (B.pack [0xF9,0xFF,0x01] `B.isPrefixOf` r) && 0x00 == r `B.index` 5
-        then do
-            skip 3
-            n <- getWord16le
-            0 <- getWord8
-            y <- getWord8
-            let c = S1 n y
-            if y == 0
-            then do
-                return [c] -- nothing follows
-            else do
-                0 <- getWord8
-                cs <- getF2
-                return [c,cs]
-        else (:[]) <$> getF2
+    getHeader = do
+        t <- getWord8
+        case t of
+            1 -> do -- Single line
+                expectWord8 0
+                expectWord8 0
+                vb <- getWord8
+                v <- case vb of 0 -> return False
+                                0x1E -> return True
+                                _ -> fail "Unexpected byte for single line header"
+                expectWord8 0
+                expectWord8 0xF9
+                expectWord8 0xFF
+                expectWord8 0x01
+                m <- getWord16le
+                b <- getWord8
+                expectWord8 0
+                when (b /= 0) $ do
+                    getWord8
+                    getWord8
+                    return ()
+                -- Commands are separated by 0x0000
+                cmds <- padded (fromIntegral b) getCmd
+                return (SingeLine v m, cmds)
+            2 -> do -- Multi-Line
+                expectWord8 0
+                expectWord8 0
+                expectWord8 0
+                expectWord8 0
+                expectWord8 0xF9
+                expectWord8 0xFF
+                expectWord8 0x01
+                m <- getWord16le
+                expectWord8 0
+                g <- getWord8
+                expectWord8 0
+                x <- getWord8
+                v <- case x of 0xF9 -> return False
+                               0xFB -> return True
+                               _ -> fail $ printf "Unexpected byte %0X for multi line header" x
+                expectWord8 0xFF
+                expectWord8 0x01
+                a <- getWord8
+                expectWord8 0
+                b <- getWord8
+                expectWord8 0
+                g2 <- getWord8
+                unless (g == g2) $ fail "Values for g are not equal in multi line header"
+                expectWord8 0
+                cmds <- padded (fromIntegral b) getCmd
+                return (MultiLine v m g a, cmds)
+            n -> fail $ "Unknown line tag" ++ show n
 
-    getF2 = do
-        a <- getWord8
-        0xFF <- getWord8
-        0x01 <- getWord8
-        n <- getWord16le
-        y <- getWord16le
-        b <- getWord16le
-        -- Commands are separated by 0x0000
-        cmds <- padded (fromIntegral y) getCmd
-
-        let c | a == 0xFB = S3 n b cmds
-              | a == 0xF9 = S2 n b cmds
-        return c
-
-
-    padded 0 a = fail "padded: 0"
+    padded 0 a = return []
     padded 1 a = (:[]) <$> a
     padded n a = do
         x <- a
@@ -211,7 +214,7 @@ lineParser = begin
 
 
 checkLine :: Int -> Line -> [String]
-checkLine n_audio l@(Line _ _ _ xs)
+checkLine n_audio l@(Line _ _ xs)
     | any (>= fromIntegral n_audio) xs
     = return $ "Invalid audio index in line " ++ ppLine l
 checkLine n_audio _ = []
@@ -385,7 +388,7 @@ main = do
     forM_ (zip jtos jts) $ \(o, jt) -> do
         printf "Jump table at %08X:\n" o
         forM_ jt $ \line -> do
-            -- printf "    %s\n" (prettyHex line)
+            --printf "    %s\n" (prettyHex line)
             let l = parseLine line
             printf "    %s\n" (ppLine l)
             mapM_  (printf "     * %s\n") (checkLine (length at) l)
