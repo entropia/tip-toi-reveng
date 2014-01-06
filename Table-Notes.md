@@ -10,15 +10,17 @@ The first 32-bit-word is an offset into the file.
 
 At that position, there is a sequence of of more offsets (32-bits). I call this the *main table*.
 
-For most files, the main table consists of
- * At first, two 32-bit numbers that do not seem to be offsets. (What are they?)
+Every object in the book has a 16 bit code number. When the user points at any object the tiptoi identified its 16 bit code, subtracts the first used code number and takes the result as the offset to find the corresponding jump table. The base for this offset is the beginning of the maintable + 8 (first two 32bit words)
+
+For most files(?), the main table consists of
+ * 32bit: last used code number
+ * 32bit: first used code number
  * Then, 32-bit offsets that point to (what I call) *jump tables* (see below).
- * In between these offsets, there are streaks of `0xFFFFFFFF`
+ * In between these offsets, there are streaks of 0xFFFFFFFF. These indicate that the corresponding code is not used within the book.
  * These correspond linearly to the OID codes.
    E.g. WWW_Bauernhof: The first piglet has OID-code 1499, the corresponding
    jump table is at `0x766A`. This offset is the 400ths entry of the main table. So possibly `OID - 1099 = main table index`. Question: Is this 1099 the same for every book?
-
-Unclear: When does the main table end?
+ * The end of the offsets can be found at (maintable + 8 + 4*(last used code - first used code). Question: What is the first and last code used?
 
 There is more data contained at the beginning of the file:
  * The second 32-bit-words is a pointer to the media table.
@@ -82,6 +84,7 @@ In `WWW_Feuerwehr.gme`, this pattern is for example found at `0x00025e4`
         17. 0100 0000 00f9 ff01 1000 0000 0000 0000
 
   * This is likely the end, because the next two bytes (at`0x27b2`, `1000`) begin another round of this pattern. But in general it is not clear how the command lines are terminated.
+  * This table probably defines the pages in the book, setting defaults (unverified)
 
 Command lines
 -------------
@@ -111,7 +114,7 @@ Their shape is
 If we have **S1 S2**, then **S1**’s x is equal to **S2**’s a.
 
 The play comands are:
- * **A**: `E8FF01 mmmm`, where `m` is a 16-bit number, the number of the media file to play.
+ * **A**: `E8FF01 mmmm`, where `m` is a 16-bit number (or a 8-bit-number, no large numbers found so far), the number of the media file to play.
  * **B**: `00FC01 aa bb`: Here `a` and `b` are 8-bit-values. This seems to be playing one of the samples from `a` to `b`, beginning with `a` and cycling through the list.
  * **C**: `FFFA01 FFFF`
  * **D**: `00FD01 nn`

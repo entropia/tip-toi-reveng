@@ -1,0 +1,95 @@
+
+
+0001b000  06 a3 06 a4 06 a5 06 a6  06 a7 06 a8 06 a9 06 aa  
+0001b010  06 ab 06 ac 06 ad 06 ae  06 af 06 b0 06 b1 06 b2  
+0001b020  06 b3 06 b4 06 b5 06 b6  06 b7 06 b8 06 b9 06 ba  
+0001b030  06 bb 06 bc 06 bd 06 be  06 bf 06 c0 06 5b b2 01  
+0001b040  00 69 b2 01 00 73 b2 01  00 75 b2 01 00 81 b2 01  
+0001b050  00 83 b2 01 00 85 b2 01  00 93 b2 01 00 a1 b2 01  
+0001b060  00 00 00 00 00 00 00 00  00 01 00 00 00 00 00 00  
+0001b070  00 00 00 00 00 02 00 a0  06 ac 06 00 00 30 00 91  
+0001b080  06 92 06 93 06 94 06 95  06 96 06 97 06 98 06 99  
+0001b090  06 9a 06 9b 06 9c 06 9d  06 9e 06 9f 06 a0 06 a1  
+0001b0a0  06 a2 06 a3 06 a4 06 a5  06 a6 06 a7 06 a8 06 a9  
+0001b0b0  06 aa 06 ab 06 ac 06 ad  06 ae 06 af 06 b0 06 b1  
+0001b0c0  06 b2 06 b3 06 b4 06 b5  06 b6 06 b7 06 b8 06 b9  
+0001b0d0  06 ba 06 bb 06 bc 06 bd  06 be 06 bf 06 c0 06 ab  
+0001b0e0  b2 01 00 b9 b2 01 00 c3  b2 01 00 c5 b2 01 00 d1  
+0001b0f0  b2 01 00 d3 b2 01 00 d5  b2 01 00 e3 b2 01 00 f1  
+0001b100  b2 01 00 01 00 09 b1 01  00 01 00 5b 02 00 00 02  
+0001b110  00 19 b1 01 00 1f b1 01  00 02 00 b3 01 52 02 02  
+0001b120  00 b3 01 4c 02 01 00 2b  b1 01 00 02 00 b3 01 5c  
+0001b130  02 01 00 37 b1 01 00 02  00 b3 01 5d 02 01 00 43  
+0001b140  b1 01 00 02 00 b3 01 fe  01 01 00 4f b1 01 00 01  
+0001b150  00 b8 01 00 00 00 00 00  00 00 00 00 00 00 00 00  
+0001b160  00 00 00 [01 00 69 b1 01  00] [03 00 b3 01 5e 02 53  
+0001b170  02 01 00 77 b1 01 00 01  00 bb 01 00 00 01 00 83  
+0001b180  b1 01 00 02 00 cf 01 4d  02 00 00 01 00 91 b1 01  
+0001b190  00 01 00 bd 01 01 00 9b  b1 01 00 03 00 bb 01 5f  
+0001b1a0  02 60 02 01 00 a9 b1 01  00 [03 00 bd 01 61 02 60  
+0001b1b0  02 [01 00 b7 b1 01 00 [01  00 bb 01 [01 00 c1 b1 01  
+0001b1c0  00 [03 00 b3 01 62 02 56  02 01 00 cf b1 [01 00 01  
+0001b1d0  00 bb 01 00 00 [01 00 db  b1 01 00
+0001b1db  [02 00 cf 01 4d 02]                               463("Bitte blättere zurück auf die Seite"),589"(Auf dem Bauernhof ist viel los")
+          00 00 00 00 
+          [01 00 eb b1 01 00] -> [03 00 bb 01 5f 02 63 02]  Ping, Ja, 611 ("Dog"...)
+          [01 00 f9 b1 01 00] -> [03 00 bd 01 61 02 63 02]  Negativ, "Leider nicht richtig", 611 ("Dog ist das englische Wort für")
+          [01 00 07 b2 01 00] -> [01 00 bb 01]              Ping
+0001b20b  [01 00 11 b2 01 00] -> [03 00 b3 01 64 02 bf 01]  435,612("Pig"),447(Grunzen)  
+          [01 00 1f b2 01 00] -> [01 00 bb 01] 
+          00 00
+          [01 00 2b b2 01 00] -> [02 00 cf 01 4d 02]        463("Bitte blättere zurück auf die Seite"),589"(Im Bauernhof ist viel los")
+          00 00 00 00
+0001b235  [01 00 3b b2 01 00] -> [03 00 bb 01 5f 02 65 02]  443(Ping),607("ja"),613("Auf englisch heißt das Schwein: Pig"
+          [01 00 49 b2 01 00] -> [03 00 bd 01 61 02 65 02]  445(negativ),609("Leider..",613
+          [01 00 57 b2 01 00] -> [01 00 bb 01]  
+0001b25b  [01 00 61 b2 01 00] -> [03 00 b3 01 66 02 c4 01] 435(Stille),614("The cat"),452(Miauen)
+          [01 00 6f b2 01 00] -> [01 00 bb 01]
+          00 00
+          [01 00 7b b2 01 00] -> [02 00 cf 01 4d 02]        463("Bitte blättere zurück auf die Seite"),589"(Auf dem Bauernhof ist viel los")
+          00 00 00 00
+          [01 00 8b b2 01 00] -> [03 00 bb 01 5f 02 67 02]  443,607,615("Cat heißt Katze")
+          [01 00 99 b2 01 00] -> [03 00 bd 01 61 02 67 02]  445,609,615 
+          [01 00 a7 b2 01 00] -> [01 00 bb 01]              443
+0001b2ab  [01 00 b1 b2 01 00] -> [03 00 b3 01 68 02 be 01]  435,616("The cow"),446(Muhen)
+0001b2b9  [01 00 bf b2 01 00] -> [01 00 bb 01]              443
+0001b2c3  00 00 
+0001b2c5  [01 00 cb b2 01 00] -> [02 00 cf 01 4d 02]       463("Bitte blättere zurück auf die Seite"),589"(Auf dem Bauernhof ist viel los")
+0001b2d1  00 00 00 00 
+0001b2d5  [01 00 db b2 01 00] -> [03 00 bb 01 5f 02 69 02] [443(Ping),607"("Ja!"),617("Cow..")]
+0001b2e3  [01 00 e9 b2 01 00] -> [03 00 bd 01 61 02 69 02] [445(Negativ-Quittung), 609("Leider nicht richtig"), 617("Cow ist das englische Wort für")]
+0001b2f1  [01 00 f7 b2 01 00] -> [01 00 bb 01]             [443(Ping (Positiv-Quittung)]
+0001b2fb  fd 00
+0001b2fd  [01 00 03 b3 01 00] -> [02 00 6a 02 6b 02]       [618,619] -> Begruessung nach Anmeldung
+0001b309  65 00  
+0001b30b  01 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
+0001b31b  00 00 00 00 00 00 00 00  00 00 00 00 00 0
+
+435 Stille (wie 14)
+443 Ping
+445 Negativ
+446 Muhen
+447 Grunzen eines Schweins
+448 Mähen
+449 Kikeriki
+450 Wuff
+452 Miauen
+463 "Bitte blättere zurück auf die Seite"
+589 "Auf dem Bauernhof ist viel los"
+603 "Du hörst gleich den Namen eines Tieres in Englisch und dann den Tierlaut. Findest du das richtige Tier?"
+604 "Hier kommt das nächste Tier"
+605 "Hier kommt das letzte Tier"
+606 "The horse"
+607 "ja"
+608 "Horse ist das englische Wort für Pferd"
+609 "Leider nicht richtig"
+610 "The dog"
+611 "Dog ist das englische Wort für Hund"
+612 "The pig"
+613 "Auf Englisch heisst das Schwein: Pig"
+614 "The cat"
+615 "Cat heisst Katze"
+616 "The cow"
+617 "Cow ist das englische Wort für"
+618 Einschaltton
+619 "Du bist jetzt angmeldet...."
