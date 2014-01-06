@@ -12,10 +12,14 @@ The first 32-bit-word is an offset into the file.
 
 At that position, there is a sequence of of more offsets (32-bits). I call this the *main table*.
 
-For most files, the main table consists of
- * At first, two 32-bit numbers that do not seem to be offsets. The meaning of the first is unknown yet. The second one defines the lowest used code number. Every object in the book has a 16 bit code number. When the user points at any object the tiptoi identified its 16 bit code, subtracts the lowest used code number and takes the result as the offset to find the corresponding jump table. The base for this offset is the beginning of the maintable + 8 (ther first two 32bit words)      
+Every object in the book has a 16 bit code number. When the user points at any object the tiptoi identified its 16 bit code, subtracts the first used code number and takes the result as the offset to find the corresponding jump table. The base for this offset is the beginning of the maintable + 8 (first two 32bit words)
+
+For most files(?), the main table consists of
+ * 32bit: last used code number
+ * 32bit: first used code number
  * Then, 32-bit offsets that point to (what I call) *jump tables* (see below).
- * In between these offsets, there are streaks of 0xFFFFFFFF.
+ * In between these offsets, there are streaks of 0xFFFFFFFF. These indicate that the corresponding code is not used within the book. 
+ * the end of the offsets can be found at (maintable + 8 + 4*(last used code - first used code)   
 
 Unclear: When does the main table end?
 
