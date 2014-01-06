@@ -90,7 +90,7 @@ Command lines
 -------------
 
 Command lines are of the form `tt nnnn nnnn cmds... nnnn ids..`:
- * the *tag* `tt` is either 1 or 2, it seems to indicate the mode (*Wissen* or *Entdecken*) - But where is *Spielen*?
+ * the *tag* `tt` is either 1 or 2.
  * `n` is amost always `0000 0000`.
  * the commands are explained below, and
  * `ids` is a list of `n` 16-bit numbers, which references the media table (0-based).
@@ -112,6 +112,8 @@ Their shape is
  * **S3** is like **S2**, but starts with `FB` instead of `F9`. So maybe the byte is not really part of the command.
 
 If we have **S1 S2**, then **S1**’s x is equal to **S2**’s a.
+
+The first parameter of the first **S**-command is likely the mode (*Wissen*, *Entdecken*, *Spielen*, etc.).
 
 The play comands are:
  * **A**: `E8FF01 mmmm`, where `m` is a 16-bit number (or a 8-bit-number, no large numbers found so far), the number of the media file to play.
