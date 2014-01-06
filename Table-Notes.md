@@ -92,7 +92,9 @@ Command lines
 -------------
 
 Command lines are of the form `tt nnnn nnnn cmds... nnnn ids..`:
- * the *tag* `tt` is either 1 or 2.
+ * the *tag* `tt` is either
+   - `1`, indicating a single line for that mode,
+   - `2`, indicating that there are several lines for this mode.
  * `n` is amost always `0000 0000`.
  * the commands are explained below, and
  * `ids` is a list of `n` 16-bit numbers, which references the media table (0-based).
@@ -123,7 +125,10 @@ The play comands are:
  * **C**: `FFFA01 FFFF`
  * **D**: `00FD01 nn`
  * **E**: `F0FF01 0100`
- * **F**: `F9FF01 nnnn` where `n` is a 16-bit number. This is very similar to `S1`.
+   - When activating this symbol again, execute the next line of this mode.
+ * **F**: `F9FF01 nnnn` where `n` is a 16-bit number.
+   - `n = 0`: When activating this symbol again, execute the first line of this mode.
+   - `n ≠ 0`: Change the mode to `n`
 
 If **D** occurs, then as the last entry. If **E** or **F** occurs, then as the first entry. **D** only occurs alone or with **F** before.
 
