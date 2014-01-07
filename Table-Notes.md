@@ -91,43 +91,30 @@ In `WWW_Feuerwehr.gme`, this pattern is for example found at `0x00025e4`
 Command lines
 -------------
 
-Command lines come in three variants
- * `02 0000 0000 F9FF01 mmmm 00 gg F9FF 01 aa00 bb00 gg00 pc... mmmm xs...` where
-    - `mmmm` indicates the mode (*Wissen*, *Entdecken*, etc.)
-    - `gg` is some number (a group of kinds), equal in both positions
-    - `aa` tends to count within the lines of one mode and table, nothing more known so far
-    - `bb` is the number of play commands in `pc...`
-    - `pc` is a sequence of `bb` play commands, which always have `0000` in between.
-    - `mmmm` is the number of media file indices in `xs...`, a list of 16-bit-numbers
-    - Sometimes, byte 12 is `FB` instead of `F9`
- * `01 0000 0000 F9FF01 mmmm bb00 pad pc... mmmm xs...` where
-    - `mmmm` indicates the mode (*Wissen*, *Entdecken*, etc.)
-    - `bb` is the number of play commands in `pc...`
-    - `pad` is empty if `bb=0`. Otherwise, it is usually, but not always `0000`.
-    - `pc` is a sequence of `bb` play commands, which always have `0000` in between.
-    - `mmmm` is the number of media file indices in `xs...`, a list of 16-bit-numbers
-    - In one instance, byte 3 is `1E` instead of `00`
+Command lines comprise of three lists, headed by the number of the elements, and a unexplicable number of `0`: `aa00  conditionals... bb00  actions... cc00 media...` where
+ * `a` is the number of conditionals,
+   - Each conditional is prefixed with `00aa00`, and has 5 more bytes (see below)
+ * `b` is the number of actions,
+   - The actions havve varying length, see below. Each is prefixed with `aa00`.
+ * `c` is the number of media table indices
+   - The media table indices are 16-bit numbers.
 
+The conditionals are:
+ * `F9FF01 mmmm` (written **S** in decode's output)
+   - Where `m` is a 8-bit or 16-bit numbers. Possible semantics: Check if the register mentioned in the prefix has this value.
+ * `FBFF01 mmmm` (rare, written **S'**)
 
-The first variant is used if there is more than one line for a mode within a
-table, so I call this a **ML** line, while the second variant is used if there is only one line, so I call this a **SL**. The variants are written **ML'** and **SL'**.
-
-I may seem strange to have the pad in **SL** depend on `b` without seeing
-something similar in **ML**. But we simply have no example of a **ML** with
-`b=0` yet... quite possibly the same mechanism works there.
-
-The play comands are:
+The actions are:
  * **A**: `E8FF01 mmmm`, where `m` is a 16-bit number (or a 8-bit-number, no large numbers found so far), the number of the media file to play.
  * **B**: `00FC01 aa bb`: Here `a` and `b` are 8-bit-values. This seems to be playing one of the samples from `a` to `b`, beginning with `a` and cycling through the list.
  * **C**: `FFFA01 FFFF`
  * **D**: `00FD01 nn`
  * **E**: `F0FF01 0100`
-   - When activating this symbol again, execute the next line of this mode.
+   - Possibly incrementing the register mentioned in the prefix.
  * **F**: `F9FF01 nnnn` where `n` is a 16-bit number.
-   - `n = 0`: When activating this symbol again, execute the first line of this mode.
-   - `n ≠ 0`: Change the mode to `n`
+   - Possibly setting the register mentioned in the prefix.
 
-The jump commands **F** and **E** only occur in **ML** lines.
+The jump commands **F** and **E** only occur in lines with two conditionals.
 
 If **D** occurs, then as the last entry. If **E** or **F** occurs, then as the first entry. **D** only occurs alone or with **F** before.
 

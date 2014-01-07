@@ -68,21 +68,21 @@ data Command
     | F Word16
     deriving Eq
 
-data Line = Line LineHeader [(Word8, Command)] [Word16]
+data Line = Line [Conditional] [(Word8, Command)] [Word16]
 
-data LineHeader
-    = MultiLine Bool Word16 Word8 Word8
-    | SingeLine Bool Word16
+data Conditional
+    = Conditional Word8 Word16
+    | Conditional2 Word8 Word16
 
 ppLine :: Line -> String
-ppLine (Line h cs xs) = ppLineHeader h ++ ": " ++ spaces (map go cs) ++ " [" ++ commas (map show xs) ++ "]"
+ppLine (Line cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map go as) ++ " [" ++ commas (map show xs) ++ "]"
   where go (0,c) = ppCommand c
         go (n,c) = "(" ++ show n ++ ")" ++ ppCommand c
 
 
-ppLineHeader :: LineHeader -> String
-ppLineHeader (MultiLine v m g a) = printf "ML%s(%d,%d,%d)" (quote v) m g a
-ppLineHeader (SingeLine v m)     = printf "SL%s(%d)" (quote v) m
+ppConditional :: Conditional -> String
+ppConditional (Conditional  g v) = printf "(%d)S(%d)" g v
+ppConditional (Conditional2 g v) = printf "(%d)S'(%d)" g v
 
 quote True = "'"
 quote False= ""
@@ -114,7 +114,23 @@ lineParser = begin
         ]
     -- Find the occurrence of a header
     begin = do
-        h <- getHeader
+        -- Conditionals
+        r <- getRemainingLazyByteString
+        a <- getWord8
+        expectWord8 0
+        conds <- replicateM (fromIntegral a) $ do
+            expectWord8 0
+            g1 <- getWord8
+            expectWord8 0
+            x <- getWord8
+            con <- case x of 0xF9 -> return Conditional
+                             0xFB -> return Conditional2
+                             _ -> fail $ printf "Unexpected byte %0X in conditional command: %s" x (prettyHex (B.take 20 r))
+            expectWord8 0xFF
+            expectWord8 01
+            n <- getWord16le
+            return $ con g1 n
+
         -- Commands
         b <- getWord8
         expectWord8 0
@@ -126,52 +142,13 @@ lineParser = begin
         -- Audio links
         n <- getWord16le
         xs <- replicateM (fromIntegral n) getWord16le
-        return $ Line h cmds xs
+        return $ Line conds cmds xs
 
     expectWord8 n = do
         n' <- getWord8
         when (n /= n') $ do
             b <- bytesRead
             fail $ printf "At position %0X, expected %d/%02X, got %d/%02X" (b-1) n n n' n'
-
-    getHeader = do
-        t <- getWord8
-        case t of
-            1 -> do -- Single line
-                expectWord8 0
-                expectWord8 0
-                vb <- getWord8
-                v <- case vb of 0 -> return False
-                                0x1E -> return True
-                                _ -> fail "Unexpected byte for single line header"
-                expectWord8 0
-                expectWord8 0xF9
-                expectWord8 0xFF
-                expectWord8 0x01
-                m <- getWord16le
-                return (SingeLine v m)
-            2 -> do -- Multi-Line
-                expectWord8 0
-                expectWord8 0
-                expectWord8 0
-                expectWord8 0
-                expectWord8 0xF9
-                expectWord8 0xFF
-                expectWord8 0x01
-                m <- getWord16le
-                expectWord8 0
-                g <- getWord8
-                expectWord8 0
-                x <- getWord8
-                v <- case x of 0xF9 -> return False
-                               0xFB -> return True
-                               _ -> fail $ printf "Unexpected byte %0X for multi line header" x
-                expectWord8 0xFF
-                expectWord8 0x01
-                a <- getWord8
-                expectWord8 0
-                return (MultiLine v m g a)
-            n -> fail $ "Unknown line tag" ++ show n
 
     padded 0 a = return []
     padded 1 a = (:[]) <$> a
