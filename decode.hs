@@ -56,7 +56,16 @@ hyp2 b =
     then B.pack [0x01,0x00,0x00,0x00,0x00,0xF9,0xFF,0x01] `B.isPrefixOf` b
     else True
 
-hyps = [ (hyp2, "01 fixed prefix")
+hyp3 :: B.ByteString -> Bool
+hyp3 b = all (ok.snd) as
+  where (Line _ as mi) = parseLine b
+        ok (A n)   = 0 <= n && n < fromIntegral (length mi)
+        ok (B a b) = 0 <= a && a < fromIntegral (length mi) &&
+                     0 <= b && b < fromIntegral (length mi)
+        ok _ = True
+
+hyps = [ -- (hyp2, "01 fixed prefix")
+         (hyp3, "play indicies are correct")
        ]
 
 data Command
@@ -375,7 +384,7 @@ main = do
             printf "These lines do not satisfy hypothesis \"%s\":\n" desc
             forM_ wrong $ \line -> do
                 let l = parseLine line
-                printf "    %s\n" (prettyHex line)
+                --printf "    %s\n" (prettyHex line)
                 printf "    %s\n" (ppLine l)
 
     let known_segments = sort $
