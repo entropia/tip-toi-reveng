@@ -68,17 +68,16 @@ data Command
     | F Word16
     deriving Eq
 
-data Line = Line LineHeader (Maybe (Word8, [Command])) [Word16]
+data Line = Line LineHeader [(Word8, Command)] [Word16]
 
 data LineHeader
     = MultiLine Bool Word16 Word8 Word8
     | SingeLine Bool Word16
 
 ppLine :: Line -> String
-ppLine (Line h Nothing xs) = ppLineHeader h ++ ": " ++ " [" ++ commas (map show xs) ++ "]"
-ppLine (Line h (Just (g, cs)) xs) = ppLineHeader h ++ ": " ++ group ++ spaces (map ppCommand cs) ++ " [" ++ commas (map show xs) ++ "]"
-  where group = case g of 0 -> ""
-                          _ -> "(" ++ show g ++ ") "
+ppLine (Line h cs xs) = ppLineHeader h ++ ": " ++ spaces (map go cs) ++ " [" ++ commas (map show xs) ++ "]"
+  where go (0,c) = ppCommand c
+        go (n,c) = "(" ++ show n ++ ")" ++ ppCommand c
 
 
 ppLineHeader :: LineHeader -> String
@@ -119,18 +118,15 @@ lineParser = begin
         -- Commands
         b <- getWord8
         expectWord8 0
-        mc <- case b of
-            0 -> return Nothing
-            b -> do
-                g <- getWord8
-                expectWord8 0
-                -- Commands are separated by 0x0000
-                cmds <- padded (fromIntegral b) getCmd
-                return $ Just (g,cmds)
+        cmds <- replicateM (fromIntegral b) $ do
+            g <- getWord8
+            expectWord8 0
+            cmd <- getCmd
+            return $ (g,cmd)
         -- Audio links
         n <- getWord16le
         xs <- replicateM (fromIntegral n) getWord16le
-        return $ Line h mc xs
+        return $ Line h cmds xs
 
     expectWord8 n = do
         n' <- getWord8
@@ -389,7 +385,7 @@ main = do
     forM_ (zip jtos jts) $ \(o, jt) -> do
         printf "Jump table at %08X:\n" o
         forM_ jt $ \line -> do
-            --printf "    %s\n" (prettyHex line)
+            -- printf "    %s\n" (prettyHex line)
             let l = parseLine line
             printf "    %s\n" (ppLine l)
             mapM_  (printf "     * %s\n") (checkLine (length at) l)
