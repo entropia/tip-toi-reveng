@@ -47,9 +47,9 @@ A play script contains of another table, which points to one or more *script lin
 
 A script line has the format  `aa00  conditionals... bb00  actions... cc00 media...` where
  * `a` is the number of conditionals,
-   - Each conditional (happens to) have 8 bytes.
+   - Each conditional is 8 bytes long.
  * `b` is the number of actions,
-   - The actions have varying length, see below.
+   - Each action is 7 bytes long.
  * `c` is the number of media table indices
    - The media table indices are 16-bit numbers.
 
@@ -62,7 +62,7 @@ The actions are:
  * `00rr F9FF01 mmmm` (written `$r+=m`): Increment register `$r` by `m`
  * `00rr E8FF01 mmmm` (written `P(m)`): Play audio referenced by the `m`ths entry in the indices list.
  * `00rr 00FC01 aabb` (written `P(b-a)`): Play a random sample from that inclusive range.
- * `00rr 00FD01 nn`  (written `G(a)`): Begin game `a`.
+ * `00rr 00FD01 nn00` (written `G(a)`): Begin game `n`.
  * `00rr FFFA01 FFFF` (written `C`): Cancel game mode.
 
 The commands `P`, `G` and `C` seem to ignore their registers, `C` also its parameter (which always is `FFFF`)

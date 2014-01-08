@@ -38,29 +38,23 @@ getJumpTableOffsets bytes offset = flip runGet bytes $ do
     first <- lookAhead getWord32le
     replicateM (fromIntegral n) getWord32le
 
-getJumpTableLineLength :: B.ByteString -> Word32 -> Word32
-getJumpTableLineLength bytes offset =
-    let (_,_,to) = runGetState (skip (fromIntegral offset) >> lineParser) bytes 0
-    in fromIntegral to - offset
+getJumpTableLineLengths :: B.ByteString -> Word32 -> [Word32]
+getJumpTableLineLengths bytes offset =
+    map lineLength (getJumpTable bytes offset)
 
-getJumpTable :: B.ByteString -> Word32 -> [B.ByteString]
-getJumpTable bytes offset = flip map offs $ \from ->
-    let to = from + getJumpTableLineLength bytes from
-    in runGet (extract from (fromIntegral to - from)) bytes
+parseLine :: B.ByteString -> Line
+parseLine = runGet lineParser
+
+getJumpTable :: B.ByteString -> Word32 -> [Line]
+getJumpTable bytes offset =
+    map (\from -> runGet (skip (fromIntegral from) >> lineParser) bytes) offs
   where
     offs = getJumpTableOffsets bytes offset
 
-hyp2 :: B.ByteString -> Bool
-hyp2 b =
-    if b `B.index` 0 == 0x01
-    then B.pack [0x01,0x00,0x00,0x00,0x00,0xF9,0xFF,0x01] `B.isPrefixOf` b
-    else True
-
-hyp3 :: B.ByteString -> Bool
-hyp3 b = all (ok.snd) as
-  where (Line _ as mi) = parseLine b
-        ok (A n)   = 0 <= n && n < fromIntegral (length mi)
-        ok (B a b) = 0 <= a && a < fromIntegral (length mi) &&
+hyp3 :: Line -> Bool
+hyp3 (Line _ as mi) = all ok as
+  where ok (Play n)   = 0 <= n && n < fromIntegral (length mi)
+        ok (Random a b) = 0 <= a && a < fromIntegral (length mi) &&
                      0 <= b && b < fromIntegral (length mi)
         ok _ = True
 
@@ -69,85 +63,77 @@ hyps = [ -- (hyp2, "01 fixed prefix")
        ]
 
 data Command
-    = A Word16
-    | B Word8 Word8
-    | C
-    | D Word8
-    | E
-    | F Word16
+    = Play Word8
+    | Random Word8 Word8
+    | Cancel
+    | Game Word8
+    | Inc Word8 Word16
+    | Set Word8 Word16
     deriving Eq
 
-data Line = Line [Conditional] [(Word8, Command)] [Word16]
+data Line = Line [Conditional] [Command] [Word16]
 
 data Conditional
     = Conditional Word8 Word16
     | Conditional2 Word8 Word16
 
 ppLine :: Line -> String
-ppLine (Line cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map go as) ++ " [" ++ commas (map show xs) ++ "]"
-  where go (0,c) = ppCommand c
-        go (n,c) = "(" ++ show n ++ ")" ++ ppCommand c
+ppLine (Line cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map ppCommand as) ++ media xs
+  where media [] = ""
+        media _  = " [" ++ commas (map show xs) ++ "]"
 
 
 ppConditional :: Conditional -> String
-ppConditional (Conditional  g v) = printf "(%d)S(%d)" g v
-ppConditional (Conditional2 g v) = printf "(%d)S'(%d)" g v
+ppConditional (Conditional  g v) = printf "$%d==%d?" g v
+ppConditional (Conditional2 g v) = printf "$%d=?%d?" g v
 
 quote True = "'"
 quote False= ""
 
 ppCommand :: Command -> String
-ppCommand (A n) = printf "A(%d)" n
-ppCommand (B a b) = printf "B(%d-%d)" a b
-ppCommand (C) = printf "C"
-ppCommand (D b) = printf "D(%d)" b
-ppCommand E = printf "E"
-ppCommand (F n) = printf "F(%d)" n
+ppCommand (Play n)     = printf "P(%d)" n
+ppCommand (Random a b) = printf "P(%d-%d)" b a
+ppCommand (Cancel)     = printf "C"
+ppCommand (Game b)     = printf "G(%d)" b
+ppCommand (Inc r n)    = printf "$%d+=%d" r n
+ppCommand (Set r n)    = printf "$%d:=%d" r n
 
 spaces = intercalate " "
 commas = intercalate ","
 
-parseLine :: B.ByteString -> Line
-parseLine = runGet lineParser
+lineLength :: Line -> Word32
+lineLength (Line conds cmds audio) = fromIntegral $
+    2 + 8 * length conds + 2 + 7 * length cmds + 2 + 2 * length audio
 
 lineParser :: Get Line
 lineParser = begin
  where
-    cmds =
-        [ (B.pack [0xE8,0xFF,0x01], format2 A)
-        , (B.pack [0x00,0xFC,0x01], formatB)
-        , (B.pack [0xFF,0xFA,0x01,0xFF,0xFF], format2 (const C))
-        , (B.pack [0x00,0xFD,0x01], formatD)
-        , (B.pack [0xF0,0xFF,0x01,0x01,0x00], skip 5 >> return E)
-        , (B.pack [0xF9,0xFF,0x01], formatF)
-        ]
-    -- Find the occurrence of a header
+   -- Find the occurrence of a header
     begin = do
         -- Conditionals
-        r <- getRemainingLazyByteString
         a <- getWord8
         expectWord8 0
         conds <- replicateM (fromIntegral a) $ do
             expectWord8 0
-            g1 <- getWord8
+            r <- getWord8
             expectWord8 0
-            x <- getWord8
-            con <- case x of 0xF9 -> return Conditional
-                             0xFB -> return Conditional2
-                             _ -> fail $ printf "Unexpected byte %0X in conditional command: %s" x (prettyHex (B.take 20 r))
-            expectWord8 0xFF
-            expectWord8 01
+            bytecode <- getLazyByteString 3
             n <- getWord16le
-            return $ con g1 n
+            case lookup bytecode conditionals of
+              Just p -> return $ p r n
+              Nothing -> fail $ "Unknown conditional: " ++ prettyHex bytecode
 
-        -- Commands
+        -- Actions
         b <- getWord8
         expectWord8 0
         cmds <- replicateM (fromIntegral b) $ do
-            g <- getWord8
+            r <- getWord8
             expectWord8 0
-            cmd <- getCmd
-            return $ (g,cmd)
+            bytecode <- getLazyByteString 3
+            case lookup bytecode actions of
+              Just p -> p r
+              Nothing -> fail $ "Unknown command: " ++ prettyHex bytecode
+
         -- Audio links
         n <- getWord16le
         xs <- replicateM (fromIntegral n) getWord16le
@@ -159,41 +145,40 @@ lineParser = begin
             b <- bytesRead
             fail $ printf "At position %0X, expected %d/%02X, got %d/%02X" (b-1) n n n' n'
 
-    padded 0 a = return []
-    padded 1 a = (:[]) <$> a
-    padded n a = do
-        x <- a
-        0 <- getWord16le
-        (x:) <$> padded (n-1) a
+    conditionals =
+        [ (B.pack [0xF9,0xFF,0x01], Conditional  )
+        , (B.pack [0xFB,0xFF,0x01], Conditional2 )
+        ]
 
-
-    getCmd = do
-        r <- getRemainingLazyByteString
-        case find (\(h,f) -> h `B.isPrefixOf` r) cmds of
-          Just (h,f) -> f
-          Nothing -> fail $ "unexpected command: " ++ prettyHex r
-
-    formatF = do
-        skip 3
-        n <- getWord16le
-        return $ F n
-
-    format2 con = do
-        skip 3
-        m <- getWord16le
-        return $ con m
-
-    formatB = do
-        skip 3
-        a <- getWord8
-        b <- getWord8
-        return $ B a b
-
-    formatD = do
-        skip 3
-        b <- getWord8
-        0 <- getWord8
-        return $ D b
+    actions =
+        [ (B.pack [0xE8,0xFF,0x01], \r -> do
+            unless (r == 0) $ fail "Non-zero register for Play command"
+            a <- getWord8
+            expectWord8 0
+            return (Play a))
+        , (B.pack [0x00,0xFC,0x01], \r -> do
+            unless (r == 0) $ fail "Non-zero register for Random command"
+            a <- getWord8
+            b <- getWord8
+            return (Random a b))
+        , (B.pack [0xFF,0xFA,0x01], \r -> do
+            unless (r == 0) $ fail "Non-zero register for Cancel command"
+            expectWord8 0xFF
+            expectWord8 0xFF
+            return Cancel)
+        , (B.pack [0x00,0xFD,0x01], \r -> do
+            unless (r == 0) $ fail "Non-zero register for Game command"
+            a <- getWord8
+            expectWord8 0
+            return (Game a))
+        , (B.pack [0xF0,0xFF,0x01], \r -> do
+            n <- getWord16le
+            return (Inc r n))
+        , (B.pack [0xF9,0xFF,0x01], \r -> do
+            n <- getWord16le
+            return (Set r n))
+        ]
+ 
 
 
 checkLine :: Int -> Line -> [String]
@@ -371,21 +356,17 @@ main = do
     forM_ (zip jtos jts) $ \(o, jt) -> do
         printf "Jump table at %08X:\n" o
         forM_ jt $ \line -> do
-            -- printf "    %s\n" (prettyHex line)
-            let l = parseLine line
-            printf "    %s\n" (ppLine l)
-            mapM_  (printf "     * %s\n") (checkLine (length at) l)
+            printf "    %s\n" (ppLine line)
+            mapM_  (printf "     * %s\n") (checkLine (length at) line)
 
     forM_ hyps $ \(hyp, desc) -> do
-        let wrong = filter (not. hyp) (concat jts)
+        let wrong = filter (not . hyp) (concat jts)
         if null wrong
         then printf "All lines do satisfy hypothesis \"%s\"!\n" desc
         else do
             printf "These lines do not satisfy hypothesis \"%s\":\n" desc
             forM_ wrong $ \line -> do
-                let l = parseLine line
-                --printf "    %s\n" (prettyHex line)
-                printf "    %s\n" (ppLine l)
+                printf "    %s\n" (ppLine line)
 
     let known_segments = sort $
             [ (0, 4, "Main table address") ] ++
@@ -397,8 +378,8 @@ main = do
             ] ++
             [ (lo, n, "Jump table line") |
                 jto <- jtos,
-                lo <- getJumpTableOffsets bytes jto,
-                let n = getJumpTableLineLength bytes lo
+                (lo,n) <- zip (getJumpTableOffsets bytes jto)
+                              (getJumpTableLineLengths bytes jto)
             ] ++
             [ (ato, fromIntegral (8 * length at), "Audio table") ] ++
             [ (ato + fromIntegral (8 * length at), fromIntegral (8 * length at), "Duplicated audio table") |
