@@ -37,7 +37,7 @@ There is more data contained at the beginning of the file:
  * `0x001c` The eighth 32-bit-word is a small number, differing between books.
  * `0x0020` is a byte that contains the lenght of the Chomptech data format version string. 
  * `0x0021` Then follows the string `CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.5.0908` or similar, resembling the length given at `0x0020
- * directly after that the is a version strings like `20111024` followed by zero bytes up to `0x005f`
+ * directly after that there is a date string like `20111024` followed by zero bytes up to `0x005f`. For some books the date contains a language string, e.g `20111024GERMAN` or `20111002DUTCH` 
  * `0x0060` For some books a 32bit address pointing to a place where another pointer can be found. Otherwise 0
  * `0x0064` to `0x0070` are 0
  * `0x0071` This points to a list that contains the address of the welcome samples played when the power on symbol is pointed at.
