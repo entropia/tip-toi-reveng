@@ -19,7 +19,7 @@ For most files(?), the main table consists of
  * At some of these offsets are 0xFFFFFFFF. These indicate that the corresponding OID code is not used within the book.
  * These correspond linearly to the OID codes.
    E.g. WWW_Bauernhof: The first piglet has OID-code 1499, the corresponding
-   jump table is at `0x766A`. This offset is the 100th entry of the main table (4 bytes for each entry). So possibly `4*(OID - 1401) = main table index + 8`. The Value 1401 in this example is taken from the second 32bit word in the main table, it represents the first used OIS code within the current book.
+   jump table is at '0x766A'. This offset is the 100th entry of the main table (4 bytes for each entry). So possibly '4*(OID - 1401) = main table index + 8'. The Value 1401 in this example is taken from the second 32bit word in the main table, it represents the first used OIS code within the current book.
  * The end of the offsets can be found at (maintable + 8 + 4*(last used OID code - first used OID code).
 
 There is more data contained at the beginning of the file:
@@ -27,8 +27,8 @@ There is more data contained at the beginning of the file:
  * 0x0004 The second 32-bit word is a pointer to the media table.
  * 0x0008 unknown 32-bit word, value always 0x000238b 
  * 0x000c points to a 16bit word that is alwaya 0x0000 (no exceptions found so far)
- * 0x0010 32-bit-word (`0x0001703b`) is an offset into the file. This offset is always direcIts value is always 2 bytes after the There is a
-   number (32-bit, `0x000 000c` = 12) followed by that many offsets right after
+ * 0x0010 32-bit-word ('0x0001703b') is an offset into the file. This offset is always direcIts value is always 2 bytes after the There is a
+   number (32-bit, '0x000 000c' = 12) followed by that many offsets right after
    the list. These offsets point to right after the list and spread out towards the
    next known block (the media file table), so its objects are relatively large
    (~1k). The objects themselves contains numbers and offsets.
@@ -70,8 +70,8 @@ The table consists of
  * A number,  16 bit. Commonly 16 or 17, determining the number of offsets to follow.
  * That many offsets, the first one commonly pointing directly after the list. These point to what I call *command lines*.
 
-In `WWW_Feuerwehr.gme`, this pattern is for example found at `0x00025e4`
- * First two bytes `1100` (= 17)
+In 'WWW_Feuerwehr.gme', this pattern is for example found at '0x00025e4'
+ * First two bytes '1100' (= 17)
  * Followed by 17 offsets (note the endianness):
 
          1. 2a26 0000
@@ -105,55 +105,45 @@ In `WWW_Feuerwehr.gme`, this pattern is for example found at `0x00025e4`
         16. 0100 0000 00f9 ff01 0f00 0000 0000 0000
         17. 0100 0000 00f9 ff01 1000 0000 0000 0000
 
-  * This is likely the end, because the next two bytes (at`0x27b2`, `1000`) begin another round of this pattern. But in general it is not clear how the command lines are terminated.
+  * This is likely the end, because the next two bytes (at'0x27b2', '1000') begin another round of this pattern. But in general it is not clear how the command lines are terminated.
 
 Command lines
 -------------
 
-Command lines come in three variants
- * `02 0000 0000 F9FF01 mmmm 00 gg F9FF 01 aa00 bb00 gg00 pc... mmmm xs...` where
-    - `mmmm` indicates the mode (*Wissen*, *Entdecken*, etc.)
-    - `gg` is some number (a group of kinds), equal in both positions
-    - `aa` tends to count within the lines of one mode and table, nothing more known so far
-    - `bb` is the number of play commands in `pc...`
-    - `pc` is a sequence of `bb` play commands, which always have `0000` in between.
-    - `mmmm` is the number of media file indices in `xs...`, a list of 16-bit-numbers
-    - Sometimes, byte 12 is `FB` instead of `F9`
- * `01 0000 0000 F9FF01 mmmm bb00 pad pc... mmmm xs...` where
-    - `mmmm` indicates the mode (*Wissen*, *Entdecken*, etc.)
-    - `bb` is the number of play commands in `pc...`
-    - `pad` is empty if `bb=0`. Otherwise, it is usually, but not always `0000`.
-    - `pc` is a sequence of `bb` play commands, which always have `0000` in between.
-    - `mmmm` is the number of media file indices in `xs...`, a list of 16-bit-numbers
-    - In one instance, byte 3 is `1E` instead of `00`
+Command lines comprise of three lists, headed by the number of the elements, and a unexplicable number of '0': 'aa00  conditionals... bb00  actions... cc00 media...' where
+ * 'a' is the number of conditionals,
+   - Each conditional is prefixed with '00aa00', and has 5 more bytes (see below)
+ * 'b' is the number of actions,
+   - The actions have varying length, see below. Each is prefixed with 'aa00'.
+ * 'c' is the number of media table indices
+   - The media table indices are 16-bit numbers.
 
+The conditionals are:
+ * 'F9FF01 mmmm' (written **S** in decode's output)
+   - Where 'm' is a 8-bit or 16-bit number. Possible semantics: Check if the register mentioned in the prefix has this value.
+ * 'FBFF01 mmmm' (rare, written **S'**)
+ * Guess: this is the same command that only differs by one bit. What could that mean? 
 
-The first variant is used if there is more than one line for a mode within a
-table, so I call this a **ML** line, while the second variant is used if there is only one line, so I call this a **SL**. The variants are written **ML'** and **SL'**.
+The actions are:
+ * **A**: 'E8FF01 mmmm', where 'm' is a 16-bit number (or a 8-bit-number, no large numbers found so far), the index of the media file to play.
+ * **B**: '00FC01 aa bb': Here 'a' and 'b' are 8-bit-values. This plays a random sample from the sublist of the media table defined by 'a' to 'b'.
+ * **C**: 'FFFA01 mmmm' where 'm' is a 16-bit-number. This has only be found in mode 4 lines and seems to end the game mode.
+ * **D**: '00FD01 nn'    This command activates the game 'n'
+ * **E**: 'F0FF01 nnnn'  This command increments the register mentioned in the prefix by 'n'.
+ * **F**: 'F9FF01 nnnn' where 'n' is a 16-bit number. This sets the register mentioned in the prefix to 'n'.
 
-I may seem strange to have the pad in **SL** depend on `b` without seeing
-something similar in **ML**. But we simply have no example of a **ML** with
-`b=0` yet... quite possibly the same mechanism works there.
+The register manipulation commands **F** and **E** only occur in lines with two conditionals. They are used to store the next line that is executed when the same symbol is tipped again (and the mode has not been changed in the meantime)  
 
-The play comands are:
- * **A**: `E8FF01 mmmm`, where `m` is a 16-bit number (or a 8-bit-number, no large numbers found so far), the number of the media file to play.
- * **B**: `00FC01 aa bb`: Here `a` and `b` are 8-bit-values. This seems to be playing one of the samples from `a` to `b`, beginning with `a` and cycling through the list.
- * **C**: `FFFA01 FFFF`
- * **D**: `00FD01 nn`
- * **E**: `F0FF01 0100`
-   - When activating this symbol again, execute the next line of this mode.
- * **F**: `F9FF01 nnnn` where `n` is a 16-bit number.
-   - `n = 0`: When activating this symbol again, execute the first line of this mode.
-   - `n ≠ 0`: Change the mode to `n`
-
-(Note: ALL commands have F as the third nibble)
-The jump commands **F** and **E** only occur in **ML** lines.
-
-If **D** occurs, then as the last entry. If **E** or **F** occurs, then as the first entry. **D** only occurs alone or with **F** before. **C** only has been seen as the last command in mode 4 lines so far. 
+Some findings:
+- If **D** occurs, then as the last entry.
+- If **E** or **F** occurs, then as the first entry.
+- **D** only occurs alone or preceeded by **F** .
+- **C** only has been seen as the last command in mode 4 lines so far. 
+- the only value for parameter **C** seen so far is FFFF
 
 Jump table locations
 --------------------
 
 Where are the others referenced from?
 
-For example there is a (very small, one line with one **F** command) jump-table at `0x35C0` in `WWW_Bauernhof.gme`, but that offset does not occur in the file.
+For example there is a (very small, one line with one **F** command) jump-table at '0x35C0' in 'WWW_Bauernhof.gme', but that offset does not occur in the file.
