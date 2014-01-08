@@ -19,7 +19,7 @@ For most files(?), the main table consists of
  * At some of these offsets are 0xFFFFFFFF. These indicate that the corresponding OID code is not used within the book.
  * These correspond linearly to the OID codes.
    E.g. WWW_Bauernhof: The first piglet has OID-code 1499, the corresponding
-   jump table is at '0x766A'. This offset is the 100th entry of the main table (4 bytes for each entry). So possibly '4*(OID - 1401) = main table index + 8'. The Value 1401 in this example is taken from the second 32bit word in the main table, it represents the first used OIS code within the current book.
+   jump table is at `0x766A`. This offset is the 100th entry of the main table (4 bytes for each entry). So possibly `4*(OID - 1401) = main table index + 8`. The Value 1401 in this example is taken from the second 32bit word in the main table, it represents the first used OIS code within the current book.
  * The end of the offsets can be found at (maintable + 8 + 4*(last used OID code - first used OID code).
 
 There is more data contained at the beginning of the file:
@@ -27,8 +27,8 @@ There is more data contained at the beginning of the file:
  * 0x0004 The second 32-bit word is a pointer to the media table.
  * 0x0008 unknown 32-bit word, value always 0x000238b 
  * 0x000c points to a 16bit word that is alwaya 0x0000 (no exceptions found so far)
- * 0x0010 32-bit-word ('0x0001703b') is an offset into the file. This offset is always direcIts value is always 2 bytes after the There is a
-   number (32-bit, '0x000 000c' = 12) followed by that many offsets right after
+ * 0x0010 32-bit-word (`0x0001703b`) is an offset into the file. This offset is always direcIts value is always 2 bytes after the There is a
+   number (32-bit, `0x000 000c` = 12) followed by that many offsets right after
    the list. These offsets point to right after the list and spread out towards the
    next known block (the media file table), so its objects are relatively large
    (~1k). The objects themselves contains numbers and offsets.
@@ -36,8 +36,8 @@ There is more data contained at the beginning of the file:
  * 0x0018 The seventh 32-bit-word points to the data directly following the list of the welcome samples. Maybe this means something like "end of table data"?
  * 0x001c The eighth 32-bit-word is a small number, differing between books.
  * 0x0020 is a byte that contains the lenght of the Chomptech data format version string. 
- * 0x0021 Then follows the string 'CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.5.0908' or similar, resembling the length given at 0x0020
- * directly after that the is a version strings like '20111024' followed by zero bytes up to 0x005f
+ * 0x0021 Then follows the string `CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.5.0908` or similar, resembling the length given at 0x0020
+ * directly after that the is a version strings like `20111024` followed by zero bytes up to 0x005f
  * 0x0060 For some books a 32bit address pointing to a place where another pointer can be found. Otherwise 0
  * 0x0064 to 0x0070 are 0
  * 0x0071 This points to a list that contains the address of the welcome samples played when the power on symbol is pointed at.
@@ -70,8 +70,8 @@ The table consists of
  * A number,  16 bit. Commonly 16 or 17, determining the number of offsets to follow.
  * That many offsets, the first one commonly pointing directly after the list. These point to what I call *command lines*.
 
-In 'WWW_Feuerwehr.gme', this pattern is for example found at '0x00025e4'
- * First two bytes '1100' (= 17)
+In `WWW_Feuerwehr.gme`, this pattern is for example found at `0x00025e4`
+ * First two bytes `1100` (= 17)
  * Followed by 17 offsets (note the endianness):
 
          1. 2a26 0000
@@ -105,32 +105,32 @@ In 'WWW_Feuerwehr.gme', this pattern is for example found at '0x00025e4'
         16. 0100 0000 00f9 ff01 0f00 0000 0000 0000
         17. 0100 0000 00f9 ff01 1000 0000 0000 0000
 
-  * This is likely the end, because the next two bytes (at'0x27b2', '1000') begin another round of this pattern. But in general it is not clear how the command lines are terminated.
+  * This is likely the end, because the next two bytes (at`0x27b2`, `1000`) begin another round of this pattern. But in general it is not clear how the command lines are terminated.
 
 Command lines
 -------------
 
-Command lines comprise of three lists, headed by the number of the elements, and a unexplicable number of '0': 'aa00  conditionals... bb00  actions... cc00 media...' where
- * 'a' is the number of conditionals,
-   - Each conditional is prefixed with '00aa00', and has 5 more bytes (see below)
- * 'b' is the number of actions,
-   - The actions have varying length, see below. Each is prefixed with 'aa00'.
- * 'c' is the number of media table indices
+Command lines comprise of three lists, headed by the number of the elements, and a unexplicable number of `0`: `aa00  conditionals... bb00  actions... cc00 media...` where
+ * `a` is the number of conditionals,
+   - Each conditional is prefixed with `00aa00`, and has 5 more bytes (see below)
+ * `b` is the number of actions,
+   - The actions have varying length, see below. Each is prefixed with `aa00`.
+ * `c` is the number of media table indices
    - The media table indices are 16-bit numbers.
 
 The conditionals are:
- * 'F9FF01 mmmm' (written **S** in decode's output)
-   - Where 'm' is a 8-bit or 16-bit number. Possible semantics: Check if the register mentioned in the prefix has this value.
- * 'FBFF01 mmmm' (rare, written **S'**)
+ * `F9FF01 mmmm` (written **S** in decode`s output)
+   - Where `m` is a 8-bit or 16-bit number. Possible semantics: Check if the register mentioned in the prefix has this value.
+ * `FBFF01 mmmm` (rare, written **S`**)
  * Guess: this is the same command that only differs by one bit. What could that mean? 
 
 The actions are:
- * **A**: 'E8FF01 mmmm', where 'm' is a 16-bit number (or a 8-bit-number, no large numbers found so far), the index of the media file to play.
- * **B**: '00FC01 aa bb': Here 'a' and 'b' are 8-bit-values. This plays a random sample from the sublist of the media table defined by 'a' to 'b'.
- * **C**: 'FFFA01 mmmm' where 'm' is a 16-bit-number. This has only be found in mode 4 lines and seems to end the game mode.
- * **D**: '00FD01 nn'    This command activates the game 'n'
- * **E**: 'F0FF01 nnnn'  This command increments the register mentioned in the prefix by 'n'.
- * **F**: 'F9FF01 nnnn' where 'n' is a 16-bit number. This sets the register mentioned in the prefix to 'n'.
+ * **A**: `E8FF01 mmmm`, where `m` is a 16-bit number (or a 8-bit-number, no large numbers found so far), the index of the media file to play.
+ * **B**: `00FC01 aa bb`: Here `a` and `b` are 8-bit-values. This plays a random sample from the sublist of the media table defined by `a` to `b`.
+ * **C**: `FFFA01 mmmm` where `m` is a 16-bit-number. This has only be found in mode 4 lines and seems to end the game mode.
+ * **D**: `00FD01 nn`    This command activates the game `n`
+ * **E**: `F0FF01 nnnn`  This command increments the register mentioned in the prefix by `n`.
+ * **F**: `F9FF01 nnnn` where `n` is a 16-bit number. This sets the register mentioned in the prefix to `n`.
 
 The register manipulation commands **F** and **E** only occur in lines with two conditionals. They are used to store the next line that is executed when the same symbol is tipped again (and the mode has not been changed in the meantime)  
 
@@ -146,4 +146,4 @@ Jump table locations
 
 Where are the others referenced from?
 
-For example there is a (very small, one line with one **F** command) jump-table at '0x35C0' in 'WWW_Bauernhof.gme', but that offset does not occur in the file.
+For example there is a (very small, one line with one **F** command) jump-table at `0x35C0` in `WWW_Bauernhof.gme`, but that offset does not occur in the file.
