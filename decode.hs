@@ -71,9 +71,9 @@ hyps = [ -- (hyp2, "01 fixed prefix")
 data Command
     = A Word16
     | B Word8 Word8
-    | C
+    | C Word16 
     | D Word8
-    | E
+    | E Word16
     | F Word16
     deriving Eq
 
@@ -85,24 +85,26 @@ data Conditional
 
 ppLine :: Line -> String
 ppLine (Line cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map go as) ++ " [" ++ commas (map show xs) ++ "]"
-  where go (0,c) = ppCommand c
-        go (n,c) = "(" ++ show n ++ ")" ++ ppCommand c
+--  where go (0,c) = ppCommand c
+--        go (n,c) = "($" ++ show n ++ "" ++ ppCommand c
+
+  where go (n,c) = "($" ++ show n ++ "" ++ ppCommand c
 
 
 ppConditional :: Conditional -> String
-ppConditional (Conditional  g v) = printf "(%d)S(%d)" g v
-ppConditional (Conditional2 g v) = printf "(%d)S'(%d)" g v
+ppConditional (Conditional  g v) = printf "($%d==%d)" g v
+ppConditional (Conditional2 g v) = printf "($%d==%d)" g v
 
 quote True = "'"
 quote False= ""
 
 ppCommand :: Command -> String
-ppCommand (A n) = printf "A(%d)" n
-ppCommand (B a b) = printf "B(%d-%d)" a b
-ppCommand (C) = printf "C"
+ppCommand (A n) = printf "play(%d)" n
+ppCommand (B a b) = printf "play_rnd(%d-%d)" a b
+ppCommand (C n) = printf "C(%d)" n
 ppCommand (D b) = printf "D(%d)" b
-ppCommand E = printf "E"
-ppCommand (F n) = printf "F(%d)" n
+ppCommand (E n)= printf "+=%d)" n
+ppCommand (F n) = printf "=%d)" n
 
 spaces = intercalate " "
 commas = intercalate ","
@@ -116,9 +118,9 @@ lineParser = begin
     cmds =
         [ (B.pack [0xE8,0xFF,0x01], format2 A)
         , (B.pack [0x00,0xFC,0x01], formatB)
-        , (B.pack [0xFF,0xFA,0x01,0xFF,0xFF], format2 (const C))
+        , (B.pack [0xFF,0xFA,0x01], format2 C)
         , (B.pack [0x00,0xFD,0x01], formatD)
-        , (B.pack [0xF0,0xFF,0x01,0x01,0x00], skip 5 >> return E)
+        , (B.pack [0xF0,0xFF,0x01], format2 E)
         , (B.pack [0xF9,0xFF,0x01], formatF)
         ]
     -- Find the occurrence of a header
@@ -185,8 +187,8 @@ lineParser = begin
 
     formatB = do
         skip 3
-        a <- getWord8
         b <- getWord8
+        a <- getWord8
         return $ B a b
 
     formatD = do
