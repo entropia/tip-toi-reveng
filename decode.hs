@@ -20,36 +20,38 @@ mainTableOffset :: Get Word32
 mainTableOffset = do
     getWord32le
 
-mainTable :: Word32 -> Get [Word32]
-mainTable offset = do
+mainTableParser :: Word32 -> Get [(Word16, Word32)]
+mainTableParser offset = do
     skip (fromIntegral offset)
-    -- It seems that the third entry points to the end of the table
-    until <- lookAhead $ do
-        skip 4
-        skip 4
+    last_code <- getWord16le
+    0 <- getWord16le
+    first_code <- getWord16le
+    0 <- getWord16le
+
+    offs <- replicateM (fromIntegral (last_code - first_code + 1)) $ do
         getWord32le
-    let n_entries = fromIntegral ((until - offset) `div` 4)
-    replicateM n_entries getWord32le
-
-getJumpTableOffsets :: B.ByteString -> Word32 -> [Word32]
-getJumpTableOffsets bytes offset = flip runGet bytes $ do
-    skip (fromIntegral offset)
-    n <- getWord16le
-    first <- lookAhead getWord32le
-    replicateM (fromIntegral n) getWord32le
-
-getJumpTableLineLengths :: B.ByteString -> Word32 -> [Word32]
-getJumpTableLineLengths bytes offset =
-    map lineLength (getJumpTable bytes offset)
+    return $ zip [first_code .. last_code] offs
 
 parseLine :: B.ByteString -> Line
 parseLine = runGet lineParser
 
-getJumpTable :: B.ByteString -> Word32 -> [Line]
-getJumpTable bytes offset =
-    map (\from -> runGet (skip (fromIntegral from) >> lineParser) bytes) offs
+getMainTable :: B.ByteString -> [(Word16, Maybe (Word32, [(Word32, Line)]))]
+getMainTable bytes =
+    let mto = runGet mainTableOffset bytes
+    in  map getJumpTable $ runGet (mainTableParser mto) bytes
   where
-    offs = getJumpTableOffsets bytes offset
+    getJumpTable (i, 0xFFFFFFFF)
+        = (i, Nothing)
+    getJumpTable (i, offset)
+        = (i, Just (offset, map getLine (getJumpTableOffsets offset)))
+
+    getJumpTableOffsets offset = flip runGet bytes $ do
+        skip (fromIntegral offset)
+        n <- getWord16le
+        replicateM (fromIntegral n) getWord32le
+
+    getLine offset
+        = (offset, runGet (skip (fromIntegral offset) >> lineParser) bytes)
 
 hyp3 :: Line -> Bool
 hyp3 (Line _ as mi) = all ok as
@@ -245,21 +247,6 @@ decypher x = B.map go
                | n == xor x 255 = n
                | otherwise = xor x n
 
-{-
-checkOgg :: B.ByteString -> IO ()
-checkOgg ogg = do
-    let (tracks, pages, rest) = pageScan ogg
-    let all_ok = all (checkPageCRC ogg) pages
-    printf "    %d tracks, %3d pages, %d bytes remain. CRC ok? %s\n" (length tracks) (length pages) (B.length rest) (show all_ok)
-
-checkPageCRC :: B.ByteString -> OggPage -> Bool
-checkPageCRC ogg page =
-    let raw_page = B.take (fromIntegral (pageLength page)) $
-                   B.drop (fromIntegral (pageOffset page)) $ ogg
-        raw_page' = pageWrite page
-    in raw_page == raw_page'
--}
-
 prettyHex :: B.ByteString -> String
 prettyHex = spaceout . map (printf "%02X") . B.unpack
   where spaceout (a:b:[]) = a ++ b
@@ -334,33 +321,22 @@ main = do
     -- Other stuff
 
     let mto = runGet mainTableOffset bytes
-        mt  = runGet (mainTable mto) bytes
-    printf "Main table offset: %08X\n" mto
+    let mt = getMainTable bytes
+    printf "Main table offset: 0x%08X\n" mto
     printf "Main table entries: %d\n" (length mt)
-    let fl = (findIndex (\x -> x /= 0xFFFFFFFF && x > ato) mt)
-    mt <- case fl of
-        Nothing -> return mt
-        Just n -> do
-            printf "First obviously wrong entry: %d, truncating\n" n
-            return $ take n mt
-    printf "Invalid main table entries: %d\n" (length (filter (== 0xFFFFFFFF) mt))
-    -- printf "Large main table entries: %d\n" (length (filter (> ato) mt))
-    printf "First two entries: %08X %08X\n" (mt !! 0) (mt !! 1)
-    printf "Last entry: %08X\n" (last mt)
+    printf "Disabled entries: %d\n" (length (filter (isNothing . snd) mt))
 
-    let jtos = filter (< ato) $
-               filter (/= 0xFFFFFFFF) (drop 2 mt)
-    let jts = map (getJumpTable bytes) jtos
-
-    printf "%d Jump tables follow:\n" (length jts)
-    forM_ (zip jtos jts) $ \(o, jt) -> do
-        printf "Jump table at %08X:\n" o
-        forM_ jt $ \line -> do
-            printf "    %s\n" (ppLine line)
-            mapM_  (printf "     * %s\n") (checkLine (length at) line)
+    forM_ mt $ \(i, mjt) -> case mjt of
+        Nothing -> do
+            printf "Jump table for OID %d: Disabled\n" i
+        Just (o, lines) -> do
+            printf "Jump table for OID %d: (at 0x%04X)\n" i o
+            forM_ lines $ \(_, line) -> do
+                printf "    %s\n" (ppLine line)
+                mapM_  (printf "     * %s\n") (checkLine (length at) line)
 
     forM_ hyps $ \(hyp, desc) -> do
-        let wrong = filter (not . hyp) (concat jts)
+        let wrong = filter (not . hyp) (map snd (concatMap snd (mapMaybe snd mt)))
         if null wrong
         then printf "All lines do satisfy hypothesis \"%s\"!\n" desc
         else do
@@ -371,15 +347,13 @@ main = do
     let known_segments = sort $
             [ (0, 4, "Main table address") ] ++
             [ (4, 4, "Audio table address") ] ++
-            [ (mto, fromIntegral (4 * length mt), "Main table") ] ++
-            [ (jto, 2 + fromIntegral n * 4, "Jump table header") |
-                jto <- jtos,
-                let n = runGet (skip (fromIntegral jto) >> getWord16le) bytes
+            [ (mto, fromIntegral (8 + 4 * length mt), "Main table") ] ++
+            [ (o, 2 + fromIntegral (length ls) * 4, "Jump table header for OID " ++ show i) |
+                (i, Just (o, ls)) <- mt
             ] ++
-            [ (lo, n, "Jump table line") |
-                jto <- jtos,
-                (lo,n) <- zip (getJumpTableOffsets bytes jto)
-                              (getJumpTableLineLengths bytes jto)
+            [ (lo, lineLength l, "Jump table line for OID " ++ show i) |
+                (i, Just (o, ls)) <- mt,
+                (lo, l) <- ls
             ] ++
             [ (ato, fromIntegral (8 * length at), "Audio table") ] ++
             [ (ato + fromIntegral (8 * length at), fromIntegral (8 * length at), "Duplicated audio table") |
