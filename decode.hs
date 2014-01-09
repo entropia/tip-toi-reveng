@@ -277,7 +277,7 @@ dumpAudioTo directory file = do
         let rawaudio = runGet (extract oo ol) bytes
         let audio = decypher x rawaudio
         let audiotype = fromMaybe "raw" $ lookup (B.take 4 audio) fileMagics
-        let filename = printf "%s/%s_%04d.%s directory" directory file n audiotype
+        let filename = printf "%s/%s_%04d.%s" directory file n audiotype
         if B.null audio
         then do
             printf "Skipping empty file %s...\n" filename
