@@ -38,14 +38,14 @@ parseLine = runGet lineParser
 getMainTable :: B.ByteString -> [(Word16, Maybe (Word32, [(Word32, Line)]))]
 getMainTable bytes =
     let mto = runGet mainTableOffset bytes
-    in  map getJumpTable $ runGet (mainTableParser mto) bytes
+    in  map getScript $ runGet (mainTableParser mto) bytes
   where
-    getJumpTable (i, 0xFFFFFFFF)
+    getScript (i, 0xFFFFFFFF)
         = (i, Nothing)
-    getJumpTable (i, offset)
-        = (i, Just (offset, map getLine (getJumpTableOffsets offset)))
+    getScript (i, offset)
+        = (i, Just (offset, map getLine (getScriptOffsets offset)))
 
-    getJumpTableOffsets offset = flip runGet bytes $ do
+    getScriptOffsets offset = flip runGet bytes $ do
         skip (fromIntegral offset)
         n <- getWord16le
         replicateM (fromIntegral n) getWord32le
@@ -328,9 +328,9 @@ main = do
 
     forM_ mt $ \(i, mjt) -> case mjt of
         Nothing -> do
-            printf "Jump table for OID %d: Disabled\n" i
+            printf "Script for OID %d: Disabled\n" i
         Just (o, lines) -> do
-            printf "Jump table for OID %d: (at 0x%04X)\n" i o
+            printf "Script for OID %d: (at 0x%04X)\n" i o
             forM_ lines $ \(_, line) -> do
                 printf "    %s\n" (ppLine line)
                 mapM_  (printf "     * %s\n") (checkLine (length at) line)
@@ -348,10 +348,10 @@ main = do
             [ (0, 4, "Main table address") ] ++
             [ (4, 4, "Audio table address") ] ++
             [ (mto, fromIntegral (8 + 4 * length mt), "Main table") ] ++
-            [ (o, 2 + fromIntegral (length ls) * 4, "Jump table header for OID " ++ show i) |
+            [ (o, 2 + fromIntegral (length ls) * 4, "Script header for OID " ++ show i) |
                 (i, Just (o, ls)) <- mt
             ] ++
-            [ (lo, lineLength l, "Jump table line for OID " ++ show i) |
+            [ (lo, lineLength l, "Script line for OID " ++ show i) |
                 (i, Just (o, ls)) <- mt,
                 (lo, l) <- ls
             ] ++
