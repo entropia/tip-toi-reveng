@@ -143,7 +143,7 @@ lineParser = begin
         n' <- getWord8
         when (n /= n') $ do
             b <- bytesRead
-            fail $ printf "At position %0X, expected %d/%02X, got %d/%02X" (b-1) n n n' n'
+            fail $ printf "At position 0x%08X, expected %d/%02X, got %d/%02X" (b-1) n n n' n'
 
     conditionals =
         [ (B.pack [0xF9,0xFF,0x01], Eq  )
@@ -362,7 +362,7 @@ getSegments bytes =
             [ (o, fromIntegral l, "Audio file " ++ show n ) | (n,(o,l)) <- zip [0..] at ]++
             [ (fromIntegral (B.length bytes), 0, "End of file") ]
 
-printSegment (o,l,desc) = printf "At %08X Size %8d: %s\n" o l desc
+printSegment (o,l,desc) = printf "At 0x%08X Size %8d: %s\n" o l desc
 
 segments :: FilePath -> IO ()
 segments file = do
@@ -375,7 +375,7 @@ findPosition pos' file = do
     let segments = getSegments bytes
     case find (\(o,l,_) -> pos >= o && pos < o + l) segments of
         Just s -> do
-            printf "Offset %08X is part of this segment:\n" pos
+            printf "Offset 0x%08X is part of this segment:\n" pos
             printSegment s
         Nothing -> do
             let before = filter (\(o,l,_) -> pos >= o + l) segments
