@@ -101,7 +101,25 @@ Links
 Tools
 -----
 
- * `decode.hs`: Decodes the OGG files from the `.gme` files, and pretty-prints the scripts. To run, run
+Use the tool `decode.hs` to investigate the gme files. It supports various subcommands:
+
+	Usage:
+	decode media [-d dir] <file.gme>...
+	       dumps all audio samples to the given directory (default: samples/)
+	decode scripts <file.gme>...
+	       prints the decoded scripts for each OID
+	decode script <file.gme> <n>
+	       prints the decoded scripts for the given OID
+	decode lint <file.gme>
+	       checks for errors in the file or in this program
+	decode segments <file.gme>...
+	       lists all known parts of the file, with description.
+	decode segment <file.gme> <pos>
+	       which segment contains the given position.
+	decode holes <file.gme>...
+	       lists all unknown parts of the file.
+
+It is a Haskell program without dependencies and can be easily compiled on all platforms, using these steps:
 
         apt-get install haskell-platform # Or download from http://www.haskell.org/platform/
         cabal update
