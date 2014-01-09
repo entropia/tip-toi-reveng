@@ -10,9 +10,11 @@ import Data.List
 import Data.Char
 import Data.Functor
 import Data.Maybe
+import Data.Ord
 import Control.Monad
 import System.Directory
 import Numeric (showHex)
+import Text.Read
 
 --import Codec.Container.Ogg.Page
 
@@ -210,20 +212,6 @@ audioTable offset = do
         len <- getWord32le
         return (ptr, len)
 
-checkAT :: B.ByteString -> Int -> (Word32, Word32) -> IO Bool
-checkAT bytes n (off, len) =
-    if fromIntegral off > B.length bytes
-    then do
-        printf "    Entry %d: Offset %d > File size %d\n"
-            n off (B.length bytes)
-        return False
-    else if fromIntegral (off + len) > B.length bytes
-         then do
-            printf "    Entry %d: Offset %d + Lengths %d > File size %d\n"
-                n off len (B.length bytes)
-            return False
-         else return True
-
 extract :: Word32 -> Word32 -> Get (B.ByteString)
 extract off len = do
     skip (fromIntegral off)
@@ -265,81 +253,57 @@ forMn_ l f = forM_ (zip l [0..]) $ \(x,n) -> f n x
 forMn :: Monad m => [a] -> (Int -> a -> m b) -> m [b]
 forMn l f = forM (zip l [0..]) $ \(x,n) -> f n x
 
-main = do
-    args <- getArgs
-    file <- case args of
-        [file] -> return file
-        _ -> do
-            prg <- getProgName
-            putStrLn $ "Usage: " ++ prg ++ " <file.gme>"
-            exitFailure
+main = getArgs >>= main'
+
+getAudioTable bytes =
+    let ato = runGet audioTableOffset bytes
+        at = runGet (audioTable ato) bytes
+    in case doubled at of Just at' -> (at', True)
+                          Nothing  -> (at, False)
+
+dumpAudioTo :: FilePath -> FilePath -> IO ()
+dumpAudioTo directory file = do
     bytes <- B.readFile file
 
     -- Ogg file stuff
-    let ato = runGet audioTableOffset bytes
-        at = runGet (audioTable ato) bytes
-        (oo,ol) = head at
-        audio = runGet (extract oo ol) bytes
-        x = runGet (getXor oo) bytes
-
-
-    printf "Filename %s\n" file
-    printf "File size: %08X (%d)\n" (B.length bytes) (B.length bytes)
-    printf "Checksum found %08X, calculated %08X\n"
-        (runGet (skip (fromIntegral (B.length bytes) - 4) >> getWord32le) bytes)
-        (foldl' (+) 0 (map fromIntegral (B.unpack (B.take (B.length bytes -4) bytes))) :: Word32)
-    printf "Audio table offset: %08X\n" ato
-    printf "First Audio table offset entry: %08X %d\n" oo ol
-    printf "XOR value: %02X\n" x
-    printf "First Audio magic: %s\n" (show (B.take 4 audio))
-    printf "First Audio magic xored: %s\n" (show (B.map (xor x) (B.take 4 audio)))
-
-    (at, at_doubled) <-
-        if take (length at `div` 2) at == drop (length at `div` 2) at
-        then do
-            printf "Audio table repeats itself! Ignoring first half.\n"
-            return (take (length at `div` 2) at, True)
-        else
-            return (at, False)
+    let (at, at_doubled) = getAudioTable bytes
+        x = runGet (getXor (fst (head at))) bytes
 
     printf "Audio Table entries: %d\n" (length at)
 
-    forMn_ at (checkAT bytes)
-
-    createDirectoryIfMissing False "oggs"
+    createDirectoryIfMissing False directory
     forMn_ at $ \n (oo,ol) -> do
         let rawaudio = runGet (extract oo ol) bytes
         let audio = decypher x rawaudio
         let audiotype = fromMaybe "raw" $ lookup (B.take 4 audio) fileMagics
-        let filename = printf "oggs/%s_%04d.%s" file n audiotype
+        let filename = printf "%s/%s_%04d.%s directory" file n audiotype
         if B.null audio
         then do
-            printf "File %s would be empty...\n" filename
+            printf "Skipping empty file %s...\n" filename
         else do
             B.writeFile filename audio
-            printf "Dumped decyphered %s\n" filename
+            printf "Dumped sample %d as %s\n" n filename
 
-            -- when (x `B.elem` (B.take 58 rawogg)) $
-            --    printf "Found XOR magic %02X in %s\n" x filename
-
-            -- checkOgg ogg
-
-    -- Other stuff
-
-    let sto = runGet scriptTableOffset bytes
+dumpScripts :: Maybe Int -> FilePath -> IO ()
+dumpScripts sel file = do
+    bytes <- B.readFile file
     let st = getScriptTable bytes
-    printf "Script table offset: 0x%08X\n" sto
-    printf "Script table entries: %d\n" (length st)
-    printf "Disabled entries: %d\n" (length (filter (isNothing . snd) st))
+    let st' | Just n <- sel = filter ((== fromIntegral n) . fst) st
+            | otherwise     = st
 
-    forM_ st $ \(i, ms) -> case ms of
+    forM_ st' $ \(i, ms) -> case ms of
         Nothing -> do
             printf "Script for OID %d: Disabled\n" i
         Just (o, lines) -> do
             printf "Script for OID %d: (at 0x%08X)\n" i o
             forM_ lines $ \(_, line) -> do
                 printf "    %s\n" (ppLine line)
-                mapM_  (printf "     * %s\n") (checkLine (length at) line)
+                -- mapM_  (printf "     * %s\n") (checkLine (length at) line)
+
+lint :: FilePath -> IO ()
+lint file = do
+    bytes <- B.readFile file
+    let st = getScriptTable bytes
 
     forM_ hyps $ \(hyp, desc) -> do
         let wrong = filter (not . hyp) (map snd (concatMap snd (mapMaybe snd st)))
@@ -350,16 +314,41 @@ main = do
             forM_ wrong $ \line -> do
                 printf "    %s\n" (ppLine line)
 
-    let known_segments = sort $
+    let segments = getSegments bytes
+        overlapping_segments =
+            filter (\((o1,l1,_),(o2,l2,_)) -> o1+l1 > o2) $
+            zip segments (tail segments)
+    unless (null overlapping_segments) $ do
+        printf "Overlapping segments: %d\n"
+            (length overlapping_segments)
+        forM_ overlapping_segments $ \((o1,l1,d1),(o2,l2,d2)) ->
+            printf "   Offset %08X Size %d (%s) overlaps Offset %08X Size %d (%s) by %d\n"
+            o1 l1 d1 o2 l2 d2 (o1 + l1 - o2)
+
+doubled :: Eq a => [a] -> Maybe [a]
+doubled xs | take l2 xs == drop l2 xs = Just (take l2 xs)
+           | otherwise                = Nothing
+  where l = length xs
+        l2 = l `div` 2
+
+
+
+getSegments :: B.ByteString -> [(Word32, Word32, String)]
+getSegments bytes =
+    let ato = runGet audioTableOffset bytes
+        (at, at_doubled) = getAudioTable bytes
+        sto = runGet scriptTableOffset bytes
+        st = getScriptTable bytes
+    in sort $
             [ (0, 4, "Script table address") ] ++
             [ (4, 4, "Audio table address") ] ++
             [ (sto, fromIntegral (8 + 4 * length st), "Script table") ] ++
             [ (o, 2 + fromIntegral (length ls) * 4, "Script header for OID " ++ show i) |
                 (i, Just (o, ls)) <- st
             ] ++
-            [ (lo, lineLength l, "Script line for OID " ++ show i) |
+            [ (lo, lineLength l, printf "Script line Nr %d for OID %d" n i) |
                 (i, Just (o, ls)) <- st,
-                (lo, l) <- ls
+                (n, (lo, l)) <- zip [1::Int ..] ls
             ] ++
             [ (ato, fromIntegral (8 * length at), "Audio table") ] ++
             [ (ato + fromIntegral (8 * length at), fromIntegral (8 * length at), "Duplicated audio table") |
@@ -367,23 +356,84 @@ main = do
             ] ++
             [ (o, fromIntegral l, "Audio file " ++ show n ) | (n,(o,l)) <- zip [0..] at ]++
             [ (fromIntegral (B.length bytes), 0, "End of file") ]
-    let overlapping_segments =
-            filter (\((o1,l1,_),(o2,l2,_)) -> o1+l1 > o2) $
-            zip known_segments (tail known_segments)
-    printf "Overlapping segments: %d\n"
-        (length overlapping_segments)
-    forM_ overlapping_segments $ \((o1,l1,d1),(o2,l2,d2)) ->
-        printf "   Offset %08X Size %d (%s) overlaps Offset %08X Size %d (%s) by %d\n"
-            o1 l1 d1 o2 l2 d2 (o1 + l1 - o2)
-    let unknown_segments =
+
+printSegment (o,l,desc) = printf "At %08X Size %8d: %s\n" o l desc
+
+segments :: FilePath -> IO ()
+segments file = do
+    bytes <- B.readFile file
+    mapM_ printSegment (getSegments bytes)
+
+findPosition :: Integer -> FilePath -> IO ()
+findPosition pos' file = do
+    bytes <- B.readFile file
+    let segments = getSegments bytes
+    case find (\(o,l,_) -> pos >= o && pos < o + l) segments of
+        Just s -> do
+            printf "Offset %08X is part of this segment:\n" pos
+            printSegment s
+        Nothing -> do
+            let before = filter (\(o,l,_) -> pos >= o + l) segments
+                after = filter (\(o,l,_) -> pos < o) segments
+                printBefore | null before = printf "(nothing before)\n"
+                            | otherwise   = printSegment (maximumBy (comparing (\(o,l,_) -> o+l)) before)
+                printAfter  | null after  = printf "(nothing after)\n"
+                            | otherwise   = printSegment (minimumBy (comparing (\(o,l,_) -> o)) after)
+            printf "Offset %08X not found. It lies between these two segments:\n" pos
+            printBefore
+            printAfter
+
+    where
+    pos = fromIntegral pos'
+
+unknown_segments :: FilePath -> IO ()
+unknown_segments file = do
+    bytes <- B.readFile file
+    let segments = getSegments bytes
+        unknown_segments =
             filter (\(o,l) -> not
                 (l == 2 && runGet (skip (fromIntegral o) >> getWord16le) bytes == 0)) $
             filter (\(o,l) -> l > 0) $
             zipWith (\(o1,l1,_) (o2,_,_) -> (o1+l1, o2-(o1+l1)))
-            known_segments (tail known_segments)
+            segments (tail segments)
     printf "Unknown file segments: %d (%d bytes total)\n"
         (length unknown_segments) (sum (map snd unknown_segments))
     forM_ unknown_segments $ \(o,l) ->
         printf "   Offset: %08X to %08X (%d bytes)\n" o (o+l) l
 
+forEachFile :: (FilePath -> IO ()) -> [FilePath] -> IO ()
+forEachFile _ [] = main' []
+forEachFile a [f] = a f 
+forEachFile a fs = forM_ fs $ \f -> do 
+    printf "%s:\n" f 
+    a f
 
+
+main' ("media": "-d": dir: files) = forEachFile (dumpAudioTo dir) files
+main' ("media": files)            = forEachFile (dumpAudioTo "media") files
+main' ("scripts": files)          = forEachFile (dumpScripts Nothing) files
+main' ("script":  file : n:[])
+    | Just int <- readMaybe n     =             dumpScripts (Just int) file
+main' ("lint": files)             = forEachFile lint files
+main' ("segments": files)         = forEachFile segments files
+main' ("segment": file : n :[])
+    | Just int <- readMaybe n     =             findPosition int file
+main' ("holes": files)            = forEachFile unknown_segments files
+main' _ = do
+    prg <- getProgName
+    putStrLn $ "Usage:"
+    putStrLn $ prg ++ " media [-d dir] <file.gme>..."
+    putStrLn $ "       dumps all audio samples to the given directory (default: samples/)"
+    putStrLn $ prg ++ " scripts <file.gme>..."
+    putStrLn $ "       prints the decoded scripts for each OID"
+    putStrLn $ prg ++ " script <file.gme> <n>"
+    putStrLn $ "       prints the decoded scripts for the given OID"
+    putStrLn $ prg ++ " lint <file.gme>"
+    putStrLn $ "       checks for errors in the file or in this program"
+    putStrLn $ prg ++ " segments <file.gme>..."
+    putStrLn $ "       lists all known parts of the file, with description."
+    putStrLn $ prg ++ " segment <file.gme> <pos>"
+    putStrLn $ "       which segment contains the given position."
+    putStrLn $ prg ++ " holes <file.gme>..."
+    putStrLn $ "       lists all unknown parts of the file."
+    exitFailure
