@@ -289,6 +289,17 @@ dumpScripts sel file = do
                 printf "    %s\n" (ppLine line)
                 -- mapM_  (printf "     * %s\n") (checkLine (length at) line)
 
+dumpRawScripts :: FilePath -> IO ()
+dumpRawScripts file = do
+    bytes <- B.readFile file
+    forM_ (getScriptTable bytes) $ \(i, ms) -> case ms of
+        Nothing -> do
+            printf "Script for OID %d: Disabled\n" i
+        Just (o, lines) -> do
+            printf "Script for OID %d: (at 0x%08X)\n" i o
+            forM_ lines $ \(_, line) -> do
+                printf "    %s\n" (prettyHex (runGet (extract o (lineLength line)) bytes))
+
 lint :: FilePath -> IO ()
 lint file = do
     bytes <- B.readFile file
@@ -474,6 +485,7 @@ main' ("media": files)            = forEachFile (dumpAudioTo "media") files
 main' ("scripts": files)          = forEachFile (dumpScripts Nothing) files
 main' ("script":  file : n:[])
     | Just int <- readMaybe n     =             dumpScripts (Just int) file
+main' ("raw-scripts": files)      = forEachFile dumpRawScripts files
 main' ("lint": files)             = forEachFile lint files
 main' ("segments": files)         = forEachFile segments files
 main' ("segment": file : n :[])
@@ -490,6 +502,8 @@ main' _ = do
     putStrLn $ "       prints the decoded scripts for each OID"
     putStrLn $ prg ++ " script <file.gme> <n>"
     putStrLn $ "       prints the decoded scripts for the given OID"
+    putStrLn $ prg ++ " raw-scripts <file.gme>..."
+    putStrLn $ "       prints the scripts for each OID, in their raw form"
     putStrLn $ prg ++ " lint <file.gme>"
     putStrLn $ "       checks for errors in the file or in this program"
     putStrLn $ prg ++ " segments <file.gme>..."
