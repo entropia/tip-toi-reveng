@@ -58,8 +58,8 @@ The conditionals are:
  * `00rr 00FB FF01 mmmm` (written `$r!=m?` in decode's output): Only continue with this line if register `$r` has not value `m`. (It could also be `<`, so far, that would not make a difference.)
 
 The actions are:
- * `00rr F0FF01 mmmm` (written `$r:=m`): Set register `$r` to `m`
- * `00rr F9FF01 mmmm` (written `$r+=m`): Increment register `$r` by `m`
+ * `00rr F9FF01 mmmm` (written `$r:=m`): Set register `$r` to `m`
+ * `00rr F0FF01 mmmm` (written `$r+=m`): Increment register `$r` by `m`
  * `00rr E8FF01 mmmm` (written `P(m)`): Play audio referenced by the `m`ths entry in the indices list.
  * `00rr 00FC01 aabb` (written `P(b-a)`): Play a random sample from that inclusive range.
  * `00rr 00FD01 nn00` (written `G(a)`): Begin game `n`.
