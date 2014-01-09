@@ -118,6 +118,8 @@ Use the tool `decode.hs` to investigate the gme files. It supports various subco
 	       which segment contains the given position.
 	decode holes <file.gme>...
 	       lists all unknown parts of the file.
+        decode play <file.gme>
+               interactively play: Enter OIDs, and see what happens.
 
 It is a Haskell program without dependencies and can be easily compiled on all platforms, using these steps:
 

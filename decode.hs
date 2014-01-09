@@ -14,6 +14,7 @@ import Data.Ord
 import Control.Monad
 import System.Directory
 import Numeric (showHex, readHex)
+import qualified Data.Map as M
 import Text.Read
 
 --import Codec.Container.Ogg.Page
@@ -408,6 +409,61 @@ forEachFile a fs = forM_ fs $ \f -> do
     printf "%s:\n" f 
     a f
 
+type State = M.Map Word8 Word16
+
+initialState :: State
+initialState = M.singleton 0 1
+
+formatState :: State -> String
+formatState s = spaces $ map (\(k,v) -> printf "$%d=%d" k v) $ M.toAscList s
+
+play :: FilePath -> IO ()
+play file = do
+    bytes <- B.readFile file
+    let st = getScriptTable bytes
+    forEachNumber initialState $ \i s -> do
+        case lookup (fromIntegral i) st of
+            Nothing -> printf "OID %d not in main table\n" i >> return s
+            Just Nothing -> printf "OID %d deactivated\n" i >> return s
+            Just (Just (_,o_lines)) -> do
+                let lines = map snd o_lines
+                case find (enabledLine s) lines of
+                    Nothing -> printf "None of these lines matched!\n" >> mapM_ (putStrLn . ppLine) lines >> return s
+                    Just l -> do
+                        printf "Executing:  %s\n" (ppLine l)
+                        let s' = applyLine l s
+                        printf "State now: %s\n" (formatState s')
+                        return s'
+
+enabledLine :: State -> Line -> Bool
+enabledLine s (Line cond _ _) = all (condTrue s) cond
+
+condTrue :: State -> Conditional -> Bool
+condTrue s (Eq r n)  = s `value` r == n
+condTrue s (NEq r n) = s `value` r /= n
+condTrue _ _ = False
+
+value :: State -> Word8 -> Word16
+value m r = M.findWithDefault 0 r m
+
+applyLine :: Line -> State -> State
+applyLine (Line _ act _) s = foldl' go s act
+  where go s (Set r n) = M.insert r n s
+        go s (Inc r n) = M.insert r (s `value` r + n) s
+        go s _         = s
+
+forEachNumber :: s -> (Int -> s -> IO s) -> IO ()
+forEachNumber state action = go state
+  where
+    go s = do
+        putStrLn "Next OID touched? "
+        str <- getLine
+        case readMaybe str of
+            Just i -> action i s >>= go
+            Nothing -> do
+                putStrLn "Not a number, please try again"
+                go s
+
 
 main' ("media": "-d": dir: files) = forEachFile (dumpAudioTo dir) files
 main' ("media": files)            = forEachFile (dumpAudioTo "media") files
@@ -420,6 +476,7 @@ main' ("segment": file : n :[])
     | Just int <- readMaybe n     =             findPosition int file
     | [(int,[])] <- readHex n     =             findPosition int file
 main' ("holes": files)            = forEachFile unknown_segments files
+main' ("play": file : [])         =             play file
 main' _ = do
     prg <- getProgName
     putStrLn $ "Usage:"
@@ -437,4 +494,6 @@ main' _ = do
     putStrLn $ "       which segment contains the given position."
     putStrLn $ prg ++ " holes <file.gme>..."
     putStrLn $ "       lists all unknown parts of the file."
+    putStrLn $ prg ++ " play <file.gme>"
+    putStrLn $ "       interactively play: Enter OIDs, and see what happens."
     exitFailure
