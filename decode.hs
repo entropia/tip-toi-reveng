@@ -330,7 +330,7 @@ main = do
         Nothing -> do
             printf "Script for OID %d: Disabled\n" i
         Just (o, lines) -> do
-            printf "Script for OID %d: (at 0x%04X)\n" i o
+            printf "Script for OID %d: (at 0x%08X)\n" i o
             forM_ lines $ \(_, line) -> do
                 printf "    %s\n" (ppLine line)
                 mapM_  (printf "     * %s\n") (checkLine (length at) line)
