@@ -15,7 +15,6 @@ import Control.Monad
 import System.Directory
 import Numeric (showHex, readHex)
 import qualified Data.Map as M
-import Text.Read
 
 --import Codec.Container.Ogg.Page
 
@@ -242,6 +241,11 @@ forMn_ l f = forM_ (zip l [0..]) $ \(x,n) -> f n x
 
 forMn :: Monad m => [a] -> (Int -> a -> m b) -> m [b]
 forMn l f = forM (zip l [0..]) $ \(x,n) -> f n x
+
+readMaybe :: (Read a) => String -> Maybe a
+readMaybe s = case reads s of
+              [(x, "")] -> Just x
+              _ -> Nothing
 
 getAudioTable :: B.ByteString -> ([(Word32, Word32)], Bool)
 getAudioTable bytes =
