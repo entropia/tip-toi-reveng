@@ -54,16 +54,16 @@ A script line has the format  `aa00  conditionals... bb00  actions... cc00 media
    - The media table indices are 16-bit numbers.
 
 The conditionals are:
- * `00rr 00F9 FF01 mmmm` (written `$r==m?` in decode's output): Only continue with this line if register `$r` has value `m`.
- * `00rr 00FB FF01 mmmm` (written `$r!=m?` in decode's output): Only continue with this line if register `$r` has not value `m`. (It could also be `<`, so far, that would not make a difference.)
+ * `00 rr00 F9FF01 mmmm` (written `$r==m?` in decode's output): Only continue with this line if register `$r` has value `m`.
+ * `00 rr00 FBFF01 mmmm` (written `$r!=m?` in decode's output): Only continue with this line if register `$r` has not value `m`. (It could also be `<`, so far, that would not make a difference.)
 
 The actions are:
- * `00rr F9FF01 mmmm` (written `$r:=m`): Set register `$r` to `m`
- * `00rr F0FF01 mmmm` (written `$r+=m`): Increment register `$r` by `m`
- * `00rr E8FF01 mmmm` (written `P(m)`): Play audio referenced by the `m`ths entry in the indices list.
- * `00rr 00FC01 aabb` (written `P(b-a)`): Play a random sample from that inclusive range.
- * `00rr 00FD01 nn00` (written `G(n)`): Begin game `n`.
- * `00rr FFFA01 FFFF` (written `C`): Cancel game mode.
+ * `rr00 F9FF01 mmmm` (written `$r:=m`): Set register `$r` to `m`
+ * `rr00 F0FF01 mmmm` (written `$r+=m`): Increment register `$r` by `m`
+ * `rr00 E8FF01 mmmm` (written `P(m)`): Play audio referenced by the `m`ths entry in the indices list.
+ * `rr00 00FC01 aabb` (written `P(b-a)`): Play a random sample from that inclusive range.
+ * `rr00 00FD01 nn00` (written `G(n)`): Begin game `n`.
+ * `rr00 FFFA01 FFFF` (written `C`): Cancel game mode.
 
 The commands `P`, `G` and `C` seem to ignore their registers, `C` also its parameter (which always is `FFFF`)
 
