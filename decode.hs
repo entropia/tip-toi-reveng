@@ -71,6 +71,7 @@ data Command
     | Game Word8
     | Inc Word8 Word16
     | Set Word8 Word16
+    | Unknown B.ByteString Word8 Word16
     deriving Eq
 
 data Line = Line [Conditional] [Command] [Word16]
@@ -78,6 +79,7 @@ data Line = Line [Conditional] [Command] [Word16]
 data Conditional
     = Eq Word8 Word16
     | NEq Word8 Word16
+    | Unknowncond B.ByteString Word8 Word16
 
 ppLine :: Line -> String
 ppLine (Line cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map ppCommand as) ++ media xs
@@ -86,19 +88,21 @@ ppLine (Line cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map pp
 
 
 ppConditional :: Conditional -> String
-ppConditional (Eq  g v) = printf "$%d==%d?" g v
-ppConditional (NEq g v) = printf "$%d!=%d?" g v
+ppConditional (Eq  g v)           = printf "$%d==%d?" g v
+ppConditional (NEq g v)           = printf "$%d!=%d?" g v
+ppConditional (Unknowncond b g v) = printf "%d??%d? (%s)" g v (prettyHex b)
 
 quote True = "'"
 quote False= ""
 
 ppCommand :: Command -> String
-ppCommand (Play n)     = printf "P(%d)" n
-ppCommand (Random a b) = printf "P(%d-%d)" b a
-ppCommand (Cancel)     = printf "C"
-ppCommand (Game b)     = printf "G(%d)" b
-ppCommand (Inc r n)    = printf "$%d+=%d" r n
-ppCommand (Set r n)    = printf "$%d:=%d" r n
+ppCommand (Play n)        = printf "P(%d)" n
+ppCommand (Random a b)    = printf "P(%d-%d)" b a
+ppCommand (Cancel)        = printf "C"
+ppCommand (Game b)        = printf "G(%d)" b
+ppCommand (Inc r n)       = printf "$%d+=%d" r n
+ppCommand (Set r n)       = printf "$%d:=%d" r n
+ppCommand (Unknown b r n) = printf "?($%r,%d9) (%s)" r n (prettyHex b)
 
 spaces = intercalate " "
 commas = intercalate ","
@@ -123,7 +127,7 @@ lineParser = begin
             n <- getWord16le
             case lookup bytecode conditionals of
               Just p -> return $ p r n
-              Nothing -> fail $ "Unknown conditional: " ++ prettyHex bytecode
+              Nothing -> return $ Unknowncond bytecode r n
 
         -- Actions
         b <- getWord8
@@ -134,7 +138,9 @@ lineParser = begin
             bytecode <- getLazyByteString 3
             case lookup bytecode actions of
               Just p -> p r
-              Nothing -> fail $ "Unknown command: " ++ prettyHex bytecode
+              Nothing -> do
+                n <- getWord16le
+                return $ Unknown bytecode r n
 
         -- Audio links
         n <- getWord16le
