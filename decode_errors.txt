@@ -1,0 +1,460 @@
+commit 925782722c3a65d39784f3dd007c1ee4104ff764
+Author: Joachim Breitner <mail@joachim-breitner.de>
+Date:   Thu Jan 9 00:43:26 2014 +0000
+
+    Offsets are 32 bits
+    
+decode: Unknown command: 00FB 01.
+------------
+
+010/00514 - Reise durch die Jahreszeiten/20100825/Reise durch die Jahreszeiten.gme
+decode: Unknown command: 00FB 01. Failed reading at byte position 854
+00000336  00 00 00 fd 01 00 00 00  00 01 00 45 03 00 00 01  |...........E....|
+00000346  00 00 00 00 f9 ff 01 00  00 01 00 00 00 00 fb 01  |................|
+00000356  01 00 02 00 00 00 01 00  01 00 64 03 00 00 01 00  |..........d.....|
+00000366  00 00 00 f9 ff 01 00 00  01 00 00 00 e8 ff 01 00  |................|
+00000376
+
+010/00551 - tiptoi® Reis door de seizoenen/20130902/Op_reis_door_de_seizoenen.gme
+decode: Unknown command: 00FB 01. Failed reading at byte position 854
+00000336  00 00 00 fd 01 00 00 00  00 01 00 45 03 00 00 01  |...........E....|
+00000346  00 00 00 00 f9 ff 01 00  00 01 00 00 00 00 fb 01  |................|
+00000356  01 00 02 00 00 00 01 00  01 00 64 03 00 00 01 00  |..........d.....|
+00000366  00 00 00 f9 ff 01 00 00  01 00 00 00 e8 ff 01 00  |................|
+00000376
+
+010/00556 - Au fil des saisons/20121109/Au fil des saisons.gme
+decode: Unknown command: 00FB 01. Failed reading at byte position 854
+00000336  00 00 00 fd 01 00 00 00  00 01 00 45 03 00 00 01  |...........E....|
+00000346  00 00 00 00 f9 ff 01 00  00 01 00 00 00 00 fb 01  |................|
+00000356  01 00 02 00 00 00 01 00  01 00 64 03 00 00 01 00  |..........d.....|
+00000366  00 00 00 f9 ff 01 00 00  01 00 00 00 e8 ff 01 00  |................|
+00000376
+
+decode: Unknown command: E0FF 01.
+------------
+
+015/00516 - Puzzeln, Entdecken, Erleben: Die Ritterburg/20110126/Puzzle Ritterburg.gme
+decode: Unknown command: E0FF 01. Failed reading at byte position 1003
+000003cb  00 9e 10 00 00 b2 10 00  00 01 00 da 03 00 00 01  |................|
+000003db  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e0 ff 01  |................|
+000003eb  00 00 01 00 00 00 01 00  f7 03 00 00 01 00 00 00  |................|
+000003fb  00 f9 ff 01 01 00 01 00  00 00 e0 ff 01 00 00 01  |................|
+0000040b
+
+015/00537 - Puzzle château fort - 100p./20120417/Puzzle Chateau.gme
+decode: Unknown command: E0FF 01. Failed reading at byte position 1003
+000003cb  00 9e 10 00 00 b2 10 00  00 01 00 da 03 00 00 01  |................|
+000003db  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e0 ff 01  |................|
+000003eb  00 00 01 00 00 00 01 00  f7 03 00 00 01 00 00 00  |................|
+000003fb  00 f9 ff 01 01 00 01 00  00 00 e0 ff 01 00 00 01  |................|
+0000040b
+
+015/00547 - tiptoi® - ridderkasteel/20120522/Het ridderkasteel.gme
+decode: Unknown command: E0FF 01. Failed reading at byte position 1003
+000003cb  00 9e 10 00 00 b2 10 00  00 01 00 da 03 00 00 01  |................|
+000003db  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e0 ff 01  |................|
+000003eb  00 00 01 00 00 00 01 00  f7 03 00 00 01 00 00 00  |................|
+000003fb  00 f9 ff 01 01 00 01 00  00 00 e0 ff 01 00 00 01  |................|
+0000040b
+
+015/00575 - Il castello/20130711/Puzzle - Il castello.gme
+decode: Unknown command: E0FF 01. Failed reading at byte position 1003
+000003cb  00 9c 10 00 00 b0 10 00  00 01 00 da 03 00 00 01  |................|
+000003db  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e0 ff 01  |................|
+000003eb  00 00 01 00 00 00 01 00  f7 03 00 00 01 00 00 00  |................|
+000003fb  00 f9 ff 01 01 00 01 00  00 00 e0 ff 01 00 00 01  |................|
+0000040b
+
+016/00517 - Puzzeln * Entdecken * Erleben: Die Baustelle/20110510/Puzzle Baustelle.gme
+decode: Unknown command: E0FF 01. Failed reading at byte position 1063
+00000407  00 23 1b 00 00 02 00 16  04 00 00 2d 04 00 00 01  |.#.........-....|
+00000417  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e0 ff 01  |................|
+00000427  00 00 01 00 00 00 01 00  00 00 00 f9 ff 01 02 00  |................|
+00000437  00 00 00 00 02 00 45 04  00 00 5c 04 00 00 01 00  |......E...\.....|
+00000447
+
+017/00518 - Puzzeln, Entdecken, Erleben: Der Ponyhof/20110928/Puzzle Ponyhof.gme
+decode: Unknown command: E0FF 01. Failed reading at byte position 1139
+00000453  00 29 20 00 00 02 00 62  04 00 00 7b 04 00 00 01  |.) ....b...{....|
+00000463  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e0 ff 01  |................|
+00000473  00 00 02 00 00 00 01 00  01 00 00 00 00 f9 ff 01  |................|
+00000483  02 00 00 00 00 00 02 00  93 04 00 00 ac 04 00 00  |................|
+00000493
+
+017/00538 - Puzzle Poney-club - 100p./20120131/Puzzle Poney.gme
+decode: Unknown command: E0FF 01. Failed reading at byte position 1139
+00000453  00 2d 20 00 00 02 00 62  04 00 00 7b 04 00 00 01  |.- ....b...{....|
+00000463  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e0 ff 01  |................|
+00000473  01 00 02 00 00 00 01 00  01 00 00 00 00 f9 ff 01  |................|
+00000483  02 00 00 00 00 00 02 00  93 04 00 00 ac 04 00 00  |................|
+00000493
+
+017/00548 - tiptoi® - manege/20120607/De manege.gme
+decode: Unknown command: E0FF 01. Failed reading at byte position 1139
+00000453  00 29 20 00 00 02 00 62  04 00 00 7b 04 00 00 01  |.) ....b...{....|
+00000463  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e0 ff 01  |................|
+00000473  01 00 02 00 00 00 01 00  01 00 00 00 00 f9 ff 01  |................|
+00000483  02 00 00 00 00 00 02 00  93 04 00 00 ac 04 00 00  |................|
+00000493
+
+017/00577 - Il maneggio dei pony/20131023/Puzzle - Il maneggio dei pony.gme
+decode: Unknown command: E0FF 01. Failed reading at byte position 1139
+00000453  00 29 20 00 00 02 00 62  04 00 00 7b 04 00 00 01  |.) ....b...{....|
+00000463  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e0 ff 01  |................|
+00000473  01 00 02 00 00 00 01 00  01 00 00 00 00 f9 ff 01  |................|
+00000483  02 00 00 00 00 00 02 00  93 04 00 00 ac 04 00 00  |................|
+00000493
+
+028/00523 - Puzzeln, Entdecken, Erleben: Beim Kinderarzt/20120102/Puzzle Kinderarzt.gme
+decode: Unknown command: E0FF 01. Failed reading at byte position 1569
+00000601  00 00 00 00 00 02 00 10  06 00 00 29 06 00 00 01  |...........)....|
+00000611  00 00 00 00 f9 ff 01 00  00 01 00 00 00 e0 ff 01  |................|
+00000621  01 00 02 00 04 00 05 00  01 00 00 00 00 f9 ff 01  |................|
+00000631  01 00 00 00 00 00 04 00  49 06 00 00 74 06 00 00  |........I...t...|
+00000641
+
+039/00526 - Das versunkene Logik-Land/20120920/Das versunkene Logikland.gme
+decode: Unknown command: E0FF 01. Failed reading at byte position 1482
+000005aa  05 00 00 f2 05 00 00 00  06 00 00 0e 06 00 00 01  |................|
+000005ba  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e0 ff 01  |................|
+000005ca  02 00 04 00 01 00 02 00  03 00 04 00 01 00 00 00  |................|
+000005da  00 f9 ff 01 02 00 00 00  00 00 01 00 00 00 00 f9  |................|
+000005ea
+
+044/00528 - Wettstreit im Hexenwald/20121130/Wettstreit im Hexenwald.gme
+decode: Unknown command: E0FF 01. Failed reading at byte position 1143
+00000457  04 00 00 9b 04 00 00 a9  04 00 00 b7 04 00 00 01  |................|
+00000467  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e0 ff 01  |................|
+00000477  00 00 02 00 00 00 01 00  01 00 00 00 00 f9 ff 01  |................|
+00000487  02 00 00 00 00 00 01 00  00 00 00 f9 ff 01 03 00  |................|
+00000497
+
+046/00527 - Die turbulente Zeitreise/20120906/Die turbulente Zeitreise.gme
+decode: Unknown command: E0FF 01. Failed reading at byte position 1647
+0000064f  00 03 00 5e 06 00 00 75  06 00 00 83 06 00 00 01  |...^...u........|
+0000065f  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e0 ff 01  |................|
+0000066f  00 00 01 00 00 00 01 00  00 00 00 f9 ff 01 02 00  |................|
+0000067f  00 00 00 00 01 00 00 00  00 f9 ff 01 03 00 00 00  |................|
+0000068f
+
+053/00564 - tiptoi® Tier-Set Bauernhof/20130930/Spielfiguren1.gme
+decode: Unknown command: E0FF 01. Failed reading at byte position 14751
+0000397f  39 00 00 a7 39 00 00 c0  39 00 00 d9 39 00 00 01  |9...9...9...9...|
+0000398f  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e0 ff 01  |................|
+0000399f  00 00 02 00 07 00 08 00  01 00 00 00 00 f9 ff 01  |................|
+000039af  02 00 01 00 00 00 e0 ff  01 01 00 02 00 07 00 08  |................|
+000039bf
+
+decode: Unknown command: E1FF 01.
+------------
+
+006/00510 - Die Englisch-Detektive/20100408/Englisch-Detektive.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 6323
+00001893  00 00 00 fd 01 00 00 00  00 01 00 a2 18 00 00 01  |................|
+000018a3  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+000018b3  ff ff 02 00 bf 00 c0 00  01 00 c1 18 00 00 01 00  |................|
+000018c3  00 00 00 f9 ff 01 01 00  01 00 00 00 e1 ff 01 ff  |................|
+000018d3
+
+006/00533 - Les détectives anglais/20111207/Detectives anglais.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 6323
+00001893  00 00 00 fd 01 00 00 00  00 01 00 a2 18 00 00 01  |................|
+000018a3  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+000018b3  ff ff 02 00 bf 00 c0 00  01 00 c1 18 00 00 01 00  |................|
+000018c3  00 00 00 f9 ff 01 01 00  01 00 00 00 e1 ff 01 ff  |................|
+000018d3
+
+006/00543 - tiptoi® - de engelse detective/20120113/Engelse detective spel.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 6323
+00001893  00 00 00 fd 01 00 00 00  00 01 00 a2 18 00 00 01  |................|
+000018a3  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+000018b3  ff ff 02 00 bf 00 c0 00  01 00 c1 18 00 00 01 00  |................|
+000018c3  00 00 00 f9 ff 01 01 00  01 00 00 00 e1 ff 01 ff  |................|
+000018d3
+
+006/00569 - English Detective/20130527/English Detective.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 6323
+00001893  00 00 00 fd 01 00 00 00  00 01 00 a2 18 00 00 01  |................|
+000018a3  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+000018b3  ff ff 02 00 bf 00 c0 00  01 00 c1 18 00 00 01 00  |................|
+000018c3  00 00 00 f9 ff 01 01 00  01 00 00 00 e1 ff 01 ff  |................|
+000018d3
+
+007/00511 - Magors Lesezauber/20110217/Magors Lesezauber.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 1619
+00000633  ff ff ff ff ff 69 23 00  00 01 00 42 06 00 00 01  |.....i#....B....|
+00000643  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+00000653  ff ff 01 00 00 00 01 00  5f 06 00 00 01 00 00 00  |........_.......|
+00000663  00 f9 ff 01 01 00 01 00  00 00 e1 ff 01 ff ff 01  |................|
+00000673
+
+011/00515 - Der interaktive Globus - puzzleball®/20120516/Globus puzzleball.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 1871
+0000072f  07 00 00 17 08 00 00 2e  08 00 00 45 08 00 00 01  |...........E....|
+0000073f  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+0000074f  ff ff 01 00 00 00 01 00  00 00 00 f9 ff 01 02 00  |................|
+0000075f  01 00 00 00 e1 ff 01 ff  ff 04 00 01 00 00 00 02  |................|
+0000076f
+
+035/00524 - Puzzeln, Entdecken, Erleben: Im Zoo/20121109/Puzzle Im Zoo.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 1831
+00000707  07 00 00 d5 07 00 00 e3  07 00 00 f1 07 00 00 01  |................|
+00000717  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+00000727  ff ff 01 00 02 00 01 00  00 00 00 f9 ff 01 02 00  |................|
+00000737  00 00 00 00 01 00 00 00  00 f9 ff 01 03 00 00 00  |................|
+00000747
+
+035/00552 - Puzzel, ontdek en beleef: De dierentuin/20130808/De dierentuin.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 1831
+00000707  07 00 00 d5 07 00 00 e3  07 00 00 f1 07 00 00 01  |................|
+00000717  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+00000727  ff ff 01 00 02 00 01 00  00 00 00 f9 ff 01 02 00  |................|
+00000737  00 00 00 00 01 00 00 00  00 f9 ff 01 03 00 00 00  |................|
+00000747
+
+035/00553 - Puzzle Zoo - 100p./20121026/Puzzle Zoo.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 1831
+00000707  07 00 00 d5 07 00 00 e3  07 00 00 f1 07 00 00 01  |................|
+00000717  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+00000727  ff ff 01 00 02 00 01 00  00 00 00 f9 ff 01 02 00  |................|
+00000737  00 00 00 00 01 00 00 00  00 f9 ff 01 03 00 00 00  |................|
+00000747
+
+035/00576 - Lo zoo/20130826/Puzzle - Lo zoo.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 1831
+00000707  07 00 00 d5 07 00 00 e3  07 00 00 f1 07 00 00 01  |................|
+00000717  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+00000727  ff ff 01 00 02 00 01 00  00 00 00 f9 ff 01 02 00  |................|
+00000737  00 00 00 00 01 00 00 00  00 f9 ff 01 03 00 00 00  |................|
+00000747
+
+037/00539 - Globe interactif - Puzzleball/20120413/Puzzleball Globe.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 1871
+0000072f  07 00 00 1f 08 00 00 36  08 00 00 4d 08 00 00 01  |.......6...M....|
+0000073f  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+0000074f  ff ff 01 00 00 00 01 00  00 00 00 f9 ff 01 02 00  |................|
+0000075f  01 00 00 00 e1 ff 01 ff  ff 05 00 01 00 02 00 03  |................|
+0000076f
+
+037/00549 - tiptoi® - 3D interactieve Globe/20130123/Interactieve Globe.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 1871
+0000072f  07 00 00 17 08 00 00 2e  08 00 00 45 08 00 00 01  |...........E....|
+0000073f  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+0000074f  ff ff 01 00 00 00 01 00  00 00 00 f9 ff 01 02 00  |................|
+0000075f  01 00 00 00 e1 ff 01 ff  ff 04 00 01 00 00 00 02  |................|
+0000076f
+
+041/00534 - Le magicien de la lecture/20120702/Magicien de la lecture.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 11371
+00002c4b  00 30 4a 00 00 4d 4a 00  00 01 00 5a 2c 00 00 01  |.0J..MJ....Z,...|
+00002c5b  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+00002c6b  ff ff 01 00 00 00 01 00  77 2c 00 00 01 00 00 00  |........w,......|
+00002c7b  00 f9 ff 01 01 00 01 00  00 00 e1 ff 01 ff ff 01  |................|
+00002c8b
+
+042/00599 - Destination Savoir - Les dinosaures/20130705/Destination Savoir Dinosaures.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 190467
+0002e7e3  e8 02 00 b3 e8 02 00 c1  e8 02 00 cf e8 02 00 01  |................|
+0002e7f3  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+0002e803  ff ff 02 00 69 01 6a 01  01 00 00 00 00 f9 ff 01  |....i.j.........|
+0002e813  02 00 00 00 00 00 01 00  00 00 00 f9 ff 01 03 00  |................|
+0002e823
+
+042/55399 - tiptoi® Dinosaurier (Expedition Wissen)/20121023/Expedition Wissen - Dinosaurier.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 190467
+0002e7e3  e8 02 00 b3 e8 02 00 c1  e8 02 00 cf e8 02 00 01  |................|
+0002e7f3  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+0002e803  ff ff 02 00 69 01 6a 01  01 00 00 00 00 f9 ff 01  |....i.j.........|
+0002e813  02 00 00 00 00 00 01 00  00 00 00 f9 ff 01 03 00  |................|
+0002e823
+
+047/00544 - tiptoi® - de magie van het lezen/20120824/De magie van het lezen.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 11347
+00002c33  ff fb 4a 00 00 33 4b 00  00 01 00 42 2c 00 00 01  |..J..3K....B,...|
+00002c43  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+00002c53  ff ff 01 00 00 00 01 00  5f 2c 00 00 01 00 00 00  |........_,......|
+00002c63  00 f9 ff 01 01 00 01 00  00 00 e1 ff 01 ff ff 01  |................|
+00002c73
+
+049/00558 - Der interaktive Globus (Halbschalen)/20130228/Der interaktive Globus.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 5998
+0000174e  18 00 00 36 18 00 00 5f  18 00 00 76 18 00 00 01  |...6..._...v....|
+0000175e  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+0000176e  ff ff 01 00 3c 00 01 00  00 00 00 f9 ff 01 0a 00  |....<...........|
+0000177e  01 00 00 00 e1 ff 01 ff  ff 03 00 3d 00 3e 00 3f  |...........=.>.?|
+0000178e
+
+049/00561 - Globe interactif/20130802/Globe Interactif.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 2283
+000008cb  09 00 00 d2 09 00 00 e9  09 00 00 06 0a 00 00 01  |................|
+000008db  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+000008eb  ff ff 01 00 00 00 01 00  00 00 00 f9 ff 01 02 00  |................|
+000008fb  01 00 00 00 e1 ff 01 ff  ff 05 00 01 00 02 00 03  |................|
+0000090b
+
+049/00563 - tiptoi® Interactieve Globe/20130830/Globe_nieuw.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 2283
+000008cb  09 00 00 ca 09 00 00 e1  09 00 00 fc 09 00 00 01  |................|
+000008db  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+000008eb  ff ff 01 00 00 00 01 00  00 00 00 f9 ff 01 02 00  |................|
+000008fb  01 00 00 00 e1 ff 01 ff  ff 04 00 01 00 00 00 02  |................|
+0000090b
+
+049/00566 - Set completo Globo interattivo + Lettore digitale/20131113/Globo interattivo.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 5998
+0000174e  18 00 00 38 18 00 00 61  18 00 00 78 18 00 00 01  |...8...a...x....|
+0000175e  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+0000176e  ff ff 01 00 3c 00 01 00  00 00 00 f9 ff 01 0a 00  |....<...........|
+0000177e  01 00 00 00 e1 ff 01 ff  ff 03 00 3d 00 3e 00 3f  |...........=.>.?|
+0000178e
+
+055/00559 - Der Millionen-Coup/20131022/Der Millionencoup.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 4723
+00001253  00 81 54 00 00 95 54 00  00 01 00 62 12 00 00 01  |..T...T....b....|
+00001263  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+00001273  ff ff 01 00 00 00 03 00  87 12 00 00 9e 12 00 00  |................|
+00001283  ac 12 00 00 01 00 00 00  00 f9 ff 01 01 00 01 00  |................|
+00001293
+
+061/00560 - Dein Körper und Du/20130902/Dein Koerper und Du.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 17747
+00004533  00 b5 ee 00 00 02 00 42  45 00 00 5b 45 00 00 01  |.......BE..[E...|
+00004543  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+00004553  ff ff 02 00 00 00 01 00  01 00 00 00 00 f9 ff 01  |................|
+00004563  02 00 00 00 00 00 02 00  73 45 00 00 8c 45 00 00  |........sE...E..|
+00004573
+
+061/00703 - A la découverte du corps humain/20131211/Jeaux corps humain.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 17747
+00004533  00 b5 ee 00 00 02 00 42  45 00 00 5b 45 00 00 01  |.......BE..[E...|
+00004543  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+00004553  ff ff 02 00 00 00 01 00  01 00 00 00 00 f9 ff 01  |................|
+00004563  02 00 00 00 00 00 02 00  73 45 00 00 8c 45 00 00  |........sE...E..|
+00004573
+
+063/00572 - Il Mago della Lettura/20130916/Il Mago della Lettura.gme
+decode: Unknown command: E1FF 01. Failed reading at byte position 11371
+00002c4b  00 18 4a 00 00 35 4a 00  00 01 00 5a 2c 00 00 01  |..J..5J....Z,...|
+00002c5b  00 00 00 00 f9 ff 01 01  00 01 00 00 00 e1 ff 01  |................|
+00002c6b  ff ff 01 00 00 00 01 00  77 2c 00 00 01 00 00 00  |........w,......|
+00002c7b  00 f9 ff 01 01 00 01 00  00 00 e1 ff 01 ff ff 01  |................|
+00002c8b
+
+decode: Unknown command: F9FF 00.
+------------
+
+013/44567 - tiptoi® Mein großes Wimmelbuch/20130423/Wimmelbuch.gme
+decode: Unknown command: F9FF 00. Failed reading at byte position 4090
+00000fda  ff 01 01 00 00 00 e8 ff  01 00 00 01 00 02 00 01  |................|
+00000fea  00 00 00 00 f9 ff 01 04  00 03 00 00 00 f9 ff 00  |................|
+00000ffa  00 00 00 00 f9 ff 01 01  00 00 00 e8 ff 01 00 00  |................|
+0000100a  01 00 02 00 01 00 00 00  00 f9 ff 01 05 00 00 00  |................|
+0000101a
+
+045/00628 - Mon premier Atlas/20131128/Mon premier Atlas.gme
+decode: Unknown command: F9FF 00. Failed reading at byte position 394524
+000604fc  06 06 00 4c 06 06 00 02  00 00 00 00 f9 ff 01 01  |...L............|
+0006050c  00 00 98 00 f9 ff 01 63  00 03 00 98 00 f9 ff 00  |.......c........|
+0006051c  03 00 98 00 f4 ff 01 0a  00 00 00 ff f8 01 4e 1f  |..............N.|
+0006052c  00 00 02 00 00 00 00 f9  ff 01 01 00 00 98 00 f9  |................|
+0006053c
+
+045/32911 - tiptoi® Mein großer Weltatlas/20131211/WWW Weltatlas.gme
+decode: Unknown command: F9FF 00. Failed reading at byte position 394827
+0006062b  07 06 00 7b 07 06 00 02  00 00 00 00 f9 ff 01 01  |...{............|
+0006063b  00 00 98 00 f9 ff 01 63  00 03 00 98 00 f9 ff 00  |.......c........|
+0006064b  03 00 98 00 f4 ff 01 0a  00 00 00 ff f8 01 4e 1f  |..............N.|
+0006065b  00 00 02 00 00 00 00 f9  ff 01 01 00 00 98 00 f9  |................|
+0006066b
+
+056/32913 - tiptoi® WWW Pferde u. Ponys (Band13)/20131211/WWW Pferde und Ponys.gme
+decode: Unknown command: F9FF 00. Failed reading at byte position 7063
+00001b77  00 16 00 17 00 18 00 02  00 00 3b 00 f9 ff 01 02  |..........;.....|
+00001b87  00 00 3c 00 f9 ff 01 63  00 03 00 3c 00 f9 ff 00  |..<....c...<....|
+00001b97  00 00 3c 00 f4 ff 01 0a  00 00 00 ff f8 01 d8 10  |..<.............|
+00001ba7  00 00 02 00 00 3b 00 f9  ff 01 02 00 00 3c 00 f9  |.....;.......<..|
+00001bb7
+
+057/223007 - tiptoi® Weltkarte/20130417/Weltkarte.gme
+decode: Unknown command: F9FF 00. Failed reading at byte position 6183
+00001807  19 00 00 57 19 00 00 02  00 00 33 00 f9 ff 01 01  |...W......3.....|
+00001817  00 00 34 00 f9 ff 01 63  00 03 00 34 00 f9 ff 00  |..4....c...4....|
+00001827  00 00 34 00 f4 ff 01 0a  00 00 00 ff f8 01 4e 1f  |..4...........N.|
+00001837  00 00 02 00 00 33 00 f9  ff 01 01 00 00 34 00 f9  |.....3.......4..|
+00001847
+
+058/55398 - tiptoi® Musik (Expedition Wissen)/20130801/Expedition Wissen - Musik.gme
+decode: Unknown command: F9FF 00. Failed reading at byte position 16953
+00004219  43 00 00 69 43 00 00 02  00 00 25 00 f9 ff 01 01  |C..iC.....%.....|
+00004229  00 00 26 00 f9 ff 01 63  00 03 00 26 00 f9 ff 00  |..&....c...&....|
+00004239  01 00 26 00 f4 ff 01 0a  00 00 00 ff f8 01 c7 21  |..&............!|
+00004249  00 00 02 00 00 25 00 f9  ff 01 01 00 00 26 00 f9  |.....%.......&..|
+00004259
+
+decode: Unknown command: FFF8 01.
+------------
+
+038/41802 - tiptoi® Grundschulwörterbuch Englisch/20130902/Grundschulwoerterbuch Englisch.gme
+decode: Unknown command: FFF8 01. Failed reading at byte position 58693
+0000e525  ff 01 00 00 01 00 94 00  01 00 00 33 00 f9 ff 01  |...........3....|
+0000e535  02 00 02 00 33 00 f9 ff  01 01 00 00 00 ff f8 01  |....3...........|
+0000e545  0b 10 00 00 01 00 00 33  00 f9 ff 01 03 00 00 00  |.......3........|
+0000e555  00 00 01 00 00 33 00 f9  ff 01 04 00 00 00 00 00  |.....3..........|
+0000e565
+
+
+
+decode: Unknown conditional: F9FF 00.
+------------
+
+043/00529 - Tom & Tina - Das Tal der Tempel/20121109/Das Tal der Tempel.gme
+decode: Unknown conditional: F9FF 00. Failed reading at byte position 13100
+0000330c  00 00 9f 35 00 00 be 35  00 00 d3 35 00 00 04 00  |...5...5...5....|
+0000331c  00 9d 00 f9 ff 01 00 00  00 2d 00 f9 ff 00 2e 00  |.........-......|
+0000332c  00 10 00 f9 ff 01 05 00  00 0d 00 f9 ff 01 01 00  |................|
+0000333c  02 00 00 00 e1 ff 01 ff  ff 00 00 f0 ff 01 01 00  |................|
+0000334c
+
+053/80120 - tiptoi® Spielfiguren Afrika/20130927/Spielfiguren3.gme
+decode: Unknown conditional: F9FF 00. Failed reading at byte position 14444
+0000384c  00 01 00 00 00 e8 ff 01  00 00 01 00 03 00 02 00  |................|
+0000385c  00 00 00 f9 ff 01 02 00  00 2d 00 f9 ff 00 2e 00  |.........-......|
+0000386c  01 00 00 00 e8 ff 01 00  00 01 00 03 00 02 00 00  |................|
+0000387c  00 00 f9 ff 01 02 00 00  2d 00 f9 ff 01 01 00 01  |........-.......|
+0000388c
+
+053/80140 - tiptoi® Spielfiguren Bauernhof/20130927/Spielfiguren2.gme
+decode: Unknown conditional: F9FF 00. Failed reading at byte position 14444
+0000384c  00 01 00 00 00 e8 ff 01  00 00 01 00 03 00 02 00  |................|
+0000385c  00 00 00 f9 ff 01 02 00  00 2d 00 f9 ff 00 2e 00  |.........-......|
+0000386c  01 00 00 00 e8 ff 01 00  00 01 00 03 00 02 00 00  |................|
+0000387c  00 00 f9 ff 01 02 00 00  2d 00 f9 ff 01 01 00 01  |........-.......|
+0000388c
+
+decode: Unknown conditional: FFFF 01.
+------------
+
+014/00519 - tiptoi® memory® - Rekorde im Tierreich/20110322/Rekorde im Tierreich.gme
+decode: Unknown conditional: FFFF 01. Failed reading at byte position 1072
+00000410  71 25 00 00 02 00 1e 04  00 00 44 04 00 00 02 00  |q%........D.....|
+00000420  00 00 00 f9 ff 01 01 00  00 01 00 ff ff 01 af 15  |................|
+00000430  02 00 01 00 f9 ff 01 af  15 00 00 e0 ff 01 00 00  |................|
+00000440  01 00 00 00 02 00 00 00  00 f9 ff 01 01 00 00 01  |................|
+00000450
+
+014/00567 - Set completo Lettore digitale + memory® interattivo/20130422/memory interattivo.gme
+decode: Unknown conditional: FFFF 01. Failed reading at byte position 1072
+00000410  71 25 00 00 02 00 1e 04  00 00 44 04 00 00 02 00  |q%........D.....|
+00000420  00 00 00 f9 ff 01 01 00  00 01 00 ff ff 01 af 15  |................|
+00000430  02 00 01 00 f9 ff 01 af  15 00 00 e0 ff 01 00 00  |................|
+00000440  01 00 00 00 02 00 00 00  00 f9 ff 01 01 00 00 01  |................|
+00000450
+
+022/00520 - Tom und Tina - Die geheimnisvolle Maske/20111111/Die geheimnisvolle Maske.gme
+decode: Unknown conditional: FFFF 01. Failed reading at byte position 4396
+0000110c  af b9 01 00 ca b9 01 00  03 00 22 11 00 00 3e 11  |.........."...>.|
+0000111c  00 00 55 11 00 00 01 00  00 03 00 ff ff 01 00 00  |..U.............|
+0000112c  02 00 92 00 f9 ff 01 01  00 00 00 ff f8 01 6c 25  |..............l%|
+0000113c  00 00 01 00 00 29 00 f9  ff 01 01 00 01 00 00 00  |.....)..........|
+0000114c
