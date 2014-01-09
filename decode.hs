@@ -481,7 +481,7 @@ main' _ = do
     prg <- getProgName
     putStrLn $ "Usage:"
     putStrLn $ prg ++ " media [-d dir] <file.gme>..."
-    putStrLn $ "       dumps all audio samples to the given directory (default: samples/)"
+    putStrLn $ "       dumps all audio samples to the given directory (default: media/)"
     putStrLn $ prg ++ " scripts <file.gme>..."
     putStrLn $ "       prints the decoded scripts for each OID"
     putStrLn $ prg ++ " script <file.gme> <n>"

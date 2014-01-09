@@ -105,7 +105,7 @@ Use the tool `decode.hs` to investigate the gme files. It supports various subco
 
 	Usage:
 	decode media [-d dir] <file.gme>...
-	       dumps all audio samples to the given directory (default: samples/)
+	       dumps all audio samples to the given directory (default: media/)
 	decode scripts <file.gme>...
 	       prints the decoded scripts for each OID
 	decode script <file.gme> <n>
