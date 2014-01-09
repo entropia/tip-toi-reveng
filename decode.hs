@@ -56,17 +56,6 @@ getScriptTable bytes =
     getLine offset
         = (offset, runGet (skip (fromIntegral offset) >> lineParser) bytes)
 
-hyp3 :: Line -> Bool
-hyp3 (Line _ as mi) = all ok as
-  where ok (Play n)   = 0 <= n && n < fromIntegral (length mi)
-        ok (Random a b) = 0 <= a && a < fromIntegral (length mi) &&
-                     0 <= b && b < fromIntegral (length mi)
-        ok _ = True
-
-hyps = [ -- (hyp2, "01 fixed prefix")
-         (hyp3, "play indicies are correct")
-       ]
-
 data Command
     = Play Word8
     | Random Word8 Word8
@@ -254,8 +243,7 @@ forMn_ l f = forM_ (zip l [0..]) $ \(x,n) -> f n x
 forMn :: Monad m => [a] -> (Int -> a -> m b) -> m [b]
 forMn l f = forM (zip l [0..]) $ \(x,n) -> f n x
 
-main = getArgs >>= main'
-
+getAudioTable :: B.ByteString -> ([(Word32, Word32)], Bool)
 getAudioTable bytes =
     let ato = runGet audioTableOffset bytes
         at = runGet (audioTable ato) bytes
@@ -305,7 +293,11 @@ lint :: FilePath -> IO ()
 lint file = do
     bytes <- B.readFile file
     let st = getScriptTable bytes
+        (at,_) = getAudioTable bytes
 
+    let hyps = [ (hyp1, "play indicies are correct")
+               , (hyp2 (fromIntegral (length at)), "media indicies are correct")
+               ]
     forM_ hyps $ \(hyp, desc) -> do
         let wrong = filter (not . hyp) (map snd (concatMap snd (mapMaybe snd st)))
         if null wrong
@@ -325,6 +317,18 @@ lint file = do
         forM_ overlapping_segments $ \((o1,l1,d1),(o2,l2,d2)) ->
             printf "   Offset %08X Size %d (%s) overlaps Offset %08X Size %d (%s) by %d\n"
             o1 l1 d1 o2 l2 d2 (o1 + l1 - o2)
+  where
+    hyp1 :: Line -> Bool
+    hyp1 (Line _ as mi) = all ok as
+      where ok (Play n)   = 0 <= n && n < fromIntegral (length mi)
+            ok (Random a b) = 0 <= a && a < fromIntegral (length mi) &&
+                         0 <= b && b < fromIntegral (length mi)
+            ok _ = True
+
+    hyp2 :: Word16 -> Line -> Bool
+    hyp2 n (Line _ _ mi) = all (<= n) mi
+
+
 
 doubled :: Eq a => [a] -> Maybe [a]
 doubled xs | take l2 xs == drop l2 xs = Just (take l2 xs)
@@ -497,3 +501,6 @@ main' _ = do
     putStrLn $ prg ++ " play <file.gme>"
     putStrLn $ "       interactively play: Enter OIDs, and see what happens."
     exitFailure
+
+main = getArgs >>= main'
+
