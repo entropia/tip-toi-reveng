@@ -55,7 +55,7 @@ A script line has the format  `aa00  conditionals... bb00  actions... cc00 media
 
 The conditionals are:
  * `00rr 00F9 FF01 mmmm` (written `$r==m?` in decode's output): Only continue with this line if register `$r` has value `m`.
- * `00rr 00FB FF01 mmmm` (written `$r=?m?` in decode's output): Unclear, no difference detected yet.
+ * `00rr 00FB FF01 mmmm` (written `$r!=m?` in decode's output): Only continue with this line if register `$r` has not value `m`. (It could also be `<`, so far, that would not make a difference.)
 
 The actions are:
  * `00rr F0FF01 mmmm` (written `$r:=m`): Set register `$r` to `m`

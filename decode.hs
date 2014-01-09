@@ -76,8 +76,8 @@ data Command
 data Line = Line [Conditional] [Command] [Word16]
 
 data Conditional
-    = Conditional Word8 Word16
-    | Conditional2 Word8 Word16
+    = Eq Word8 Word16
+    | NEq Word8 Word16
 
 ppLine :: Line -> String
 ppLine (Line cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map ppCommand as) ++ media xs
@@ -86,8 +86,8 @@ ppLine (Line cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map pp
 
 
 ppConditional :: Conditional -> String
-ppConditional (Conditional  g v) = printf "$%d==%d?" g v
-ppConditional (Conditional2 g v) = printf "$%d=?%d?" g v
+ppConditional (Eq  g v) = printf "$%d==%d?" g v
+ppConditional (NEq g v) = printf "$%d!=%d?" g v
 
 quote True = "'"
 quote False= ""
@@ -148,8 +148,8 @@ lineParser = begin
             fail $ printf "At position %0X, expected %d/%02X, got %d/%02X" (b-1) n n n' n'
 
     conditionals =
-        [ (B.pack [0xF9,0xFF,0x01], Conditional  )
-        , (B.pack [0xFB,0xFF,0x01], Conditional2 )
+        [ (B.pack [0xF9,0xFF,0x01], Eq  )
+        , (B.pack [0xFB,0xFF,0x01], NEq )
         ]
 
     actions =
