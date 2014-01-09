@@ -16,12 +16,12 @@ import Numeric (showHex)
 
 --import Codec.Container.Ogg.Page
 
-mainTableOffset :: Get Word32
-mainTableOffset = do
+scriptTableOffset :: Get Word32
+scriptTableOffset = do
     getWord32le
 
-mainTableParser :: Word32 -> Get [(Word16, Word32)]
-mainTableParser offset = do
+scriptTableParser :: Word32 -> Get [(Word16, Word32)]
+scriptTableParser offset = do
     skip (fromIntegral offset)
     last_code <- getWord16le
     0 <- getWord16le
@@ -35,10 +35,10 @@ mainTableParser offset = do
 parseLine :: B.ByteString -> Line
 parseLine = runGet lineParser
 
-getMainTable :: B.ByteString -> [(Word16, Maybe (Word32, [(Word32, Line)]))]
-getMainTable bytes =
-    let mto = runGet mainTableOffset bytes
-    in  map getScript $ runGet (mainTableParser mto) bytes
+getScriptTable :: B.ByteString -> [(Word16, Maybe (Word32, [(Word32, Line)]))]
+getScriptTable bytes =
+    let sto = runGet scriptTableOffset bytes
+    in  map getScript $ runGet (scriptTableParser sto) bytes
   where
     getScript (i, 0xFFFFFFFF)
         = (i, Nothing)
@@ -320,13 +320,13 @@ main = do
 
     -- Other stuff
 
-    let mto = runGet mainTableOffset bytes
-    let mt = getMainTable bytes
-    printf "Main table offset: 0x%08X\n" mto
-    printf "Main table entries: %d\n" (length mt)
-    printf "Disabled entries: %d\n" (length (filter (isNothing . snd) mt))
+    let sto = runGet scriptTableOffset bytes
+    let st = getScriptTable bytes
+    printf "Script table offset: 0x%08X\n" sto
+    printf "Script table entries: %d\n" (length st)
+    printf "Disabled entries: %d\n" (length (filter (isNothing . snd) st))
 
-    forM_ mt $ \(i, mjt) -> case mjt of
+    forM_ st $ \(i, ms) -> case ms of
         Nothing -> do
             printf "Script for OID %d: Disabled\n" i
         Just (o, lines) -> do
@@ -336,7 +336,7 @@ main = do
                 mapM_  (printf "     * %s\n") (checkLine (length at) line)
 
     forM_ hyps $ \(hyp, desc) -> do
-        let wrong = filter (not . hyp) (map snd (concatMap snd (mapMaybe snd mt)))
+        let wrong = filter (not . hyp) (map snd (concatMap snd (mapMaybe snd st)))
         if null wrong
         then printf "All lines do satisfy hypothesis \"%s\"!\n" desc
         else do
@@ -345,14 +345,14 @@ main = do
                 printf "    %s\n" (ppLine line)
 
     let known_segments = sort $
-            [ (0, 4, "Main table address") ] ++
+            [ (0, 4, "Script table address") ] ++
             [ (4, 4, "Audio table address") ] ++
-            [ (mto, fromIntegral (8 + 4 * length mt), "Main table") ] ++
+            [ (sto, fromIntegral (8 + 4 * length st), "Script table") ] ++
             [ (o, 2 + fromIntegral (length ls) * 4, "Script header for OID " ++ show i) |
-                (i, Just (o, ls)) <- mt
+                (i, Just (o, ls)) <- st
             ] ++
             [ (lo, lineLength l, "Script line for OID " ++ show i) |
-                (i, Just (o, ls)) <- mt,
+                (i, Just (o, ls)) <- st,
                 (lo, l) <- ls
             ] ++
             [ (ato, fromIntegral (8 * length at), "Audio table") ] ++
