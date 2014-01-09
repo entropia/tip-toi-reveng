@@ -13,7 +13,7 @@ import Data.Maybe
 import Data.Ord
 import Control.Monad
 import System.Directory
-import Numeric (showHex)
+import Numeric (showHex, readHex)
 import Text.Read
 
 --import Codec.Container.Ogg.Page
@@ -418,6 +418,7 @@ main' ("lint": files)             = forEachFile lint files
 main' ("segments": files)         = forEachFile segments files
 main' ("segment": file : n :[])
     | Just int <- readMaybe n     =             findPosition int file
+    | [(int,[])] <- readHex n     =             findPosition int file
 main' ("holes": files)            = forEachFile unknown_segments files
 main' _ = do
     prg <- getProgName
