@@ -62,7 +62,7 @@ The actions are:
  * `00rr F0FF01 mmmm` (written `$r+=m`): Increment register `$r` by `m`
  * `00rr E8FF01 mmmm` (written `P(m)`): Play audio referenced by the `m`ths entry in the indices list.
  * `00rr 00FC01 aabb` (written `P(b-a)`): Play a random sample from that inclusive range.
- * `00rr 00FD01 nn00` (written `G(a)`): Begin game `n`.
+ * `00rr 00FD01 nn00` (written `G(n)`): Begin game `n`.
  * `00rr FFFA01 FFFF` (written `C`): Cancel game mode.
 
 The commands `P`, `G` and `C` seem to ignore their registers, `C` also its parameter (which always is `FFFF`)
