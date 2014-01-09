@@ -2,6 +2,7 @@ import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
 import System.Environment
 import System.Exit
+import System.FilePath
 import Data.Binary.Get
 import Data.Word
 import Text.Printf
@@ -269,7 +270,7 @@ dumpAudioTo directory file = do
         let rawaudio = runGet (extract oo ol) bytes
         let audio = decypher x rawaudio
         let audiotype = fromMaybe "raw" $ lookup (B.take 4 audio) fileMagics
-        let filename = printf "%s/%s_%04d.%s" directory file n audiotype
+        let filename = printf "%s/%s_%04d.%s" directory (takeBaseName file) n audiotype
         if B.null audio
         then do
             printf "Skipping empty file %s...\n" filename
