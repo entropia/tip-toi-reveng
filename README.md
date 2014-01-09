@@ -26,11 +26,11 @@ The header begins with these 8 32-bit numbers, listed with their offset:
  * `0x0008`: Unknown
  * `0x000B`: Unknown
  * `0x0010`: Unknown; related to `0x000B` (as it is sometimes equal)
- * `0x0014`: Unknown
+ * `0x0014`: Product id code (== OID code of the power on symbol on page 1)
  * `0x0018`: Unknown
  * `0x001B`: Unknown
  * Next (at `0x0020`), is a variable length string, consisting of its length (8-bits), and that many characters. Commonly `CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.4.031`
- * Next is a 8-byte long date (`20111024`)
+ * Next is a 8-byte long date (`20111024`). For some books the date contains a language string, e.g `20111024GERMAN` or `20111002DUTCH`.
 
 The rest of the header is dubious, and contains a few more 32-bit numbers.
 
