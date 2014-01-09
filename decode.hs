@@ -102,7 +102,7 @@ ppCommand (Cancel)        = printf "C"
 ppCommand (Game b)        = printf "G(%d)" b
 ppCommand (Inc r n)       = printf "$%d+=%d" r n
 ppCommand (Set r n)       = printf "$%d:=%d" r n
-ppCommand (Unknown b r n) = printf "?($%r,%d9) (%s)" r n (prettyHex b)
+ppCommand (Unknown b r n) = printf "?($%d,%d) (%s)" r n (prettyHex b)
 
 spaces = intercalate " "
 commas = intercalate ","
