@@ -12,19 +12,29 @@ If you apply one of these soundpackages to a gme file the tiptoy will output the
 
 packages:
  * numbers - numbers in english where each digit of the ID will be spoken
- * zahlen - outputs the IDs in german
  * hex - outputs the IDs in german hex values
+
+
+	The "Blop Sound" at the start of the samples is (CC) by Mark DiAngelo
+	http://soundbible.com/2008-0-9-Male-Vocalized.html
+	http://creativecommons.org/licenses/by/3.0/legalcode
+
+	The "0-9 Male Vocalized" sounds are (CC) by Mike Koenig
+	and have been splitted and merged by me
+	http://soundbible.com/2067-Blop.html
+	http://creativecommons.org/licenses/by/3.0/legalcode
+
+	Booth sounds have been converted from wav to ogg
 
 procedure:
  * Compile libtiptoy.c with you favorite C-Compiler (only MS Visual Studio express 2013 tested so far)
- * download and extract an audio package (for example numbers.7z)
+ * download  an audio package (for example numbers)
  * run libtiptoy with the path to the audiopackage, an output filename and inputfilename as arguments
 
 For now this is only tested with Bauernhof and will not work if there is data after the audiotable!
 	
 	example:
 	libtiptoi n  ./numbers Bauernhof_numbers.gme Bauernhof.gme
-
 
 
 Extract Audio Files
