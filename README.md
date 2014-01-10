@@ -25,7 +25,7 @@ The header begins with these 8 32-bit numbers, listed with their offset:
  * `0x0004`: The offset to the *media file table*
  * `0x0008`: Unknown
  * `0x000B`: Unknown
- * `0x0010`: Unknown; related to `0x000B` (as it is sometimes equal)
+ * `0x0010`: The offset to the *game script table*
  * `0x0014`: Product id code (== OID code of the power on symbol on page 1)
  * `0x0018`: Unknown
  * `0x001B`: Unknown
@@ -83,6 +83,14 @@ Commands:
 Conditionals:
   * `F9FF00` (4 times)
 
+The game scripts
+----------------
+
+At the position referenced by `0x0010`, is the game script table.
+ * starting with a 32-bit count (# of games)
+ * followed by # of games 32-bit pointer to the games
+
+
 The audio file table
 --------------------
 
@@ -95,6 +103,7 @@ The audio files themselves are encrypted using a simple scheme, using a magic XO
 The magic XOR value can be found by finding the number which makes the first 4 bytes of the first media file read `OggS` or `RIFF`.
 
 In `Leserabe_een.gme*`, the audio table is repeated right after itself. Why?
+
 
 The checksum
 ------------
