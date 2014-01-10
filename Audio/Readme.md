@@ -16,31 +16,35 @@ packages:
  * hex - outputs the IDs in german hex values
 
 procedure:
-* Compile libtiptoy.c with you favorite C-Compiler (only MS Visual Studio express 2013 tested so far)
-* download and extract an audio package (for example numbers.7z)
-* run libtiptoy with the path to the audiopackage, an output filename and inputfilename as arguments
-example:
-   libtiptoi n  ./numbers Bauernhof_numbers.gme Bauernhof.gme
+ * Compile libtiptoy.c with you favorite C-Compiler (only MS Visual Studio express 2013 tested so far)
+ * download and extract an audio package (for example numbers.7z)
+ * run libtiptoy with the path to the audiopackage, an output filename and inputfilename as arguments
 
 For now this is only tested with Bauernhof and will not work if there is data after the audiotable!
+	
+	example:
+	libtiptoi n  ./numbers Bauernhof_numbers.gme Bauernhof.gme
+
+
 
 Extract Audio Files
 -----------------
 
-To extract the oudiofiles of a gme and write a filelist.txt file use the x mode with a path to extract and an inputfile.
+To extract the Audiofiles of a gme and write a filelist.txt file use the x mode with a path to extract and an inputfile.
 The outputpath must exist!
-example:
-   libtiptoi x  ./bauernhof Bauernhof.gme
+
+	example:
+	libtiptoi x  ./bauernhof Bauernhof.gme
    
-Afterwards you will find all Auudiofiles with their id as name in that path with a filelist.txt 
+Afterwards you will find all Audiofiles with their id as name in that path with a filelist.txt 
 As there might be multible entries in the Audio Table to the same Audiofile the file filelist might contain duplicates.
 
 
 Replace Audio Files
 -----------------
 
-You can replace all audiofiles in a gme with the mode r. You have to give the path to the filelist.txt an input and an outputfile as parameter.
+You can replace all audiofiles in a gme with the mode r. You have to give the path to the filelist.txt, an input and an outputfile as parameter.
 
-exaple:
-   libtiptoi r  ./pathto/filelist.txt Bauernhof_new.gme Bauernhof.gme
+	example:
+	libtiptoi r  ./pathto/filelist.txt Bauernhof_new.gme Bauernhof.gme
 
