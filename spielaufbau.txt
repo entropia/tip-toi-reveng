@@ -1,4 +1,92 @@
+Gametable
+--------
+Address to Gametable lies at '0x0010'
 
+Example from WWW Bauernhof
+
+0001703d  0c 00 00 00 71 70 01 00  35 7a 01 00 91 7f 01 00
+          aa aa aa aa bb bb bb bb  bb bb bb bb bb bb bb bb
+0001704d  cd 82 01 00 59 8a 01 00  e7 8e 01 00 4f 97 01 00 
+          bb bb bb bb bb bb bb bb  bb bb bb bb bb bb bb bb
+0001705d  0f 9f 01 00 c7 9f 01 00  69 a1 01 00 69 ad 01 00 
+          bb bb bb bb bb bb bb bb  bb bb bb bb bb bb bb bb
+0001706d  fb b2 01 00 
+          bb bb bb bb
+
+a = 32 bit counter
+b = a * 32 bit pointer to game header
+
+Header
+------
+00017071  01 00 0b 00 05 00 00 00  04 00 81 05 00 00 6f 00
+                aa aa bb bb        cc cc dd dd dd dd dd dd
+00017081  de 00 97 76 01 00 a9 76  01 00 ab 76 01 00 ad 76 
+          dd dd ee ee ee ee ee ee  ee ee ee ee ee ee ee ee
+00017091  01 00 b9 76 01 00 ff 70  01 00 83 71 01 00 05 72
+          ee ee ee ee ee ee ff ff  ff ff ff ff ff ff ff ff
+000170a1  01 00 87 72 01 00 09 73  01 00 8b 73 01 00 0d 74 
+          ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff
+000170b1  01 00 8f 74 01 00 11 75  01 00 93 75 01 00 15 76 
+          ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff
+000170c1  01 00 03 00 00 00 00 00  00 00 00 00 00 00 00 00
+          ff ff 
+000170d1  00 00 00 00 00 00 c5 76  01 00 d3 76 01 00 e1 76 
+000170e1  01 00 e3 76 01 00 e5 76  01 00 e7 76 01 00 e9 76 
+000170f1  01 00 eb 76 01 00 ed 76  01 00 ef 76 01 00 00
+
+a = 16 bit count
+b = 16 bit count
+c = 16 bit count
+d = c * 16 bit
+e = b * 32 bit pointer to playlistpointer
+f = a * 32 bit pointer to subgame blocks 
+
+
+Subgameblock
+------
+000170ff  00 00 00 00 00 00 01 00  01 00 00 00 00 00 00 00 
+0001710f  00 00 00 00 02 00 8e 05  9f 05 00 00 21 00 79 05 
+                      aa aa bb bb  bb bb       cc cc dd dd
+0001711f  7a 05 7b 05 7c 05 7d 05  83 05 84 05 85 05 86 05
+          dd dd dd dd dd dd dd dd  dd dd dd dd dd dd dd dd
+0001712f  87 05 88 05 89 05 8a 05  8b 05 8c 05 8d 05 8e 05 
+          dd dd dd dd dd dd dd dd  dd dd dd dd dd dd dd dd
+0001713f  8f 05 90 05 91 05 92 05  93 05 94 05 95 05 96 05 
+          dd dd dd dd dd dd dd dd  dd dd dd dd dd dd dd dd
+0001714f  97 05 98 05 99 05 9a 05  9b 05 9c 05 9e 05 9f 05 
+          dd dd dd dd dd dd dd dd  dd dd dd dd dd dd dd dd
+0001715f  f1 76 01 00 fd 76 01 00  07 77 01 00 09 77 01 00
+          ee ee ee ee ee ee ee ee  ee ee ee ee ee ee ee ee
+0001716f  13 77 01 00 15 77 01 00  1f 77 01 00 29 77 01 00 
+          ee ee ee ee ee ee ee ee  ee ee ee ee ee ee ee ee
+0001717f  33 77 01 00 
+          ee ee ee ee
+
+a = 16 bit count
+b = a * 16bit oids
+c = 16 bit count
+d = c * 16 bit oid
+e = 9 (where is the count from? so far 9 in every block) * 32 bit pointer to playlistpointer
+
+Playlistpointer
+------
+000176f1 01 00 f7 76 01 00 
+         aa aa bb bb bb bb
+         
+a = 16 bit count (can be zero than no b is present)
+b = a * 32 bit pointer to playlist
+
+Playlist
+------
+000176f7 02 00 b3 01 ba 01
+         aa aa bb bb bb bb
+
+a = 16 bit count
+b = a * 16 bit id of media to be played
+
+
+Old Stuff
+---------
 
 0001b000  06 a3 06 a4 06 a5 06 a6  06 a7 06 a8 06 a9 06 aa  
 0001b010  06 ab 06 ac 06 ad 06 ae  06 af 06 b0 06 b1 06 b2  
