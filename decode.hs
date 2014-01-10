@@ -311,6 +311,20 @@ dumpRawScripts file = do
             forM_ lines $ \(_, line) -> do
                 printf "    %s\n" (prettyHex (runGet (extract o (lineLength line)) bytes))
 
+dumpInfo :: FilePath -> IO ()
+dumpInfo file = do
+    bytes <- B.readFile file
+    let st = getScriptTable bytes
+        (at,at_doubled) = getAudioTable bytes
+        x = runGet (getXor (fst (head at))) bytes
+
+    printf "Scripts for OIDs from %d to %d; %d/%d are disabled.\n"
+        (fst (head st)) (fst (last st))
+        (length (filter (isNothing . snd) st)) (length st)
+    printf "Magic XOR value: 0x%02X\n" x
+    when at_doubled $ printf "Audio table repeated twice\n"
+    printf "Audio Table entries: %d\n" (length at)
+
 lint :: FilePath -> IO ()
 lint file = do
     bytes <- B.readFile file
@@ -349,7 +363,6 @@ lint file = do
 
     hyp2 :: Word16 -> Line -> Bool
     hyp2 n (Line _ _ mi) = all (<= n) mi
-
 
 
 doubled :: Eq a => [a] -> Maybe [a]
@@ -493,6 +506,7 @@ forEachNumber state action = go state
                 go s
 
 
+main' ("info": files)             = forEachFile dumpInfo files
 main' ("media": "-d": dir: files) = forEachFile (dumpAudioTo dir) files
 main' ("media": files)            = forEachFile (dumpAudioTo "media") files
 main' ("scripts": files)          = forEachFile (dumpScripts Nothing) files
@@ -509,6 +523,8 @@ main' ("play": file : [])         =             play file
 main' _ = do
     prg <- getProgName
     putStrLn $ "Usage:"
+    putStrLn $ prg ++ " info <file.gme>..."
+    putStrLn $ "       general information"
     putStrLn $ prg ++ " media [-d dir] <file.gme>..."
     putStrLn $ "       dumps all audio samples to the given directory (default: media/)"
     putStrLn $ prg ++ " scripts <file.gme>..."
