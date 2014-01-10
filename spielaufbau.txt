@@ -19,9 +19,9 @@ b = a * 32 bit pointer to game header
 Header
 ------
 00017071  01 00 0b 00 05 00 00 00  04 00 81 05 00 00 6f 00
-                aa aa bb bb        cc cc dd dd dd dd dd dd
+                aa aa bb bb        
 00017081  de 00 97 76 01 00 a9 76  01 00 ab 76 01 00 ad 76 
-          dd dd ee ee ee ee ee ee  ee ee ee ee ee ee ee ee
+                ee ee ee ee ee ee  ee ee ee ee ee ee ee ee
 00017091  01 00 b9 76 01 00 ff 70  01 00 83 71 01 00 05 72
           ee ee ee ee ee ee ff ff  ff ff ff ff ff ff ff ff
 000170a1  01 00 87 72 01 00 09 73  01 00 8b 73 01 00 0d 74 
@@ -30,17 +30,20 @@ Header
           ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff
 000170c1  01 00 03 00 00 00 00 00  00 00 00 00 00 00 00 00
           ff ff 
-000170d1  00 00 00 00 00 00 c5 76  01 00 d3 76 01 00 e1 76 
+000170d1  00 00 00 00 00 00 c5 76  01 00 d3 76 01 00 e1 76
+                            gg gg  gg gg gg gg gg gg gg gg
 000170e1  01 00 e3 76 01 00 e5 76  01 00 e7 76 01 00 e9 76 
-000170f1  01 00 eb 76 01 00 ed 76  01 00 ef 76 01 00 00
-
+          gg gg gg gg gg gg gg gg  gg gg gg gg gg gg gg gg
+000170f1  01 00 eb 76 01 00 ed 76  01 00 ef 76 01 00 
+          gg gg gg gg gg gg gg gg  gg gg gg gg gg gg
+2 byte unknown (type?, seen 1,2,3? more?)
 a = 16 bit count
 b = 16 bit count
-c = 16 bit count
-d = c * 16 bit
+12 byte unknown
 e = b * 32 bit pointer to playlistpointer
 f = a * 32 bit pointer to subgame blocks 
-
+20 byte unknown
+g = 10 (where is the count from? so far 9 in every block) * 32 bit pointer to playlistpointer
 
 Subgameblock
 ------
