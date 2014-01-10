@@ -75,7 +75,7 @@ There are probably 256 registers. A register can hold 16bit values.
 Other commands and conditionals (or variants of existing ones) that have been seen (rarely) in the wild but have not been analyzed yet:
 
 commands:
-  * `00FB01` (4 time)
+  * `00FB01` (4 times)
   * `E0FF01` (15 times)
   * `E1FF01` (25 times)
   * `F9FF00` (7 times)
