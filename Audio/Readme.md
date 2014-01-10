@@ -10,11 +10,9 @@ Replace audios with numbers
 there are 3 soundpackages, compressed by 7-zip, you can use to debug the tiptoy.
 If you apply one of these soundpackages to a gme file the tiptoy will output the ID (position) of the audio file in the audio file table.
 
-packages:
- * numbers - numbers in english where each digit of the ID will be spoken
- * hex - outputs the IDs in german hex values
-
-
+Audio package
+numbers - numbers in english where each digit of the ID will be spoken
+ 
 	The "Blop Sound" at the start of the samples is (CC) by Mark DiAngelo
 	http://soundbible.com/2008-0-9-Male-Vocalized.html
 	http://creativecommons.org/licenses/by/3.0/legalcode
