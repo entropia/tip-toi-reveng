@@ -16,9 +16,9 @@ packages:
  * hex - outputs the IDs in german hex values
 
 procedure:
-   1) Compile libtiptoy.c with you favorite C-Compiler (only MS Visual Studio express 2013 tested so far)
-   2) download and extract an audio package (for example numbers.7z)
-   3) run libtiptoy with the path to the audiopackage, an output filename and inputfilename as arguments
+* Compile libtiptoy.c with you favorite C-Compiler (only MS Visual Studio express 2013 tested so far)
+* download and extract an audio package (for example numbers.7z)
+* run libtiptoy with the path to the audiopackage, an output filename and inputfilename as arguments
 example:
    libtiptoi n  ./numbers Bauernhof_numbers.gme Bauernhof.gme
 
