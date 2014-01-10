@@ -55,17 +55,33 @@ A script line has the format  `aa00  conditionals... bb00  actions... cc00 media
 
 The conditionals are:
  * `00 rr00 F9FF01 mmmm` (written `$r==m?` in decode's output): Only continue with this line if register `$r` has value `m`.
- * `00 rr00 FBFF01 mmmm` (written `$r!=m?` in decode's output): Only continue with this line if register `$r` has not value `m`. (It could also be `<`, so far, that would not make a difference.)
+ * `00 rr00 FBFF01 mmmm` (written `$r<m?` in decode's output): Only continue with this line if register `$r` has a value lower than `m`.
+ * `00 rr00 FDFF01 mmmm` (written `$r>=m?` in decode's output): Only continue with this line if register `$r` has a value greater or equal `m`.
+ * `00 rr00 FFFF01 mmmm` (written `$r!=m?` in decode's output): Only continue with this line if register `$r` has not value `m`.
 
 The actions are:
  * `rr00 F9FF01 mmmm` (written `$r:=m`): Set register `$r` to `m`
  * `rr00 F0FF01 mmmm` (written `$r+=m`): Increment register `$r` by `m`
- * `rr00 E8FF01 mmmm` (written `P(m)`): Play audio referenced by the `m`ths entry in the indices list.
+ * `rr00 E8FF01 mmmm` (written `P(m)`): Play audio referenced by the `m`th entry in the indices list.
  * `rr00 00FC01 aabb` (written `P(b-a)`): Play a random sample from that inclusive range.
  * `rr00 00FD01 nn00` (written `G(n)`): Begin game `n`.
  * `rr00 FFFA01 FFFF` (written `C`): Cancel game mode.
 
 The commands `P`, `G` and `C` seem to ignore their registers, `C` also its parameter (which always is `FFFF`)
+
+There are probably 256 registers. A register can hold 16bit values.
+
+Other commands and conditionals (or variants of existing ones) that have been seen (rarely) in the wild but have not been analyzed yet:
+
+Commands:
+  * `00FB01` (4 times)
+  * `E0FF01` (15 times)
+  * `E1FF01` (25 times)
+  * `F9FF00` (7 times)
+  * `FFF801` (2 times)
+
+Conditionals:
+  * `F9FF00` (4 times)
 
 The audio file table
 --------------------

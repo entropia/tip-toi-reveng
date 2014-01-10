@@ -69,8 +69,10 @@ data Command
 data Line = Line [Conditional] [Command] [Word16]
 
 data Conditional
-    = Eq Word8 Word16
+    = Eq  Word8 Word16
     | NEq Word8 Word16
+    | Lt  Word8 Word16
+    | GEq Word8 Word16
     | Unknowncond B.ByteString Word8 Word16
 
 ppLine :: Line -> String
@@ -82,6 +84,8 @@ ppLine (Line cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map pp
 ppConditional :: Conditional -> String
 ppConditional (Eq  g v)           = printf "$%d==%d?" g v
 ppConditional (NEq g v)           = printf "$%d!=%d?" g v
+ppConditional (Lt g v)            = printf "$%d< %d?" g v
+ppConditional (GEq g v)           = printf "$%d>=%d?" g v
 ppConditional (Unknowncond b g v) = printf "%d??%d? (%s)" g v (prettyHex b)
 
 quote True = "'"
@@ -147,7 +151,9 @@ lineParser = begin
 
     conditionals =
         [ (B.pack [0xF9,0xFF,0x01], Eq  )
-        , (B.pack [0xFB,0xFF,0x01], NEq )
+        , (B.pack [0xFF,0xFF,0x01], NEq )
+        , (B.pack [0xFB,0xFF,0x01], Lt )
+        , (B.pack [0xFD,0xFF,0x01], GEq )
         ]
 
     actions =
@@ -178,7 +184,7 @@ lineParser = begin
             n <- getWord16le
             return (Set r n))
         ]
- 
+
 
 
 checkLine :: Int -> Line -> [String]
@@ -461,6 +467,8 @@ enabledLine s (Line cond _ _) = all (condTrue s) cond
 condTrue :: State -> Conditional -> Bool
 condTrue s (Eq r n)  = s `value` r == n
 condTrue s (NEq r n) = s `value` r /= n
+condTrue s (Lt r n)  = s `value` r < n
+condTrue s (GEq r n) = s `value` r >= n
 condTrue _ _ = False
 
 value :: State -> Word8 -> Word16

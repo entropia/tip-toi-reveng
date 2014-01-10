@@ -3,3 +3,6 @@ Codes der Buecher, das ist der (aus dem chin. uebersetzte) Zahlencode des Einsch
 0001 Bauernhof
 0019 Wald
 0004 Welt der Musik
+
+
+ie Codes kann man auch aus folgender Datei ermittlen: http://www.tiptoi.com/db/tiptoi.xml
