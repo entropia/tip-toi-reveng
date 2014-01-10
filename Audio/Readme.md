@@ -7,8 +7,8 @@ This small howto explains how you can replace the audiofiles in a gme file.
 Replace audios with numbers
 ---------------------------
 
-there are 3 soundpackages, compressed by 7-zip, you can use to debug the tiptoy.
-If you apply one of these soundpackages to a gme file the tiptoy will output the ID (position) of the audio file in the audio file table.
+There is a soundpackage you can use to debug the tiptoy.
+If you apply this soundpackage to a gme file the tiptoy will output the ID (position) of the audio file in the audio file table.
 
 Audio package
 numbers - numbers in english where each digit of the ID will be spoken
