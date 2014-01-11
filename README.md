@@ -130,6 +130,8 @@ Use the tool `decode.hs` to investigate the gme files. It supports various subco
 	       prints the decoded scripts for the given OID
 	decode raw-scripts <file.gme>...
 	       prints the scripts for each OID, in their raw form
+        decode raw-script <file.gme> <n>
+               prints the scripts for the given OID, in their raw form
 	decode lint <file.gme>
 	       checks for errors in the file or in this program
 	decode segments <file.gme>...
