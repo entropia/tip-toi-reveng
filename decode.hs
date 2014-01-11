@@ -238,10 +238,7 @@ decypher x = B.map go
                | otherwise = xor x n
 
 prettyHex :: B.ByteString -> String
-prettyHex = spaceout . map (printf "%02X") . B.unpack
-  where spaceout (a:b:[]) = a ++ b
-        spaceout (a:b:r) = a ++ b ++ " " ++ spaceout r
-        spaceout r = concat r
+prettyHex = intercalate " " . map (printf "%02X") . B.unpack
 
 forMn_ :: Monad m => [a] -> (Int -> a -> m b) -> m ()
 forMn_ l f = forM_ (zip l [0..]) $ \(x,n) -> f n x
