@@ -1,3 +1,5 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
 import System.Environment
@@ -16,16 +18,40 @@ import Control.Monad
 import System.Directory
 import Numeric (showHex, readHex)
 import qualified Data.Map as M
+import Control.Monad.Writer.Strict
+import Control.Monad.Reader
 
 --import Codec.Container.Ogg.Page
 
-scriptTableOffset :: Get Word32
-scriptTableOffset = do
-    getWord32le
 
-scriptTableParser :: Word32 -> Get [(Word16, Word32)]
-scriptTableParser offset = do
-    skip (fromIntegral offset)
+-- Reverse Engineering Monad
+
+type Offset = Word32
+type Segment = (Offset, Word32, String)
+type Segments = [Segment]
+
+newtype SGet a = SGet (ReaderT B.ByteString (Writer [Segment]) a)
+    deriving (Functor, Monad)
+
+getAt :: Offset -> (Get a) -> SGet a
+getAt offset act = SGet $ runGet (skip (fromIntegral offset) >> act) <$> ask
+
+getSegAt :: Offset -> String -> (Get a) -> SGet a
+getSegAt offset desc act = SGet $ do
+    bytes <- ask
+    let (a, _, i) = runGetState  (skip (fromIntegral offset) >> act) bytes 0
+    tell [(offset, fromIntegral i - offset, desc)]
+    return a
+
+runSGet :: B.ByteString -> SGet a -> (a, Segments)
+runSGet bytes (SGet act) = runWriter (runReaderT act bytes)
+
+
+getScriptTableOffset :: SGet Offset
+getScriptTableOffset = getSegAt 0x00 "Script Table Offset" getWord32le
+
+getScriptTable :: Offset -> SGet [(Word16, Offset)]
+getScriptTable offset = getSegAt offset "Script table" $ do
     last_code <- getWord16le
     0 <- getWord16le
     first_code <- getWord16le
@@ -35,26 +61,24 @@ scriptTableParser offset = do
         getWord32le
     return $ zip [first_code .. last_code] offs
 
-parseLine :: B.ByteString -> Line
-parseLine = runGet lineParser
-
-getScriptTable :: B.ByteString -> [(Word16, Maybe (Word32, [(Word32, Line)]))]
-getScriptTable bytes =
-    let sto = runGet scriptTableOffset bytes
-    in  map getScript $ runGet (scriptTableParser sto) bytes
+getScripts :: SGet [(Word16, Maybe [Line])]
+getScripts = do
+    sto <- getScriptTableOffset
+    sto <- getScriptTable sto
+    mapM getScript sto
   where
-    getScript (i, 0xFFFFFFFF)
-        = (i, Nothing)
-    getScript (i, offset)
-        = (i, Just (offset, map getLine (getScriptOffsets offset)))
+    getScript (i, 0xFFFFFFFF) = return (i, Nothing)
+    getScript (i, offset)     = do
+        los <- getLineOffsets i offset
+        ls <- forMn los $ getLine i
+        return (i, Just ls)
 
-    getScriptOffsets offset = flip runGet bytes $ do
-        skip (fromIntegral offset)
+    getLineOffsets i offset = getSegAt offset (printf "Script header for OID %d" i) $ do
         n <- getWord16le
         replicateM (fromIntegral n) getWord32le
 
-    getLine offset
-        = (offset, runGet (skip (fromIntegral offset) >> lineParser) bytes)
+    getLine i n offset = getSegAt offset (printf "Script Line %d for OID %d" n i) $
+        lineParser offset
 
 data Command
     = Play Word8
@@ -66,7 +90,11 @@ data Command
     | Unknown B.ByteString Word8 Word16
     deriving Eq
 
-data Line = Line [Conditional] [Command] [Word16]
+data Line = Line Offset [Conditional] [Command] [Word16]
+
+lineOffset (Line o _ _ _) = o
+
+lineHex bytes l = prettyHex $ runGet (extract (lineOffset l) (lineLength l)) bytes
 
 data Conditional
     = Eq  Word8 Word16
@@ -76,7 +104,7 @@ data Conditional
     | Unknowncond B.ByteString Word8 Word16
 
 ppLine :: Line -> String
-ppLine (Line cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map ppCommand as) ++ media xs
+ppLine (Line _ cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map ppCommand as) ++ media xs
   where media [] = ""
         media _  = " [" ++ commas (map show xs) ++ "]"
 
@@ -104,11 +132,11 @@ spaces = intercalate " "
 commas = intercalate ","
 
 lineLength :: Line -> Word32
-lineLength (Line conds cmds audio) = fromIntegral $
+lineLength (Line _ conds cmds audio) = fromIntegral $
     2 + 8 * length conds + 2 + 7 * length cmds + 2 + 2 * length audio
 
-lineParser :: Get Line
-lineParser = begin
+lineParser :: Offset -> Get Line
+lineParser offset = begin
  where
    -- Find the occurrence of a header
     begin = do
@@ -141,7 +169,7 @@ lineParser = begin
         -- Audio links
         n <- getWord16le
         xs <- replicateM (fromIntegral n) getWord16le
-        return $ Line conds cmds xs
+        return $ Line offset conds cmds xs
 
     expectWord8 n = do
         n' <- getWord8
@@ -188,17 +216,17 @@ lineParser = begin
 
 
 checkLine :: Int -> Line -> [String]
-checkLine n_audio l@(Line _ _ xs)
+checkLine n_audio l@(Line _ _ _ xs)
     | any (>= fromIntegral n_audio) xs
     = return $ "Invalid audio index in line " ++ ppLine l
 checkLine n_audio _ = []
 
-audioTableOffset :: Get Word32
+audioTableOffset :: Get Offset
 audioTableOffset = do
     skip 4
     getWord32le
 
-audioTable :: Word32 -> Get [(Word32, Word32)]
+audioTable :: Offset -> Get [(Word32, Word32)]
 audioTable offset = do
     skip (fromIntegral offset)
     until <- lookAhead getWord32le
@@ -208,7 +236,7 @@ audioTable offset = do
         len <- getWord32le
         return (ptr, len)
 
-extract :: Word32 -> Word32 -> Get (B.ByteString)
+extract :: Offset -> Word32 -> Get (B.ByteString)
 extract off len = do
     skip (fromIntegral off)
     getLazyByteString (fromIntegral len)
@@ -284,24 +312,24 @@ dumpAudioTo directory file = do
 dumpScripts :: Bool -> Maybe Int -> FilePath -> IO ()
 dumpScripts raw sel file = do
     bytes <- B.readFile file
-    let st = getScriptTable bytes
+    let (st,_) = runSGet bytes getScripts
     let st' | Just n <- sel = filter ((== fromIntegral n) . fst) st
             | otherwise     = st
 
     forM_ st' $ \(i, ms) -> case ms of
         Nothing -> do
             printf "Script for OID %d: Disabled\n" i
-        Just (o, lines) -> do
-            printf "Script for OID %d: (at 0x%08X)\n" i o
-            forM_ lines $ \(_, line) -> do
-                if raw then printf "%s\n" (prettyHex (runGet (extract o (lineLength line)) bytes))
+        Just lines -> do
+            printf "Script for OID %d:\n" i
+            forM_ lines $ \line -> do
+                if raw then printf "%s\n"     (lineHex bytes line)
                        else printf "    %s\n" (ppLine line)
 
 
 dumpInfo :: FilePath -> IO ()
 dumpInfo file = do
     bytes <- B.readFile file
-    let st = getScriptTable bytes
+    let (st,_) = runSGet bytes getScripts
         (at,at_doubled) = getAudioTable bytes
         x = runGet (getXor (fst (head at))) bytes
 
@@ -315,14 +343,14 @@ dumpInfo file = do
 lint :: FilePath -> IO ()
 lint file = do
     bytes <- B.readFile file
-    let st = getScriptTable bytes
+    let (st,_) = runSGet bytes getScripts
         (at,_) = getAudioTable bytes
 
     let hyps = [ (hyp1, "play indicies are correct")
                , (hyp2 (fromIntegral (length at)), "media indicies are correct")
                ]
     forM_ hyps $ \(hyp, desc) -> do
-        let wrong = filter (not . hyp) (map snd (concatMap snd (mapMaybe snd st)))
+        let wrong = filter (not . hyp) (concat (mapMaybe snd st))
         if null wrong
         then printf "All lines do satisfy hypothesis \"%s\"!\n" desc
         else do
@@ -342,14 +370,14 @@ lint file = do
             o1 l1 d1 o2 l2 d2 (o1 + l1 - o2)
   where
     hyp1 :: Line -> Bool
-    hyp1 (Line _ as mi) = all ok as
+    hyp1 (Line _ _ as mi) = all ok as
       where ok (Play n)   = 0 <= n && n < fromIntegral (length mi)
             ok (Random a b) = 0 <= a && a < fromIntegral (length mi) &&
                          0 <= b && b < fromIntegral (length mi)
             ok _ = True
 
     hyp2 :: Word16 -> Line -> Bool
-    hyp2 n (Line _ _ mi) = all (<= n) mi
+    hyp2 n (Line _ _ _ mi) = all (<= n) mi
 
 
 doubled :: Eq a => [a] -> Maybe [a]
@@ -364,19 +392,9 @@ getSegments :: B.ByteString -> [(Word32, Word32, String)]
 getSegments bytes =
     let ato = runGet audioTableOffset bytes
         (at, at_doubled) = getAudioTable bytes
-        sto = runGet scriptTableOffset bytes
-        st = getScriptTable bytes
-    in sort $
-            [ (0, 4, "Script table address") ] ++
+        (sto, script_segments) = runSGet bytes getScripts
+    in sort $ script_segments ++
             [ (4, 4, "Audio table address") ] ++
-            [ (sto, fromIntegral (8 + 4 * length st), "Script table") ] ++
-            [ (o, 2 + fromIntegral (length ls) * 4, "Script header for OID " ++ show i) |
-                (i, Just (o, ls)) <- st
-            ] ++
-            [ (lo, lineLength l, printf "Script line Nr %d for OID %d" n i) |
-                (i, Just (o, ls)) <- st,
-                (n, (lo, l)) <- zip [1::Int ..] ls
-            ] ++
             [ (ato, fromIntegral (8 * length at), "Audio table") ] ++
             [ (ato + fromIntegral (8 * length at), fromIntegral (8 * length at), "Duplicated audio table") |
               at_doubled
@@ -446,13 +464,12 @@ formatState s = spaces $ map (\(k,v) -> printf "$%d=%d" k v) $ M.toAscList s
 play :: FilePath -> IO ()
 play file = do
     bytes <- B.readFile file
-    let st = getScriptTable bytes
+    let (st,_) = runSGet bytes getScripts
     forEachNumber initialState $ \i s -> do
         case lookup (fromIntegral i) st of
             Nothing -> printf "OID %d not in main table\n" i >> return s
             Just Nothing -> printf "OID %d deactivated\n" i >> return s
-            Just (Just (_,o_lines)) -> do
-                let lines = map snd o_lines
+            Just (Just lines) -> do
                 case find (enabledLine s) lines of
                     Nothing -> printf "None of these lines matched!\n" >> mapM_ (putStrLn . ppLine) lines >> return s
                     Just l -> do
@@ -462,7 +479,7 @@ play file = do
                         return s'
 
 enabledLine :: State -> Line -> Bool
-enabledLine s (Line cond _ _) = all (condTrue s) cond
+enabledLine s (Line _ cond _ _) = all (condTrue s) cond
 
 condTrue :: State -> Conditional -> Bool
 condTrue s (Eq r n)  = s `value` r == n
@@ -475,7 +492,7 @@ value :: State -> Word8 -> Word16
 value m r = M.findWithDefault 0 r m
 
 applyLine :: Line -> State -> State
-applyLine (Line _ act _) s = foldl' go s act
+applyLine (Line _ _ act _) s = foldl' go s act
   where go s (Set r n) = M.insert r n s
         go s (Inc r n) = M.insert r (s `value` r + n) s
         go s _         = s
