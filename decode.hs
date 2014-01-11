@@ -306,7 +306,7 @@ dumpRawScripts file = do
         Just (o, lines) -> do
             printf "Script for OID %d: (at 0x%08X)\n" i o
             forM_ lines $ \(_, line) -> do
-                printf "    %s\n" (prettyHex (runGet (extract o (lineLength line)) bytes))
+                printf "%s\n" (prettyHex (runGet (extract o (lineLength line)) bytes))
 
 dumpInfo :: FilePath -> IO ()
 dumpInfo file = do
