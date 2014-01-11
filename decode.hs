@@ -20,8 +20,37 @@ import Numeric (showHex, readHex)
 import qualified Data.Map as M
 import Control.Monad.Writer.Strict
 import Control.Monad.Reader
+import Control.Arrow (second)
 
---import Codec.Container.Ogg.Page
+
+-- Main data types
+data Conditional
+    = Eq  Word8 Word16
+    | NEq Word8 Word16
+    | Lt  Word8 Word16
+    | GEq Word8 Word16
+    | Unknowncond B.ByteString Word8 Word16
+
+data Command
+    = Play Word8
+    | Random Word8 Word8
+    | Cancel
+    | Game Word8
+    | Inc Word8 Word16
+    | Set Word8 Word16
+    | Unknown B.ByteString Word8 Word16
+    deriving Eq
+
+data Line = Line Offset [Conditional] [Command] [Word16]
+
+data TipToiFile = TipToiFile
+    { ttScripts :: [(Word16, Maybe [Line])]
+    , ttAudioFiles :: [B.ByteString]
+    , ttAudioFilesDoubles :: Bool
+    , ttAudioXor :: Word8
+    , ttChecksum :: Word32
+    , ttChecksumCalc :: Word32
+    }
 
 
 -- Reverse Engineering Monad
@@ -43,9 +72,18 @@ getSegAt offset desc act = SGet $ do
     tell [(offset, fromIntegral i - offset, desc)]
     return a
 
-runSGet :: B.ByteString -> SGet a -> (a, Segments)
-runSGet bytes (SGet act) = runWriter (runReaderT act bytes)
+getLength :: SGet Word32
+getLength = fromIntegral . B.length <$> getAllBytes
 
+getAllBytes :: SGet B.ByteString
+getAllBytes = SGet ask
+
+runSGet :: SGet a -> B.ByteString -> (a, Segments)
+runSGet (SGet act) bytes =
+    second (sort . ((fromIntegral (B.length bytes), 0, "End of file"):)) $
+    runWriter $ runReaderT act bytes
+
+-- Parsers
 
 getScriptTableOffset :: SGet Offset
 getScriptTableOffset = getSegAt 0x00 "Script Table Offset" getWord32le
@@ -79,61 +117,6 @@ getScripts = do
 
     getLine i n offset = getSegAt offset (printf "Script Line %d for OID %d" n i) $
         lineParser offset
-
-data Command
-    = Play Word8
-    | Random Word8 Word8
-    | Cancel
-    | Game Word8
-    | Inc Word8 Word16
-    | Set Word8 Word16
-    | Unknown B.ByteString Word8 Word16
-    deriving Eq
-
-data Line = Line Offset [Conditional] [Command] [Word16]
-
-lineOffset (Line o _ _ _) = o
-
-lineHex bytes l = prettyHex $ runGet (extract (lineOffset l) (lineLength l)) bytes
-
-data Conditional
-    = Eq  Word8 Word16
-    | NEq Word8 Word16
-    | Lt  Word8 Word16
-    | GEq Word8 Word16
-    | Unknowncond B.ByteString Word8 Word16
-
-ppLine :: Line -> String
-ppLine (Line _ cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map ppCommand as) ++ media xs
-  where media [] = ""
-        media _  = " [" ++ commas (map show xs) ++ "]"
-
-
-ppConditional :: Conditional -> String
-ppConditional (Eq  g v)           = printf "$%d==%d?" g v
-ppConditional (NEq g v)           = printf "$%d!=%d?" g v
-ppConditional (Lt g v)            = printf "$%d< %d?" g v
-ppConditional (GEq g v)           = printf "$%d>=%d?" g v
-ppConditional (Unknowncond b g v) = printf "%d??%d? (%s)" g v (prettyHex b)
-
-quote True = "'"
-quote False= ""
-
-ppCommand :: Command -> String
-ppCommand (Play n)        = printf "P(%d)" n
-ppCommand (Random a b)    = printf "P(%d-%d)" b a
-ppCommand (Cancel)        = printf "C"
-ppCommand (Game b)        = printf "G(%d)" b
-ppCommand (Inc r n)       = printf "$%d+=%d" r n
-ppCommand (Set r n)       = printf "$%d:=%d" r n
-ppCommand (Unknown b r n) = printf "?($%d,%d) (%s)" r n (prettyHex b)
-
-spaces = intercalate " "
-commas = intercalate ","
-
-lineLength :: Line -> Word32
-lineLength (Line _ conds cmds audio) = fromIntegral $
-    2 + 8 * length conds + 2 + 7 * length cmds + 2 + 2 * length audio
 
 lineParser :: Offset -> Get Line
 lineParser offset = begin
@@ -213,22 +196,8 @@ lineParser offset = begin
             return (Set r n))
         ]
 
-
-
-checkLine :: Int -> Line -> [String]
-checkLine n_audio l@(Line _ _ _ xs)
-    | any (>= fromIntegral n_audio) xs
-    = return $ "Invalid audio index in line " ++ ppLine l
-checkLine n_audio _ = []
-
-audioTableOffset :: Get Offset
-audioTableOffset = do
-    skip 4
-    getWord32le
-
-audioTable :: Offset -> Get [(Word32, Word32)]
-audioTable offset = do
-    skip (fromIntegral offset)
+getAudioTable :: Offset -> SGet [(Word32, Word32)]
+getAudioTable offset = getSegAt offset "Audio Table" $ do
     until <- lookAhead getWord32le
     let n_entries = fromIntegral ((until - offset) `div` 8)
     replicateM n_entries $ do
@@ -236,14 +205,26 @@ audioTable offset = do
         len <- getWord32le
         return (ptr, len)
 
-extract :: Offset -> Word32 -> Get (B.ByteString)
-extract off len = do
-    skip (fromIntegral off)
-    getLazyByteString (fromIntegral len)
+getAudioTableOffset :: SGet Offset
+getAudioTableOffset = getSegAt 0x4 "Audio table offset" getWord32le
 
-getXor :: Word32 -> Get (Word8)
-getXor off = do
-    skip (fromIntegral off)
+getAudios :: SGet ([B.ByteString], Bool, Word8)
+getAudios = do
+    ato <- getAudioTableOffset
+    at <- getAudioTable ato
+    let (at', at_doubled) | Just at' <- doubled at = (at', True)
+                          | otherwise              = (at, False)
+    x <- getAt (fst (head at')) $ getXor
+    decoded <- forMn at' (getAudioFile x)
+    return (decoded, at_doubled, x)
+
+getAudioFile :: Word8 -> Int -> (Offset, Word32) -> SGet B.ByteString
+getAudioFile x n (o,l) =
+    getSegAt o (printf "Audio file %d" n) $ do
+        decypher x <$> getLazyByteString (fromIntegral l)
+
+getXor :: Get Word8
+getXor = do
     present <- getLazyByteString 4
     -- Brute force, but that's ok here
     return $ head $
@@ -265,6 +246,81 @@ decypher x = B.map go
                | n == xor x 255 = n
                | otherwise = xor x n
 
+getChecksum :: SGet Word32
+getChecksum = do
+    l <- getLength
+    getSegAt (l-4) "Checksum" $ getWord32le
+
+calcChecksum :: SGet Word32
+calcChecksum = do
+    l <- getLength
+    bs <- getAt 0 $ getLazyByteString (fromIntegral l - 4)
+    return $ B.foldl' (\s b -> fromIntegral b + s) 0 bs
+
+getTipToiFile :: SGet TipToiFile
+getTipToiFile = do
+    scripts <- getScripts
+    (at, at_doubled, xor) <- getAudios
+    checksum <- getChecksum
+    checksumCalc <- calcChecksum
+    return (TipToiFile scripts at at_doubled xor checksum checksumCalc)
+
+parseTipToiFile :: B.ByteString -> (TipToiFile, Segments)
+parseTipToiFile = runSGet getTipToiFile
+
+-- Pretty printing
+
+lineHex bytes l = prettyHex $ runGet (extract (lineOffset l) (lineLength l)) bytes
+
+extract :: Offset -> Word32 -> Get (B.ByteString)
+extract off len = do
+    skip (fromIntegral off)
+    getLazyByteString (fromIntegral len)
+
+
+lineOffset (Line o _ _ _) = o
+
+lineLength :: Line -> Word32
+lineLength (Line _ conds cmds audio) = fromIntegral $
+    2 + 8 * length conds + 2 + 7 * length cmds + 2 + 2 * length audio
+
+ppLine :: Line -> String
+ppLine (Line _ cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map ppCommand as) ++ media xs
+  where media [] = ""
+        media _  = " [" ++ commas (map show xs) ++ "]"
+
+
+ppConditional :: Conditional -> String
+ppConditional (Eq  g v)           = printf "$%d==%d?" g v
+ppConditional (NEq g v)           = printf "$%d!=%d?" g v
+ppConditional (Lt g v)            = printf "$%d< %d?" g v
+ppConditional (GEq g v)           = printf "$%d>=%d?" g v
+ppConditional (Unknowncond b g v) = printf "%d??%d? (%s)" g v (prettyHex b)
+
+quote True = "'"
+quote False= ""
+
+ppCommand :: Command -> String
+ppCommand (Play n)        = printf "P(%d)" n
+ppCommand (Random a b)    = printf "P(%d-%d)" b a
+ppCommand (Cancel)        = printf "C"
+ppCommand (Game b)        = printf "G(%d)" b
+ppCommand (Inc r n)       = printf "$%d+=%d" r n
+ppCommand (Set r n)       = printf "$%d:=%d" r n
+ppCommand (Unknown b r n) = printf "?($%d,%d) (%s)" r n (prettyHex b)
+
+spaces = intercalate " "
+commas = intercalate ","
+
+
+
+checkLine :: Int -> Line -> [String]
+checkLine n_audio l@(Line _ _ _ xs)
+    | any (>= fromIntegral n_audio) xs
+    = return $ "Invalid audio index in line " ++ ppLine l
+checkLine n_audio _ = []
+
+
 prettyHex :: B.ByteString -> String
 prettyHex = intercalate " " . map (printf "%02X") . B.unpack
 
@@ -279,27 +335,14 @@ readMaybe s = case reads s of
               [(x, "")] -> Just x
               _ -> Nothing
 
-getAudioTable :: B.ByteString -> ([(Word32, Word32)], Bool)
-getAudioTable bytes =
-    let ato = runGet audioTableOffset bytes
-        at = runGet (audioTable ato) bytes
-    in case doubled at of Just at' -> (at', True)
-                          Nothing  -> (at, False)
-
 dumpAudioTo :: FilePath -> FilePath -> IO ()
 dumpAudioTo directory file = do
-    bytes <- B.readFile file
+    (tt,_) <- parseTipToiFile <$> B.readFile file
 
-    -- Ogg file stuff
-    let (at, at_doubled) = getAudioTable bytes
-        x = runGet (getXor (fst (head at))) bytes
-
-    printf "Audio Table entries: %d\n" (length at)
+    printf "Audio Table entries: %d\n" (length (ttAudioFiles tt))
 
     createDirectoryIfMissing False directory
-    forMn_ at $ \n (oo,ol) -> do
-        let rawaudio = runGet (extract oo ol) bytes
-        let audio = decypher x rawaudio
+    forMn_ (ttAudioFiles tt) $ \n audio -> do
         let audiotype = fromMaybe "raw" $ lookup (B.take 4 audio) fileMagics
         let filename = printf "%s/%s_%04d.%s" directory (takeBaseName file) n audiotype
         if B.null audio
@@ -312,9 +355,9 @@ dumpAudioTo directory file = do
 dumpScripts :: Bool -> Maybe Int -> FilePath -> IO ()
 dumpScripts raw sel file = do
     bytes <- B.readFile file
-    let (st,_) = runSGet bytes getScripts
-    let st' | Just n <- sel = filter ((== fromIntegral n) . fst) st
-            | otherwise     = st
+    let (tt,_) = parseTipToiFile bytes
+        st' | Just n <- sel = filter ((== fromIntegral n) . fst) (ttScripts tt)
+            | otherwise     = ttScripts tt
 
     forM_ st' $ \(i, ms) -> case ms of
         Nothing -> do
@@ -328,29 +371,27 @@ dumpScripts raw sel file = do
 
 dumpInfo :: FilePath -> IO ()
 dumpInfo file = do
-    bytes <- B.readFile file
-    let (st,_) = runSGet bytes getScripts
-        (at,at_doubled) = getAudioTable bytes
-        x = runGet (getXor (fst (head at))) bytes
+    (tt,_) <- parseTipToiFile <$> B.readFile file
+    let st = ttScripts tt
 
+    printf "Checksum found 0x%08X, calculated 0x%08X\n" (ttChecksum tt) (ttChecksumCalc tt)
     printf "Scripts for OIDs from %d to %d; %d/%d are disabled.\n"
         (fst (head st)) (fst (last st))
         (length (filter (isNothing . snd) st)) (length st)
-    printf "Magic XOR value: 0x%02X\n" x
-    when at_doubled $ printf "Audio table repeated twice\n"
-    printf "Audio Table entries: %d\n" (length at)
+    printf "Magic XOR value: 0x%02X\n" (ttAudioXor tt)
+    when (ttAudioFilesDoubles tt) $ printf "Audio table repeated twice\n"
+    printf "Audio Table entries: %d\n" (length (ttAudioFiles tt))
 
 lint :: FilePath -> IO ()
 lint file = do
-    bytes <- B.readFile file
-    let (st,_) = runSGet bytes getScripts
-        (at,_) = getAudioTable bytes
+    (tt,segments) <- parseTipToiFile <$> B.readFile file
 
     let hyps = [ (hyp1, "play indicies are correct")
-               , (hyp2 (fromIntegral (length at)), "media indicies are correct")
+               , (hyp2 (fromIntegral (length (ttAudioFiles tt))),
+                  "media indicies are correct")
                ]
     forM_ hyps $ \(hyp, desc) -> do
-        let wrong = filter (not . hyp) (concat (mapMaybe snd st))
+        let wrong = filter (not . hyp) (concat (mapMaybe snd (ttScripts tt)))
         if null wrong
         then printf "All lines do satisfy hypothesis \"%s\"!\n" desc
         else do
@@ -358,8 +399,7 @@ lint file = do
             forM_ wrong $ \line -> do
                 printf "    %s\n" (ppLine line)
 
-    let segments = getSegments bytes
-        overlapping_segments =
+    let overlapping_segments =
             filter (\((o1,l1,_),(o2,l2,_)) -> o1+l1 > o2) $
             zip segments (tail segments)
     unless (null overlapping_segments) $ do
@@ -388,31 +428,16 @@ doubled xs | take l2 xs == drop l2 xs = Just (take l2 xs)
 
 
 
-getSegments :: B.ByteString -> [(Word32, Word32, String)]
-getSegments bytes =
-    let ato = runGet audioTableOffset bytes
-        (at, at_doubled) = getAudioTable bytes
-        (sto, script_segments) = runSGet bytes getScripts
-    in sort $ script_segments ++
-            [ (4, 4, "Audio table address") ] ++
-            [ (ato, fromIntegral (8 * length at), "Audio table") ] ++
-            [ (ato + fromIntegral (8 * length at), fromIntegral (8 * length at), "Duplicated audio table") |
-              at_doubled
-            ] ++
-            [ (o, fromIntegral l, "Audio file " ++ show n ) | (n,(o,l)) <- zip [0..] at ]++
-            [ (fromIntegral (B.length bytes), 0, "End of file") ]
-
 printSegment (o,l,desc) = printf "At 0x%08X Size %8d: %s\n" o l desc
 
 segments :: FilePath -> IO ()
 segments file = do
-    bytes <- B.readFile file
-    mapM_ printSegment (getSegments bytes)
+    (tt,segments) <- parseTipToiFile <$> B.readFile file
+    mapM_ printSegment segments
 
 findPosition :: Integer -> FilePath -> IO ()
 findPosition pos' file = do
-    bytes <- B.readFile file
-    let segments = getSegments bytes
+    (tt,segments) <- parseTipToiFile <$> B.readFile file
     case find (\(o,l,_) -> pos >= o && pos < o + l) segments of
         Just s -> do
             printf "Offset 0x%08X is part of this segment:\n" pos
@@ -434,8 +459,8 @@ findPosition pos' file = do
 unknown_segments :: FilePath -> IO ()
 unknown_segments file = do
     bytes <- B.readFile file
-    let segments = getSegments bytes
-        unknown_segments =
+    let (tt,segments) = parseTipToiFile bytes
+    let unknown_segments =
             filter (\(o,l) -> not
                 (l == 2 && runGet (skip (fromIntegral o) >> getWord16le) bytes == 0)) $
             filter (\(o,l) -> l > 0) $
@@ -446,10 +471,11 @@ unknown_segments file = do
     forM_ unknown_segments $ \(o,l) ->
         printf "   Offset: %08X to %08X (%d bytes)\n" o (o+l) l
 
-forEachFile :: (FilePath -> IO ()) -> [FilePath] -> IO ()
-forEachFile _ [] = main' []
-forEachFile a [f] = a f 
-forEachFile a fs = forM_ fs $ \f -> do 
+
+withEachFile :: (FilePath -> IO ()) -> [FilePath] -> IO ()
+withEachFile _ [] = main' []
+withEachFile a [f] = a f 
+withEachFile a fs = forM_ fs $ \f -> do 
     printf "%s:\n" f 
     a f
 
@@ -463,10 +489,9 @@ formatState s = spaces $ map (\(k,v) -> printf "$%d=%d" k v) $ M.toAscList s
 
 play :: FilePath -> IO ()
 play file = do
-    bytes <- B.readFile file
-    let (st,_) = runSGet bytes getScripts
+    (tt,segments) <- parseTipToiFile <$> B.readFile file
     forEachNumber initialState $ \i s -> do
-        case lookup (fromIntegral i) st of
+        case lookup (fromIntegral i) (ttScripts tt) of
             Nothing -> printf "OID %d not in main table\n" i >> return s
             Just Nothing -> printf "OID %d deactivated\n" i >> return s
             Just (Just lines) -> do
@@ -510,21 +535,22 @@ forEachNumber state action = go state
                 go s
 
 
-main' ("info": files)             = forEachFile dumpInfo files
-main' ("media": "-d": dir: files) = forEachFile (dumpAudioTo dir) files
-main' ("media": files)            = forEachFile (dumpAudioTo "media") files
-main' ("scripts": files)          = forEachFile (dumpScripts False Nothing) files
+
+main' ("info": files)             = withEachFile dumpInfo files
+main' ("media": "-d": dir: files) = withEachFile (dumpAudioTo dir) files
+main' ("media": files)            = withEachFile (dumpAudioTo "media") files
+main' ("scripts": files)          = withEachFile (dumpScripts False Nothing) files
 main' ("script":  file : n:[])
     | Just int <- readMaybe n     =             dumpScripts False (Just int) file
-main' ("raw-scripts": files)      = forEachFile (dumpScripts True Nothing) files
+main' ("raw-scripts": files)      = withEachFile (dumpScripts True Nothing) files
 main' ("raw-script": file : n:[])
     | Just int <- readMaybe n     =             dumpScripts True (Just int) file
-main' ("lint": files)             = forEachFile lint files
-main' ("segments": files)         = forEachFile segments files
+main' ("lint": files)             = withEachFile lint files
+main' ("segments": files)         = withEachFile segments files
 main' ("segment": file : n :[])
     | Just int <- readMaybe n     =             findPosition int file
     | [(int,[])] <- readHex n     =             findPosition int file
-main' ("holes": files)            = forEachFile unknown_segments files
+main' ("holes": files)            = withEachFile unknown_segments files
 main' ("play": file : [])         =             play file
 main' _ = do
     prg <- getProgName
