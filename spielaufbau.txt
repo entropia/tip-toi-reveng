@@ -16,6 +16,9 @@ Example from WWW Bauernhof
 a = 32 bit counter
 b = a * 32 bit pointer to game header
 
+do you see adress in '0x0018'
+that is right after the games ( for debugging you can take it at end of the last game block)
+
 Header
 ------
 00017071  01 00 0b 00 05 00 00 00  04 00 81 05 00 00 6f 00
@@ -36,12 +39,12 @@ Header
           gg gg gg gg gg gg gg gg  gg gg gg gg gg gg gg gg
 000170f1  01 00 eb 76 01 00 ed 76  01 00 ef 76 01 00 
           gg gg gg gg gg gg gg gg  gg gg gg gg gg gg
-a = 16 bit type
+a = 16 bit type (type 253 is special see below)
 b = 16 bit count
 unknown = 2 byte
 c = 16 bit count (only if type == 6 else unknown and c = 0 not the value here)
 12 byte unknown (if type == 6 then 20 byte unknown)
-d = 5 (where is the count from so far in every block) * 32 bit pointer to playlistpointer
+d = 5 (if type == 6 then count is 7, where is the count from so far in every block) * 32 bit pointer to playlistpointer
 e = b * 32 bit pointer to subgame blocks 
 f = c * 32 bit pointer to subgame blocks 
 20 byte unknown
@@ -64,6 +67,23 @@ if ( type == 16 )
           3 * 32 bit pointer to playlistpointer
 nothing for other types
 end of block
+
+now type 253
+0x1B2FB B00 000008
+        FD 00 01 00 03 B3 01 00  
+        aa aa bb bb cc cc cc cc
+
+a = type == 253
+b = count
+c = b * 32bit pointer to 16 bit lists
+
+16 bit list example from type (253)
+0x1B303 B01 000210
+        02 00 6A 02 6B 02
+        aa aa bb bb bb bb
+a = count
+b = a * 16 bit (what i dont know)
+
 
 Subgameblock
 ------
