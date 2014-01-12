@@ -112,8 +112,7 @@ getScripts = do
         return (i, Just ls)
 
     getLineOffsets i offset = getSegAt offset (printf "Script header for OID %d" i) $ do
-        n <- getWord16le
-        replicateM (fromIntegral n) getWord32le
+        array getWord16le getWord32le
 
     getLine i n offset = getSegAt offset (printf "Script Line %d for OID %d" n i) $
         lineParser offset
@@ -124,9 +123,7 @@ lineParser offset = begin
    -- Find the occurrence of a header
     begin = do
         -- Conditionals
-        a <- getWord8
-        expectWord8 0
-        conds <- replicateM (fromIntegral a) $ do
+        conds <- array getWord16le $ do
             expectWord8 0
             r <- getWord8
             expectWord8 0
@@ -137,9 +134,7 @@ lineParser offset = begin
               Nothing -> return $ Unknowncond bytecode r n
 
         -- Actions
-        b <- getWord8
-        expectWord8 0
-        cmds <- replicateM (fromIntegral b) $ do
+        cmds <- array getWord16le $ do
             r <- getWord8
             expectWord8 0
             bytecode <- getLazyByteString 3
@@ -150,8 +145,7 @@ lineParser offset = begin
                 return $ Unknown bytecode r n
 
         -- Audio links
-        n <- getWord16le
-        xs <- replicateM (fromIntegral n) getWord16le
+        xs <- array getWord16le getWord16le
         return $ Line offset conds cmds xs
 
     expectWord8 n = do
@@ -256,6 +250,11 @@ calcChecksum = do
     l <- getLength
     bs <- getAt 0 $ getLazyByteString (fromIntegral l - 4)
     return $ B.foldl' (\s b -> fromIntegral b + s) 0 bs
+
+array :: Integral a => Get a -> Get b -> Get [b]
+array g1 g2 = do
+    n <- g1
+    replicateM (fromIntegral n) g2
 
 getTipToiFile :: SGet TipToiFile
 getTipToiFile = do
