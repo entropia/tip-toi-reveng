@@ -322,20 +322,19 @@ getGame n offset = do
             u1 <- getWord16le
             c <- getWord16le
             u2 <- getLazyByteString 18
-            pllos <- replicateM 5 getWord32le
+            pllos <- replicateM 7 getWord32le
             sg1os <- replicateM (fromIntegral b) getWord32le
             sg2os <- replicateM (fromIntegral c) getWord32le
-            skip (2*4)
             u3 <- getLazyByteString 20
             pll2os <- replicateM 10 getWord32le
             plo <- getWord32le
             return (u1, u2, pllos, sg1os, sg2os, u3, pll2os, plo)
         plls <- mapM getPlayListList pllos
-        -- sg1s <- mapM getSubGame sg1os
-        --sg2s <- mapM getSubGame sg2os
+        sg1s <- mapM getSubGame sg1os
+        sg2s <- mapM getSubGame sg2os
         pll2s <- mapM getPlayListList pll2os
         pl <- getPlayList plo
-        return (Game6 u1 u2 plls [] [] u3 pll2s pl)
+        return (Game6 u1 u2 plls sg1s sg2s u3 pll2s pl)
       7 -> do
         ((u1,c,u2,pllos, sgos, u3, pll2os), pllo) <- getHeader $ do
             c <- common
