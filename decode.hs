@@ -21,6 +21,7 @@ import qualified Data.Map as M
 import Control.Monad.Writer.Strict
 import Control.Monad.Reader
 import Control.Arrow (second)
+import Debug.Trace
 
 
 -- Main data types
@@ -45,6 +46,7 @@ data Line = Line Offset [Conditional] [Command] [Word16]
 
 data TipToiFile = TipToiFile
     { ttScripts :: [(Word16, Maybe [Line])]
+    , ttGames :: [Game]
     , ttAudioFiles :: [B.ByteString]
     , ttAudioFilesDoubles :: Bool
     , ttAudioXor :: Word8
@@ -52,6 +54,27 @@ data TipToiFile = TipToiFile
     , ttChecksumCalc :: Word32
     }
 
+
+type PlayList = [Word16]
+type PlayListList = [PlayList]
+type GameId = Word16
+
+data Game
+    = Game6 Word16 B.ByteString [PlayListList] [SubGame] [SubGame] B.ByteString [PlayListList] PlayList
+    | Game7 Word16 Word16 B.ByteString [PlayListList] [SubGame] B.ByteString [PlayListList] PlayListList
+    | Game8 Word16 Word16 B.ByteString [PlayListList] [SubGame] B.ByteString [PlayListList] [OID] [GameId] PlayListList PlayListList
+    | Game9
+    | Game10
+    | Game16
+    | UnknownGame Word16 Word16 Word16 B.ByteString [PlayListList] [SubGame] B.ByteString [PlayListList]
+    deriving Show
+
+
+type OID = Word16
+
+data SubGame
+    = SubGame B.ByteString [OID] [OID] [OID] [PlayListList]
+    deriving Show
 
 -- Reverse Engineering Monad
 
@@ -68,6 +91,8 @@ getAt offset act = SGet $ runGet (skip (fromIntegral offset) >> act) <$> ask
 getSegAt :: Offset -> String -> (Get a) -> SGet a
 getSegAt offset desc act = SGet $ do
     bytes <- ask
+    when (offset > fromIntegral (B.length bytes)) $ do
+        fail $ printf "Trying to read Segment %s from offset 0x%08X, which is after the end of the file!" desc offset
     let (a, _, i) = runGetState  (skip (fromIntegral offset) >> act) bytes 0
     tell [(offset, fromIntegral i - offset, desc)]
     return a
@@ -256,13 +281,123 @@ array g1 g2 = do
     n <- g1
     replicateM (fromIntegral n) g2
 
+getPlayList :: Offset -> SGet PlayList
+getPlayList offset = do
+    getSegAt offset "Playlist" $ array getWord16le getWord16le
+
+getOidList :: Offset -> SGet [OID]
+getOidList offset = do
+    getSegAt offset "OID list" $ array getWord16le getWord16le
+
+getGidList :: Offset -> SGet [OID]
+getGidList offset = do
+    getSegAt offset "GID list" $ array getWord16le getWord16le
+
+getPlayListList :: Offset -> SGet PlayListList
+getPlayListList offset = do
+    os <- getSegAt offset "Playlistlist" $ array getWord16le getWord32le
+    mapM getPlayList os
+
+getSubGame :: Offset -> SGet SubGame
+getSubGame offset = do
+    (u, oid1s, oid2s, oid3s, pllos) <- getSegAt offset "Subgame" $ do
+        u <- getLazyByteString 20
+        oid1s <- array getWord16le getWord16le
+        oid2s <- array getWord16le getWord16le
+        oid3s <- array getWord16le getWord16le
+        pllos <- replicateM 9 getWord32le
+        return (u, oid1s, oid2s, oid3s, pllos)
+    plls <- mapM getPlayListList pllos
+    return (SubGame u oid1s oid2s oid3s plls)
+
+getGame :: Int -> Offset -> SGet Game
+getGame n offset = do
+    t <- getAt offset getWord16le
+    let getHeader = getSegAt offset (printf "Game Nr. %d (Type %d)" n t)
+    case t of
+      6 -> do
+        (u1,u2,pllos, sg1os, sg2os, u3, pll2os, plo) <- getHeader $ do
+            6 <- getWord16le
+            b <- getWord16le
+            u1 <- getWord16le
+            c <- getWord16le
+            u2 <- getLazyByteString 18
+            pllos <- replicateM 5 getWord32le
+            sg1os <- replicateM (fromIntegral b) getWord32le
+            sg2os <- replicateM (fromIntegral c) getWord32le
+            skip (2*4)
+            u3 <- getLazyByteString 20
+            pll2os <- replicateM 10 getWord32le
+            plo <- getWord32le
+            return (u1, u2, pllos, sg1os, sg2os, u3, pll2os, plo)
+        plls <- mapM getPlayListList pllos
+        -- sg1s <- mapM getSubGame sg1os
+        --sg2s <- mapM getSubGame sg2os
+        pll2s <- mapM getPlayListList pll2os
+        pl <- getPlayList plo
+        return (Game6 u1 u2 plls [] [] u3 pll2s pl)
+      7 -> do
+        ((u1,c,u2,pllos, sgos, u3, pll2os), pllo) <- getHeader $ do
+            c <- common
+            pllo <- getWord32le
+            return (c, pllo)
+        plls <- mapM getPlayListList pllos
+        sgs <- mapM getSubGame sgos
+        pll2s <- mapM getPlayListList pll2os
+        pll <- getPlayListList pllo
+        return (Game7 u1 c u2 plls sgs u3 pll2s pll)
+      8 -> do
+        ((u1,c,u2,pllos, sgos, u3, pll2os), oidlo, gidlo, pll1o, pll2o) <- getHeader $ do
+            c <- common
+            oidlo <- getWord32le
+            gidlo <- getWord32le
+            pll1o <- getWord32le
+            pll2o <- getWord32le
+            return (c, oidlo, gidlo, pll1o, pll2o)
+        plls <- mapM getPlayListList pllos
+        sgs <- mapM getSubGame sgos
+        pll2s <- mapM getPlayListList pll2os
+        oidl <- getOidList oidlo
+        gidl <- getGidList gidlo
+        pll1 <- getPlayListList pll1o
+        pll2 <- getPlayListList pll2o
+        return (Game8 u1 c u2 plls sgs u3 pll2s oidl gidl pll1 pll2)
+
+      _ -> do
+        (u1,c,u2,pllos, sgos, u3, pll2os) <- getHeader common
+        plls <- mapM getPlayListList pllos
+        sgs <- mapM getSubGame sgos
+        pll2s <- mapM getPlayListList pll2os
+        return (UnknownGame t u1 c u2 plls sgs u3 pll2s)
+ where
+    common = do -- the common header of a non-type-6-game
+        _ <- getWord16le
+        b <- getWord16le
+        u1 <- getWord16le
+        c <- getWord16le
+        u2 <- getLazyByteString 10
+        pllos <- replicateM 5 getWord32le
+        sgos <- replicateM (fromIntegral b) getWord32le
+        u3 <- getLazyByteString 20
+        pll2os <- replicateM 10 getWord32le
+        return (u1, c, u2, pllos, sgos, u3, pll2os)
+
+
+getGames :: SGet [Game]
+getGames = do
+    gameTable <- getSegAt 0x0010 "Game Table Offset" getWord32le
+    gameOffsets <- getSegAt gameTable "Game Table" $
+        array getWord32le getWord32le
+    forMn (init gameOffsets) getGame
+
 getTipToiFile :: SGet TipToiFile
 getTipToiFile = do
     scripts <- getScripts
+    games <- getGames
     (at, at_doubled, xor) <- getAudios
     checksum <- getChecksum
     checksumCalc <- calcChecksum
-    return (TipToiFile scripts at at_doubled xor checksum checksumCalc)
+    return (TipToiFile scripts games at at_doubled xor checksum checksumCalc)
 
 parseTipToiFile :: B.ByteString -> (TipToiFile, Segments)
 parseTipToiFile = runSGet getTipToiFile
@@ -312,6 +447,63 @@ spaces = intercalate " "
 commas = intercalate ","
 
 
+ppGame :: Game -> String
+ppGame (Game6 u1 u2 plls sg1s sg2s u3 pll2s pl) =
+    printf (unlines ["  type: 6", "  u1:   %d", "  u2:   %s",
+                     "  playlistlists:", "%s",
+                     "  subgames1:", "%s", "  subgames2:", "%s",
+                     "  u3: %s",   "  playlistlists:","%s",
+                     "  playlist: %s"])
+    u1 (prettyHex u2) (indent 4 (map show plls))
+    (concatMap ppSubGame sg1s) (concatMap ppSubGame sg2s)
+    (prettyHex u3) (indent 4 (map show pll2s))
+    (show pl)
+ppGame (Game7 u1 c u2 plls sgs u3 pll2s pll) =
+    printf (unlines ["  type: 6", "  u1:   %d", "  u2:   %s",
+                     "  playlistlists:", "%s",
+                     "  subgames:", "%s",
+                     "  u3: %s",   "  playlistlists:","%s",
+                     "  playlistlist: %s"])
+    u1 (prettyHex u2) (indent 4 (map show plls))
+    (concatMap ppSubGame sgs)
+    (prettyHex u3) (indent 4 (map show pll2s)) (show pll)
+ppGame (Game8 u1 c u2 plls sgs u3 pll2s oidl gidl pll1 pll2) =
+    printf (unlines ["  type: 6", "  u1:   %d", "  u2:   %s",
+                     "  playlistlists:", "%s",
+                     "  subgames:", "%s",
+                     "  u3: %s",   "  playlistlists:","%s",
+                     "  oids: %s",
+                     "  gids: %s",
+                     "  playlistlist: %s",
+                     "  playlistlist: %s"
+                     ])
+    u1 (prettyHex u2) (indent 4 (map show plls))
+    (concatMap ppSubGame sgs)
+    (prettyHex u3) (indent 4 (map show pll2s)) (show oidl) (show gidl)
+    (show pll1) (show pll2)
+ppGame (UnknownGame t u1 c u2 plls sgs u3 pll2s) =
+    printf (unlines ["  type: %d", "  u1:   %d", "  c:    %d", "  u2:   %s",
+                     "  playlistlists:", "%s", "  subgames:", "%s",
+                     "  u3: %s",   "  playlistlists:","%s"])
+    t u1 c (prettyHex u2) (indent 4 (map show plls))
+    (concatMap ppSubGame sgs) (prettyHex u3) (indent 4 (map show pll2s))
+ppGame _ = "TODO"
+
+ppSubGame :: SubGame -> String
+ppSubGame (SubGame u oids1 oids2 oids3 plls) = printf (unlines
+    [ "    Subgame:"
+    , "      u: %s"
+    , "      oids1: %s"
+    , "      oids2: %s"
+    , "      oids3: %s"
+    , "      playlistlists:"
+    , "%s"
+    ])
+    (prettyHex u)
+    (show oids1) (show oids2) (show oids3)
+    (indent 8 (map show plls))
+
+indent n = intercalate "\n" . map (replicate n ' ' ++)
 
 checkLine :: Int -> Line -> [String]
 checkLine n_audio l@(Line _ _ _ xs)
@@ -533,7 +725,13 @@ forEachNumber state action = go state
                 putStrLn "Not a number, please try again"
                 go s
 
-
+dumpGames :: FilePath -> IO ()
+dumpGames file = do
+    bytes <- B.readFile file
+    let (tt,_) = parseTipToiFile bytes
+    forMn_ (ttGames tt) $ \n g -> do
+        printf "Game %d:\n" n
+        printf "%s\n" (ppGame g)
 
 main' ("info": files)             = withEachFile dumpInfo files
 main' ("media": "-d": dir: files) = withEachFile (dumpAudioTo dir) files
@@ -544,6 +742,7 @@ main' ("script":  file : n:[])
 main' ("raw-scripts": files)      = withEachFile (dumpScripts True Nothing) files
 main' ("raw-script": file : n:[])
     | Just int <- readMaybe n     =             dumpScripts True (Just int) file
+main' ("games": files)            = withEachFile dumpGames files
 main' ("lint": files)             = withEachFile lint files
 main' ("segments": files)         = withEachFile segments files
 main' ("segment": file : n :[])
