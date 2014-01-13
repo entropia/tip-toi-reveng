@@ -417,11 +417,16 @@ lineLength :: Line -> Word32
 lineLength (Line _ conds cmds audio) = fromIntegral $
     2 + 8 * length conds + 2 + 7 * length cmds + 2 + 2 * length audio
 
-ppLine :: Line -> String
-ppLine (Line _ cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map ppCommand as) ++ media xs
+ppLine :: Transscript -> Line -> String
+ppLine t (Line _ cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map ppCommand as) ++ media xs
   where media [] = ""
-        media _  = " [" ++ commas (map show xs) ++ "]"
+        media _  = " " ++ ppPlayList t xs
 
+ppPlayList :: Transscript -> PlayList -> String
+ppPlayList t xs = "[" ++ commas (map (transcribe t) xs) ++ "]"
+
+ppPlayListList :: Transscript -> PlayListList -> String
+ppPlayListList t xs = "[" ++ commas (map (ppPlayList t) xs) ++ "]"
 
 ppConditional :: Conditional -> String
 ppConditional (Eq  g v)           = printf "$%d==%d?" g v
@@ -446,27 +451,27 @@ spaces = intercalate " "
 commas = intercalate ","
 
 
-ppGame :: Game -> String
-ppGame (Game6 u1 u2 plls sg1s sg2s u3 pll2s pl) =
+ppGame :: Transscript -> Game -> String
+ppGame t (Game6 u1 u2 plls sg1s sg2s u3 pll2s pl) =
     printf (unlines ["  type: 6", "  u1:   %d", "  u2:   %s",
                      "  playlistlists:", "%s",
                      "  subgames1:", "%s", "  subgames2:", "%s",
                      "  u3: %s",   "  playlistlists:","%s",
                      "  playlist: %s"])
-    u1 (prettyHex u2) (indent 4 (map show plls))
-    (concatMap ppSubGame sg1s) (concatMap ppSubGame sg2s)
-    (prettyHex u3) (indent 4 (map show pll2s))
+    u1 (prettyHex u2) (indent 4 (map (ppPlayListList t) plls))
+    (concatMap (ppSubGame t) sg1s) (concatMap (ppSubGame t) sg2s)
+    (prettyHex u3) (indent 4 (map (ppPlayListList t) pll2s))
     (show pl)
-ppGame (Game7 u1 c u2 plls sgs u3 pll2s pll) =
+ppGame t (Game7 u1 c u2 plls sgs u3 pll2s pll) =
     printf (unlines ["  type: 6", "  u1:   %d", "  u2:   %s",
                      "  playlistlists:", "%s",
                      "  subgames:", "%s",
                      "  u3: %s",   "  playlistlists:","%s",
                      "  playlistlist: %s"])
-    u1 (prettyHex u2) (indent 4 (map show plls))
-    (concatMap ppSubGame sgs)
-    (prettyHex u3) (indent 4 (map show pll2s)) (show pll)
-ppGame (Game8 u1 c u2 plls sgs u3 pll2s oidl gidl pll1 pll2) =
+    u1 (prettyHex u2) (indent 4 (map (ppPlayListList t) plls))
+    (concatMap (ppSubGame t) sgs)
+    (prettyHex u3) (indent 4 (map (ppPlayListList t) pll2s)) (ppPlayListList t pll)
+ppGame t (Game8 u1 c u2 plls sgs u3 pll2s oidl gidl pll1 pll2) =
     printf (unlines ["  type: 6", "  u1:   %d", "  u2:   %s",
                      "  playlistlists:", "%s",
                      "  subgames:", "%s",
@@ -476,20 +481,20 @@ ppGame (Game8 u1 c u2 plls sgs u3 pll2s oidl gidl pll1 pll2) =
                      "  playlistlist: %s",
                      "  playlistlist: %s"
                      ])
-    u1 (prettyHex u2) (indent 4 (map show plls))
-    (concatMap ppSubGame sgs)
-    (prettyHex u3) (indent 4 (map show pll2s)) (show oidl) (show gidl)
-    (show pll1) (show pll2)
-ppGame (UnknownGame t u1 c u2 plls sgs u3 pll2s) =
+    u1 (prettyHex u2) (indent 4 (map (ppPlayListList t) plls))
+    (concatMap (ppSubGame t) sgs)
+    (prettyHex u3) (indent 4 (map (ppPlayListList t) pll2s)) (show oidl) (show gidl)
+    (ppPlayListList t pll1) (ppPlayListList t pll2)
+ppGame t (UnknownGame typ u1 c u2 plls sgs u3 pll2s) =
     printf (unlines ["  type: %d", "  u1:   %d", "  c:    %d", "  u2:   %s",
                      "  playlistlists:", "%s", "  subgames:", "%s",
                      "  u3: %s",   "  playlistlists:","%s"])
-    t u1 c (prettyHex u2) (indent 4 (map show plls))
-    (concatMap ppSubGame sgs) (prettyHex u3) (indent 4 (map show pll2s))
-ppGame _ = "TODO"
+    typ u1 c (prettyHex u2) (indent 4 (map (ppPlayListList t) plls))
+    (concatMap (ppSubGame t) sgs) (prettyHex u3) (indent 4 (map (ppPlayListList t) pll2s))
+ppGame t _ = "TODO"
 
-ppSubGame :: SubGame -> String
-ppSubGame (SubGame u oids1 oids2 oids3 plls) = printf (unlines
+ppSubGame :: Transscript -> SubGame -> String
+ppSubGame t (SubGame u oids1 oids2 oids3 plls) = printf (unlines
     [ "    Subgame:"
     , "      u: %s"
     , "      oids1: %s"
@@ -500,14 +505,14 @@ ppSubGame (SubGame u oids1 oids2 oids3 plls) = printf (unlines
     ])
     (prettyHex u)
     (show oids1) (show oids2) (show oids3)
-    (indent 8 (map show plls))
+    (indent 8 (map (ppPlayListList t) plls))
 
 indent n = intercalate "\n" . map (replicate n ' ' ++)
 
 checkLine :: Int -> Line -> [String]
 checkLine n_audio l@(Line _ _ _ xs)
     | any (>= fromIntegral n_audio) xs
-    = return $ "Invalid audio index in line " ++ ppLine l
+    = return $ "Invalid audio index in line " ++ ppLine M.empty l
 checkLine n_audio _ = []
 
 
@@ -542,8 +547,8 @@ dumpAudioTo directory file = do
             B.writeFile filename audio
             printf "Dumped sample %d as %s\n" n filename
 
-dumpScripts :: Bool -> Maybe Int -> FilePath -> IO ()
-dumpScripts raw sel file = do
+dumpScripts :: Transscript -> Bool -> Maybe Int -> FilePath -> IO ()
+dumpScripts t raw sel file = do
     bytes <- B.readFile file
     let (tt,_) = parseTipToiFile bytes
         st' | Just n <- sel = filter ((== fromIntegral n) . fst) (ttScripts tt)
@@ -556,7 +561,7 @@ dumpScripts raw sel file = do
             printf "Script for OID %d:\n" i
             forM_ lines $ \line -> do
                 if raw then printf "%s\n"     (lineHex bytes line)
-                       else printf "    %s\n" (ppLine line)
+                       else printf "    %s\n" (ppLine t line)
 
 
 dumpInfo :: FilePath -> IO ()
@@ -587,7 +592,7 @@ lint file = do
         else do
             printf "These lines do not satisfy hypothesis \"%s\":\n" desc
             forM_ wrong $ \line -> do
-                printf "    %s\n" (ppLine line)
+                printf "    %s\n" (ppLine M.empty line)
 
     let overlapping_segments =
             filter (\((o1,l1,_),(o2,l2,_)) -> o1+l1 > o2) $
@@ -663,7 +668,7 @@ unknown_segments file = do
 
 
 withEachFile :: (FilePath -> IO ()) -> [FilePath] -> IO ()
-withEachFile _ [] = main' []
+withEachFile _ [] = main' undefined []
 withEachFile a [f] = a f 
 withEachFile a fs = forM_ fs $ \f -> do 
     printf "%s:\n" f 
@@ -677,8 +682,8 @@ initialState = M.singleton 0 1
 formatState :: State -> String
 formatState s = spaces $ map (\(k,v) -> printf "$%d=%d" k v) $ M.toAscList s
 
-play :: FilePath -> IO ()
-play file = do
+play :: Transscript -> FilePath -> IO ()
+play t file = do
     (tt,segments) <- parseTipToiFile <$> B.readFile file
     forEachNumber initialState $ \i s -> do
         case lookup (fromIntegral i) (ttScripts tt) of
@@ -686,9 +691,9 @@ play file = do
             Just Nothing -> printf "OID %d deactivated\n" i >> return s
             Just (Just lines) -> do
                 case find (enabledLine s) lines of
-                    Nothing -> printf "None of these lines matched!\n" >> mapM_ (putStrLn . ppLine) lines >> return s
+                    Nothing -> printf "None of these lines matched!\n" >> mapM_ (putStrLn . ppLine t) lines >> return s
                     Just l -> do
-                        printf "Executing:  %s\n" (ppLine l)
+                        printf "Executing:  %s\n" (ppLine t l)
                         let s' = applyLine l s
                         printf "State now: %s\n" (formatState s')
                         return s'
@@ -724,57 +729,89 @@ forEachNumber state action = go state
                 putStrLn "Not a number, please try again"
                 go s
 
-dumpGames :: FilePath -> IO ()
-dumpGames file = do
+dumpGames :: Transscript -> FilePath -> IO ()
+dumpGames t file = do
     bytes <- B.readFile file
     let (tt,_) = parseTipToiFile bytes
     forMn_ (ttGames tt) $ \n g -> do
         printf "Game %d:\n" n
-        printf "%s\n" (ppGame g)
+        printf "%s\n" (ppGame t g)
 
-main' ("info": files)             = withEachFile dumpInfo files
-main' ("media": "-d": dir: files) = withEachFile (dumpAudioTo dir) files
-main' ("media": files)            = withEachFile (dumpAudioTo "media") files
-main' ("scripts": files)          = withEachFile (dumpScripts False Nothing) files
-main' ("script":  file : n:[])
-    | Just int <- readMaybe n     =             dumpScripts False (Just int) file
-main' ("raw-scripts": files)      = withEachFile (dumpScripts True Nothing) files
-main' ("raw-script": file : n:[])
-    | Just int <- readMaybe n     =             dumpScripts True (Just int) file
-main' ("games": files)            = withEachFile dumpGames files
-main' ("lint": files)             = withEachFile lint files
-main' ("segments": files)         = withEachFile segments files
-main' ("segment": file : n :[])
-    | Just int <- readMaybe n     =             findPosition int file
-    | [(int,[])] <- readHex n     =             findPosition int file
-main' ("holes": files)            = withEachFile unknown_segments files
-main' ("play": file : [])         =             play file
-main' _ = do
+type Transscript = M.Map Word16 String
+
+transcribe :: Transscript -> Word16 -> String
+transcribe t idx = fromMaybe (show idx) (M.lookup idx t)
+
+readTransscriptFile :: FilePath -> IO (M.Map Word16 String)
+readTransscriptFile transcriptfile_ = do
+    file <- readFile transcriptfile_
+    return $ M.fromList
+        [ (idx, string)
+        | l <- lines file
+        , (idxstr:string:_) <- return $ wordsWhen (';'==) l
+        , Just idx <- return $ readMaybe idxstr
+        ]
+
+-- Avoiding dependencies, using code from http://stackoverflow.com/a/4981265/946226
+wordsWhen     :: (Char -> Bool) -> String -> [String]
+wordsWhen p s =  case dropWhile p s of
+                      "" -> []
+                      s' -> w : wordsWhen p s''
+                            where (w, s'') = break p s'
+
+main' t ("-t":transscript:args) =
+    do t2 <- readTransscriptFile transscript
+       main' (t `M.union` t2) args
+
+main' t ("info": files)             = withEachFile dumpInfo files
+main' t ("media": "-d": dir: files) = withEachFile (dumpAudioTo dir) files
+main' t ("media": files)            = withEachFile (dumpAudioTo "media") files
+main' t ("scripts": files)          = withEachFile (dumpScripts t False Nothing) files
+main' t ("script":  file : n:[])
+    | Just int <- readMaybe n       =              dumpScripts t False (Just int) file
+main' t ("raw-scripts": files)      = withEachFile (dumpScripts t True Nothing) files
+main' t ("raw-script": file : n:[])
+    | Just int <- readMaybe n       =              dumpScripts t True (Just int) file
+main' t ("games": files)            = withEachFile (dumpGames t) files
+main' t ("lint": files)             = withEachFile lint files
+main' t ("segments": files)         = withEachFile segments files
+main' t ("segment": file : n :[])
+    | Just int <- readMaybe n       =              findPosition int file
+    | [(int,[])] <- readHex n       =              findPosition int file
+main' t ("holes": files)            = withEachFile unknown_segments files
+main' t ("play": file : [])         =              play t file
+main' _ _ = do
     prg <- getProgName
-    putStrLn $ "Usage:"
-    putStrLn $ prg ++ " info <file.gme>..."
+    putStrLn $ "Usage: " ++ prg ++ " [options] command"
+    putStrLn $ ""
+    putStrLn $ "Options:"
+    putStrLn $ "    -t <transcriptfile>"
+    putStrLn $ "       replaces media file indices by a transscript"
+    putStrLn $ ""
+    putStrLn $ "Commands:"
+    putStrLn $ "    info <file.gme>..."
     putStrLn $ "       general information"
-    putStrLn $ prg ++ " media [-d dir] <file.gme>..."
+    putStrLn $ "    media [-d dir] <file.gme>..."
     putStrLn $ "       dumps all audio samples to the given directory (default: media/)"
-    putStrLn $ prg ++ " scripts <file.gme>..."
+    putStrLn $ "    scripts <file.gme>..."
     putStrLn $ "       prints the decoded scripts for each OID"
-    putStrLn $ prg ++ " script <file.gme> <n>"
+    putStrLn $ "    script <file.gme> <n>"
     putStrLn $ "       prints the decoded scripts for the given OID"
-    putStrLn $ prg ++ " raw-scripts <file.gme>..."
+    putStrLn $ "    raw-scripts <file.gme>..."
     putStrLn $ "       prints the scripts for each OID, in their raw form"
-    putStrLn $ prg ++ " raw-script <file.gme> <n>"
+    putStrLn $ "    raw-script <file.gme> <n>"
     putStrLn $ "       prints the scripts for the given OID, in their raw form"
-    putStrLn $ prg ++ " lint <file.gme>"
+    putStrLn $ "    lint <file.gme>"
     putStrLn $ "       checks for errors in the file or in this program"
-    putStrLn $ prg ++ " segments <file.gme>..."
+    putStrLn $ "    segments <file.gme>..."
     putStrLn $ "       lists all known parts of the file, with description."
-    putStrLn $ prg ++ " segment <file.gme> <pos>"
+    putStrLn $ "    segment <file.gme> <pos>"
     putStrLn $ "       which segment contains the given position."
-    putStrLn $ prg ++ " holes <file.gme>..."
+    putStrLn $ "    holes <file.gme>..."
     putStrLn $ "       lists all unknown parts of the file."
-    putStrLn $ prg ++ " play <file.gme>"
+    putStrLn $ "    play <file.gme>"
     putStrLn $ "       interactively play: Enter OIDs, and see what happens."
     exitFailure
 
-main = getArgs >>= main'
+main = getArgs >>= (main' M.empty)
 
