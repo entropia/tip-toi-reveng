@@ -455,7 +455,7 @@ ID;VALUE;REFERENCEVALUE
 0453;#0017#;NOISE: Fliessen
 0454;#0076#;NOISE: Kuckkuck
 0455;#0012#;NOISE: Storch (Klappern)
-0456;"Wir spielen ""Ich sehe was, was du nicht siehts"". Versuche herauszufinden welches Objekt gesucht ist. Nach jedem falschen Treffer bekommst du einen weiteren Hinweis.";
+0456;Wir spielen 'Ich sehe was, was du nicht siehts'. Versuche herauszufinden welches Objekt gesucht ist. Nach jedem falschen Treffer bekommst du einen weiteren Hinweis.;
 0457;Es geht los.;
 0458;Willst du noch einmal spielen?;
 0459;Dann gehe auf SPIELEN.;
@@ -534,7 +534,7 @@ ID;VALUE;REFERENCEVALUE
 0532;Der Roggen ist kleiner und hat kuerzere Grannen. Wo siehst du den Roggen?;
 0533;Der Weizen hat dicke Koerner und keine Grannen. Tippe auf die Aehre des Weizen!;
 0534;Mais hat dicke gelbe Koerner und waechst als Kolben. Findest du das Maisfeld?;
-0535;"Wir spielen ""Fahrzeuge raten"". Hoer dir die Frage gut an und tippe auf das gesuchte Fahrzeug.";
+0535;Wir spielen 'Fahrzeuge raten'. Hoer dir die Frage gut an und tippe auf das gesuchte Fahrzeug.;
 0536;Hier kommt das naechste Fahrzeug.;
 0537;Hier kommt das letzte Fahrzeug.;
 0538;Super, du bist ein echter Fahrzeugprofi.;
@@ -559,7 +559,7 @@ ID;VALUE;REFERENCEVALUE
 0557;Dann geht es weiter.;
 0558;Hier kommt ein Beispiel.;
 0559;Tra, ri, ra, der ..., der ist da !;
-0560;"Das fehlende Wort ist ""der Sommer"", du muesstest dann hier auf das Sommerbild tippen.";
+0560;Das fehlende Wort ist 'der Sommer', du muesstest dann hier auf das Sommerbild tippen.;
 0561;Jetzt geht es los!;
 0562;Das war das Liederatespiel.;
 0563;Hier kommt das naechste Lied.;
