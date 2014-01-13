@@ -454,43 +454,64 @@ commas = intercalate ","
 ppGame :: Transscript -> Game -> String
 ppGame t (Game6 u1 u2 plls sg1s sg2s u3 pll2s pl) =
     printf (unlines ["  type: 6", "  u1:   %d", "  u2:   %s",
-                     "  playlistlists:", "%s",
-                     "  subgames1:", "%s", "  subgames2:", "%s",
-                     "  u3: %s",   "  playlistlists:","%s",
+                     "  playlistlists: (%d)", "%s",
+                     "  subgames1: (%d)", "%s",
+                     "  subgames2: (%d)", "%s",
+                     "  u3: %s",
+                     "  playlistlists: (%d)","%s",
                      "  playlist: %s"])
-    u1 (prettyHex u2) (indent 4 (map (ppPlayListList t) plls))
-    (concatMap (ppSubGame t) sg1s) (concatMap (ppSubGame t) sg2s)
-    (prettyHex u3) (indent 4 (map (ppPlayListList t) pll2s))
+    u1 (prettyHex u2)
+    (length plls)   (indent 4 (map (ppPlayListList t) plls))
+    (length sg1s)   (concatMap (ppSubGame t) sg1s)
+    (length sg2s)   (concatMap (ppSubGame t) sg2s)
+    (prettyHex u3)
+    (length pll2s)  (indent 4 (map (ppPlayListList t) pll2s))
     (show pl)
 ppGame t (Game7 u1 c u2 plls sgs u3 pll2s pll) =
     printf (unlines ["  type: 6", "  u1:   %d", "  u2:   %s",
-                     "  playlistlists:", "%s",
-                     "  subgames:", "%s",
-                     "  u3: %s",   "  playlistlists:","%s",
+                     "  playlistlists: (%d)", "%s",
+                     "  subgames: (%d)", "%s",
+                     "  u3: %s",
+                     "  playlistlists: (%d)","%s",
                      "  playlistlist: %s"])
-    u1 (prettyHex u2) (indent 4 (map (ppPlayListList t) plls))
-    (concatMap (ppSubGame t) sgs)
-    (prettyHex u3) (indent 4 (map (ppPlayListList t) pll2s)) (ppPlayListList t pll)
+    u1 (prettyHex u2)
+    (length plls)   (indent 4 (map (ppPlayListList t) plls))
+    (length sgs)    (concatMap (ppSubGame t) sgs)
+    (prettyHex u3)
+    (length pll2s)  (indent 4 (map (ppPlayListList t) pll2s))
+    (ppPlayListList t pll)
 ppGame t (Game8 u1 c u2 plls sgs u3 pll2s oidl gidl pll1 pll2) =
     printf (unlines ["  type: 6", "  u1:   %d", "  u2:   %s",
-                     "  playlistlists:", "%s",
-                     "  subgames:", "%s",
-                     "  u3: %s",   "  playlistlists:","%s",
+                     "  playlistlists: (%d)", "%s",
+                     "  subgames: (%d)", "%s",
+                     "  u3: %s",
+                     "  playlistlists: (%d)","%s",
                      "  oids: %s",
                      "  gids: %s",
                      "  playlistlist: %s",
                      "  playlistlist: %s"
                      ])
-    u1 (prettyHex u2) (indent 4 (map (ppPlayListList t) plls))
-    (concatMap (ppSubGame t) sgs)
-    (prettyHex u3) (indent 4 (map (ppPlayListList t) pll2s)) (show oidl) (show gidl)
+    u1 (prettyHex u2)
+    (length plls)   (indent 4 (map (ppPlayListList t) plls))
+    (length sgs)    (concatMap (ppSubGame t) sgs)
+    (prettyHex u3)
+    (length pll2s)  (indent 4 (map (ppPlayListList t) pll2s))
+    (show oidl) (show gidl)
     (ppPlayListList t pll1) (ppPlayListList t pll2)
 ppGame t (UnknownGame typ u1 c u2 plls sgs u3 pll2s) =
-    printf (unlines ["  type: %d", "  u1:   %d", "  c:    %d", "  u2:   %s",
-                     "  playlistlists:", "%s", "  subgames:", "%s",
-                     "  u3: %s",   "  playlistlists:","%s"])
-    typ u1 c (prettyHex u2) (indent 4 (map (ppPlayListList t) plls))
-    (concatMap (ppSubGame t) sgs) (prettyHex u3) (indent 4 (map (ppPlayListList t) pll2s))
+    printf (unlines ["  type: %d",
+                     "  u1:   %d",
+                     "  c:    %d",
+                     "  u2:   %s",
+                     "  playlistlists: (%d)", "%s",
+                     "  subgames: (%d)", "%s",
+                     "  u3: %s",
+                     "  playlistlists: (%d)","%s"])
+    typ u1 c (prettyHex u2)
+    (length plls)   (indent 4 (map (ppPlayListList t) plls))
+    (length sgs)    (concatMap (ppSubGame t) sgs)
+    (prettyHex u3)
+    (length pll2s)  (indent 4 (map (ppPlayListList t) pll2s))
 ppGame t _ = "TODO"
 
 ppSubGame :: Transscript -> SubGame -> String
@@ -500,12 +521,11 @@ ppSubGame t (SubGame u oids1 oids2 oids3 plls) = printf (unlines
     , "      oids1: %s"
     , "      oids2: %s"
     , "      oids3: %s"
-    , "      playlistlists:"
-    , "%s"
+    , "      playlistlists: (%d)" , "%s"
     ])
     (prettyHex u)
     (show oids1) (show oids2) (show oids3)
-    (indent 8 (map (ppPlayListList t) plls))
+    (length plls)  (indent 8 (map (ppPlayListList t) plls))
 
 indent n = intercalate "\n" . map (replicate n ' ' ++)
 
