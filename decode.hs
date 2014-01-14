@@ -312,14 +312,6 @@ spaces = intercalate " "
 commas = intercalate ","
 
 
-
-checkLine :: Int -> Line -> [String]
-checkLine n_audio l@(Line _ _ _ xs)
-    | any (>= fromIntegral n_audio) xs
-    = return $ "Invalid audio index in line " ++ ppLine l
-checkLine n_audio _ = []
-
-
 prettyHex :: B.ByteString -> String
 prettyHex = intercalate " " . map (printf "%02X") . B.unpack
 
