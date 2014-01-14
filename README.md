@@ -24,8 +24,8 @@ The header begins with these 8 32-bit numbers, listed with their offset:
  * `0x0000`: The offset to the *play script table*
  * `0x0004`: The offset to the *media file table*
  * `0x0008`: Unknown
- * `0x000B`: Unknown
- * `0x0010`: Unknown; related to `0x000B` (as it is sometimes equal)
+ * `0x000C`: The offset to an *aditional script table*
+ * `0x0010`: The offset to the *game table*
  * `0x0014`: Product id code (== OID code of the power on symbol on page 1)
  * `0x0018`: Unknown
  * `0x001B`: Unknown
@@ -95,6 +95,35 @@ The audio files themselves are encrypted using a simple scheme, using a magic XO
 The magic XOR value can be found by finding the number which makes the first 4 bytes of the first media file read `OggS` or `RIFF`.
 
 In `Leserabe_een.gme*`, the audio table is repeated right after itself. Why?
+
+Additional script table
+-----------------------
+
+Used only in 'Puzzle Ponyhof' and 'Reise durch die Jahreszeiten' and there FR, NL, IT Version.
+
+Its starts with a list of pointers, means an uint16 with the count 'c' followed by 'c' times an uint32 pointer value.
+The pointer itself point to a script line described earlier.
+
+In Other Files there is only the uint16 counter with value '0x0000'.
+
+Puzzle Ponyhof
+
+0x2092
+        02 00 9C 20 00 00 B1 20  00 00
+
+0x209C
+        01 00 00 06 00 FB FF 01  05 00 01 00 06 00 F0 FF 
+        01 01 00 00 00 
+
+0x20B1
+        01 00 00 06 00 F9 FF 01  05 00 01 00 06 00 F9 FF 
+        01 00 00 00 00 
+
+In 'Reise durch die Jahreszeiten' the Pointer in the Pointerlist points only to empty scriptlines.
+
+Example:
+	00 00 00 00 00 00
+
 
 The checksum
 ------------
