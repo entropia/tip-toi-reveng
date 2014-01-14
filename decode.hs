@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, RecursiveDo #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, RecursiveDo, ScopedTypeVariables, GADTs #-}
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
@@ -82,20 +82,26 @@ putArray h xs = do
     h (fromIntegral (length xs))
     sequence_ xs
 
-mapFstMapSnd :: MonadFix m => [(a -> m (), m a)] -> m ()
-mapFstMapSnd xs = const () `liftM` go xs (return [])
+data FunSplit m where
+    FunSplit :: forall m a . (a -> m ()) -> m a -> FunSplit m
+
+
+mapFstMapSnd :: forall m. MonadFix m => [FunSplit m] -> m ()
+mapFstMapSnd xs = const () `liftM` go xs (return ())
   where
+    go :: [FunSplit m] -> m b -> m b
     go [] cont = cont
-    go ((f,s):xs) cont = mdo
+    go (FunSplit f s:xs) cont = mdo
         f v
-        (v:vs) <- go xs $ do
+        (v,vs) <- go xs $ do
             vs <- cont
             v <- s
-            return (v:vs)
+            return (v,vs)
         return vs
 
 offsetsAndThen :: [SPut] -> SPut
-offsetsAndThen = mapFstMapSnd . map (\x -> (putWord32, getAddress x))
+offsetsAndThen = mapFstMapSnd . map go
+    where go x = FunSplit putWord32 (getAddress x)
 
 putOffsets :: Integral n => (n -> SPut) -> [SPut] -> SPut
 putOffsets h xs = mdo
@@ -153,8 +159,8 @@ putScriptTable scripts = mdo
     return ()
   where
     go i = case M.lookup i m of
-        Just (Just l) -> (putWord32, getAddress $ putLines l)
-        _ -> (putWord32, return 0xFFFFFFFF)
+        Just (Just l) -> FunSplit putWord32 (getAddress $ putLines l)
+        _ -> FunSplit (\_ -> putWord32 0xFFFFFFFF) (return ())
     m = M.fromList scripts
     first = fst (M.findMin m)
     last = fst (M.findMax m)
@@ -238,8 +244,8 @@ putCommand (Unknown b r v) = do
 
 putAudioTable :: Word8 -> [B.ByteString] -> SPut
 putAudioTable x as = mapFstMapSnd
-    [ (\o -> putWord32 o >> putWord32 (fromIntegral (B.length a))
-       , getAddress (putBS (decypher x a)))
+    [ FunSplit (\o -> putWord32 o >> putWord32 (fromIntegral (B.length a)))
+               (getAddress (putBS (decypher x a)))
     | a <- as ]
 
 -- Reverse Engineering Monad
