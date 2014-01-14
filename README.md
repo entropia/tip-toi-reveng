@@ -171,6 +171,8 @@ Use the tool `decode.hs` to investigate the gme files. It supports various subco
 	       lists all unknown parts of the file.
         decode play <file.gme>
                interactively play: Enter OIDs, and see what happens.
+        decode rewrite <infile.gme> <outfile.gme>
+               parses the file and serializes it again (for debugging).
 
 It is a Haskell program without dependencies and can be easily compiled on all platforms, using these steps:
 
