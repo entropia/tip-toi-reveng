@@ -45,7 +45,8 @@ data Command
 data Line = Line Offset [Conditional] [Command] [Word16]
 
 data TipToiFile = TipToiFile
-    { ttScripts :: [(Word16, Maybe [Line])]
+    { ttProductId :: Word32
+    , ttScripts :: [(Word16, Maybe [Line])]
     , ttGames :: [Game]
     , ttAudioFiles :: [B.ByteString]
     , ttAudioFilesDoubles :: Bool
@@ -389,14 +390,18 @@ getGames = do
         array getWord32le getWord32le
     forMn (init gameOffsets) getGame
 
+getProductID :: SGet Word32
+getProductID = getSegAt 0x0014 "Product id" getWord32le
+
 getTipToiFile :: SGet TipToiFile
 getTipToiFile = do
+    id <- getProductID
     scripts <- getScripts
     games <- getGames
     (at, at_doubled, xor) <- getAudios
     checksum <- getChecksum
     checksumCalc <- calcChecksum
-    return (TipToiFile scripts games at at_doubled xor checksum checksumCalc)
+    return (TipToiFile id scripts games at at_doubled xor checksum checksumCalc)
 
 parseTipToiFile :: B.ByteString -> (TipToiFile, Segments)
 parseTipToiFile = runSGet getTipToiFile
@@ -589,6 +594,7 @@ dumpInfo file = do
     (tt,_) <- parseTipToiFile <$> B.readFile file
     let st = ttScripts tt
 
+    printf "Product ID: 0x%08X\n" (ttProductId tt)
     printf "Checksum found 0x%08X, calculated 0x%08X\n" (ttChecksum tt) (ttChecksumCalc tt)
     printf "Scripts for OIDs from %d to %d; %d/%d are disabled.\n"
         (fst (head st)) (fst (last st))
