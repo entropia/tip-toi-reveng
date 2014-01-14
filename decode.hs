@@ -315,6 +315,8 @@ commas = intercalate ","
 prettyHex :: B.ByteString -> String
 prettyHex = intercalate " " . map (printf "%02X") . B.unpack
 
+-- Utilities
+
 forMn_ :: Monad m => [a] -> (Int -> a -> m b) -> m ()
 forMn_ l f = forM_ (zip l [0..]) $ \(x,n) -> f n x
 
@@ -325,6 +327,15 @@ readMaybe :: (Read a) => String -> Maybe a
 readMaybe s = case reads s of
               [(x, "")] -> Just x
               _ -> Nothing
+
+doubled :: Eq a => [a] -> Maybe [a]
+doubled xs | take l2 xs == drop l2 xs = Just (take l2 xs)
+           | otherwise                = Nothing
+  where l = length xs
+        l2 = l `div` 2
+
+
+-- Main commands
 
 dumpAudioTo :: FilePath -> FilePath -> IO ()
 dumpAudioTo directory file = do
@@ -409,13 +420,6 @@ lint file = do
 
     hyp2 :: Word16 -> Line -> Bool
     hyp2 n (Line _ _ _ mi) = all (<= n) mi
-
-
-doubled :: Eq a => [a] -> Maybe [a]
-doubled xs | take l2 xs == drop l2 xs = Just (take l2 xs)
-           | otherwise                = Nothing
-  where l = length xs
-        l2 = l `div` 2
 
 
 
@@ -525,6 +529,8 @@ forEachNumber state action = go state
                 putStrLn "Not a number, please try again"
                 go s
 
+
+-- The main function
 
 
 main' ("info": files)             = withEachFile dumpInfo files
