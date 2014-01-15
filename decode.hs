@@ -133,7 +133,7 @@ putTipToiFile tt = mdo
     putWord32 sto
     putWord32 mft
     putWord32 0
-    putWord32 0 -- Additional script table
+    putWord32 ast -- Additional script table
     putWord32 gto -- Game table offset
     putWord32 (ttProductId tt)
     putWord32 0
@@ -144,6 +144,7 @@ putTipToiFile tt = mdo
     putBS $ BC.pack "20130101"
     seek 0x200 -- Just to be safe
     sto <- getAddress $ putScriptTable (ttScripts tt)
+    ast <- getAddress $ putWord16 0x00 -- For now, no additional script table
     gto <- getAddress $ putGameTable
     mft <- getAddress $ putAudioTable (ttAudioXor tt) (ttAudioFiles tt)
     return ()
