@@ -1,0 +1,3153 @@
+Game (WWW Bauernhof.gme)
+Games (0x1703D)
+--------------------------
+	Count = 12
+
+Game Header ( 0, 0x17071)
+--------------------------
+	Type:	1
+
+0x17071 B00 000018
+	01 00 0B 00 05 00 00 00  04 00 81 05 00 00 6F 00 
+	DE 00 
+		
+	Playlistpointer (0x17697, 1)
+		Playlist (0x1769D, 5) = [ 
+			0430	"NOISE: Tuedelue",
+			0431	"Jetzt spielen wir ein Geraeuschespiel!",
+			0432	"Hoer genau zu!",
+			0433	"Wenn du weist woher das Geraeusch kommt, beruehre es im Bild!",
+			0434	"Achtung es geht los!", ]
+	Playlistpointer (0x176A9, 0)
+	Playlistpointer (0x176AB, 0)
+	Playlistpointer (0x176AD, 1)
+		Playlist (0x176B3, 2) = [ 
+			0435	"Silence",
+			0436	"Hier kommt das naechste Geraeusch!", ]
+	Playlistpointer (0x176B9, 1)
+		Playlist (0x176BF, 2) = [ 
+			0435	"Silence",
+			0437	"Hier kommt das letzte Geraeusch!", ]
+
+	Subgames:	[0x170FF,0x17183,0x17205,0x17287,0x17309,0x1738B,0x1740D,0x1748F,0x17511,0x17593,0x17615,]
+
+
+0x170C3 B00 000020
+	03 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+	Playlistpointer (0x176C5, 1)
+		Playlist (0x176CB, 3) = [ 
+			0435	"Silence",
+			0438	"Super, du hast gute Ohren.",
+			0439	"Schau dich mal auf der naechsten Seite um. Was endeckst du dort alles?", ]
+	Playlistpointer (0x176D3, 1)
+		Playlist (0x176D9, 3) = [ 
+			0435	"Silence",
+			0440	"Das ist ganz schoen schwer, oder?",
+			0441	"Hoer dir bei ENTDECKEN doch in Ruhe alles noch einmal genau an.", ]
+	Playlistpointer (0x176E1, 0)
+	Playlistpointer (0x176E3, 0)
+	Playlistpointer (0x176E5, 0)
+	Playlistpointer (0x176E7, 0)
+	Playlistpointer (0x176E9, 0)
+	Playlistpointer (0x176EB, 0)
+	Playlistpointer (0x176ED, 0)
+	Playlistpointer (0x176EF, 0)
+
+SubGame( 0, 0x170FF)
+--------------------------
+
+0x170FF B00 000020
+	00 00 00 00 00 00 01 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 2) = [ 1422, 1439,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 33) = [ 1401, 1402, 1403, 1404, 1405, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1438, 1439,  ]
+	Playlistpointer (0x176F1, 1)
+		Playlist (0x176F7, 2) = [ 
+			0435	"Silence",
+			0442	"NOISE: Traktor", ]
+	Playlistpointer (0x176FD, 1)
+		Playlist (0x17703, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x17707, 0)
+	Playlistpointer (0x17709, 1)
+		Playlist (0x1770F, 1) = [ 
+			0444	"Bitte blaettere zurueck auf die erste Seite!", ]
+	Playlistpointer (0x17713, 0)
+	Playlistpointer (0x17715, 1)
+		Playlist (0x1771B, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x1771F, 1)
+		Playlist (0x17725, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x17729, 1)
+		Playlist (0x1772F, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x17733, 1)
+		Playlist (0x17739, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 1, 0x17183)
+--------------------------
+
+0x17183 B00 000020
+	00 00 00 00 00 00 01 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1419,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 33) = [ 1401, 1402, 1403, 1404, 1405, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1438, 1439,  ]
+	Playlistpointer (0x1773D, 1)
+		Playlist (0x17743, 2) = [ 
+			0435	"Silence",
+			0446	"NOISE: Kuh (Muhen)", ]
+	Playlistpointer (0x17749, 1)
+		Playlist (0x1774F, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x17753, 0)
+	Playlistpointer (0x17755, 1)
+		Playlist (0x1775B, 1) = [ 
+			0444	"Bitte blaettere zurueck auf die erste Seite!", ]
+	Playlistpointer (0x1775F, 0)
+	Playlistpointer (0x17761, 1)
+		Playlist (0x17767, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x1776B, 1)
+		Playlist (0x17771, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x17775, 1)
+		Playlist (0x1777B, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x1777F, 1)
+		Playlist (0x17785, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 2, 0x17205)
+--------------------------
+
+0x17205 B00 000020
+	00 00 00 00 00 00 01 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1420,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 33) = [ 1401, 1402, 1403, 1404, 1405, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1438, 1439,  ]
+	Playlistpointer (0x17789, 1)
+		Playlist (0x1778F, 2) = [ 
+			0435	"Silence",
+			0447	"NOISE: Schwein (Grunzen, Quiecken)", ]
+	Playlistpointer (0x17795, 1)
+		Playlist (0x1779B, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1779F, 0)
+	Playlistpointer (0x177A1, 1)
+		Playlist (0x177A7, 1) = [ 
+			0444	"Bitte blaettere zurueck auf die erste Seite!", ]
+	Playlistpointer (0x177AB, 0)
+	Playlistpointer (0x177AD, 1)
+		Playlist (0x177B3, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x177B7, 1)
+		Playlist (0x177BD, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x177C1, 1)
+		Playlist (0x177C7, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x177CB, 1)
+		Playlist (0x177D1, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 3, 0x17287)
+--------------------------
+
+0x17287 B00 000020
+	00 00 00 00 00 00 01 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1420,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 33) = [ 1401, 1402, 1403, 1404, 1405, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1438, 1439,  ]
+	Playlistpointer (0x177D5, 1)
+		Playlist (0x177DB, 2) = [ 
+			0435	"Silence",
+			0448	"NOISE: Schaf (Maehen)", ]
+	Playlistpointer (0x177E1, 1)
+		Playlist (0x177E7, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x177EB, 0)
+	Playlistpointer (0x177ED, 1)
+		Playlist (0x177F3, 1) = [ 
+			0444	"Bitte blaettere zurueck auf die erste Seite!", ]
+	Playlistpointer (0x177F7, 0)
+	Playlistpointer (0x177F9, 1)
+		Playlist (0x177FF, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x17803, 1)
+		Playlist (0x17809, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1780D, 1)
+		Playlist (0x17813, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x17817, 1)
+		Playlist (0x1781D, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 4, 0x17309)
+--------------------------
+
+0x17309 B00 000020
+	00 00 00 00 00 00 01 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1431,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 33) = [ 1401, 1402, 1403, 1404, 1405, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1438, 1439,  ]
+	Playlistpointer (0x17821, 1)
+		Playlist (0x17827, 2) = [ 
+			0435	"Silence",
+			0449	"NOISE: Hahn (Kraehen)", ]
+	Playlistpointer (0x1782D, 1)
+		Playlist (0x17833, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x17837, 0)
+	Playlistpointer (0x17839, 1)
+		Playlist (0x1783F, 1) = [ 
+			0444	"Bitte blaettere zurueck auf die erste Seite!", ]
+	Playlistpointer (0x17843, 0)
+	Playlistpointer (0x17845, 1)
+		Playlist (0x1784B, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x1784F, 1)
+		Playlist (0x17855, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x17859, 1)
+		Playlist (0x1785F, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x17863, 1)
+		Playlist (0x17869, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 5, 0x1738B)
+--------------------------
+
+0x1738B B00 000020
+	00 00 00 00 00 00 01 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1428,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 33) = [ 1401, 1402, 1403, 1404, 1405, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1438, 1439,  ]
+	Playlistpointer (0x1786D, 1)
+		Playlist (0x17873, 2) = [ 
+			0435	"Silence",
+			0450	"NOISE: Schnarchen", ]
+	Playlistpointer (0x17879, 1)
+		Playlist (0x1787F, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x17883, 0)
+	Playlistpointer (0x17885, 1)
+		Playlist (0x1788B, 1) = [ 
+			0444	"Bitte blaettere zurueck auf die erste Seite!", ]
+	Playlistpointer (0x1788F, 0)
+	Playlistpointer (0x17891, 1)
+		Playlist (0x17897, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x1789B, 1)
+		Playlist (0x178A1, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x178A5, 1)
+		Playlist (0x178AB, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x178AF, 1)
+		Playlist (0x178B5, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 6, 0x1740D)
+--------------------------
+
+0x1740D B00 000020
+	00 00 00 00 00 00 01 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1424,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 33) = [ 1401, 1402, 1403, 1404, 1405, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1438, 1439,  ]
+	Playlistpointer (0x178B9, 1)
+		Playlist (0x178BF, 2) = [ 
+			0435	"Silence",
+			0451	"NOISE: Morsen", ]
+	Playlistpointer (0x178C5, 1)
+		Playlist (0x178CB, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x178CF, 0)
+	Playlistpointer (0x178D1, 1)
+		Playlist (0x178D7, 1) = [ 
+			0444	"Bitte blaettere zurueck auf die erste Seite!", ]
+	Playlistpointer (0x178DB, 0)
+	Playlistpointer (0x178DD, 1)
+		Playlist (0x178E3, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x178E7, 1)
+		Playlist (0x178ED, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x178F1, 1)
+		Playlist (0x178F7, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x178FB, 1)
+		Playlist (0x17901, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 7, 0x1748F)
+--------------------------
+
+0x1748F B00 000020
+	00 00 00 00 00 00 01 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1429,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 33) = [ 1401, 1402, 1403, 1404, 1405, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1438, 1439,  ]
+	Playlistpointer (0x17905, 1)
+		Playlist (0x1790B, 2) = [ 
+			0435	"Silence",
+			0452	"NOISE: Katze (Miauen)", ]
+	Playlistpointer (0x17911, 1)
+		Playlist (0x17917, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1791B, 0)
+	Playlistpointer (0x1791D, 1)
+		Playlist (0x17923, 1) = [ 
+			0444	"Bitte blaettere zurueck auf die erste Seite!", ]
+	Playlistpointer (0x17927, 0)
+	Playlistpointer (0x17929, 1)
+		Playlist (0x1792F, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x17933, 1)
+		Playlist (0x17939, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1793D, 1)
+		Playlist (0x17943, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x17947, 1)
+		Playlist (0x1794D, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 8, 0x17511)
+--------------------------
+
+0x17511 B00 000020
+	00 00 00 00 00 00 01 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1417,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 33) = [ 1401, 1402, 1403, 1404, 1405, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1438, 1439,  ]
+	Playlistpointer (0x17951, 1)
+		Playlist (0x17957, 2) = [ 
+			0435	"Silence",
+			0453	"NOISE: Fliessen", ]
+	Playlistpointer (0x1795D, 1)
+		Playlist (0x17963, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x17967, 0)
+	Playlistpointer (0x17969, 1)
+		Playlist (0x1796F, 1) = [ 
+			0444	"Bitte blaettere zurueck auf die erste Seite!", ]
+	Playlistpointer (0x17973, 0)
+	Playlistpointer (0x17975, 1)
+		Playlist (0x1797B, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x1797F, 1)
+		Playlist (0x17985, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x17989, 1)
+		Playlist (0x1798F, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x17993, 1)
+		Playlist (0x17999, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 9, 0x17593)
+--------------------------
+
+0x17593 B00 000020
+	00 00 00 00 00 00 01 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1436,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 33) = [ 1401, 1402, 1403, 1404, 1405, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1438, 1439,  ]
+	Playlistpointer (0x1799D, 1)
+		Playlist (0x179A3, 2) = [ 
+			0435	"Silence",
+			0454	"NOISE: Kuckkuck", ]
+	Playlistpointer (0x179A9, 1)
+		Playlist (0x179AF, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x179B3, 0)
+	Playlistpointer (0x179B5, 1)
+		Playlist (0x179BB, 1) = [ 
+			0444	"Bitte blaettere zurueck auf die erste Seite!", ]
+	Playlistpointer (0x179BF, 0)
+	Playlistpointer (0x179C1, 1)
+		Playlist (0x179C7, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x179CB, 1)
+		Playlist (0x179D1, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x179D5, 1)
+		Playlist (0x179DB, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x179DF, 1)
+		Playlist (0x179E5, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame(10, 0x17615)
+--------------------------
+
+0x17615 B00 000020
+	00 00 00 00 00 00 01 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1413,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 33) = [ 1401, 1402, 1403, 1404, 1405, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1438, 1439,  ]
+	Playlistpointer (0x179E9, 1)
+		Playlist (0x179EF, 2) = [ 
+			0435	"Silence",
+			0455	"NOISE: Storch (Klappern)", ]
+	Playlistpointer (0x179F5, 1)
+		Playlist (0x179FB, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x179FF, 0)
+	Playlistpointer (0x17A01, 1)
+		Playlist (0x17A07, 1) = [ 
+			0444	"Bitte blaettere zurueck auf die erste Seite!", ]
+	Playlistpointer (0x17A0B, 0)
+	Playlistpointer (0x17A0D, 1)
+		Playlist (0x17A13, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x17A17, 1)
+		Playlist (0x17A1D, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x17A21, 1)
+		Playlist (0x17A27, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x17A2B, 1)
+		Playlist (0x17A31, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+
+Game Header ( 1, 0x17A35)
+--------------------------
+	Type:	2
+
+0x17A35 B00 000018
+	02 00 05 00 05 00 00 00  00 00 A9 05 00 00 6F 00 
+	DE 00 
+		
+	Playlistpointer (0x17D17, 1)
+		Playlist (0x17D1D, 3) = [ 
+			0430	"NOISE: Tuedelue",
+			0456	""Wir spielen ""Ich sehe was, was du nicht siehts"". Versuche herauszufinden welches Objekt gesucht ist. Nach jedem falschen Treffer bekommst du einen weiteren Hinweis."",
+			0457	"Es geht los.", ]
+	Playlistpointer (0x17D25, 0)
+	Playlistpointer (0x17D27, 1)
+		Playlist (0x17D2D, 3) = [ 
+			0435	"Silence",
+			0458	"Willst du noch einmal spielen?",
+			0459	"Dann gehe auf SPIELEN.", ]
+	Playlistpointer (0x17D35, 0)
+	Playlistpointer (0x17D37, 0)
+
+	Subgames:	[0x17AAB,0x17B27,0x17BA3,0x17C1F,0x17C9B,]
+
+
+0x17A6F B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+	Playlistpointer (0x17D39, 0)
+	Playlistpointer (0x17D3B, 0)
+	Playlistpointer (0x17D3D, 0)
+	Playlistpointer (0x17D3F, 0)
+	Playlistpointer (0x17D41, 0)
+	Playlistpointer (0x17D43, 0)
+	Playlistpointer (0x17D45, 0)
+	Playlistpointer (0x17D47, 0)
+	Playlistpointer (0x17D49, 0)
+	Playlistpointer (0x17D4B, 0)
+
+SubGame( 0, 0x17AAB)
+--------------------------
+
+0x17AAB B00 000020
+	00 00 00 00 00 00 00 00  04 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1471,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 30) = [ 1441, 1442, 1443, 1444, 1445, 1449, 1450, 1451, 1452, 1453, 1454, 1455, 1456, 1457, 1458, 1459, 1460, 1461, 1462, 1463, 1464, 1465, 1466, 1467, 1468, 1469, 1470, 1471, 1472, 1446,  ]
+	Playlistpointer (0x17D4D, 1)
+		Playlist (0x17D53, 3) = [ 
+			0435	"Silence",
+			0460	"Ich sehe was, was du nichts siehst ?",
+			0461	"und das ist rosa.", ]
+	Playlistpointer (0x17D5B, 1)
+		Playlist (0x17D61, 2) = [ 
+			0443	"NOISE: Pling",
+			0462	"Es ist das Euter.", ]
+	Playlistpointer (0x17D67, 0)
+	Playlistpointer (0x17D69, 1)
+		Playlist (0x17D6F, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0464	"Woher kommt die Milch?", ]
+	Playlistpointer (0x17D75, 0)
+	Playlistpointer (0x17D77, 3)
+		Playlist (0x17D85, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0465	"Es ist weich.", ]
+		Playlist (0x17D8D, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0466	"Es gehoert einem Tier.", ]
+		Playlist (0x17D95, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0467	"Es kommt Milch heraus.", ]
+	Playlistpointer (0x17D9D, 1)
+		Playlist (0x17DA3, 2) = [ 
+			0443	"NOISE: Pling",
+			0462	"Es ist das Euter.", ]
+	Playlistpointer (0x17DA9, 1)
+		Playlist (0x17DAF, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0462	"Es ist das Euter.", ]
+	Playlistpointer (0x17DB7, 1)
+		Playlist (0x17DBD, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 1, 0x17B27)
+--------------------------
+
+0x17B27 B00 000020
+	00 00 00 00 00 00 00 00  04 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1468,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 30) = [ 1441, 1442, 1443, 1444, 1445, 1449, 1450, 1451, 1452, 1453, 1454, 1455, 1456, 1457, 1458, 1459, 1460, 1461, 1462, 1463, 1464, 1465, 1466, 1467, 1468, 1469, 1470, 1471, 1472, 1446,  ]
+	Playlistpointer (0x17DC1, 1)
+		Playlist (0x17DC7, 3) = [ 
+			0435	"Silence",
+			0460	"Ich sehe was, was du nichts siehst ?",
+			0468	"und das ist blau.", ]
+	Playlistpointer (0x17DCF, 1)
+		Playlist (0x17DD5, 2) = [ 
+			0443	"NOISE: Pling",
+			0469	"Das ist Moritzs T-Shirt.", ]
+	Playlistpointer (0x17DDB, 0)
+	Playlistpointer (0x17DDD, 1)
+		Playlist (0x17DE3, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0464	"Woher kommt die Milch?", ]
+	Playlistpointer (0x17DE9, 0)
+	Playlistpointer (0x17DEB, 3)
+		Playlist (0x17DF9, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0470	"Das ist weich.", ]
+		Playlist (0x17E01, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0471	"Das hat vier Loecher.", ]
+		Playlist (0x17E09, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0472	"Das gehoert Moritz.", ]
+	Playlistpointer (0x17E11, 1)
+		Playlist (0x17E17, 2) = [ 
+			0443	"NOISE: Pling",
+			0469	"Das ist Moritzs T-Shirt.", ]
+	Playlistpointer (0x17E1D, 1)
+		Playlist (0x17E23, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0469	"Das ist Moritzs T-Shirt.", ]
+	Playlistpointer (0x17E2B, 1)
+		Playlist (0x17E31, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 2, 0x17BA3)
+--------------------------
+
+0x17BA3 B00 000020
+	00 00 00 00 00 00 00 00  04 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1469,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 30) = [ 1441, 1442, 1443, 1444, 1445, 1449, 1450, 1451, 1452, 1453, 1454, 1455, 1456, 1457, 1458, 1459, 1460, 1461, 1462, 1463, 1464, 1465, 1466, 1467, 1468, 1469, 1470, 1471, 1472, 1446,  ]
+	Playlistpointer (0x17E35, 1)
+		Playlist (0x17E3B, 3) = [ 
+			0435	"Silence",
+			0460	"Ich sehe was, was du nichts siehst ?",
+			0473	"und das ist gruen.", ]
+	Playlistpointer (0x17E43, 1)
+		Playlist (0x17E49, 2) = [ 
+			0443	"NOISE: Pling",
+			0474	"Das sind die Gummistiefel von Maries Papa.", ]
+	Playlistpointer (0x17E4F, 0)
+	Playlistpointer (0x17E51, 1)
+		Playlist (0x17E57, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0464	"Woher kommt die Milch?", ]
+	Playlistpointer (0x17E5D, 0)
+	Playlistpointer (0x17E5F, 3)
+		Playlist (0x17E6D, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0475	"Das ist wasserdicht.", ]
+		Playlist (0x17E75, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0476	"Das ist aus Gummi.", ]
+		Playlist (0x17E7D, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0477	"Das gehoert Maries Papa.", ]
+	Playlistpointer (0x17E85, 1)
+		Playlist (0x17E8B, 2) = [ 
+			0443	"NOISE: Pling",
+			0474	"Das sind die Gummistiefel von Maries Papa.", ]
+	Playlistpointer (0x17E91, 1)
+		Playlist (0x17E97, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0474	"Das sind die Gummistiefel von Maries Papa.", ]
+	Playlistpointer (0x17E9F, 1)
+		Playlist (0x17EA5, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 3, 0x17C1F)
+--------------------------
+
+0x17C1F B00 000020
+	00 00 00 00 00 00 00 00  04 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1470,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 30) = [ 1441, 1442, 1443, 1444, 1445, 1449, 1450, 1451, 1452, 1453, 1454, 1455, 1456, 1457, 1458, 1459, 1460, 1461, 1462, 1463, 1464, 1465, 1466, 1467, 1468, 1469, 1470, 1471, 1472, 1446,  ]
+	Playlistpointer (0x17EA9, 1)
+		Playlist (0x17EAF, 3) = [ 
+			0435	"Silence",
+			0460	"Ich sehe was, was du nichts siehst ?",
+			0478	"und das ist braun.", ]
+	Playlistpointer (0x17EB7, 1)
+		Playlist (0x17EBD, 2) = [ 
+			0443	"NOISE: Pling",
+			0479	"Das ist die Fellbuerste.", ]
+	Playlistpointer (0x17EC3, 0)
+	Playlistpointer (0x17EC5, 1)
+		Playlist (0x17ECB, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0464	"Woher kommt die Milch?", ]
+	Playlistpointer (0x17ED1, 0)
+	Playlistpointer (0x17ED3, 3)
+		Playlist (0x17EE1, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0480	"Das wird fuer die Kuehe benutzt.", ]
+		Playlist (0x17EE9, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0481	"Das ist kratzig.", ]
+		Playlist (0x17EF1, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0482	"Das benutzen die Bauern und Karl.", ]
+	Playlistpointer (0x17EF9, 1)
+		Playlist (0x17EFF, 2) = [ 
+			0443	"NOISE: Pling",
+			0479	"Das ist die Fellbuerste.", ]
+	Playlistpointer (0x17F05, 1)
+		Playlist (0x17F0B, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0479	"Das ist die Fellbuerste.", ]
+	Playlistpointer (0x17F13, 1)
+		Playlist (0x17F19, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 4, 0x17C9B)
+--------------------------
+
+0x17C9B B00 000020
+	00 00 00 00 00 00 00 00  04 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1464,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 30) = [ 1441, 1442, 1443, 1444, 1445, 1449, 1450, 1451, 1452, 1453, 1454, 1455, 1456, 1457, 1458, 1459, 1460, 1461, 1462, 1463, 1464, 1465, 1466, 1467, 1468, 1469, 1470, 1471, 1472, 1446,  ]
+	Playlistpointer (0x17F1D, 1)
+		Playlist (0x17F23, 3) = [ 
+			0435	"Silence",
+			0460	"Ich sehe was, was du nichts siehst ?",
+			0483	"und das ist silber.", ]
+	Playlistpointer (0x17F2B, 1)
+		Playlist (0x17F31, 2) = [ 
+			0443	"NOISE: Pling",
+			0484	"Das ist der Milchtank.", ]
+	Playlistpointer (0x17F37, 0)
+	Playlistpointer (0x17F39, 1)
+		Playlist (0x17F3F, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0464	"Woher kommt die Milch?", ]
+	Playlistpointer (0x17F45, 0)
+	Playlistpointer (0x17F47, 3)
+		Playlist (0x17F55, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0485	"Das ist gross.", ]
+		Playlist (0x17F5D, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0486	"Das ist aus Metall.", ]
+		Playlist (0x17F65, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0487	"Dort wird die Milch gesammelt.", ]
+	Playlistpointer (0x17F6D, 1)
+		Playlist (0x17F73, 2) = [ 
+			0443	"NOISE: Pling",
+			0484	"Das ist der Milchtank.", ]
+	Playlistpointer (0x17F79, 1)
+		Playlist (0x17F7F, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0484	"Das ist der Milchtank.", ]
+	Playlistpointer (0x17F87, 1)
+		Playlist (0x17F8D, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+
+Game Header ( 2, 0x17F91)
+--------------------------
+	Type:	3
+
+0x17F91 B00 000018
+	03 00 03 00 03 00 01 00  03 00 D1 05 00 00 6F 00 
+	DE 00 
+		
+	Playlistpointer (0x18185, 1)
+		Playlist (0x1818B, 2) = [ 
+			0430	"NOISE: Tuedelue",
+			0488	"Die Tierkinder spielen Verstecken.", ]
+	Playlistpointer (0x18191, 0)
+	Playlistpointer (0x18193, 1)
+		Playlist (0x18199, 3) = [ 
+			0489	"Klasse!",
+			0490	"Du hast alle Tierkinder gefunden.",
+			0491	"Hoer doch mal was es auf der naechsten Seite alles gibt.", ]
+	Playlistpointer (0x181A1, 1)
+		Playlist (0x181A7, 1) = [ 
+			0492	"Und jetzt", ]
+	Playlistpointer (0x181AB, 0)
+
+	Subgames:	[0x17FFF,0x18081,0x18103,]
+
+
+0x17FC3 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+	Playlistpointer (0x181AD, 0)
+	Playlistpointer (0x181AF, 0)
+	Playlistpointer (0x181B1, 0)
+	Playlistpointer (0x181B3, 0)
+	Playlistpointer (0x181B5, 0)
+	Playlistpointer (0x181B7, 0)
+	Playlistpointer (0x181B9, 0)
+	Playlistpointer (0x181BB, 0)
+	Playlistpointer (0x181BD, 0)
+	Playlistpointer (0x181BF, 0)
+
+SubGame( 0, 0x17FFF)
+--------------------------
+
+0x17FFF B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 4) = [ 1499, 1500, 1501, 1502,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 30) = [ 1481, 1482, 1483, 1484, 1485, 1489, 1490, 1491, 1492, 1493, 1494, 1495, 1496, 1497, 1498, 1499, 1500, 1501, 1502, 1503, 1504, 1505, 1506, 1507, 1508, 1509, 1510, 1511, 1512, 1513,  ]
+	Playlistpointer (0x181C1, 1)
+		Playlist (0x181C7, 4) = [ 
+			0435	"Silence",
+			0493	"suche die vier Ferkel",
+			0494	"Tippe sie nacheinander an!",
+			0495	"Findest du sie?", ]
+	Playlistpointer (0x181D1, 1)
+		Playlist (0x181D7, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x181DB, 0)
+	Playlistpointer (0x181DD, 1)
+		Playlist (0x181E3, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0496	"Was machen die Tierkinder?", ]
+	Playlistpointer (0x181E9, 1)
+		Playlist (0x181EF, 1) = [ 
+			0497	"Das hattest du schon gefunden.", ]
+	Playlistpointer (0x181F3, 1)
+		Playlist (0x181F9, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0498	"Das war nicht richtig. Probier es noch einmal.", ]
+	Playlistpointer (0x18201, 1)
+		Playlist (0x18207, 3) = [ 
+			0443	"NOISE: Pling",
+			0499	"Super, du hast alle vier gefunden.",
+			0435	"Silence", ]
+	Playlistpointer (0x1820F, 0)
+	Playlistpointer (0x18211, 1)
+		Playlist (0x18217, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 1, 0x18081)
+--------------------------
+
+0x18081 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 4) = [ 1493, 1494, 1495, 1496,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 30) = [ 1481, 1482, 1483, 1484, 1485, 1489, 1490, 1491, 1492, 1493, 1494, 1495, 1496, 1497, 1498, 1499, 1500, 1501, 1502, 1503, 1504, 1505, 1506, 1507, 1508, 1509, 1510, 1511, 1512, 1513,  ]
+	Playlistpointer (0x1821B, 1)
+		Playlist (0x18221, 3) = [ 
+			0435	"Silence",
+			0500	"Wo haben sich die vier Laemmer versteckt?",
+			0494	"Tippe sie nacheinander an!", ]
+	Playlistpointer (0x18229, 1)
+		Playlist (0x1822F, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18233, 0)
+	Playlistpointer (0x18235, 1)
+		Playlist (0x1823B, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0496	"Was machen die Tierkinder?", ]
+	Playlistpointer (0x18241, 1)
+		Playlist (0x18247, 1) = [ 
+			0497	"Das hattest du schon gefunden.", ]
+	Playlistpointer (0x1824B, 1)
+		Playlist (0x18251, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0498	"Das war nicht richtig. Probier es noch einmal.", ]
+	Playlistpointer (0x18259, 1)
+		Playlist (0x1825F, 3) = [ 
+			0443	"NOISE: Pling",
+			0499	"Super, du hast alle vier gefunden.",
+			0435	"Silence", ]
+	Playlistpointer (0x18267, 0)
+	Playlistpointer (0x18269, 1)
+		Playlist (0x1826F, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 2, 0x18103)
+--------------------------
+
+0x18103 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 4) = [ 1504, 1505, 1506, 1510,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 30) = [ 1481, 1482, 1483, 1484, 1485, 1489, 1490, 1491, 1492, 1493, 1494, 1495, 1496, 1497, 1498, 1499, 1500, 1501, 1502, 1503, 1504, 1505, 1506, 1507, 1508, 1509, 1510, 1511, 1512, 1513,  ]
+	Playlistpointer (0x18273, 1)
+		Playlist (0x18279, 4) = [ 
+			0435	"Silence",
+			0501	"Wo sind bloss die vier Zicklein?",
+			0494	"Tippe sie nacheinander an!",
+			0495	"Findest du sie?", ]
+	Playlistpointer (0x18283, 1)
+		Playlist (0x18289, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1828D, 0)
+	Playlistpointer (0x1828F, 1)
+		Playlist (0x18295, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0496	"Was machen die Tierkinder?", ]
+	Playlistpointer (0x1829B, 1)
+		Playlist (0x182A1, 1) = [ 
+			0497	"Das hattest du schon gefunden.", ]
+	Playlistpointer (0x182A5, 1)
+		Playlist (0x182AB, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0498	"Das war nicht richtig. Probier es noch einmal.", ]
+	Playlistpointer (0x182B3, 1)
+		Playlist (0x182B9, 3) = [ 
+			0443	"NOISE: Pling",
+			0499	"Super, du hast alle vier gefunden.",
+			0435	"Silence", ]
+	Playlistpointer (0x182C1, 0)
+	Playlistpointer (0x182C3, 1)
+		Playlist (0x182C9, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+
+Game Header ( 3, 0x182CD)
+--------------------------
+	Type:	4
+
+0x182CD B00 000018
+	04 00 09 00 06 00 00 00  00 00 F9 05 00 00 6F 00 
+	DE 00 
+		
+	Playlistpointer (0x1875F, 1)
+		Playlist (0x18765, 5) = [ 
+			0430	"NOISE: Tuedelue",
+			0502	"Du hoerst jetzt nacheinander verschiedene Woerter. Tippe die dazugehoerigen Bilder in der Reihenfolge an in der du die Woerter hoerst.",
+			0435	"Silence",
+			0503	"Hier kommt das erste Wort.",
+			0435	"Silence", ]
+	Playlistpointer (0x18771, 6)
+		Playlist (0x1878B, 2) = [ 
+			0504	"Jetzt hoerst du zwei",
+			0505	"Woerter hintereinander.", ]
+		Playlist (0x18791, 3) = [ 
+			0506	"Jetzt hoerst du drei",
+			0505	"Woerter hintereinander.",
+			0435	"Silence", ]
+		Playlist (0x18799, 3) = [ 
+			0507	"Jetzt hoerst du vier",
+			0505	"Woerter hintereinander.",
+			0435	"Silence", ]
+		Playlist (0x187A1, 3) = [ 
+			0508	"Jetzt hoerst du fuenf",
+			0505	"Woerter hintereinander.",
+			0435	"Silence", ]
+		Playlist (0x187A9, 3) = [ 
+			0509	"Jetzt hoerst du sechs",
+			0505	"Woerter hintereinander.",
+			0435	"Silence", ]
+		Playlist (0x187B1, 2) = [ 
+			0510	"Super gemacht.",
+			0511	"Was gibt es auf der naechsten Seite alles zu entdecken. Probier es aus!", ]
+	Playlistpointer (0x187B7, 0)
+	Playlistpointer (0x187B9, 0)
+	Playlistpointer (0x187BB, 0)
+
+	Subgames:	[0x18353,0x183CF,0x18441,0x184B3,0x18525,0x18597,0x18609,0x1867B,0x186ED,]
+
+
+0x18317 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+	Playlistpointer (0x187BD, 0)
+	Playlistpointer (0x187BF, 0)
+	Playlistpointer (0x187C1, 0)
+	Playlistpointer (0x187C3, 0)
+	Playlistpointer (0x187C5, 0)
+	Playlistpointer (0x187C7, 0)
+	Playlistpointer (0x187C9, 0)
+	Playlistpointer (0x187CB, 0)
+	Playlistpointer (0x187CD, 0)
+	Playlistpointer (0x187CF, 0)
+
+SubGame( 0, 0x18353)
+--------------------------
+
+0x18353 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 6) = [ 1532, 1539, 1540, 1541, 1542, 1543,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 25) = [ 1521, 1522, 1523, 1524, 1525, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548,  ]
+	Playlistpointer (0x187D1, 1)
+		Playlist (0x187D7, 1) = [ 
+			0512	"Henne", ]
+	Playlistpointer (0x187DB, 1)
+		Playlist (0x187E1, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x187E5, 0)
+	Playlistpointer (0x187E7, 1)
+		Playlist (0x187ED, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0513	"Wer gackert denn da?", ]
+	Playlistpointer (0x187F3, 0)
+	Playlistpointer (0x187F5, 1)
+		Playlist (0x187FB, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x18803, 1)
+		Playlist (0x18809, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1880D, 0)
+	Playlistpointer (0x1880F, 1)
+		Playlist (0x18815, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 1, 0x183CF)
+--------------------------
+
+0x183CF B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1533,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 25) = [ 1521, 1522, 1523, 1524, 1525, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548,  ]
+	Playlistpointer (0x18819, 1)
+		Playlist (0x1881F, 1) = [ 
+			0515	"Hahn", ]
+	Playlistpointer (0x18823, 1)
+		Playlist (0x18829, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1882D, 0)
+	Playlistpointer (0x1882F, 1)
+		Playlist (0x18835, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0513	"Wer gackert denn da?", ]
+	Playlistpointer (0x1883B, 0)
+	Playlistpointer (0x1883D, 1)
+		Playlist (0x18843, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x1884B, 1)
+		Playlist (0x18851, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18855, 0)
+	Playlistpointer (0x18857, 1)
+		Playlist (0x1885D, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 2, 0x18441)
+--------------------------
+
+0x18441 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1536,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 25) = [ 1521, 1522, 1523, 1524, 1525, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548,  ]
+	Playlistpointer (0x18861, 1)
+		Playlist (0x18867, 1) = [ 
+			0516	"Baeuerin", ]
+	Playlistpointer (0x1886B, 1)
+		Playlist (0x18871, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18875, 0)
+	Playlistpointer (0x18877, 1)
+		Playlist (0x1887D, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0513	"Wer gackert denn da?", ]
+	Playlistpointer (0x18883, 0)
+	Playlistpointer (0x18885, 1)
+		Playlist (0x1888B, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x18893, 1)
+		Playlist (0x18899, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1889D, 0)
+	Playlistpointer (0x1889F, 1)
+		Playlist (0x188A5, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 3, 0x184B3)
+--------------------------
+
+0x184B3 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1534,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 25) = [ 1521, 1522, 1523, 1524, 1525, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548,  ]
+	Playlistpointer (0x188A9, 1)
+		Playlist (0x188AF, 1) = [ 
+			0517	"Kuecken", ]
+	Playlistpointer (0x188B3, 1)
+		Playlist (0x188B9, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x188BD, 0)
+	Playlistpointer (0x188BF, 1)
+		Playlist (0x188C5, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0513	"Wer gackert denn da?", ]
+	Playlistpointer (0x188CB, 0)
+	Playlistpointer (0x188CD, 1)
+		Playlist (0x188D3, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x188DB, 1)
+		Playlist (0x188E1, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x188E5, 0)
+	Playlistpointer (0x188E7, 1)
+		Playlist (0x188ED, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 4, 0x18525)
+--------------------------
+
+0x18525 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1548,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 25) = [ 1521, 1522, 1523, 1524, 1525, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548,  ]
+	Playlistpointer (0x188F1, 1)
+		Playlist (0x188F7, 1) = [ 
+			0518	"Ei", ]
+	Playlistpointer (0x188FB, 1)
+		Playlist (0x18901, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18905, 0)
+	Playlistpointer (0x18907, 1)
+		Playlist (0x1890D, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0513	"Wer gackert denn da?", ]
+	Playlistpointer (0x18913, 0)
+	Playlistpointer (0x18915, 1)
+		Playlist (0x1891B, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x18923, 1)
+		Playlist (0x18929, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1892D, 0)
+	Playlistpointer (0x1892F, 1)
+		Playlist (0x18935, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 5, 0x18597)
+--------------------------
+
+0x18597 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1547,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 25) = [ 1521, 1522, 1523, 1524, 1525, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548,  ]
+	Playlistpointer (0x18939, 1)
+		Playlist (0x1893F, 1) = [ 
+			0519	"Spatz", ]
+	Playlistpointer (0x18943, 1)
+		Playlist (0x18949, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1894D, 0)
+	Playlistpointer (0x1894F, 1)
+		Playlist (0x18955, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0513	"Wer gackert denn da?", ]
+	Playlistpointer (0x1895B, 0)
+	Playlistpointer (0x1895D, 1)
+		Playlist (0x18963, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x1896B, 1)
+		Playlist (0x18971, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18975, 0)
+	Playlistpointer (0x18977, 1)
+		Playlist (0x1897D, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 6, 0x18609)
+--------------------------
+
+0x18609 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1535,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 25) = [ 1521, 1522, 1523, 1524, 1525, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548,  ]
+	Playlistpointer (0x18981, 1)
+		Playlist (0x18987, 1) = [ 
+			0520	"Huehnertraenke", ]
+	Playlistpointer (0x1898B, 1)
+		Playlist (0x18991, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18995, 0)
+	Playlistpointer (0x18997, 1)
+		Playlist (0x1899D, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0513	"Wer gackert denn da?", ]
+	Playlistpointer (0x189A3, 0)
+	Playlistpointer (0x189A5, 1)
+		Playlist (0x189AB, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x189B3, 1)
+		Playlist (0x189B9, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x189BD, 0)
+	Playlistpointer (0x189BF, 1)
+		Playlist (0x189C5, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 7, 0x1867B)
+--------------------------
+
+0x1867B B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1537,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 25) = [ 1521, 1522, 1523, 1524, 1525, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548,  ]
+	Playlistpointer (0x189C9, 1)
+		Playlist (0x189CF, 1) = [ 
+			0521	"Paul", ]
+	Playlistpointer (0x189D3, 1)
+		Playlist (0x189D9, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x189DD, 0)
+	Playlistpointer (0x189DF, 1)
+		Playlist (0x189E5, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0513	"Wer gackert denn da?", ]
+	Playlistpointer (0x189EB, 0)
+	Playlistpointer (0x189ED, 1)
+		Playlist (0x189F3, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x189FB, 1)
+		Playlist (0x18A01, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18A05, 0)
+	Playlistpointer (0x18A07, 1)
+		Playlist (0x18A0D, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 8, 0x186ED)
+--------------------------
+
+0x186ED B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1538,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 25) = [ 1521, 1522, 1523, 1524, 1525, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548,  ]
+	Playlistpointer (0x18A11, 1)
+		Playlist (0x18A17, 1) = [ 
+			0522	"Marie", ]
+	Playlistpointer (0x18A1B, 1)
+		Playlist (0x18A21, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18A25, 0)
+	Playlistpointer (0x18A27, 1)
+		Playlist (0x18A2D, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0513	"Wer gackert denn da?", ]
+	Playlistpointer (0x18A33, 0)
+	Playlistpointer (0x18A35, 1)
+		Playlist (0x18A3B, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x18A43, 1)
+		Playlist (0x18A49, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18A4D, 0)
+	Playlistpointer (0x18A4F, 1)
+		Playlist (0x18A55, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+
+Game Header ( 4, 0x18A59)
+--------------------------
+	Type:	5
+
+0x18A59 B00 000018
+	05 00 05 00 05 00 00 00  04 00 21 06 00 00 6F 00 
+	DE 00 
+		
+	Playlistpointer (0x18D0B, 1)
+		Playlist (0x18D11, 2) = [ 
+			0430	"NOISE: Tuedelue",
+			0523	"Kennst du alle Getreidearten? Welche ist gemeint? Tippe sie an!", ]
+	Playlistpointer (0x18D17, 0)
+	Playlistpointer (0x18D19, 0)
+	Playlistpointer (0x18D1B, 1)
+		Playlist (0x18D21, 2) = [ 
+			0435	"Silence",
+			0524	"Hier kommt die naechste Getreideart.", ]
+	Playlistpointer (0x18D27, 1)
+		Playlist (0x18D2D, 2) = [ 
+			0435	"Silence",
+			0525	"Hier kommt die letzte Getreideart.", ]
+
+	Subgames:	[0x18ACF,0x18B41,0x18BB3,0x18C25,0x18C99,]
+
+
+0x18A93 B00 000020
+	03 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+	Playlistpointer (0x18D33, 1)
+		Playlist (0x18D39, 4) = [ 
+			0435	"Silence",
+			0489	"Klasse!",
+			0526	"Du kennst dich perfekt mit den Getreidearten aus.",
+			0491	"Hoer doch mal was es auf der naechsten Seite alles gibt.", ]
+	Playlistpointer (0x18D43, 1)
+		Playlist (0x18D49, 3) = [ 
+			0435	"Silence",
+			0527	"Das war ziemlich schwer.",
+			0528	"Hoer doch noch einmal bei WISSEN nach.", ]
+	Playlistpointer (0x18D51, 0)
+	Playlistpointer (0x18D53, 0)
+	Playlistpointer (0x18D55, 0)
+	Playlistpointer (0x18D57, 0)
+	Playlistpointer (0x18D59, 0)
+	Playlistpointer (0x18D5B, 0)
+	Playlistpointer (0x18D5D, 0)
+	Playlistpointer (0x18D5F, 0)
+
+SubGame( 0, 0x18ACF)
+--------------------------
+
+0x18ACF B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1582,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 25) = [ 1561, 1562, 1563, 1564, 1565, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1579, 1580, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588,  ]
+	Playlistpointer (0x18D61, 1)
+		Playlist (0x18D67, 2) = [ 
+			0435	"Silence",
+			0529	"Der Hafer hat einzelne Koerner. Wo siehst du Hafer?", ]
+	Playlistpointer (0x18D6D, 1)
+		Playlist (0x18D73, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18D77, 0)
+	Playlistpointer (0x18D79, 1)
+		Playlist (0x18D7F, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0530	"Was waechst auf den Feldern?", ]
+	Playlistpointer (0x18D85, 0)
+	Playlistpointer (0x18D87, 1)
+		Playlist (0x18D8D, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x18D91, 1)
+		Playlist (0x18D97, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18D9B, 1)
+		Playlist (0x18DA1, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x18DA5, 1)
+		Playlist (0x18DAB, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 1, 0x18B41)
+--------------------------
+
+0x18B41 B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1583,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 25) = [ 1561, 1562, 1563, 1564, 1565, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1579, 1580, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588,  ]
+	Playlistpointer (0x18DAF, 1)
+		Playlist (0x18DB5, 2) = [ 
+			0435	"Silence",
+			0531	"Die Gerste hat Aehren und lange Grannen. Welches der vier Bilder zeigt die Gerste?", ]
+	Playlistpointer (0x18DBB, 1)
+		Playlist (0x18DC1, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18DC5, 0)
+	Playlistpointer (0x18DC7, 1)
+		Playlist (0x18DCD, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0530	"Was waechst auf den Feldern?", ]
+	Playlistpointer (0x18DD3, 0)
+	Playlistpointer (0x18DD5, 1)
+		Playlist (0x18DDB, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x18DDF, 1)
+		Playlist (0x18DE5, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18DE9, 1)
+		Playlist (0x18DEF, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x18DF3, 1)
+		Playlist (0x18DF9, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 2, 0x18BB3)
+--------------------------
+
+0x18BB3 B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1584,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 25) = [ 1561, 1562, 1563, 1564, 1565, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1579, 1580, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588,  ]
+	Playlistpointer (0x18DFD, 1)
+		Playlist (0x18E03, 2) = [ 
+			0435	"Silence",
+			0532	"Der Roggen ist kleiner und hat kuerzere Grannen. Wo siehst du den Roggen?", ]
+	Playlistpointer (0x18E09, 1)
+		Playlist (0x18E0F, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18E13, 0)
+	Playlistpointer (0x18E15, 1)
+		Playlist (0x18E1B, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0530	"Was waechst auf den Feldern?", ]
+	Playlistpointer (0x18E21, 0)
+	Playlistpointer (0x18E23, 1)
+		Playlist (0x18E29, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x18E2D, 1)
+		Playlist (0x18E33, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18E37, 1)
+		Playlist (0x18E3D, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x18E41, 1)
+		Playlist (0x18E47, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 3, 0x18C25)
+--------------------------
+
+0x18C25 B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 2) = [ 1572, 1581,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 25) = [ 1561, 1562, 1563, 1564, 1565, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1579, 1580, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588,  ]
+	Playlistpointer (0x18E4B, 1)
+		Playlist (0x18E51, 2) = [ 
+			0435	"Silence",
+			0533	"Der Weizen hat dicke Koerner und keine Grannen. Tippe auf die Aehre des Weizen!", ]
+	Playlistpointer (0x18E57, 1)
+		Playlist (0x18E5D, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18E61, 0)
+	Playlistpointer (0x18E63, 1)
+		Playlist (0x18E69, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0530	"Was waechst auf den Feldern?", ]
+	Playlistpointer (0x18E6F, 0)
+	Playlistpointer (0x18E71, 1)
+		Playlist (0x18E77, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x18E7B, 1)
+		Playlist (0x18E81, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18E85, 1)
+		Playlist (0x18E8B, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x18E8F, 1)
+		Playlist (0x18E95, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 4, 0x18C99)
+--------------------------
+
+0x18C99 B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1587,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 25) = [ 1561, 1562, 1563, 1564, 1565, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1579, 1580, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588,  ]
+	Playlistpointer (0x18E99, 1)
+		Playlist (0x18E9F, 2) = [ 
+			0435	"Silence",
+			0534	"Mais hat dicke gelbe Koerner und waechst als Kolben. Findest du das Maisfeld?", ]
+	Playlistpointer (0x18EA5, 1)
+		Playlist (0x18EAB, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18EAF, 0)
+	Playlistpointer (0x18EB1, 1)
+		Playlist (0x18EB7, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0530	"Was waechst auf den Feldern?", ]
+	Playlistpointer (0x18EBD, 0)
+	Playlistpointer (0x18EBF, 1)
+		Playlist (0x18EC5, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x18EC9, 1)
+		Playlist (0x18ECF, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x18ED3, 1)
+		Playlist (0x18ED9, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x18EDD, 1)
+		Playlist (0x18EE3, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+
+Game Header ( 5, 0x18EE7)
+--------------------------
+	Type:	6
+
+0x18EE7 B00 000026
+	06 00 05 00 05 00 04 00  03 00 05 00 00 00 04 00 
+	03 00 49 06 00 00 6F 00  DE 00 
+		
+	Playlistpointer (0x193F7, 1)
+		Playlist (0x193FD, 2) = [ 
+			0430	"NOISE: Tuedelue",
+			0535	""Wir spielen ""Fahrzeuge raten"". Hoer dir die Frage gut an und tippe auf das gesuchte Fahrzeug."", ]
+	Playlistpointer (0x19403, 0)
+	Playlistpointer (0x19405, 0)
+	Playlistpointer (0x19407, 1)
+		Playlist (0x1940D, 2) = [ 
+			0435	"Silence",
+			0536	"Hier kommt das naechste Fahrzeug.", ]
+	Playlistpointer (0x19413, 1)
+		Playlist (0x19419, 2) = [ 
+			0435	"Silence",
+			0537	"Hier kommt das letzte Fahrzeug.", ]
+	Playlistpointer (0x1941F, 1)
+		Playlist (0x19425, 2) = [ 
+			0435	"Silence",
+			0536	"Hier kommt das naechste Fahrzeug.", ]
+	Playlistpointer (0x1942B, 1)
+		Playlist (0x19431, 2) = [ 
+			0435	"Silence",
+			0537	"Hier kommt das letzte Fahrzeug.", ]
+
+	Subgames:	[0x1917B,0x18F81,0x18FFF,0x1907D,0x190FB,]
+
+	Subgames2:	[0x191FD,0x1927D,0x192FB,0x19379,]
+
+
+0x18F41 B00 000020
+	03 00 00 00 03 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+	Playlistpointer (0x19437, 1)
+		Playlist (0x1943D, 5) = [ 
+			0435	"Silence",
+			0538	"Super, du bist ein echter Fahrzeugprofi.",
+			0435	"Silence",
+			0539	"Ich denk du bist bereit fuer das superschwere zweite Level.",
+			0540	"Los geht?s!", ]
+	Playlistpointer (0x19449, 1)
+		Playlist (0x1944F, 3) = [ 
+			0435	"Silence",
+			0440	"Das ist ganz schoen schwer, oder?",
+			0541	"Hoer doch noch einmal alles bei WISSEN an und gehe dann wieder auf SPIELEN, wenn du das Quiz nocheinmal spielen moechtest.", ]
+	Playlistpointer (0x19457, 1)
+		Playlist (0x1945D, 3) = [ 
+			0435	"Silence",
+			0510	"Super gemacht.",
+			0542	"Auf den anderen Seiten haben wir noch mehr Spiele. Probiere sie aus!", ]
+	Playlistpointer (0x19465, 1)
+		Playlist (0x1946B, 3) = [ 
+			0435	"Silence",
+			0440	"Das ist ganz schoen schwer, oder?",
+			0541	"Hoer doch noch einmal alles bei WISSEN an und gehe dann wieder auf SPIELEN, wenn du das Quiz nocheinmal spielen moechtest.", ]
+	Playlistpointer (0x19473, 0)
+	Playlistpointer (0x19475, 0)
+	Playlistpointer (0x19477, 0)
+	Playlistpointer (0x19479, 0)
+	Playlistpointer (0x1947B, 0)
+	Playlistpointer (0x1947D, 0)
+
+	Additional:
+		Playlist (0x1947F, 4) = [ 
+			0006	"NOISE: Tuedelue",
+			0007	"Warum Maries Mutter so frueh aufsteht, erzaehlt sie dir, wenn du sie antippst.",
+			0008	"Warum ist Marie heute aufgeregt? Die Antwort kannst du hoeren wenn du sie antippst.",
+			0009	"Paul ist unterwegs zu Marie. Hoer dir doch an worauf er sich freut.", ]
+
+SubGame( 0, 0x1917B)
+--------------------------
+
+0x1917B B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 3) = [ 1622, 1601, 1621,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 31) = [ 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631,  ]
+	Playlistpointer (0x19489, 1)
+		Playlist (0x1948F, 2) = [ 
+			0435	"Silence",
+			0543	"Mit dieser Maschine zieht der Bauer Maschinen und Anhaenger. Zeige auf das richtige Fahrzeug!", ]
+	Playlistpointer (0x19495, 1)
+		Playlist (0x1949B, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1949F, 0)
+	Playlistpointer (0x194A1, 1)
+		Playlist (0x194A7, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0544	"Welche Maschinen braucht der Bauer?", ]
+	Playlistpointer (0x194AD, 0)
+	Playlistpointer (0x194AF, 1)
+		Playlist (0x194B5, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x194B9, 1)
+		Playlist (0x194BF, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x194C3, 1)
+		Playlist (0x194C9, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x194CD, 1)
+		Playlist (0x194D3, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 1, 0x18F81)
+--------------------------
+
+0x18F81 B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1616,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 31) = [ 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631,  ]
+	Playlistpointer (0x194D7, 1)
+		Playlist (0x194DD, 2) = [ 
+			0435	"Silence",
+			0545	"Mit dieser Maschine bringt der Bauer das Saatgut in die Erde. Welche ist gemeint?", ]
+	Playlistpointer (0x194E3, 1)
+		Playlist (0x194E9, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x194ED, 0)
+	Playlistpointer (0x194EF, 1)
+		Playlist (0x194F5, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0544	"Welche Maschinen braucht der Bauer?", ]
+	Playlistpointer (0x194FB, 0)
+	Playlistpointer (0x194FD, 1)
+		Playlist (0x19503, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19507, 1)
+		Playlist (0x1950D, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x19511, 1)
+		Playlist (0x19517, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x1951B, 1)
+		Playlist (0x19521, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 2, 0x18FFF)
+--------------------------
+
+0x18FFF B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1617,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 31) = [ 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631,  ]
+	Playlistpointer (0x19525, 1)
+		Playlist (0x1952B, 2) = [ 
+			0435	"Silence",
+			0546	"Mit dieser Maschine erntet der Bauer das Getreide. Weist du welche gemeint ist?", ]
+	Playlistpointer (0x19531, 1)
+		Playlist (0x19537, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1953B, 0)
+	Playlistpointer (0x1953D, 1)
+		Playlist (0x19543, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0544	"Welche Maschinen braucht der Bauer?", ]
+	Playlistpointer (0x19549, 0)
+	Playlistpointer (0x1954B, 1)
+		Playlist (0x19551, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19555, 1)
+		Playlist (0x1955B, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1955F, 1)
+		Playlist (0x19565, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19569, 1)
+		Playlist (0x1956F, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 3, 0x1907D)
+--------------------------
+
+0x1907D B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1618,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 31) = [ 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631,  ]
+	Playlistpointer (0x19573, 1)
+		Playlist (0x19579, 2) = [ 
+			0435	"Silence",
+			0547	"Dies Maschine macht grosse Ballen aus Stroh. Findest du sie?", ]
+	Playlistpointer (0x1957F, 1)
+		Playlist (0x19585, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x19589, 0)
+	Playlistpointer (0x1958B, 1)
+		Playlist (0x19591, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0544	"Welche Maschinen braucht der Bauer?", ]
+	Playlistpointer (0x19597, 0)
+	Playlistpointer (0x19599, 1)
+		Playlist (0x1959F, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x195A3, 1)
+		Playlist (0x195A9, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x195AD, 1)
+		Playlist (0x195B3, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x195B7, 1)
+		Playlist (0x195BD, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 4, 0x190FB)
+--------------------------
+
+0x190FB B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 2) = [ 1615, 1621,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 31) = [ 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631,  ]
+	Playlistpointer (0x195C1, 1)
+		Playlist (0x195C7, 2) = [ 
+			0435	"Silence",
+			0548	"Dies Maschine zieht tiefe Furchen in das Feld.", ]
+	Playlistpointer (0x195CD, 1)
+		Playlist (0x195D3, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x195D7, 0)
+	Playlistpointer (0x195D9, 1)
+		Playlist (0x195DF, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0544	"Welche Maschinen braucht der Bauer?", ]
+	Playlistpointer (0x195E5, 0)
+	Playlistpointer (0x195E7, 1)
+		Playlist (0x195ED, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x195F1, 1)
+		Playlist (0x195F7, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x195FB, 1)
+		Playlist (0x19601, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19605, 1)
+		Playlist (0x1960B, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame2( 0, 0x191FD)
+--------------------------
+
+0x191FD B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 2) = [ 1615, 1621,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 31) = [ 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631,  ]
+	Playlistpointer (0x1960F, 1)
+		Playlist (0x19615, 3) = [ 
+			0435	"Silence",
+			0549	"Diese Maschine bringt kein Saatgut in die Erde, damit kann man auch nicht Ernten, sie zieht auch keine Maschinen und macht auch keine grossen Ballen.",
+			0550	"Welche Maschine meine ich?", ]
+	Playlistpointer (0x1961D, 1)
+		Playlist (0x19623, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x19627, 0)
+	Playlistpointer (0x19629, 1)
+		Playlist (0x1962F, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0544	"Welche Maschinen braucht der Bauer?", ]
+	Playlistpointer (0x19635, 0)
+	Playlistpointer (0x19637, 1)
+		Playlist (0x1963D, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19641, 1)
+		Playlist (0x19647, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1964B, 1)
+		Playlist (0x19651, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19655, 1)
+		Playlist (0x1965B, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame2( 1, 0x1927D)
+--------------------------
+
+0x1927D B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1616,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 31) = [ 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631,  ]
+	Playlistpointer (0x1965F, 1)
+		Playlist (0x19665, 3) = [ 
+			0435	"Silence",
+			0551	"Diese Maschine hilft nicht beim Ernten, sie presst auch keine Ballen, zieht keine tiefen Rillen in die Erde, sie zieht auch keine Maschinen.",
+			0550	"Welche Maschine meine ich?", ]
+	Playlistpointer (0x1966D, 1)
+		Playlist (0x19673, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x19677, 0)
+	Playlistpointer (0x19679, 1)
+		Playlist (0x1967F, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0544	"Welche Maschinen braucht der Bauer?", ]
+	Playlistpointer (0x19685, 0)
+	Playlistpointer (0x19687, 1)
+		Playlist (0x1968D, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19691, 1)
+		Playlist (0x19697, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1969B, 1)
+		Playlist (0x196A1, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x196A5, 1)
+		Playlist (0x196AB, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame2( 2, 0x192FB)
+--------------------------
+
+0x192FB B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1617,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 31) = [ 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631,  ]
+	Playlistpointer (0x196AF, 1)
+		Playlist (0x196B5, 3) = [ 
+			0435	"Silence",
+			0552	"Diese Maschine macht keine grossen Ballen aus Stroh, bringt aber auch kein Saatgut in die Erde, zieht keine tiefen Rillen und zieht keine Anhaenger.",
+			0550	"Welche Maschine meine ich?", ]
+	Playlistpointer (0x196BD, 1)
+		Playlist (0x196C3, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x196C7, 0)
+	Playlistpointer (0x196C9, 1)
+		Playlist (0x196CF, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0544	"Welche Maschinen braucht der Bauer?", ]
+	Playlistpointer (0x196D5, 0)
+	Playlistpointer (0x196D7, 1)
+		Playlist (0x196DD, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x196E1, 1)
+		Playlist (0x196E7, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x196EB, 1)
+		Playlist (0x196F1, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x196F5, 1)
+		Playlist (0x196FB, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame2( 3, 0x19379)
+--------------------------
+
+0x19379 B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1618,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 31) = [ 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631,  ]
+	Playlistpointer (0x196FF, 1)
+		Playlist (0x19705, 3) = [ 
+			0435	"Silence",
+			0553	"Diese Maschine bringt nicht das Saatgut in die Erde, auch erntet sie nicht und zieht auch keine Anhaenger, aber sie zieht auch keine Rillen in die Erde.",
+			0550	"Welche Maschine meine ich?", ]
+	Playlistpointer (0x1970D, 1)
+		Playlist (0x19713, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x19717, 0)
+	Playlistpointer (0x19719, 1)
+		Playlist (0x1971F, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0544	"Welche Maschinen braucht der Bauer?", ]
+	Playlistpointer (0x19725, 0)
+	Playlistpointer (0x19727, 1)
+		Playlist (0x1972D, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19731, 1)
+		Playlist (0x19737, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1973B, 1)
+		Playlist (0x19741, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19745, 1)
+		Playlist (0x1974B, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+
+Game Header ( 6, 0x1974F)
+--------------------------
+	Type:	7
+
+0x1974F B00 000018
+	07 00 08 00 03 00 00 00  03 00 71 06 00 00 6F 00 
+	DE 00 
+		
+	Playlistpointer (0x19C11, 1)
+		Playlist (0x19C17, 9) = [ 
+			0430	"NOISE: Tuedelue",
+			0554	"Wir spielen ein Liederatespiel!",
+			0555	"Du hoerst die Lieder, die du schon aus ERZAEHLEN kennst. Aber an ein paar Stellen fehlen Woerter. Weisst du welches Wort fehlt? Dann suche es im Bild und tippe dieses an.",
+			0556	"Wenn es richtig ist, hoerst du Pling! und die Liedzeile noch einmal komplett.",
+			0557	"Dann geht es weiter.",
+			0558	"Hier kommt ein Beispiel.",
+			0559	"Tra, ri, ra, der ..., der ist da !",
+			0560	""Das fehlende Wort ist ""der Sommer"", du muesstest dann hier auf das Sommerbild tippen."",
+			0561	"Jetzt geht es los!", ]
+	Playlistpointer (0x19C2B, 0)
+	Playlistpointer (0x19C2D, 1)
+		Playlist (0x19C33, 3) = [ 
+			0435	"Silence",
+			0562	"Das war das Liederatespiel.",
+			0542	"Auf den anderen Seiten haben wir noch mehr Spiele. Probiere sie aus!", ]
+	Playlistpointer (0x19C3B, 1)
+		Playlist (0x19C41, 1) = [ 
+			0563	"Hier kommt das naechste Lied.", ]
+	Playlistpointer (0x19C45, 0)
+
+	Subgames:	[0x197D5,0x1985D,0x198E3,0x19967,0x199ED,0x19A83,0x19B09,0x19B8D,]
+
+
+0x19795 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+	Playlistpointer (0x19C47, 0)
+	Playlistpointer (0x19C49, 0)
+	Playlistpointer (0x19C4B, 0)
+	Playlistpointer (0x19C4D, 0)
+	Playlistpointer (0x19C4F, 0)
+	Playlistpointer (0x19C51, 0)
+	Playlistpointer (0x19C53, 0)
+	Playlistpointer (0x19C55, 0)
+	Playlistpointer (0x19C57, 0)
+	Playlistpointer (0x19C59, 0)
+
+	Additional:
+	Playlistpointer (0x19C5B, 3)
+		Playlist (0x19C69, 2) = [ 
+			0001	"NOISE: Tuedelue",
+			0002	"NOISE: Tuedelue", ]
+		Playlist (0x19C6F, 4) = [ 
+			0003	"Was ist das Besondere an dem Kuhstall, die Antwort hoerst du wenn du auf den Kuhstall tippst.",
+			0004	"Wenn du auf den Nebenstall tippst, hoerst du welche Tier Maries Eltern noch haben.",
+			0005	"Tippe doch Mal auf den Hahn, da erfaehrst du mehr ueber seine Rolle auf dem Hof.",
+			0006	"NOISE: Tuedelue", ]
+		Playlist (0x19C79, 2) = [ 
+			0007	"Warum Maries Mutter so frueh aufsteht, erzaehlt sie dir, wenn du sie antippst.",
+			0008	"Warum ist Marie heute aufgeregt? Die Antwort kannst du hoeren wenn du sie antippst.", ]
+
+SubGame( 0, 0x197D5)
+--------------------------
+
+0x197D5 B00 000020
+	00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 3) = [ 1653, 1655, 1665,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 34) = [ 1641, 1642, 1643, 1644, 1645, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 1656, 1657, 1658, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1666, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676, 1677,  ]
+	Playlistpointer (0x19C7F, 1)
+		Playlist (0x19C85, 2) = [ 
+			0435	"Silence",
+			0564	"Im Maerzen der ... die Roesslein anspannt", ]
+	Playlistpointer (0x19C8B, 1)
+		Playlist (0x19C91, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x19C95, 0)
+	Playlistpointer (0x19C97, 1)
+		Playlist (0x19C9D, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0565	"Welche Aufgaben hat der Bauer?", ]
+	Playlistpointer (0x19CA3, 0)
+	Playlistpointer (0x19CA5, 1)
+		Playlist (0x19CAB, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19CAF, 1)
+		Playlist (0x19CB5, 2) = [ 
+			0443	"NOISE: Pling",
+			0566	"Im Maerzen der Bauer die Roesslein anspannt", ]
+	Playlistpointer (0x19CBB, 1)
+		Playlist (0x19CC1, 2) = [ 
+			0567	"Das war leider auch falsch, aber weiter geht?s.",
+			0566	"Im Maerzen der Bauer die Roesslein anspannt", ]
+	Playlistpointer (0x19CC7, 1)
+		Playlist (0x19CCD, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 1, 0x1985D)
+--------------------------
+
+0x1985D B00 000020
+	00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 2) = [ 1672, 1674,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 34) = [ 1641, 1642, 1643, 1644, 1645, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 1656, 1657, 1658, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1666, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676, 1677,  ]
+	Playlistpointer (0x19CD1, 1)
+		Playlist (0x19CD7, 1) = [ 
+			0568	"Er setzt seine ... und Wiesen in Stand.", ]
+	Playlistpointer (0x19CDB, 1)
+		Playlist (0x19CE1, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x19CE5, 0)
+	Playlistpointer (0x19CE7, 1)
+		Playlist (0x19CED, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0565	"Welche Aufgaben hat der Bauer?", ]
+	Playlistpointer (0x19CF3, 0)
+	Playlistpointer (0x19CF5, 1)
+		Playlist (0x19CFB, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19CFF, 1)
+		Playlist (0x19D05, 3) = [ 
+			0443	"NOISE: Pling",
+			0569	"Er setzt seine Felder und Wiesen in Stand.",
+			0570	"Er pflueget den Boden, er egget und saet und ruehrt seine Haende frueh morgens und spaet.", ]
+	Playlistpointer (0x19D0D, 1)
+		Playlist (0x19D13, 3) = [ 
+			0567	"Das war leider auch falsch, aber weiter geht?s.",
+			0569	"Er setzt seine Felder und Wiesen in Stand.",
+			0570	"Er pflueget den Boden, er egget und saet und ruehrt seine Haende frueh morgens und spaet.", ]
+	Playlistpointer (0x19D1B, 1)
+		Playlist (0x19D21, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 2, 0x198E3)
+--------------------------
+
+0x198E3 B00 000020
+	00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1673,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 34) = [ 1641, 1642, 1643, 1644, 1645, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 1656, 1657, 1658, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1666, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676, 1677,  ]
+	Playlistpointer (0x19D25, 1)
+		Playlist (0x19D2B, 2) = [ 
+			0435	"Silence",
+			0571	"Bunt sind schon die ...,", ]
+	Playlistpointer (0x19D31, 1)
+		Playlist (0x19D37, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x19D3B, 0)
+	Playlistpointer (0x19D3D, 1)
+		Playlist (0x19D43, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0565	"Welche Aufgaben hat der Bauer?", ]
+	Playlistpointer (0x19D49, 0)
+	Playlistpointer (0x19D4B, 1)
+		Playlist (0x19D51, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19D55, 1)
+		Playlist (0x19D5B, 2) = [ 
+			0443	"NOISE: Pling",
+			0572	"Bunt sind schon die Waelder,", ]
+	Playlistpointer (0x19D61, 1)
+		Playlist (0x19D67, 2) = [ 
+			0567	"Das war leider auch falsch, aber weiter geht?s.",
+			0572	"Bunt sind schon die Waelder,", ]
+	Playlistpointer (0x19D6D, 1)
+		Playlist (0x19D73, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 3, 0x19967)
+--------------------------
+
+0x19967 B00 000020
+	00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 2) = [ 1672, 1674,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 34) = [ 1641, 1642, 1643, 1644, 1645, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 1656, 1657, 1658, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1666, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676, 1677,  ]
+	Playlistpointer (0x19D77, 1)
+		Playlist (0x19D7D, 1) = [ 
+			0573	"gelb die ...,", ]
+	Playlistpointer (0x19D81, 1)
+		Playlist (0x19D87, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x19D8B, 0)
+	Playlistpointer (0x19D8D, 1)
+		Playlist (0x19D93, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0565	"Welche Aufgaben hat der Bauer?", ]
+	Playlistpointer (0x19D99, 0)
+	Playlistpointer (0x19D9B, 1)
+		Playlist (0x19DA1, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19DA5, 1)
+		Playlist (0x19DAB, 2) = [ 
+			0443	"NOISE: Pling",
+			0574	"gelb die Stoppelfelder,", ]
+	Playlistpointer (0x19DB1, 1)
+		Playlist (0x19DB7, 2) = [ 
+			0567	"Das war leider auch falsch, aber weiter geht?s.",
+			0574	"gelb die Stoppelfelder,", ]
+	Playlistpointer (0x19DBD, 1)
+		Playlist (0x19DC3, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 4, 0x199ED)
+--------------------------
+
+0x199ED B00 000020
+	00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 10) = [ 1658, 1663, 1664, 1665, 1666, 1667, 1672, 1673, 1675, 1677,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 34) = [ 1641, 1642, 1643, 1644, 1645, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 1656, 1657, 1658, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1666, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676, 1677,  ]
+	Playlistpointer (0x19DC7, 1)
+		Playlist (0x19DCD, 1) = [ 
+			0575	"und der ... beginnt.", ]
+	Playlistpointer (0x19DD1, 1)
+		Playlist (0x19DD7, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x19DDB, 0)
+	Playlistpointer (0x19DDD, 1)
+		Playlist (0x19DE3, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0565	"Welche Aufgaben hat der Bauer?", ]
+	Playlistpointer (0x19DE9, 0)
+	Playlistpointer (0x19DEB, 1)
+		Playlist (0x19DF1, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19DF5, 1)
+		Playlist (0x19DFB, 2) = [ 
+			0443	"NOISE: Pling",
+			0576	"und der Herbst beginnt.", ]
+	Playlistpointer (0x19E01, 1)
+		Playlist (0x19E07, 2) = [ 
+			0567	"Das war leider auch falsch, aber weiter geht?s.",
+			0576	"und der Herbst beginnt.", ]
+	Playlistpointer (0x19E0D, 1)
+		Playlist (0x19E13, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 5, 0x19A83)
+--------------------------
+
+0x19A83 B00 000020
+	00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 2) = [ 1675, 1658,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 34) = [ 1641, 1642, 1643, 1644, 1645, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 1656, 1657, 1658, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1666, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676, 1677,  ]
+	Playlistpointer (0x19E17, 1)
+		Playlist (0x19E1D, 1) = [ 
+			0577	"Rote ... fallen,", ]
+	Playlistpointer (0x19E21, 1)
+		Playlist (0x19E27, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x19E2B, 0)
+	Playlistpointer (0x19E2D, 1)
+		Playlist (0x19E33, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0565	"Welche Aufgaben hat der Bauer?", ]
+	Playlistpointer (0x19E39, 0)
+	Playlistpointer (0x19E3B, 1)
+		Playlist (0x19E41, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19E45, 1)
+		Playlist (0x19E4B, 3) = [ 
+			0443	"NOISE: Pling",
+			0578	"Rote Blaetter fallen,",
+			0579	"graue Nebel wallen, kuehler weht der Wind.", ]
+	Playlistpointer (0x19E53, 1)
+		Playlist (0x19E59, 3) = [ 
+			0567	"Das war leider auch falsch, aber weiter geht?s.",
+			0578	"Rote Blaetter fallen,",
+			0579	"graue Nebel wallen, kuehler weht der Wind.", ]
+	Playlistpointer (0x19E61, 1)
+		Playlist (0x19E67, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 6, 0x19B09)
+--------------------------
+
+0x19B09 B00 000020
+	00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1668,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 34) = [ 1641, 1642, 1643, 1644, 1645, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 1656, 1657, 1658, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1666, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676, 1677,  ]
+	Playlistpointer (0x19E6B, 1)
+		Playlist (0x19E71, 2) = [ 
+			0435	"Silence",
+			0580	"A B C, die ... lief im Schnee.", ]
+	Playlistpointer (0x19E77, 1)
+		Playlist (0x19E7D, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x19E81, 0)
+	Playlistpointer (0x19E83, 1)
+		Playlist (0x19E89, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0565	"Welche Aufgaben hat der Bauer?", ]
+	Playlistpointer (0x19E8F, 0)
+	Playlistpointer (0x19E91, 1)
+		Playlist (0x19E97, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19E9B, 1)
+		Playlist (0x19EA1, 2) = [ 
+			0443	"NOISE: Pling",
+			0581	"A B C, die Katze lief im Schnee.", ]
+	Playlistpointer (0x19EA7, 1)
+		Playlist (0x19EAD, 2) = [ 
+			0567	"Das war leider auch falsch, aber weiter geht?s.",
+			0581	"A B C, die Katze lief im Schnee.", ]
+	Playlistpointer (0x19EB3, 1)
+		Playlist (0x19EB9, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 7, 0x19B8D)
+--------------------------
+
+0x19B8D B00 000020
+	00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1676,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 34) = [ 1641, 1642, 1643, 1644, 1645, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 1656, 1657, 1658, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1666, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676, 1677,  ]
+	Playlistpointer (0x19EBD, 1)
+		Playlist (0x19EC3, 2) = [ 
+			0582	"Und als sie dann nach Hause kam, da hatte sie weisse Stiefel an.",
+			0583	"O jemine! O jemine! Die Katze lief im ....", ]
+	Playlistpointer (0x19EC9, 1)
+		Playlist (0x19ECF, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x19ED3, 0)
+	Playlistpointer (0x19ED5, 1)
+		Playlist (0x19EDB, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0565	"Welche Aufgaben hat der Bauer?", ]
+	Playlistpointer (0x19EE1, 0)
+	Playlistpointer (0x19EE3, 1)
+		Playlist (0x19EE9, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x19EED, 1)
+		Playlist (0x19EF3, 2) = [ 
+			0443	"NOISE: Pling",
+			0584	"O jemine! O jemine! Die Katze lief im Schnee.", ]
+	Playlistpointer (0x19EF9, 1)
+		Playlist (0x19EFF, 2) = [ 
+			0567	"Das war leider auch falsch, aber weiter geht?s.",
+			0584	"O jemine! O jemine! Die Katze lief im Schnee.", ]
+	Playlistpointer (0x19F05, 1)
+		Playlist (0x19F0B, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+
+Game Header ( 7, 0x19F0F)
+--------------------------
+	Type:	8
+
+0x19F0F B00 000018
+	08 00 00 00 00 00 00 00  00 00 99 06 00 00 6F 00 
+	DE 00 
+		
+	Playlistpointer (0x19F81, 1)
+		Playlist (0x19F87, 2) = [ 
+			0430	"NOISE: Tuedelue",
+			0585	"Tippst du auf den roten Stern, findest du dort ein lustiges Maeusesuchspiel. Tippst du auf den gruenen Stern, wartet ein Geraeuschesuchspiel auf dich. Bei dem blauen Stern kannst du ein Spiel mit englischen Tiernamen spielen.", ]
+	Playlistpointer (0x19F8D, 0)
+	Playlistpointer (0x19F8F, 0)
+	Playlistpointer (0x19F91, 0)
+	Playlistpointer (0x19F93, 0)
+
+0x19F35 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+	Playlistpointer (0x19F95, 0)
+	Playlistpointer (0x19F97, 0)
+	Playlistpointer (0x19F99, 0)
+	Playlistpointer (0x19F9B, 0)
+	Playlistpointer (0x19F9D, 0)
+	Playlistpointer (0x19F9F, 0)
+	Playlistpointer (0x19FA1, 0)
+	Playlistpointer (0x19FA3, 0)
+	Playlistpointer (0x19FA5, 0)
+	Playlistpointer (0x19FA7, 0)
+
+	Additional:
+	OIDlist (0x19FA9, 3) = [ 1686, 1687, 1688,  ]
+	Gamelist (0x19FB1, 3) = [   9,  10,  11,  ]
+	Playlistpointer (0x19FB9, 0)
+	Playlistpointer (0x19FBB, 1)
+		Playlist (0x19FC1, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+
+
+Game Header ( 8, 0x19FC7)
+--------------------------
+	Type:	1
+
+0x19FC7 B00 000018
+	01 00 01 00 01 00 01 00  00 00 99 06 00 00 6F 00 
+	DE 00 
+		
+	Playlistpointer (0x1A0DF, 1)
+		Playlist (0x1A0E5, 3) = [ 
+			0586	"Im Bild haben sich zehn Maeuse versteckt.",
+			0495	"Findest du sie?",
+			0435	"Silence", ]
+	Playlistpointer (0x1A0ED, 0)
+	Playlistpointer (0x1A0EF, 2)
+		Playlist (0x1A0F9, 3) = [ 
+			0435	"Silence",
+			0510	"Super gemacht.",
+			0587	"Probiere doch mal das Englishspiel. Tippe dazu nochmals auf den Wuerfel und dann auf den blauen Stern.", ]
+		Playlist (0x1A101, 3) = [ 
+			0435	"Silence",
+			0510	"Super gemacht.",
+			0588	"Probiere doch mal das Geraeuschesuchspiel. Tippe dazu nochmals auf den Wuerfel und dann auf den gruenen Stern.", ]
+	Playlistpointer (0x1A109, 0)
+	Playlistpointer (0x1A10B, 0)
+
+	Subgames:	[0x1A02D,]
+
+
+0x19FF1 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+	Playlistpointer (0x1A10D, 0)
+	Playlistpointer (0x1A10F, 0)
+	Playlistpointer (0x1A111, 0)
+	Playlistpointer (0x1A113, 0)
+	Playlistpointer (0x1A115, 0)
+	Playlistpointer (0x1A117, 0)
+	Playlistpointer (0x1A119, 0)
+	Playlistpointer (0x1A11B, 0)
+	Playlistpointer (0x1A11D, 0)
+	Playlistpointer (0x1A11F, 0)
+
+SubGame( 0, 0x1A02D)
+--------------------------
+
+0x1A02D B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 10) = [ 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1726, 1727,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 48) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728,  ]
+	Playlistpointer (0x1A121, 0)
+	Playlistpointer (0x1A123, 1)
+		Playlist (0x1A129, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1A12D, 0)
+	Playlistpointer (0x1A12F, 1)
+		Playlist (0x1A135, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1A13B, 1)
+		Playlist (0x1A141, 1) = [ 
+			0590	"Die hattest du schon gefunden.", ]
+	Playlistpointer (0x1A145, 1)
+		Playlist (0x1A14B, 3) = [ 
+			0445	"NOISE: Moep",
+			0435	"Silence",
+			0498	"Das war nicht richtig. Probier es noch einmal.", ]
+	Playlistpointer (0x1A153, 1)
+		Playlist (0x1A159, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1A15D, 0)
+	Playlistpointer (0x1A15F, 1)
+		Playlist (0x1A165, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+
+Game Header ( 9, 0x1A169)
+--------------------------
+	Type:	4
+
+0x1A169 B00 000018
+	04 00 0C 00 06 00 00 00  00 00 99 06 00 00 6F 00 
+	DE 00 
+		
+	Playlistpointer (0x1A989, 1)
+		Playlist (0x1A98F, 4) = [ 
+			0591	"Du hoerst jetzt nacheinander verschiedene Geraeusche. Tippe die dazugehoerigen Bilder in der Reihenfolge an in der du die Geraeusche hoerst.",
+			0435	"Silence",
+			0592	"Hier kommt das erste Geraeusch.",
+			0435	"Silence", ]
+	Playlistpointer (0x1A999, 6)
+		Playlist (0x1A9B3, 2) = [ 
+			0504	"Jetzt hoerst du zwei",
+			0593	"Geraeusche hintereinander.", ]
+		Playlist (0x1A9B9, 3) = [ 
+			0506	"Jetzt hoerst du drei",
+			0593	"Geraeusche hintereinander.",
+			0435	"Silence", ]
+		Playlist (0x1A9C1, 3) = [ 
+			0507	"Jetzt hoerst du vier",
+			0593	"Geraeusche hintereinander.",
+			0435	"Silence", ]
+		Playlist (0x1A9C9, 3) = [ 
+			0508	"Jetzt hoerst du fuenf",
+			0593	"Geraeusche hintereinander.",
+			0435	"Silence", ]
+		Playlist (0x1A9D1, 3) = [ 
+			0509	"Jetzt hoerst du sechs",
+			0593	"Geraeusche hintereinander.",
+			0435	"Silence", ]
+		Playlist (0x1A9D9, 1) = [ 
+			0510	"Super gemacht.", ]
+	Playlistpointer (0x1A9DD, 2)
+		Playlist (0x1A9E7, 2) = [ 
+			0435	"Silence",
+			0587	"Probiere doch mal das Englishspiel. Tippe dazu nochmals auf den Wuerfel und dann auf den blauen Stern.", ]
+		Playlist (0x1A9ED, 1) = [ 
+			0594	"Wenn du nochmal auf SPIELEN gehst und dann auf den roten Stern tippst, startet ein lustiges Maeusesuchspiel.", ]
+	Playlistpointer (0x1A9F1, 0)
+	Playlistpointer (0x1A9F3, 0)
+
+	Subgames:	[0x1A1FB,0x1A29B,0x1A33B,0x1A3DB,0x1A47B,0x1A51B,0x1A5BB,0x1A65B,0x1A6FB,0x1A79F,0x1A841,0x1A8E5,]
+
+
+0x1A1BF B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+	Playlistpointer (0x1A9F5, 0)
+	Playlistpointer (0x1A9F7, 0)
+	Playlistpointer (0x1A9F9, 0)
+	Playlistpointer (0x1A9FB, 0)
+	Playlistpointer (0x1A9FD, 0)
+	Playlistpointer (0x1A9FF, 0)
+	Playlistpointer (0x1AA01, 0)
+	Playlistpointer (0x1AA03, 0)
+	Playlistpointer (0x1AA05, 0)
+	Playlistpointer (0x1AA07, 0)
+
+SubGame( 0, 0x1A1FB)
+--------------------------
+
+0x1A1FB B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1698,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 48) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728,  ]
+	Playlistpointer (0x1AA09, 1)
+		Playlist (0x1AA0F, 1) = [ 
+			0595	"NOISE: Pferd (Wiehern)", ]
+	Playlistpointer (0x1AA13, 1)
+		Playlist (0x1AA19, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AA1D, 0)
+	Playlistpointer (0x1AA1F, 1)
+		Playlist (0x1AA25, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1AA2B, 0)
+	Playlistpointer (0x1AA2D, 1)
+		Playlist (0x1AA33, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x1AA3B, 1)
+		Playlist (0x1AA41, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AA45, 0)
+	Playlistpointer (0x1AA47, 1)
+		Playlist (0x1AA4D, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 1, 0x1A29B)
+--------------------------
+
+0x1A29B B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1703,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 48) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728,  ]
+	Playlistpointer (0x1AA51, 1)
+		Playlist (0x1AA57, 1) = [ 
+			0596	"NOISE: Traktor (anlassen)", ]
+	Playlistpointer (0x1AA5B, 1)
+		Playlist (0x1AA61, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AA65, 0)
+	Playlistpointer (0x1AA67, 1)
+		Playlist (0x1AA6D, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1AA73, 0)
+	Playlistpointer (0x1AA75, 1)
+		Playlist (0x1AA7B, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x1AA83, 1)
+		Playlist (0x1AA89, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AA8D, 0)
+	Playlistpointer (0x1AA8F, 1)
+		Playlist (0x1AA95, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 2, 0x1A33B)
+--------------------------
+
+0x1A33B B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1711,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 48) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728,  ]
+	Playlistpointer (0x1AA99, 1)
+		Playlist (0x1AA9F, 1) = [ 
+			0597	"NOISE: Zicke (Meckern)", ]
+	Playlistpointer (0x1AAA3, 1)
+		Playlist (0x1AAA9, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AAAD, 0)
+	Playlistpointer (0x1AAAF, 1)
+		Playlist (0x1AAB5, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1AABB, 0)
+	Playlistpointer (0x1AABD, 1)
+		Playlist (0x1AAC3, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x1AACB, 1)
+		Playlist (0x1AAD1, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AAD5, 0)
+	Playlistpointer (0x1AAD7, 1)
+		Playlist (0x1AADD, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 3, 0x1A3DB)
+--------------------------
+
+0x1A3DB B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1706,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 48) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728,  ]
+	Playlistpointer (0x1AAE1, 1)
+		Playlist (0x1AAE7, 1) = [ 
+			0598	"NOISE: Hund (Bellen)", ]
+	Playlistpointer (0x1AAEB, 1)
+		Playlist (0x1AAF1, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AAF5, 0)
+	Playlistpointer (0x1AAF7, 1)
+		Playlist (0x1AAFD, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1AB03, 0)
+	Playlistpointer (0x1AB05, 1)
+		Playlist (0x1AB0B, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x1AB13, 1)
+		Playlist (0x1AB19, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AB1D, 0)
+	Playlistpointer (0x1AB1F, 1)
+		Playlist (0x1AB25, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 4, 0x1A47B)
+--------------------------
+
+0x1A47B B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1695,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 48) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728,  ]
+	Playlistpointer (0x1AB29, 1)
+		Playlist (0x1AB2F, 1) = [ 
+			0599	"NOISE: Quietschen, Lachen", ]
+	Playlistpointer (0x1AB33, 1)
+		Playlist (0x1AB39, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AB3D, 0)
+	Playlistpointer (0x1AB3F, 1)
+		Playlist (0x1AB45, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1AB4B, 0)
+	Playlistpointer (0x1AB4D, 1)
+		Playlist (0x1AB53, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x1AB5B, 1)
+		Playlist (0x1AB61, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AB65, 0)
+	Playlistpointer (0x1AB67, 1)
+		Playlist (0x1AB6D, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 5, 0x1A51B)
+--------------------------
+
+0x1A51B B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1707,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 48) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728,  ]
+	Playlistpointer (0x1AB71, 1)
+		Playlist (0x1AB77, 1) = [ 
+			0600	"NOISE: Huehner (Gackern)", ]
+	Playlistpointer (0x1AB7B, 1)
+		Playlist (0x1AB81, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AB85, 0)
+	Playlistpointer (0x1AB87, 1)
+		Playlist (0x1AB8D, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1AB93, 0)
+	Playlistpointer (0x1AB95, 1)
+		Playlist (0x1AB9B, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x1ABA3, 1)
+		Playlist (0x1ABA9, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1ABAD, 0)
+	Playlistpointer (0x1ABAF, 1)
+		Playlist (0x1ABB5, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 6, 0x1A5BB)
+--------------------------
+
+0x1A5BB B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1709,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 48) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728,  ]
+	Playlistpointer (0x1ABB9, 1)
+		Playlist (0x1ABBF, 1) = [ 
+			0447	"NOISE: Schwein (Grunzen, Quiecken)", ]
+	Playlistpointer (0x1ABC3, 1)
+		Playlist (0x1ABC9, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1ABCD, 0)
+	Playlistpointer (0x1ABCF, 1)
+		Playlist (0x1ABD5, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1ABDB, 0)
+	Playlistpointer (0x1ABDD, 1)
+		Playlist (0x1ABE3, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x1ABEB, 1)
+		Playlist (0x1ABF1, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1ABF5, 0)
+	Playlistpointer (0x1ABF7, 1)
+		Playlist (0x1ABFD, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 7, 0x1A65B)
+--------------------------
+
+0x1A65B B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1715,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 48) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728,  ]
+	Playlistpointer (0x1AC01, 1)
+		Playlist (0x1AC07, 1) = [ 
+			0601	"NOISE: Kraehe (Kraechzen)", ]
+	Playlistpointer (0x1AC0B, 1)
+		Playlist (0x1AC11, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AC15, 0)
+	Playlistpointer (0x1AC17, 1)
+		Playlist (0x1AC1D, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1AC23, 0)
+	Playlistpointer (0x1AC25, 1)
+		Playlist (0x1AC2B, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x1AC33, 1)
+		Playlist (0x1AC39, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AC3D, 0)
+	Playlistpointer (0x1AC3F, 1)
+		Playlist (0x1AC45, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 8, 0x1A6FB)
+--------------------------
+
+0x1A6FB B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 2) = [ 1714, 1725,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 49) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728, 1437,  ]
+	Playlistpointer (0x1AC49, 1)
+		Playlist (0x1AC4F, 1) = [ 
+			0602	"NOISE: Vogel (Tschilpen)", ]
+	Playlistpointer (0x1AC53, 1)
+		Playlist (0x1AC59, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AC5D, 0)
+	Playlistpointer (0x1AC5F, 1)
+		Playlist (0x1AC65, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1AC6B, 0)
+	Playlistpointer (0x1AC6D, 1)
+		Playlist (0x1AC73, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x1AC7B, 1)
+		Playlist (0x1AC81, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AC85, 0)
+	Playlistpointer (0x1AC87, 1)
+		Playlist (0x1AC8D, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 9, 0x1A79F)
+--------------------------
+
+0x1A79F B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1704,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 49) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728, 1437,  ]
+	Playlistpointer (0x1AC91, 1)
+		Playlist (0x1AC97, 1) = [ 
+			0455	"NOISE: Storch (Klappern)", ]
+	Playlistpointer (0x1AC9B, 1)
+		Playlist (0x1ACA1, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1ACA5, 0)
+	Playlistpointer (0x1ACA7, 1)
+		Playlist (0x1ACAD, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1ACB3, 0)
+	Playlistpointer (0x1ACB5, 1)
+		Playlist (0x1ACBB, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x1ACC3, 1)
+		Playlist (0x1ACC9, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1ACCD, 0)
+	Playlistpointer (0x1ACCF, 1)
+		Playlist (0x1ACD5, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame(10, 0x1A841)
+--------------------------
+
+0x1A841 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 2) = [ 1700, 1705,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 49) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728, 1437,  ]
+	Playlistpointer (0x1ACD9, 1)
+		Playlist (0x1ACDF, 1) = [ 
+			0452	"NOISE: Katze (Miauen)", ]
+	Playlistpointer (0x1ACE3, 1)
+		Playlist (0x1ACE9, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1ACED, 0)
+	Playlistpointer (0x1ACEF, 1)
+		Playlist (0x1ACF5, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1ACFB, 0)
+	Playlistpointer (0x1ACFD, 1)
+		Playlist (0x1AD03, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x1AD0B, 1)
+		Playlist (0x1AD11, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AD15, 0)
+	Playlistpointer (0x1AD17, 1)
+		Playlist (0x1AD1D, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame(11, 0x1A8E5)
+--------------------------
+
+0x1A8E5 B00 000020
+	00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 2) = [ 1696, 1708,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 49) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728, 1437,  ]
+	Playlistpointer (0x1AD21, 1)
+		Playlist (0x1AD27, 1) = [ 
+			0446	"NOISE: Kuh (Muhen)", ]
+	Playlistpointer (0x1AD2B, 1)
+		Playlist (0x1AD31, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AD35, 0)
+	Playlistpointer (0x1AD37, 1)
+		Playlist (0x1AD3D, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1AD43, 0)
+	Playlistpointer (0x1AD45, 1)
+		Playlist (0x1AD4B, 3) = [ 
+			0445	"NOISE: Moep",
+			0514	"Hoer noch einmal genau hin.",
+			0435	"Silence", ]
+	Playlistpointer (0x1AD53, 1)
+		Playlist (0x1AD59, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1AD5D, 0)
+	Playlistpointer (0x1AD5F, 1)
+		Playlist (0x1AD65, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+
+Game Header (10, 0x1AD69)
+--------------------------
+	Type:	1
+
+0x1AD69 B00 000018
+	01 00 05 00 05 00 00 00  04 00 99 06 00 00 6F 00 
+	DE 00 
+		
+	Playlistpointer (0x1B103, 1)
+		Playlist (0x1B109, 1) = [ 
+			0603	"Du hoerst gleich den Namen eines Tieres in English und dann den Tierlaut. Findest du das richtige Tier?", ]
+	Playlistpointer (0x1B10D, 0)
+	Playlistpointer (0x1B10F, 2)
+		Playlist (0x1B119, 2) = [ 
+			0435	"Silence",
+			0594	"Wenn du nochmal auf SPIELEN gehst und dann auf den roten Stern tippst, startet ein lustiges Maeusesuchspiel.", ]
+		Playlist (0x1B11F, 2) = [ 
+			0435	"Silence",
+			0588	"Probiere doch mal das Geraeuschesuchspiel. Tippe dazu nochmals auf den Wuerfel und dann auf den gruenen Stern.", ]
+	Playlistpointer (0x1B125, 1)
+		Playlist (0x1B12B, 2) = [ 
+			0435	"Silence",
+			0604	"Hier kommt das naechste Tier.", ]
+	Playlistpointer (0x1B131, 1)
+		Playlist (0x1B137, 2) = [ 
+			0435	"Silence",
+			0605	"Hier kommt das letzte Tier.", ]
+
+	Subgames:	[0x1ADDF,0x1AE7F,0x1AF1F,0x1AFBF,0x1B061,]
+
+
+0x1ADA3 B00 000020
+	03 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+	Playlistpointer (0x1B13D, 1)
+		Playlist (0x1B143, 2) = [ 
+			0435	"Silence",
+			0510	"Super gemacht.", ]
+	Playlistpointer (0x1B149, 1)
+		Playlist (0x1B14F, 1) = [ 
+			0440	"Das ist ganz schoen schwer, oder?", ]
+	Playlistpointer (0x1B153, 0)
+	Playlistpointer (0x1B155, 0)
+	Playlistpointer (0x1B157, 0)
+	Playlistpointer (0x1B159, 0)
+	Playlistpointer (0x1B15B, 0)
+	Playlistpointer (0x1B15D, 0)
+	Playlistpointer (0x1B15F, 0)
+	Playlistpointer (0x1B161, 0)
+
+SubGame( 0, 0x1ADDF)
+--------------------------
+
+0x1ADDF B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1698,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 48) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728,  ]
+	Playlistpointer (0x1B163, 1)
+		Playlist (0x1B169, 3) = [ 
+			0435	"Silence",
+			0606	"The Horse",
+			0595	"NOISE: Pferd (Wiehern)", ]
+	Playlistpointer (0x1B171, 1)
+		Playlist (0x1B177, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1B17B, 0)
+	Playlistpointer (0x1B17D, 1)
+		Playlist (0x1B183, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1B189, 0)
+	Playlistpointer (0x1B18B, 1)
+		Playlist (0x1B191, 1) = [ 
+			0445	"NOISE: Moep", ]
+	Playlistpointer (0x1B195, 1)
+		Playlist (0x1B19B, 3) = [ 
+			0443	"NOISE: Pling",
+			0607	"Ja",
+			0608	"Horse ist das englische Wort fuer Pferd.", ]
+	Playlistpointer (0x1B1A3, 1)
+		Playlist (0x1B1A9, 3) = [ 
+			0445	"NOISE: Moep",
+			0609	"Leider nicht richtig.",
+			0608	"Horse ist das englische Wort fuer Pferd.", ]
+	Playlistpointer (0x1B1B1, 1)
+		Playlist (0x1B1B7, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 1, 0x1AE7F)
+--------------------------
+
+0x1AE7F B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1706,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 48) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728,  ]
+	Playlistpointer (0x1B1BB, 1)
+		Playlist (0x1B1C1, 3) = [ 
+			0435	"Silence",
+			0610	"The Dog",
+			0598	"NOISE: Hund (Bellen)", ]
+	Playlistpointer (0x1B1C9, 1)
+		Playlist (0x1B1CF, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1B1D3, 0)
+	Playlistpointer (0x1B1D5, 1)
+		Playlist (0x1B1DB, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1B1E1, 0)
+	Playlistpointer (0x1B1E3, 0)
+	Playlistpointer (0x1B1E5, 1)
+		Playlist (0x1B1EB, 3) = [ 
+			0443	"NOISE: Pling",
+			0607	"Ja",
+			0611	"Dog ist das englische Wort fuer Hund.", ]
+	Playlistpointer (0x1B1F3, 1)
+		Playlist (0x1B1F9, 3) = [ 
+			0445	"NOISE: Moep",
+			0609	"Leider nicht richtig.",
+			0611	"Dog ist das englische Wort fuer Hund.", ]
+	Playlistpointer (0x1B201, 1)
+		Playlist (0x1B207, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 2, 0x1AF1F)
+--------------------------
+
+0x1AF1F B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 1) = [ 1709,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 48) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728,  ]
+	Playlistpointer (0x1B20B, 1)
+		Playlist (0x1B211, 3) = [ 
+			0435	"Silence",
+			0612	"The Pig",
+			0447	"NOISE: Schwein (Grunzen, Quiecken)", ]
+	Playlistpointer (0x1B219, 1)
+		Playlist (0x1B21F, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1B223, 0)
+	Playlistpointer (0x1B225, 1)
+		Playlist (0x1B22B, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1B231, 0)
+	Playlistpointer (0x1B233, 0)
+	Playlistpointer (0x1B235, 1)
+		Playlist (0x1B23B, 3) = [ 
+			0443	"NOISE: Pling",
+			0607	"Ja",
+			0613	"Auf Englisch heisst das Schwein Pig.", ]
+	Playlistpointer (0x1B243, 1)
+		Playlist (0x1B249, 3) = [ 
+			0445	"NOISE: Moep",
+			0609	"Leider nicht richtig.",
+			0613	"Auf Englisch heisst das Schwein Pig.", ]
+	Playlistpointer (0x1B251, 1)
+		Playlist (0x1B257, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 3, 0x1AFBF)
+--------------------------
+
+0x1AFBF B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 2) = [ 1700, 1705,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 48) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728,  ]
+	Playlistpointer (0x1B25B, 1)
+		Playlist (0x1B261, 3) = [ 
+			0435	"Silence",
+			0614	"The Cat",
+			0452	"NOISE: Katze (Miauen)", ]
+	Playlistpointer (0x1B269, 1)
+		Playlist (0x1B26F, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1B273, 0)
+	Playlistpointer (0x1B275, 1)
+		Playlist (0x1B27B, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1B281, 0)
+	Playlistpointer (0x1B283, 0)
+	Playlistpointer (0x1B285, 1)
+		Playlist (0x1B28B, 3) = [ 
+			0443	"NOISE: Pling",
+			0607	"Ja",
+			0615	"Cat heisst Katze auf English.", ]
+	Playlistpointer (0x1B293, 1)
+		Playlist (0x1B299, 3) = [ 
+			0445	"NOISE: Moep",
+			0609	"Leider nicht richtig.",
+			0615	"Cat heisst Katze auf English.", ]
+	Playlistpointer (0x1B2A1, 1)
+		Playlist (0x1B2A7, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+SubGame( 4, 0x1B061)
+--------------------------
+
+0x1B061 B00 000020
+	00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00 
+	00 00 00 00 
+		
+		OID List (0, 2) = [ 1696, 1708,  ]
+		OID List (1, 0) = [  ]
+		OID List (2, 48) = [ 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728,  ]
+	Playlistpointer (0x1B2AB, 1)
+		Playlist (0x1B2B1, 3) = [ 
+			0435	"Silence",
+			0616	"The Cow",
+			0446	"NOISE: Kuh (Muhen)", ]
+	Playlistpointer (0x1B2B9, 1)
+		Playlist (0x1B2BF, 1) = [ 
+			0443	"NOISE: Pling", ]
+	Playlistpointer (0x1B2C3, 0)
+	Playlistpointer (0x1B2C5, 1)
+		Playlist (0x1B2CB, 2) = [ 
+			0463	"Bitte blaettere zurueck auf die Seite ?",
+			0589	"Auf dem Bauernhof ist viel los.", ]
+	Playlistpointer (0x1B2D1, 0)
+	Playlistpointer (0x1B2D3, 0)
+	Playlistpointer (0x1B2D5, 1)
+		Playlist (0x1B2DB, 3) = [ 
+			0443	"NOISE: Pling",
+			0607	"Ja",
+			0617	"Cow ist das englishe Wort fuer Kuh.", ]
+	Playlistpointer (0x1B2E3, 1)
+		Playlist (0x1B2E9, 3) = [ 
+			0445	"NOISE: Moep",
+			0609	"Leider nicht richtig.",
+			0617	"Cow ist das englishe Wort fuer Kuh.", ]
+	Playlistpointer (0x1B2F1, 1)
+		Playlist (0x1B2F7, 1) = [ 
+			0443	"NOISE: Pling", ]
+
+
+Game Header (11, 0x1B2FB)
+--------------------------
+	Type:	253
+
+0x1B2FB B00 000008
+	FD 00 01 00 03 B3 01 00  
+		LB00 I00 L01 
+		
+
+0x1B303 B01 000006
+	02 00 6A 02 6B 02 
+		
+List (0x1B303, 2) = [ 618, 619,  ]
