@@ -99,30 +99,12 @@ In `Leserabe_een.gme*`, the audio table is repeated right after itself. Why?
 Additional script table
 -----------------------
 
-Used only in 'Puzzle Ponyhof' and 'Reise durch die Jahreszeiten' and there FR, NL, IT Version.
+Used only in 'Puzzle Ponyhof' and 'Reise durch die Jahreszeiten' and their FR,
+NL, IT Version. The format is that of a play script (see above). In most files,
+it is an empty play script, i.e. simply `0x0000` . In 'Reise durch die
+Jahreszeiten' it is a playscript with empty script lines.
 
-Its starts with a list of pointers, means an uint16 with the count 'c' followed by 'c' times an uint32 pointer value.
-The pointer itself point to a script line described earlier.
-
-In Other Files there is only the uint16 counter with value '0x0000'.
-
-Puzzle Ponyhof
-
-0x2092
-        02 00 9C 20 00 00 B1 20  00 00
-
-0x209C
-        01 00 00 06 00 FB FF 01  05 00 01 00 06 00 F0 FF 
-        01 01 00 00 00 
-
-0x20B1
-        01 00 00 06 00 F9 FF 01  05 00 01 00 06 00 F9 FF 
-        01 00 00 00 00 
-
-In 'Reise durch die Jahreszeiten' the Pointer in the Pointerlist points only to empty scriptlines.
-
-Example:
-	00 00 00 00 00 00
+TODO: When is this executed?
 
 
 The checksum
