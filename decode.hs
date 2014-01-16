@@ -152,7 +152,14 @@ putTipToiFile tt = mdo
     return ()
 
 putGameTable :: SPut
-putGameTable = putWord32 0 -- Stub
+putGameTable = mdo
+    putWord32 1 -- Hardcoded empty
+    putWord32 offset
+    offset <- getAddress $ do
+       putWord16 253
+       putWord16 0
+    return ()
+
 
 putScriptTable :: [(Word16, Maybe [Line])] -> SPut
 putScriptTable scripts = mdo
