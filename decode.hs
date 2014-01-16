@@ -68,6 +68,7 @@ data Game
     | Game9
     | Game10
     | Game16
+    | Game253 PlayListList
     | UnknownGame Word16 Word16 Word16 B.ByteString [PlayListList] [SubGame] B.ByteString [PlayListList]
     deriving Show
 
@@ -558,6 +559,15 @@ getGame n offset = do
         pll2 <- getPlayListList pll2o
         return (Game8 u1 c u2 plls sgs u3 pll2s oidl gidl pll1 pll2)
 
+      253 -> do -- Special "Power on game"
+        plos <- getHeader $ do
+            _ <- getWord16le
+            array getWord16le getWord32le
+        pls <- forM plos $ \o ->
+            getSegAt o "Power on play list" $
+                array getWord16le getWord16le
+        return (Game253 pls) 
+
       _ -> do
         (u1,c,u2,pllos, sgos, u3, pll2os) <- getHeader common
         plls <- mapM getPlayListList pllos
@@ -583,7 +593,7 @@ getGames = do
     gameTable <- getSegAt 0x0010 "Game Table Offset" getWord32le
     gameOffsets <- getSegAt gameTable "Game Table" $
         array getWord32le getWord32le
-    forMn (init gameOffsets) getGame
+    forMn gameOffsets getGame
 
 getProductID :: SGet Word32
 getProductID = getSegAt 0x0014 "Product id" getWord32le
@@ -711,6 +721,11 @@ ppGame t (UnknownGame typ u1 c u2 plls sgs u3 pll2s) =
     (length sgs)    (concatMap (ppSubGame t) sgs)
     (prettyHex u3)
     (length pll2s)  (indent 4 (map (ppPlayListList t) pll2s))
+ppGame t (Game253 pll) =
+    printf (unlines ["  type: 256",
+                     "  lists: %s"
+                     ])
+    (ppPlayListList t pll)
 ppGame t _ = "TODO"
 
 ppSubGame :: Transscript -> SubGame -> String
