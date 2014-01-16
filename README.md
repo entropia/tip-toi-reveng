@@ -24,8 +24,8 @@ The header begins with these 8 32-bit numbers, listed with their offset:
  * `0x0000`: The offset to the *play script table*
  * `0x0004`: The offset to the *media file table*
  * `0x0008`: Unknown
- * `0x000B`: Unknown
- * `0x0010`: Unknown; related to `0x000B` (as it is sometimes equal)
+ * `0x000C`: The offset to an *aditional script table*
+ * `0x0010`: The offset to the *game table*
  * `0x0014`: Product id code (== OID code of the power on symbol on page 1)
  * `0x0018`: Unknown
  * `0x001B`: Unknown
@@ -96,6 +96,17 @@ The magic XOR value can be found by finding the number which makes the first 4 b
 
 In `Leserabe_een.gme*`, the audio table is repeated right after itself. Why?
 
+Additional script table
+-----------------------
+
+Used only in 'Puzzle Ponyhof' and 'Reise durch die Jahreszeiten' and their FR,
+NL, IT Version. The format is that of a play script (see above). In most files,
+it is an empty play script, i.e. simply `0x0000` . In 'Reise durch die
+Jahreszeiten' it is a playscript with empty script lines.
+
+TODO: When is this executed?
+
+
 The checksum
 ------------
 
@@ -142,6 +153,8 @@ Use the tool `decode.hs` to investigate the gme files. It supports various subco
 	       lists all unknown parts of the file.
         decode play <file.gme>
                interactively play: Enter OIDs, and see what happens.
+        decode rewrite <infile.gme> <outfile.gme>
+               parses the file and serializes it again (for debugging).
 
 It is a Haskell program without dependencies and can be easily compiled on all platforms, using these steps:
 

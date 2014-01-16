@@ -22,9 +22,9 @@ that is right after the games ( for debugging you can take it at end of the last
 Header
 ------
 00017071  01 00 0b 00 05 00 00 00  04 00 81 05 00 00 6f 00
-          aa aa bb bb       cc cc        
+          aa aa bb bb rr rr cc cc  zz zz yy yy xx xx ww ww   
 00017081  de 00 97 76 01 00 a9 76  01 00 ab 76 01 00 ad 76 
-                dd dd dd dd dd dd  dd dd dd dd dd dd dd dd
+          vv vv dd dd dd dd dd dd  dd dd dd dd dd dd dd dd
 00017091  01 00 b9 76 01 00 ff 70  01 00 83 71 01 00 05 72
           dd dd dd dd dd dd ee ee  ee ee ee ee ee ee ee ee
 000170a1  01 00 87 72 01 00 09 73  01 00 8b 73 01 00 0d 74
@@ -32,22 +32,32 @@ Header
 000170b1  01 00 8f 74 01 00 11 75  01 00 93 75 01 00 15 76 
           ee ee ee ee ee ee ee ee  ee ee ee ee ee ee ee ee
 000170c1  01 00 03 00 00 00 00 00  00 00 00 00 00 00 00 00
-          ee ee
+          ee ee uu uu uu uu uu uu  uu uu uu uu uu uu uu uu
 000170d1  00 00 00 00 00 00 c5 76  01 00 d3 76 01 00 e1 76
-                            gg gg  gg gg gg gg gg gg gg gg
+          uu uu uu uu uu uu gg gg  gg gg gg gg gg gg gg gg
 000170e1  01 00 e3 76 01 00 e5 76  01 00 e7 76 01 00 e9 76 
           gg gg gg gg gg gg gg gg  gg gg gg gg gg gg gg gg
 000170f1  01 00 eb 76 01 00 ed 76  01 00 ef 76 01 00 
           gg gg gg gg gg gg gg gg  gg gg gg gg gg gg
 a = 16 bit type (type 253 is special see below)
 b = 16 bit count
-unknown = 2 byte
-c = 16 bit count (only if type == 6 else unknown and c = 0 not the value here)
-12 byte unknown (if type == 6 then 20 byte unknown)
-d = 5 (if type == 6 then count is 7, where is the count from so far in every block) * 32 bit pointer to playlistpointer
+r = 16 bit number of rounds to play in this game
+c = 16 bit count (if type == 6) followed by c*16bit; (if type != 6) c=0 or c=1 followed by additional 16bit 0 
+z = 16 bit: number of round to start with the "pre next round" sound, after that play the "last round" sound  
+y = 16 bit: OID, maybe this defines where the "special" OIDs on this page end. In Bauernhof on the last page
+            OIDs 1681-1689 are the buttons on the lower right including stars and repeat. However, they
+            can all be pointed to and leave the game mode immediately so this value seems not to be taken
+            into account. 
+x = 16 bit unknown
+w = 16 bit unknown (111 in all Bauernhof games)
+v = 16 bit unknown, sometimes v=2*w (222 in all Bauernhof games)
+d = 5 (if type != 6) or 7 (if type ==7) * 32 bit pointer to playlistpointer (where is the count from? So far found in every block) 
 e = b * 32 bit pointer to subgame blocks 
-f = c * 32 bit pointer to subgame blocks 
-20 byte unknown
+f = c * 32 bit pointer to subgame blocks (not existant in this game)
+u = 10 * 16bit, each 16 bit value defines the number correct answers are needed to play the media of g (at the corresponding position).
+    This list must be ordered from highest value to lowest. Example: When this list looks like 5,3,1,0,0,0,0,0,0,0 this means: if the
+    player hat 5 or more correct answers, the first media line of g is played, when the player has 3 or 4 correct answers, the second
+    media line is played, if he has at least one correct answer, media line 3 get played.      
 g = 10 (where is the count from? so far 10 in every block) * 32 bit pointer to playlistpointer
 now it differs on type 
 if ( type == 6 )
@@ -68,7 +78,11 @@ if ( type == 16 )
 nothing for other types
 end of block
 
-now type 253
+type 253
+--------
+
+type 253 seems to describe the power on action:
+
 0x1B2FB B00 000008
         FD 00 01 00 03 B3 01 00  
         aa aa bb bb cc cc cc cc
@@ -83,6 +97,8 @@ c = b * 32bit pointer to 16 bit lists
         aa aa bb bb bb bb
 a = count
 b = a * 16 bit (what i dont know)
+
+For Bauernhof these are 618 and 619, the sounds played when you point the tiptoi to the power on sign on page one. 
 
 
 Subgameblock
