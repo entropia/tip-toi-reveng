@@ -134,7 +134,7 @@ putTipToiFile :: TipToiFile -> SPut
 putTipToiFile tt = mdo
     putWord32 sto
     putWord32 mft
-    putWord32 0
+    putWord32 0x238b
     putWord32 ast -- Additional script table
     putWord32 gto -- Game table offset
     putWord32 (ttProductId tt)

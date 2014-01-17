@@ -23,7 +23,7 @@ The header
 The header begins with these 8 32-bit numbers, listed with their offset:
  * `0x0000`: The offset to the *play script table*
  * `0x0004`: The offset to the *media file table*
- * `0x0008`: Unknown
+ * `0x0008`: Unknown. It seems this always needs to be `0x238b`
  * `0x000C`: The offset to an *aditional script table*
  * `0x0010`: The offset to the *game table*
  * `0x0014`: Product id code (== OID code of the power on symbol on page 1)
