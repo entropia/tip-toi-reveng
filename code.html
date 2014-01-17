@@ -1,0 +1,552 @@
+<html>
+<head>
+<title>Tiptoi/TING-Codetester</title>
+
+<script type="text/javascript">
+
+function checkBoxChanged(checkBox) {
+	//XY_Z
+	var i = 0;
+	var left = checkBox.substr(0,2);
+	var right = checkBox.substr(3,1);
+	
+	var checked = document.getElementById("cb_"+left+"_"+right).checked;
+	
+	
+	for (i=0;i<4;i++) {
+		//uncheck boxes
+		document.getElementById("cb_"+left+"_"+i).checked = false;
+		
+		//reset bgcolors
+		document.getElementById("td_"+left+"_"+i).bgColor = "#FFFFFF";
+	}
+	
+	
+	if (checked) {
+		//set bgcolor
+		document.getElementById("td_"+left+"_"+right).bgColor = "#FF00FF";
+
+		//check selected box
+		document.getElementById("cb_"+left+"_"+right).checked = true;
+	
+		//set field value
+		document.getElementById("td_"+left).innerHTML = "<b>"+right+"</b>";
+	}
+	else {
+		//clear field
+		document.getElementById("td_"+left).innerHTML = "&nbsp;";
+	}
+
+	calculateChecksum();
+}
+
+function calculateChecksum() {
+	
+	var field = "b2";
+	
+	for (i=0;i<4;i++) {
+		//uncheck boxes
+		document.getElementById("cb_"+field+"_"+i).checked = false;
+		
+		//reset bgcolors
+		document.getElementById("td_"+field+"_"+i).bgColor = "#FFFFFF";
+	}
+	
+	if (validateCheckboxes() == true) {
+	
+		code2num();
+
+		var bin = document.getElementById("in_bin").value;
+		var dec = parseInt(bin.replace(/\./g,""),2);
+
+		var checksum = 0;
+		
+		if (document.getElementById("rb_method_ting").checked) {
+			checksum  = (((dec >> 2) ^ (dec >> 8) ^ (dec >> 12) ^ (dec >> 14)) & 0x01) << 1;
+			checksum |= (((dec) ^ (dec >> 4) ^ (dec >>  6) ^ (dec >> 10)) & 0x01);
+		}
+		
+		if (document.getElementById("rb_method_tiptoi").checked) {
+			checksum  = (((dec >> 2) ^ (dec >> 8) ^ (dec >> 12) ^ (dec >> 14)) & 0x01) << 1;
+			checksum |= (((dec) ^ (dec >> 4) ^ (dec >>  6) ^ (dec >> 10)) & 0x01);
+			checksum ^= 0x02; //needs to be tested
+		}
+		
+		document.getElementById("in_checksum").value = checksum;
+		
+		//set bgcolor
+		document.getElementById("td_"+field+"_"+checksum).bgColor = "#FF00FF";
+
+		//check selected box
+		document.getElementById("cb_"+field+"_"+checksum).checked = true;
+
+		//set field value
+		document.getElementById("td_"+field).innerHTML = "<b>"+checksum+"</b>";
+		
+	}
+	else {
+		//clear field
+		document.getElementById("td_"+field).innerHTML = "&nbsp;";
+	}
+	
+}
+
+function validateCheckboxes() {
+
+	//Liste der Felder (b2 => checksum)
+	var fields = new Array("e2","h2","b5","e5","h5","b8","e8","h8");
+	
+	var ret = true;
+	
+	for(var i=0;i<fields.length;i++) {
+		var hits = 0;
+		var field = fields[i];
+		
+		for(var j=0;j<4;j++) {
+			if (document.getElementById("cb_"+field+"_"+j).checked == true) {
+			 	hits++;
+			}
+		}
+		
+		if (hits != 1) {
+			ret = false;
+		}
+	}
+	
+	return ret;
+	
+}
+
+function code2num() {
+
+	//Liste der Felder (b2 => checksum)
+	var fields = new Array("e2","h2","b5","e5","h5","b8","e8","h8");
+	
+	var raw = "";
+	var dec = 0;
+	var tmpbin = "";
+	var bin = "";
+	var zeroes = "00";
+		
+	for(var i=0;i<fields.length;i++) {
+		
+		var field = fields[i];
+
+		for(var j=0;j<4;j++) {
+
+			if (document.getElementById("cb_"+field+"_"+j).checked == true) {
+				
+				tmpbin = parseInt(j).toString(2);
+				if (tmpbin.length < 2) {
+					tmpbin = zeroes.substr(0, 2-tmpbin.length) + tmpbin;
+				}
+								
+				if (raw == "") {
+					raw = parseInt(j).toString();
+					bin = tmpbin;
+				}
+				else {
+					raw += "." + parseInt(j).toString();
+					if (i%2) {
+						bin += tmpbin;
+					}
+					else {
+						bin += "." + tmpbin;
+					}					
+				}
+				
+				dec += Math.pow(4, 7-i)*j;
+				
+			}
+		}
+	}
+	
+	document.getElementById("in_raw").value = raw;
+	document.getElementById("in_bin").value = bin;
+	document.getElementById("in_dec").value = dec;
+	
+}
+
+function raw2code() {
+
+	//Liste der Felder (b2 => checksum)
+	var fields = new Array("e2","h2","b5","e5","h5","b8","e8","h8");
+	var raw = document.getElementById("in_raw").value;
+	
+	if (raw.match(/([0-3]\.){7}[0-3]/)) {
+	
+		for(var i=0;i<fields.length;i++) {
+			var field = fields[i];
+			var number = raw.substr(2*i,1);
+		
+			document.getElementById("cb_"+field+"_"+number).checked = true;
+			checkBoxChanged(field + "_" + number);
+		}
+	}
+	else {
+		alert("invalid dec-value. expected format: 0.1.2.3.0.1.2.3");
+	}
+}
+
+function bin2code() {
+	
+	var bin = document.getElementById("in_bin").value;
+
+	if (bin.match(/(([0-1]){4}\.){3}([0-1]){4}/)) {
+				
+		var binarray = bin.split(".");
+		var raw = "";
+		
+		for (var i=0;i<4;i++) {
+			var leftraw = parseInt(binarray[i].substr(0,2), 2);
+			var rightraw = parseInt(binarray[i].substr(2,2), 2);
+			
+			if (raw == "") {
+				raw = leftraw + "." + rightraw;
+			}
+			else {
+				raw += "." + leftraw + "." + rightraw;
+			}
+		}
+		
+		document.getElementById("in_raw").value = raw;
+		raw2code();
+	}
+	else {
+		alert("invalid bin-value. expected format: 0000.1111.0011.1100");
+	}
+}
+
+function dec2code() {
+	var dec = document.getElementById("in_dec").value;
+
+	if (dec.match(/^\d+$/) && parseInt(dec) >= 0 && parseInt(dec) <= 65535) {
+		
+		var bin="";
+		var binstr = parseInt(dec).toString(2);
+		var zeroes = "00000000000000000";
+		
+		if (binstr.length < 16) {
+			binstr = zeroes.substr(0, 16-binstr.length) + binstr;
+		}
+		
+		document.getElementById("in_bin").value = binstr.substr(0,4)+"."+binstr.substr(4,4)+"."+binstr.substr(8,4)+"."+binstr.substr(12,4);
+		bin2code();
+	}
+	else {
+		alert("invalid dec-value. expected int from 0 to 65535");
+	}
+	
+}
+
+function min2max(dec) {
+	
+	var min = parseInt(document.getElementById("in_min").value);
+	var max = parseInt(document.getElementById("in_max").value);
+	var sleep = parseInt(document.getElementById("in_sleep").value);
+	
+	if (dec < min) {
+		dec = min;
+	}
+
+	document.getElementById("in_dec").value = dec;
+	dec2code();
+	
+	if (dec < max) {
+		dec++;
+		setTimeout(function() { min2max(dec) }, sleep);
+	}
+	
+}
+
+function max2min(dec) {
+	
+	var min = parseInt(document.getElementById("in_min").value);
+	var max = parseInt(document.getElementById("in_max").value);
+	var sleep = parseInt(document.getElementById("in_sleep").value);
+	
+	if (dec > max) {
+		dec = max;
+	}
+	
+	document.getElementById("in_dec").value = dec;
+	dec2code();
+	
+	if (dec > min) {
+		dec--;
+		setTimeout(function() { max2min(dec) }, sleep);
+	}
+	
+}
+
+function add2dec(add) {
+	var dec = parseInt(document.getElementById("in_dec").value);
+	
+	dec += add;
+	
+	if (dec >= 0 && dec <= 65535) {
+	
+		document.getElementById("in_dec").value = dec;
+		dec2code();
+
+	}
+	
+}
+
+function changeMethod() {
+
+	if (validateCheckboxes()) {
+	
+		dec2code();
+	
+	}
+}
+
+</script>
+
+</head>
+
+<body onload="dec2code();">
+
+<table border=1 width="360" height="360" cellspacing="0" cellpadding="0">
+	<tr>
+		<td width="120" cellspacing="0" cellpadding="0">
+			<table border=0 cellspacing="0" cellpadding="0">
+				<tr>
+					<td id="td_b2_2" width="40" height="40" align="center" valign="center"><input type="checkbox" name="b2_2" id="cb_b2_2" value="1" disabled></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_b2_3" width="40" height="40" align="center" valign="center"><input type="checkbox" name="b2_3" id="cb_b2_3" value="1" disabled></td>
+				</tr>
+				<tr>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_b2" width="40" height="40" align="center" valign="center" bgcolor="#00FFFF">&nbsp;</td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+				</tr>
+				<tr>
+					<td id="td_b2_1" width="40" height="40" align="center" valign="center"><input type="checkbox" name="b2_1" id="cb_b2_1" value="1" disabled></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_b2_0" width="40" height="40" align="center" valign="center"><input type="checkbox" name="b2_0" id="cb_b2_0" value="1" disabled></td>
+				</tr>
+			</table>
+		</td>
+		<td width="120" cellspacing="0" cellpadding="0">
+			<table border=0 cellspacing="0" cellpadding="0">
+				<tr>
+					<td id="td_e2_2" width="40" height="40" align="center" valign="center"><input type="checkbox" name="e2_2" id="cb_e2_2" value="1" onclick="checkBoxChanged('e2_2');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_e2_3" width="40" height="40" align="center" valign="center"><input type="checkbox" name="e2_3" id="cb_e2_3" value="1" onclick="checkBoxChanged('e2_3');"></td>
+				</tr>
+				<tr>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_e2" width="40" height="40" align="center" valign="center" bgcolor="#00FFFF">&nbsp;</td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+				</tr>
+				<tr>
+					<td id="td_e2_1" width="40" height="40" align="center" valign="center"><input type="checkbox" name="e2_1" id="cb_e2_1" value="1" onclick="checkBoxChanged('e2_1');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_e2_0" width="40" height="40" align="center" valign="center"><input type="checkbox" name="e2_0" id="cb_e2_0" value="1" onclick="checkBoxChanged('e2_0');"></td>
+				</tr>
+			</table>
+
+		</td>
+		<td width="120" cellspacing="0" cellpadding="0">
+			<table border=0 cellspacing="0" cellpadding="0">
+				<tr>
+					<td id="td_h2_2" width="40" height="40" align="center" valign="center"><input type="checkbox" name="h2_2" id="cb_h2_2" value="1" onclick="checkBoxChanged('h2_2');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_h2_3" width="40" height="40" align="center" valign="center"><input type="checkbox" name="h2_3" id="cb_h2_3" value="1" onclick="checkBoxChanged('h2_3');"></td>
+				</tr>
+				<tr>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_h2" width="40" height="40" align="center" valign="center" bgcolor="#00FFFF">&nbsp;</td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+				</tr>
+				<tr>
+					<td id="td_h2_1" width="40" height="40" align="center" valign="center"><input type="checkbox" name="h2_1" id="cb_h2_1" value="1" onclick="checkBoxChanged('h2_1');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_h2_0" width="40" height="40" align="center" valign="center"><input type="checkbox" name="h2_0" id="cb_h2_0" value="1" onclick="checkBoxChanged('h2_0');"></td>
+				</tr>
+			</table>
+
+		</td>
+	</tr>
+	<tr>
+		<td width="120" cellspacing="0" cellpadding="0">
+			<table border=0 cellspacing="0" cellpadding="0">
+				<tr>
+					<td id="td_b5_2" width="40" height="40" align="center" valign="center"><input type="checkbox" name="b5_2" id="cb_b5_2" value="1" onclick="checkBoxChanged('b5_2');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_b5_3" width="40" height="40" align="center" valign="center"><input type="checkbox" name="b5_3" id="cb_b5_3" value="1" onclick="checkBoxChanged('b5_3');"></td>
+				</tr>
+				<tr>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_b5" width="40" height="40" align="center" valign="center" bgcolor="#00FFFF">&nbsp;</td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+				</tr>
+				<tr>
+					<td id="td_b5_1" width="40" height="40" align="center" valign="center"><input type="checkbox" name="b5_1" id="cb_b5_1" value="1" onclick="checkBoxChanged('b5_1');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_b5_0" width="40" height="40" align="center" valign="center"><input type="checkbox" name="b5_0" id="cb_b5_0" value="1" onclick="checkBoxChanged('b5_0');"></td>
+				</tr>
+			</table>
+		</td>
+		<td width="120" cellspacing="0" cellpadding="0">
+			<table border=0 cellspacing="0" cellpadding="0">
+				<tr>
+					<td id="td_e5_2" width="40" height="40" align="center" valign="center"><input type="checkbox" name="e5_2" id="cb_e5_2" value="1" onclick="checkBoxChanged('e5_2');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_e5_3" width="40" height="40" align="center" valign="center"><input type="checkbox" name="e5_3" id="cb_e5_3" value="1" onclick="checkBoxChanged('e5_3');"></td>
+				</tr>
+				<tr>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_e5" width="40" height="40" align="center" valign="center" bgcolor="#00FFFF">&nbsp;</td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+				</tr>
+				<tr>
+					<td id="td_e5_1" width="40" height="40" align="center" valign="center"><input type="checkbox" name="e5_1" id="cb_e5_1" value="1" onclick="checkBoxChanged('e5_1');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_e5_0" width="40" height="40" align="center" valign="center"><input type="checkbox" name="e5_0" id="cb_e5_0" value="1" onclick="checkBoxChanged('e5_0');"></td>
+				</tr>
+			</table>
+
+		</td>
+		<td width="120" cellspacing="0" cellpadding="0">
+			<table border=0 cellspacing="0" cellpadding="0">
+				<tr>
+					<td id="td_h5_2" width="40" height="40" align="center" valign="center"><input type="checkbox" name="h5_2" id="cb_h5_2" value="1" onclick="checkBoxChanged('h5_2');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_h5_3" width="40" height="40" align="center" valign="center"><input type="checkbox" name="h5_3" id="cb_h5_3" value="1" onclick="checkBoxChanged('h5_3');"></td>
+				</tr>
+				<tr>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_h5" width="40" height="40" align="center" valign="center" bgcolor="#00FFFF">&nbsp;</td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+				</tr>
+				<tr>
+					<td id="td_h5_1" width="40" height="40" align="center" valign="center"><input type="checkbox" name="h5_1" id="cb_h5_1" value="1" onclick="checkBoxChanged('h5_1');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_h5_0" width="40" height="40" align="center" valign="center"><input type="checkbox" name="h5_0" id="cb_h5_0" value="1" onclick="checkBoxChanged('h5_0');"></td>
+				</tr>
+			</table>
+
+		</td>
+	</tr>
+	<tr>
+		<td width="120" cellspacing="0" cellpadding="0">
+			<table border=0 cellspacing="0" cellpadding="0">
+				<tr>
+					<td id="td_b8_2" width="40" height="40" align="center" valign="center"><input type="checkbox" name="b8_2" id="cb_b8_2" value="1" onclick="checkBoxChanged('b8_2');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_b8_3" width="40" height="40" align="center" valign="center"><input type="checkbox" name="b8_2" id="cb_b8_3" value="1" onclick="checkBoxChanged('b8_3');"></td>
+				</tr>
+				<tr>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_b8" width="40" height="40" align="center" valign="center" bgcolor="#00FFFF">&nbsp;</td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+				</tr>
+				<tr>
+					<td id="td_b8_1" width="40" height="40" align="center" valign="center"><input type="checkbox" name="b8_2" id="cb_b8_1" value="1" onclick="checkBoxChanged('b8_1');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_b8_0" width="40" height="40" align="center" valign="center"><input type="checkbox" name="b8_2" id="cb_b8_0" value="1" onclick="checkBoxChanged('b8_0');"></td>
+				</tr>
+			</table>
+		</td>
+		<td width="120" cellspacing="0" cellpadding="0">
+			<table border=0 cellspacing="0" cellpadding="0">
+				<tr>
+					<td id="td_e8_2" width="40" height="40" align="center" valign="center"><input type="checkbox" name="e8_2" id="cb_e8_2" value="1" onclick="checkBoxChanged('e8_2');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_e8_3" width="40" height="40" align="center" valign="center"><input type="checkbox" name="e8_3" id="cb_e8_3" value="1" onclick="checkBoxChanged('e8_3');"></td>
+				</tr>
+				<tr>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_e8" width="40" height="40" align="center" valign="center" bgcolor="#00FFFF">&nbsp;</td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+				</tr>
+				<tr>
+					<td id="td_e8_1" width="40" height="40" align="center" valign="center"><input type="checkbox" name="e8_1" id="cb_e8_1" value="1" onclick="checkBoxChanged('e8_1');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_e8_0" width="40" height="40" align="center" valign="center"><input type="checkbox" name="e8_0" id="cb_e8_0" value="1" onclick="checkBoxChanged('e8_0');"></td>
+				</tr>
+			</table>
+
+		</td>
+		<td width="120" cellspacing="0" cellpadding="0">
+			<table border=0 cellspacing="0" cellpadding="0">
+				<tr>
+					<td id="td_h8_2" width="40" height="40" align="center" valign="center"><input type="checkbox" name="h8_2" id="cb_h8_2" value="1" onclick="checkBoxChanged('h8_2');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_h8_3" width="40" height="40" align="center" valign="center"><input type="checkbox" name="h8_3" id="cb_h8_3" value="1" onclick="checkBoxChanged('h8_3');"></td>
+				</tr>
+				<tr>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_h8" width="40" height="40" align="center" valign="center" bgcolor="#00FFFF">&nbsp;</td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+				</tr>
+				<tr>
+					<td id="td_h8_1" width="40" height="40" align="center" valign="center"><input type="checkbox" name="h8_1" id="cb_h8_1" value="1" onclick="checkBoxChanged('h8_1');"></td>
+					<td width="40" height="40" align="center" valign="center">&nbsp;</td>
+					<td id="td_h8_0" width="40" height="40" align="center" valign="center"><input type="checkbox" name="h8_0" id="cb_h8_0" value="1" onclick="checkBoxChanged('h8_0');"></td>
+				</tr>
+			</table>
+
+		</td>
+	</tr>
+</table>
+
+<br>
+	
+<table border=1 cellspacing="0" cellpadding="0">
+	<tr>
+		<td><b>checksum-method:</b></td>
+		<td><input type="radio" name="rb_method" id="rb_method_tiptoi" value="tiptoi" onclick="changeMethod();" checked>Tiptoi (experimental)
+			<input type="radio" name="rb_method" id="rb_method_ting" value="ting" onclick="changeMethod();">TING</td>
+	</tr>
+	<tr>
+		<td><b>checksum:</b></td>
+		<td><input name="checksum" id="in_checksum" type="text" size="20" maxlength="1" value="0" disabled></td>
+	</tr>
+	<tr>
+		<td><b>raw:</b></td>
+		<td><input name="raw" id="in_raw" type="text" size="20" maxlength="15" value="0.0.0.0.0.0.0.0"
+			onkeydown="if (event.keyCode == 13) raw2code();">
+			<input value="set" name"set_raw" type="button" onclick="raw2code();"></td>
+	</tr>
+	<tr>
+		<td><b>bin:</b></td>
+		<td><input name="bin" id="in_bin" type="text" size="20" maxlength="19" value="0000.0000.0000.0000"
+			onkeydown="if (event.keyCode == 13) bin2code();">
+			<input value="set" name"set_bin" type="button" onclick="bin2code();"></td>
+	</tr>
+	<tr>
+		<td><b>dec:</b></td>
+		<td><input name="dec" id="in_dec" type="text" size="20" maxlength="5" value="0"
+			onkeydown="if (event.keyCode == 13) dec2code();">
+			<input value="set" name"set_dec" type="button" onclick="dec2code();">
+			<input value="-" name"dec_dec" type="button" onclick="add2dec(-1);">
+			<input value="+" name"dec_inc" type="button" onclick="add2dec(1);">
+		</td>
+	</tr>
+</table>
+
+<br>
+<b>generate codes automatically</b>
+<table border=1 cellspacing="0" cellpadding="0">
+	<tr>
+		<td><b>min</b></td>
+		<td><b>max</b></td>
+		<td><b>sleep (ms)</b></td>
+		<td><b>min2max</b></td>
+		<td><b>max2min</b></td>
+	</tr>
+	<tr>
+		<td><input name="min" id="in_min" type="text" size="10" maxlength="5" value="0"></td>
+		<td><input name="max" id="in_max" type="text" size="10" maxlength="5" value="65535"></td>
+		<td><input name="sleep" id="in_sleep" type="text" size="10" maxlength="5" value="500"></td>
+		<td><input value="min2max" name"" type="button" onclick="min2max(0);"></td>
+		<td><input value="max2min" name"" type="button" onclick="max2min(65535);"></td>
+	</tr>
+</table>
+
+</body>
+</html>
