@@ -49,6 +49,7 @@ data Line = Line Offset [Conditional] [Command] PlayList
 
 data TipToiFile = TipToiFile
     { ttProductId :: Word32
+    , ttInitialRegs :: [Word16]
     , ttScripts :: [(Word16, Maybe [Line])]
     , ttAudioFiles :: [B.ByteString]
     , ttAudioFilesDoubles :: Bool
@@ -457,14 +458,21 @@ array g1 g2 = do
 getProductID :: SGet Word32
 getProductID = getSegAt 0x0014 "Product id" getWord32le
 
+getInitialRegs :: SGet [Word16]
+getInitialRegs = do
+    offset <- getSegAt 0x0018 "Initial register offset" getWord32le
+    getSegAt offset "Initial registers" $
+        array getWord16le getWord16le
+
 getTipToiFile :: SGet TipToiFile
 getTipToiFile = do
     id <- getProductID
+    regs <- getInitialRegs
     scripts <- getScripts
     (at, at_doubled, xor) <- getAudios
     checksum <- getChecksum
     checksumCalc <- calcChecksum
-    return (TipToiFile id scripts at at_doubled xor checksum checksumCalc)
+    return (TipToiFile id regs scripts at at_doubled xor checksum checksumCalc)
 
 parseTipToiFile :: B.ByteString -> (TipToiFile, Segments)
 parseTipToiFile = runSGet getTipToiFile
@@ -588,6 +596,8 @@ dumpInfo file = do
     printf "Magic XOR value: 0x%02X\n" (ttAudioXor tt)
     when (ttAudioFilesDoubles tt) $ printf "Audio table repeated twice\n"
     printf "Audio Table entries: %d\n" (length (ttAudioFiles tt))
+    printf "Number of registers: %d\n" (length (ttInitialRegs tt))
+    printf "Initial registers: %s\n" (show (ttInitialRegs tt))
 
 lint :: FilePath -> IO ()
 lint file = do
