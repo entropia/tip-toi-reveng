@@ -40,13 +40,14 @@ The play scripts
 ----------------
 
 At the position referenced by `0x0000` (commonly `0x0200`), is the play script table. It constists of
- * Two 32-bit numbers of unknown meaning
- * An unknown number of offsets. Each of them either is `0xFFFF FFFF` or is an offset to a *play script*. They corresond to the OID code: The first OID code used corresponds to the first *play script*, and so on. `0xFFFF FFFF` means that this OID is disabled. For example, in `WWW_Bauernhof`, OID - 1099 is the index in the table.
+ * a 32 bit number of the largest oid (max_oid) in this book, following by
+ * a 32 bit number of the smallest oid (min_oid) in this book
+ * (max_oid - min_oid + 1) 32bit offsets. Each of them either is `0xFFFF FFFF` or is an offset to a *play script*. They corresond to the OID code: The first OID code used corresponds to the first *play script*, and so on. `0xFFFF FFFF` means that this OID is disabled.
 
 
 A play script contains of another table, which points to one or more *script lines*. A script line consists of a list of *conditional*, a list of *actions*, and a list of *media file indices*. Table of a play scitpt is simply a 16-bit number followed by that many offsets.
 
-A script line has the format  `aa00  conditionals... bb00  actions... cc00 media...` where
+A script line has the format  `aaaa  conditionals... bbbb  actions... cccc media...` where
  * `a` is the number of conditionals,
    - Each conditional is 8 bytes long.
  * `b` is the number of actions,
@@ -54,35 +55,38 @@ A script line has the format  `aa00  conditionals... bb00  actions... cc00 media
  * `c` is the number of media table indices
    - The media table indices are 16-bit numbers.
 
-The conditionals are:
- * `00 rr00 F9FF01 mmmm` (written `$r==m?` in decode's output): Only continue with this line if register `$r` has value `m`.
- * `00 rr00 FBFF01 mmmm` (written `$r<m?` in decode's output): Only continue with this line if register `$r` has a value lower than `m`.
- * `00 rr00 FDFF01 mmmm` (written `$r>=m?` in decode's output): Only continue with this line if register `$r` has a value greater or equal `m`.
- * `00 rr00 FFFF01 mmmm` (written `$r!=m?` in decode's output): Only continue with this line if register `$r` has not value `m`.
+The conditionals are of the format `t1 aaaa cccc t2 bbbb`
+ * `t1` & `t2` (uint8) type of `a` and `b` resp. (0 == register, 1 == value)
+ * `a` & `b` (uint16) value or id of register
+ * `c` (uint16) is the compare operator
 
-The actions are:
- * `rr00 F9FF01 mmmm` (written `$r:=m`): Set register `$r` to `m`
- * `rr00 F0FF01 mmmm` (written `$r+=m`): Increment register `$r` by `m`
- * `rr00 E8FF01 mmmm` (written `P(m)`): Play audio referenced by the `m`th entry in the indices list.
- * `rr00 00FC01 aabb` (written `P(b-a)`): Play a random sample from that inclusive range.
- * `rr00 00FD01 nn00` (written `G(n)`): Begin game `n`.
- * `rr00 FFFA01 FFFF` (written `C`): Cancel game mode.
+Known Compare Operators are:
+ * `FFF9`  equal == (written `$r==m?` in decode's output): Only continue with this line if register `$r` has value `m`.
+ * `FFFB`  lesser < (written `$r<m?` in decode's output): Only continue with this line if register `$r` has a value lower than `m`.
+ * `FFFD`  greater or equal >= (written `$r>=m?` in decode's output): Only continue with this line if register `$r` has a value greater or equal `m`.
+ * `FFFF` not equal !=  (written `$r!=m?` in decode's output): Only continue with this line if register `$r` has not value `m`.
+
+Currently unknown Compare Operators are `FFFA` & `FFFE`.
+
+The actions are of the format `rrrr cccc tt mmmm`
+ * `r` (uint16) id of register
+ * `c` (uint16) is the command
+ * `t` (uint8) type of `m` (0 == register, 1 == value)
+ * `m` (uint16) value or id of register
+
+Known Commands are:
+ * `FFF9` (written `$r:=m`): Set register `$r` to `m` or value of `$m`
+ * `FFF0` (written `$r+=m`): Increment register `$r` by `m` or value of `$m`
+ * `FFE8` (written `P(m)`): Play audio referenced by the `m`th entry in the indices list.
+ * `FC00` (written `P(b-a)`): Play a random sample from that inclusive range. `a` := lowbyte(`m`), `b` := highbyte(`m`)
+ * `FD00` (written `G(n)`): Begin game `n`. `n` := highbyte(`m`.
+ * `FAFF` (written `C`): Cancel game mode.
+
+Currently unknown Commands are `F8FF`, `FB00`, `FE00`, `FF00`, `FFE0`, `FFE1`, `FFF1`, `FFF3` & `FFF4`.
 
 The commands `P`, `G` and `C` seem to ignore their registers, `C` also its parameter (which always is `FFFF`)
 
 There are probably 256 registers. A register can hold 16bit values.
-
-Other commands and conditionals (or variants of existing ones) that have been seen (rarely) in the wild but have not been analyzed yet:
-
-Commands:
-  * `00FB01` (4 times)
-  * `E0FF01` (15 times)
-  * `E1FF01` (25 times)
-  * `F9FF00` (7 times)
-  * `FFF801` (2 times)
-
-Conditionals:
-  * `F9FF00` (4 times)
 
 The audio file table
 --------------------
