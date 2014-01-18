@@ -691,15 +691,17 @@ withEachFile a fs = forM_ fs $ \f -> do
 
 type PlayState = M.Map Word8 Word16
 
-initialState :: PlayState
-initialState = M.singleton 0 1
-
 formatState :: PlayState -> String
-formatState s = spaces $ map (\(k,v) -> printf "$%d=%d" k v) $ M.toAscList s
+formatState s = spaces $
+    map (\(k,v) -> printf "$%d=%d" k v) $
+    filter (\(k,v) -> k == 0 || v /= 0) $
+    M.toAscList s
 
 play :: Transscript -> FilePath -> IO ()
 play t file = do
-    (tt,segments) <- parseTipToiFile <$> B.readFile file
+    (tt,_) <- parseTipToiFile <$> B.readFile file
+    let initialState = M.fromList $ zip [0..] (ttInitialRegs tt)
+    printf "Initial state (not showing zero registers): %s\n" (formatState initialState)
     forEachNumber initialState $ \i s -> do
         case lookup (fromIntegral i) (ttScripts tt) of
             Nothing -> printf "OID %d not in main table\n" i >> return s
