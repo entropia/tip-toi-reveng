@@ -9,8 +9,8 @@ What we know
 The file format consists of these parts
  * A header
  * A block containing the *play scripts*
- * Some unknown data (possibly games)
- * A block containing the audio files, in WAV or OGG format
+ * Some unknown data
+ * A block containing the audio files, in WAV or OGG format (the pen can also play mp3 but we have not found any gme files with mp3s
  * A checksum
 
 All offsets are always relative to the start of the file. If we say something is an 8-bit number followed by a zero byte, it might of course also be a 16-bit number, and we just did not see high values yet.
@@ -21,30 +21,36 @@ The header
 ----------
 
 The header begins with these 8 32-bit numbers, listed with their offset:
- * `0x0000`: The offset to the *play script table*
- * `0x0004`: The offset to the *media file table*
- * `0x0008`: Unknown. Commonly `0x238b`. If you change this value in a working game file it will no longer be accepted. Maybe some kind of header checksum?
- * `0x000C`: The offset to an *aditional script table*
+ * `0x0000`: 32bit offset to the *play script table*
+ * `0x0004`: 32bit offset to the *media file table*
+ * `0x0008`: 32bit. If you change this value in a working game file it will no longer be accepted. Its value is 0x0000238b for all tiptoi products seen so far.
+ * `0x000C`: The offset to an *aditional script table*. Purpose unknown.
  * `0x0010`: The offset to the *game table*
  * `0x0014`: Product id code (== OID code of the power on symbol on page 1)
  * `0x0018`: Pointer to register init values. 16bit counter followed by n*16bit values. First value is register $0, followed by $1 and so on
- * `0x001C`: Unknown, tests revealed that this value probably has something to do with the XOR value of the media file table  
+ * `0x001C`: raw XOR value. This somehow defines how the files in media table are encoded. We know, that they are XORed, and were able to find a way to deduct it before, but the XOR value is not the one seen here. Probably the firmware applies a function on this value that results in the correct XOR value or it uses a lookup table for that. For all seen tiptoi gme files same value here leads to same XOR value. We have found ~55 different combinations as of now.
  * Next (at `0x0020`), is a variable length string, consisting of its length (8-bits), and that many characters. Commonly `CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.4.031`
- * Next is a 8-byte long date (`20111024`). For some books the date contains a language string, e.g `20111024GERMAN` or `20111002DUTCH`.
+ * Next is a 8-byte long date (`20111024`). For some books the date contains a language string, e.g `20111024GERMAN` or `20111002DUTCH`. If the language string is given it must match to language of the firmware that is running on the pen (.tiptoi.log is nit used here!) or the pen will ignore it. If the language is missing any tiptoi pen will accept the file. The date string seem optional, only condition is that the language string must be preceded by at least one ASCII number. At the end there is sequence of zeros up to position 0x5f.
+ * 0x0060: unknown, some files have a 32bit offset here.
  * 0x0071: pointer to the power-on sound (played, when the book is recognized. If 0, no sound is played.)  This pointer leads to a 16 bit counter with the value 1 followed by one 32bit pointer to a media list (16bit count, n*16bit media number)
 
-The rest of the header is dubious, and contains a few more 32-bit numbers.
+The rest of the header is dubious, and contains a few more 16 or 32 bit numbers.
 
 
 The play scripts
 ----------------
 
 At the position referenced by `0x0000` (commonly `0x0200`), is the play script table. It constists of
- * Two 32-bit numbers of unknown meaning
- * An unknown number of offsets. Each of them either is `0xFFFF FFFF` or is an offset to a *play script*. They corresond to the OID code: The first OID code used corresponds to the first *play script*, and so on. `0xFFFF FFFF` means that this OID is disabled. For example, in `WWW_Bauernhof`, OID - 1099 is the index in the table.
+ * 32 bit: last used OID code
+ * 32 bit: first used OID code
+ * Then, 32-bit offsets that point to (what I call) *play script* (see below).
+ * These correspond linearly to the OID codes.
+   E.g. WWW_Bauernhof: The first piglet has OID code 1499, the corresponding
+   jump table is at `0x766A`. This offset is the 100th entry of the main table (4 bytes for each entry). So possibly `4*(OID - 1401) = main table index + 8`. The value 1401 in this example is taken from the second 32-bit word in the main table, it represents the first used OID code within the current book.
+ * Some of these offsets are `0xFFFFFFFF`. This indicates that the corresponding OID code is not used within the book.
+ * The end of the offsets can be found at (maintable + 8 + 4*(last used OID code - first used OID code).
 
-
-A play script contains of another table, which points to one or more *script lines*. A script line consists of a list of *conditional*, a list of *actions*, and a list of *media file indices*. Table of a play scitpt is simply a 16-bit number followed by that many offsets.
+A play script contains of another table (16-bit number followed by that many offsets), which points to one or more *script lines*. A script line consists of a list of *conditional*, a list of *actions*, and a list of *media file indices*.
 
 A script line has the format  `aa00  conditionals... bb00  actions... cc00 media...` where
  * `a` is the number of conditionals,
