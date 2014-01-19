@@ -375,6 +375,10 @@ arrayN g1 g2 = do
     n <- g1
     mapM g2 [0.. fromIntegral n - 1]
 
+indirections :: Integral a => SGet a -> String -> SGet b -> SGet [b]
+indirections g1 prefix g2 =
+    arrayN g1 (\n -> indirection (prefix ++ show n) g2)
+
 -- Parsers
 
 getScripts :: SGet [(Word16, Maybe [Line])]
@@ -389,7 +393,7 @@ getScripts = do
         return (oid,l)
 
 getScript :: SGet [Line]
-getScript = arrayN getWord16 $ \n -> indirection ("Line " ++ show n) lineParser
+getScript = indirections getWord16 "Line " lineParser
 
 getValue :: SGet Value
 getValue = do
