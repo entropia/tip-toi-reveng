@@ -355,20 +355,6 @@ arrayN g1 g2 = do
 
 -- Parsers
 
-getScriptTableOffset :: SGet Offset
-getScriptTableOffset = getSegAt 0x00 "Script Table Offset" getWord32
-
-getScriptTable ::  SGet [(Word16, Offset)]
-getScriptTable = do
-    last_code <- getWord16
-    0 <- getWord16
-    first_code <- getWord16
-    0 <- getWord16
-
-    offs <- replicateM (fromIntegral (last_code - first_code + 1)) $ do
-        getWord32
-    return $ zip [first_code .. last_code] offs
-
 getScripts :: SGet [(Word16, Maybe [Line])]
 getScripts = do
     last_code <- getWord16
@@ -458,18 +444,6 @@ lineParser = begin
             return (Set r n))
         ]
 
-getAudioTable :: Offset -> SGet [(Word32, Word32)]
-getAudioTable offset = getSegAt offset "Audio Table" $ do
-    until <- lookAhead getWord32
-    let n_entries = fromIntegral ((until - offset) `div` 8)
-    replicateM n_entries $ do
-        ptr <- getWord32
-        len <- getWord32
-        return (ptr, len)
-
-getAudioTableOffset :: SGet Offset
-getAudioTableOffset = getSegAt 0x4 "Audio table offset" getWord32
-
 getAudios :: SGet ([B.ByteString], Bool, Word8)
 getAudios = do
     until <- lookAhead getWord32
@@ -489,11 +463,6 @@ getAudios = do
         replicateM_ (fromIntegral n_entries') (getWord32 >> getWord32)
 
     return (decoded, at_doubled, x)
-
-getAudioFile :: Word8 -> Int -> (Offset, Word32) -> SGet B.ByteString
-getAudioFile x n (o,l) =
-    getSegAt o (printf "Audio file %d" n) $ do
-        decypher x <$> getBS (fromIntegral l)
 
 getXor :: SGet Word8
 getXor = do
@@ -583,9 +552,6 @@ ppConditional (Lt g v)            = printf "$%d< %d?" g v
 ppConditional (GEq g v)           = printf "$%d>=%d?" g v
 ppConditional (Unknowncond b g v) = printf "%d??%d? (%s)" g v (prettyHex b)
 
-quote True = "'"
-quote False= ""
-
 ppCommand :: Command -> String
 ppCommand (Play n)        = printf "P(%d)" n
 ppCommand (Random a b)    = printf "P(%d-%d)" b a
@@ -614,13 +580,6 @@ readMaybe :: (Read a) => String -> Maybe a
 readMaybe s = case reads s of
               [(x, "")] -> Just x
               _ -> Nothing
-
-doubled :: Eq a => [a] -> Maybe [a]
-doubled xs | take l2 xs == drop l2 xs = Just (take l2 xs)
-           | otherwise                = Nothing
-  where l = length xs
-        l2 = l `div` 2
-
 
 -- Main commands
 
@@ -750,7 +709,7 @@ findPosition pos' file = do
 unknown_segments :: FilePath -> IO ()
 unknown_segments file = do
     bytes <- B.readFile file
-    let (tt,segments) = parseTipToiFile bytes
+    let (_,segments) = parseTipToiFile bytes
     let unknown_segments =
             filter (\(o,l) -> not
                 (l == 2 && G.runGet (G.skip (fromIntegral o) >> G.getWord16le) bytes == 0)) $
