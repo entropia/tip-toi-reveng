@@ -27,12 +27,12 @@ The header begins with these 8 32-bit numbers, listed with their offset:
  * `0x000C`: The offset to an *aditional script table*. Purpose unknown.
  * `0x0010`: The offset to the *game table*
  * `0x0014`: Product id code (== OID code of the power on symbol on page 1)
- * `0x0018`: Pointer to register init values. 16bit counter followed by n*16bit values. First value is register $0, followed by $1 and so on
+ * `0x0018`: Pointer to register init values. 16bit counter followed by n×16bit values. First value is register $0, followed by $1 and so on
  * `0x001C`: raw XOR value. This somehow defines how the files in media table are encoded. We know, that they are XORed, and were able to find a way to deduct it before, but the XOR value is not the one seen here. Probably the firmware applies a function on this value that results in the correct XOR value or it uses a lookup table for that. For all seen tiptoi gme files same value here leads to same XOR value. We have found ~55 different combinations as of now.
  * Next (at `0x0020`), is a variable length string, consisting of its length (8-bits), and that many characters. Commonly `CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.4.031`
  * Next is a 8-byte long date (`20111024`). For some books the date contains a language string, e.g `20111024GERMAN` or `20111002DUTCH`. If the language string is given it must match to language of the firmware that is running on the pen (.tiptoi.log is nit used here!) or the pen will ignore it. If the language is missing any tiptoi pen will accept the file. The date string seem optional, only condition is that the language string must be preceded by at least one ASCII number. At the end there is sequence of zeros up to position 0x5f.
  * 0x0060: unknown, some files have a 32bit offset here.
- * 0x0071: pointer to the power-on sound (played, when the book is recognized. If 0, no sound is played.)  This pointer leads to a 16 bit counter with the value 1 followed by one 32bit pointer to a media list (16bit count, n*16bit media number)
+ * 0x0071: pointer to the power-on sound (played, when the book is recognized. If 0, no sound is played.)  This pointer leads to a 16 bit counter with the value 1 followed by one 32bit pointer to a media list (16bit count, n×16bit media number)
 
 The rest of the header is dubious, and contains a few more 16 or 32 bit numbers.
 
@@ -46,13 +46,13 @@ At the position referenced by `0x0000` (commonly `0x0200`), is the play script t
  * Then, 32-bit offsets that point to (what I call) *play script* (see below).
  * These correspond linearly to the OID codes.
    E.g. WWW_Bauernhof: The first piglet has OID code 1499, the corresponding
-   jump table is at `0x766A`. This offset is the 100th entry of the main table (4 bytes for each entry). So possibly `4*(OID - 1401) = main table index + 8`. The value 1401 in this example is taken from the second 32-bit word in the main table, it represents the first used OID code within the current book.
+   jump table is at `0x766A`. This offset is the 100th entry of the main table (4 bytes for each entry). So possibly `4×(OID - 1401) = main table index + 8`. The value 1401 in this example is taken from the second 32-bit word in the main table, it represents the first used OID code within the current book.
  * Some of these offsets are `0xFFFFFFFF`. This indicates that the corresponding OID code is not used within the book.
- * The end of the offsets can be found at (maintable + 8 + 4*(last used OID code - first used OID code).
+ * The end of the offsets can be found at (maintable + 8 + 4×(last used OID code - first used OID code).
 
 A play script contains of another table (16-bit number followed by that many offsets), which points to one or more *script lines*. A script line consists of a list of *conditional*, a list of *actions*, and a list of *media file indices*.
 
-A script line has the format  `aa00  conditionals... bb00  actions... cc00 media...` where
+A script line has the format  `aaaa  conditionals... bbbb  actions... cccc media...` where
  * `a` is the number of conditionals,
    - Each conditional is 8 bytes long.
  * `b` is the number of actions,
@@ -60,35 +60,38 @@ A script line has the format  `aa00  conditionals... bb00  actions... cc00 media
  * `c` is the number of media table indices
    - The media table indices are 16-bit numbers.
 
-The conditionals are:
- * `00 rr00 F9FF01 mmmm` (written `$r==m?` in decode's output): Only continue with this line if register `$r` has value `m`.
- * `00 rr00 FBFF01 mmmm` (written `$r<m?` in decode's output): Only continue with this line if register `$r` has a value lower than `m`.
- * `00 rr00 FDFF01 mmmm` (written `$r>=m?` in decode's output): Only continue with this line if register `$r` has a value greater or equal `m`.
- * `00 rr00 FFFF01 mmmm` (written `$r!=m?` in decode's output): Only continue with this line if register `$r` has not value `m`.
+The conditionals are of the format `t1 aaaa cccc t2 bbbb`
+ * `t1` & `t2` (uint8) type of `a` and `b` resp. (0 == register, 1 == value)
+ * `a` & `b` (uint16) value or id of register
+ * `c` (uint16) is the compare operator
 
-The actions are:
- * `rr00 F9FF01 mmmm` (written `$r:=m`): Set register `$r` to `m`
- * `rr00 F0FF01 mmmm` (written `$r+=m`): Increment register `$r` by `m`
- * `rr00 E8FF01 mmmm` (written `P(m)`): Play audio referenced by the `m`th entry in the indices list.
- * `rr00 00FC01 aabb` (written `P(b-a)`): Play a random sample from that inclusive range.
- * `rr00 00FD01 nn00` (written `G(n)`): Begin game `n`.
- * `rr00 FFFA01 FFFF` (written `C`): Cancel game mode.
+Known Compare Operators are:
+ * `FFF9`  equal == (written `$r==m?` in decode's output): Only continue with this line if register `$r` has value `m`.
+ * `FFFB`  lesser < (written `$r<m?` in decode's output): Only continue with this line if register `$r` has a value lower than `m`.
+ * `FFFD`  greater or equal >= (written `$r>=m?` in decode's output): Only continue with this line if register `$r` has a value greater or equal `m`.
+ * `FFFF` not equal !=  (written `$r!=m?` in decode's output): Only continue with this line if register `$r` has not value `m`.
+
+Currently unknown Compare Operators are `FFFA` & `FFFE`.
+
+The actions are of the format `rrrr cccc tt mmmm`
+ * `r` (uint16) id of register
+ * `c` (uint16) is the command
+ * `t` (uint8) type of `m` (0 == register, 1 == value)
+ * `m` (uint16) value or id of register
+
+Known Commands are:
+ * `FFF9` (written `$r:=m`): Set register `$r` to `m` or value of `$m`
+ * `FFF0` (written `$r+=m`): Increment register `$r` by `m` or value of `$m`
+ * `FFE8` (written `P(m)`): Play audio referenced by the `m`th entry in the indices list.
+ * `FC00` (written `P(b-a)`): Play a random sample from that inclusive range. `a` := lowbyte(`m`), `b` := highbyte(`m`)
+ * `FD00` (written `G(m)`): Begin game `m`.
+ * `FAFF` (written `C`): Cancel game mode.
+
+Currently unknown Commands are `F8FF`, `FB00`, `FE00`, `FF00`, `FFE0`, `FFE1`, `FFF1`, `FFF3` & `FFF4`.
 
 The commands `P`, `G` and `C` seem to ignore their registers, `C` also its parameter (which always is `FFFF`)
 
-There are probably 256 registers. A register can hold 16bit values.
-
-Other commands and conditionals (or variants of existing ones) that have been seen (rarely) in the wild but have not been analyzed yet:
-
-Commands:
-  * `00FB01` (4 times)
-  * `E0FF01` (15 times)
-  * `E1FF01` (25 times)
-  * `F9FF00` (7 times)
-  * `FFF801` (2 times)
-
-Conditionals:
-  * `F9FF00` (4 times)
+The number of registers and their intial size is set in the array refernced by `0x0018`. A register can hold 16bit values.
 
 The audio file table
 --------------------
@@ -101,7 +104,7 @@ The audio files themselves are encrypted using a simple scheme, using a magic XO
 
 The magic XOR value can be found by finding the number which makes the first 4 bytes of the first media file read `OggS` or `RIFF`.
 
-In `Leserabe_een.gme*`, the audio table is repeated right after itself. Why?
+In `Leserabe_een.gme`, the audio table is repeated right after itself. Why?
 
 Additional script table
 -----------------------
