@@ -485,15 +485,15 @@ getAudios = do
     offset <- bytesRead
     let n_entries = fromIntegral ((until - offset) `div` 8)
     at_doubled <- lookAhead $ do
-        half1 <- getBS (n_entries `div` 2)
-        half2 <- getBS (n_entries `div` 2)
+        half1 <- getBS (n_entries * 8 `div` 2)
+        half2 <- getBS (n_entries * 8 `div` 2)
         return $ half1 == half2
     let n_entries' | at_doubled = n_entries `div` 2
                    | otherwise  = n_entries
     decoded <- forM [0..n_entries'-1] $ \n -> do
         decypher x <$> indirectBS (show n)
     -- Fix segment
-    when at_doubled $ getSeg "Audio table copy" $
+    when at_doubled $ lookAhead $ getSeg "Audio table copy" $
         replicateM_ (fromIntegral n_entries') (getWord32 >> getWord32)
 
     return (decoded, at_doubled, x)
