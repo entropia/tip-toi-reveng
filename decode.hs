@@ -542,8 +542,7 @@ getGidList :: SGet [OID]
 getGidList = array getWord16 getWord16
 
 getPlayListList :: SGet PlayListList
-getPlayListList =
-    arrayN getWord16 $ \n -> indirection (show n) getPlayList
+getPlayListList = indirections getWord16 "" getPlayList
 
 getSubGame :: SGet SubGame
 getSubGame = do
@@ -551,7 +550,7 @@ getSubGame = do
     oid1s <- getOidList
     oid2s <- getOidList
     oid3s <- getOidList
-    plls <- replicateM 9 (indirection "playlistlist" getPlayListList)
+    plls <- indirections (return 9) "playlistlist " getPlayListList
     return (SubGame u oid1s oid2s oid3s plls)
 
 getGame :: SGet Game
@@ -563,11 +562,11 @@ getGame = do
         u1 <- getWord16
         c <- getWord16
         u2 <- getBS 18
-        plls <- replicateM 7 (indirection "playlistlist" getPlayListList)
-        sg1s <- replicateM (fromIntegral b) (indirection "subgame1" getSubGame)
-        sg2s <- replicateM (fromIntegral c) (indirection "subgame2" getSubGame)
+        plls <- indirections (return 7) "playlistlistA-" getPlayListList
+        sg1s <- indirections (return b) "subgameA-" getSubGame
+        sg2s <- indirections (return c) "subgameB-" getSubGame
         u3 <- getBS 20
-        pll2s <- replicateM 10 (indirection "playlistlist" getPlayListList)
+        pll2s <- indirections (return 10) "playlistlistB-" getPlayListList
         pl <- indirection "playlist" getPlayList
 
         return (Game6 u1 u2 plls sg1s sg2s u3 pll2s pl)
@@ -584,8 +583,8 @@ getGame = do
         return (Game8 u1 c u2 plls sgs u3 pll2s oidl gidl pll1 pll2)
 
       253 -> do -- Special "Power on game"
-        pls <- array getWord16 $ indirection "playlist" getPlayList 
-        return (Game253 pls) 
+        pls <- indirections getWord16 "playlist-" getPlayList
+        return (Game253 pls)
 
       _ -> do
         (u1,c,u2,plls, sgs, u3, pll2s) <- common
@@ -596,15 +595,12 @@ getGame = do
         u1 <- getWord16
         c <- getWord16
         u2 <- getBS 10
-        plls <- replicateM 5 (indirection "playlistlist" getPlayListList)
-        sgs <- replicateM (fromIntegral b) (indirection "subgame" getSubGame)
+        plls <- indirections (return 5) "playlistlistA-" getPlayListList
+        sgs <- indirections (return b) "subgame-" getSubGame
         u3 <- getBS 20
-        pll2s <- replicateM 10 (indirection "playlistlist" getPlayListList)
+        pll2s <- indirections (return 10) "playlistlistB-" getPlayListList
         return (u1, c, u2, plls, sgs, u3, pll2s)
 
-
-getGames :: SGet [Game]
-getGames = array getWord32 $ indirection "Game" getGame
 
 getInitialRegs :: SGet [Word16]
 getInitialRegs = array getWord16 getWord16
@@ -615,7 +611,7 @@ getTipToiFile = getSegAt 0x00 "Header" $ do
     (at, at_doubled, xor) <- indirection "Media" getAudios
     _ <- getWord32 -- Usually 0x0000238b
     _ <- indirection "Additional script" getScript
-    games <- indirection "Games" getGames
+    games <- indirection "Games" $ indirections getWord32 "" getGame
     id <- getWord32
     regs <- indirection "Initial registers" getInitialRegs
     raw_xor <- getWord32
