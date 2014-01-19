@@ -1,2 +1,2 @@
 decode: decode.hs
-	ghc -with-rtsopts=-K100M  decode.hs
+	ghc -O -with-rtsopts=-K100M  decode.hs
