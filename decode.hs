@@ -267,7 +267,7 @@ putAudioTable x as = mapFstMapSnd
 -- Reverse Engineering Monad
 
 type Offset = Word32
-type Segment = (Offset, Word32, String)
+type Segment = (Offset, Word32, [String])
 type Segments = [Segment]
 
 newtype SGet a = SGet (RWS B.ByteString [Segment] Word32  a)
@@ -294,12 +294,35 @@ lookAhead (SGet act) = SGet $ do
 getAt :: Offset -> (SGet a) -> SGet a
 getAt offset act = lookAhead (jumpTo offset >> act)
 
-getSegAt :: Offset -> String -> SGet a -> SGet a
-getSegAt offset desc (SGet act) = getAt offset $ SGet $ do
-    a <- act
+getSeg :: String -> SGet a -> SGet a
+getSeg desc (SGet act) = SGet $ do
+    offset <- get
+    a <- censor (map addDesc) act
     newOffset <- get
-    tell [(offset, newOffset - offset, desc)]
+    tell [(offset, newOffset - offset, [desc])]
     return a
+  where addDesc (o,l,d) = (o,l,desc : d)
+
+getSegAt :: Offset -> String -> SGet a -> SGet a
+getSegAt offset desc act = getAt offset $ getSeg desc act
+
+indirection :: String -> SGet a -> SGet a
+indirection desc act = do
+    offset <- getWord32
+    getSegAt offset desc act
+
+indirectBS :: String -> SGet B.ByteString
+indirectBS desc = do
+    offset <- getWord32
+    length <- getWord32
+    getSegAt offset desc (getBS length)
+
+maybeIndirection :: String -> SGet a -> SGet (Maybe a)
+maybeIndirection desc act = do
+    offset <- getWord32
+    if offset == 0xFFFFFFFF
+    then return Nothing
+    else Just <$> getSegAt offset desc act
 
 getLength :: SGet Word32
 getLength = fromIntegral . B.length <$> getAllBytes
@@ -309,23 +332,34 @@ getAllBytes = SGet ask
 
 runSGet :: SGet a -> B.ByteString -> (a, Segments)
 runSGet (SGet act) bytes =
-    second (sort . ((fromIntegral (B.length bytes), 0, "End of file"):)) $
+    second (sort . ((fromIntegral (B.length bytes), 0, ["End of file"]):)) $
     evalRWS act bytes 0
 
 getWord8  = liftGet G.getWord8
 getWord16 = liftGet G.getWord16le
 getWord32 = liftGet G.getWord32le
-getBS n   = liftGet $ G.getLazyByteString n
+getBS :: Word32 -> SGet B.ByteString
+getBS n   = liftGet $ G.getLazyByteString (fromIntegral n)
 
 bytesRead = SGet get
+
+array :: Integral a => SGet a -> SGet b -> SGet [b]
+array g1 g2 = do
+    n <- g1
+    replicateM (fromIntegral n) g2
+
+arrayN :: Integral a => SGet a -> (Int -> SGet b) -> SGet [b]
+arrayN g1 g2 = do
+    n <- g1
+    mapM g2 [0.. fromIntegral n - 1]
 
 -- Parsers
 
 getScriptTableOffset :: SGet Offset
 getScriptTableOffset = getSegAt 0x00 "Script Table Offset" getWord32
 
-getScriptTable :: Offset -> SGet [(Word16, Offset)]
-getScriptTable offset = getSegAt offset "Script table" $ do
+getScriptTable ::  SGet [(Word16, Offset)]
+getScriptTable = do
     last_code <- getWord16
     0 <- getWord16
     first_code <- getWord16
@@ -337,27 +371,25 @@ getScriptTable offset = getSegAt offset "Script table" $ do
 
 getScripts :: SGet [(Word16, Maybe [Line])]
 getScripts = do
-    sto <- getScriptTableOffset
-    sto <- getScriptTable sto
-    mapM getScript sto
-  where
-    getScript (i, 0xFFFFFFFF) = return (i, Nothing)
-    getScript (i, offset)     = do
-        los <- getLineOffsets i offset
-        ls <- forMn los $ getLine i
-        return (i, Just ls)
+    last_code <- getWord16
+    0 <- getWord16
+    first_code <- getWord16
+    0 <- getWord16
 
-    getLineOffsets i offset = getSegAt offset (printf "Script header for OID %d" i) $ do
-        array getWord16 getWord32
+    forM [first_code .. last_code] $ \oid -> do
+        l <- maybeIndirection (show oid) $ getScript
+        return (oid,l)
 
-    getLine i n offset = getSegAt offset (printf "Script Line %d for OID %d" n i) $
-        lineParser offset
+getScript :: SGet [Line]
+getScript = arrayN getWord16 $ \n -> indirection ("Line " ++ show n) lineParser
 
-lineParser :: Offset -> SGet Line
-lineParser offset = begin
+lineParser :: SGet Line
+lineParser = begin
  where
    -- Find the occurrence of a header
     begin = do
+        offset <- bytesRead
+
         -- Conditionals
         conds <- array getWord16 $ do
             expectWord8 0
@@ -440,13 +472,22 @@ getAudioTableOffset = getSegAt 0x4 "Audio table offset" getWord32
 
 getAudios :: SGet ([B.ByteString], Bool, Word8)
 getAudios = do
-    ato <- getAudioTableOffset
-    at <- getAudioTable ato
-    when (null at) $ fail "No audio files found, aborting"
-    let (at', at_doubled) | Just at' <- doubled at = (at', True)
-                          | otherwise              = (at, False)
-    x <- getAt (fst (head at')) $ getXor
-    decoded <- forMn at' (getAudioFile x)
+    until <- lookAhead getWord32
+    x <- lookAhead $ jumpTo until >> getXor
+    offset <- bytesRead
+    let n_entries = fromIntegral ((until - offset) `div` 8)
+    at_doubled <- lookAhead $ do
+        half1 <- getBS (n_entries `div` 2)
+        half2 <- getBS (n_entries `div` 2)
+        return $ half1 == half2
+    let n_entries' | at_doubled = n_entries `div` 2
+                   | otherwise  = n_entries
+    decoded <- forM [0..n_entries'-1] $ \n -> do
+        decypher x <$> indirectBS (show n)
+    -- Fix segment
+    when at_doubled $ getSeg "Audio table copy" $
+        replicateM_ (fromIntegral n_entries') (getWord32 >> getWord32)
+
     return (decoded, at_doubled, x)
 
 getAudioFile :: Word8 -> Int -> (Offset, Word32) -> SGet B.ByteString
@@ -488,32 +529,28 @@ calcChecksum = do
     bs <- getAt 0 $ getBS (fromIntegral l - 4)
     return $ B.foldl' (\s b -> fromIntegral b + s) 0 bs
 
-array :: Integral a => SGet a -> SGet b -> SGet [b]
-array g1 g2 = do
-    n <- g1
-    replicateM (fromIntegral n) g2
-
 getInitialRegs :: SGet [Word16]
-getInitialRegs = do
-    offset <- getSegAt 0x0018 "Initial register offset" getWord32
-    getSegAt offset "Initial registers" $
-        array getWord16 getWord16
+getInitialRegs = array getWord16 getWord16
 
 getTipToiFile :: SGet TipToiFile
-getTipToiFile = do
-    id <- getSegAt 0x0014 "Product id" getWord32
-    raw_xor <- getSegAt 0x001C "Raw XOR value" getWord32
-    (comment,date) <- getSegAt 0x0020 "Comment and date" $ do
+getTipToiFile = getSegAt 0x00 "Header" $ do
+    scripts <- indirection "Scripts" getScripts
+    (at, at_doubled, xor) <- indirection "Media" getAudios
+    _ <- getWord32 -- Usually 0x0000238b
+    _ <- indirection "Additional script" getScript
+    _ <- getWord32 -- Game table
+    id <- getWord32
+    regs <- indirection "Initial registers" getInitialRegs
+    raw_xor <- getWord32
+    (comment,date) <- do
         l <- getWord8
         c <- getBS (fromIntegral l)
         d <- getBS 8
         return (c,d)
-    regs <- getInitialRegs
-    scripts <- getScripts
-    (at, at_doubled, xor) <- getAudios
     checksum <- getChecksum
     checksumCalc <- calcChecksum
     return (TipToiFile id raw_xor comment date regs scripts at at_doubled xor checksum checksumCalc)
+
 
 parseTipToiFile :: B.ByteString -> (TipToiFile, Segments)
 parseTipToiFile = runSGet getTipToiFile
@@ -665,7 +702,7 @@ lint file = do
             (length overlapping_segments)
         forM_ overlapping_segments $ \((o1,l1,d1),(o2,l2,d2)) ->
             printf "   Offset %08X Size %d (%s) overlaps Offset %08X Size %d (%s) by %d\n"
-            o1 l1 d1 o2 l2 d2 (o1 + l1 - o2)
+            o1 l1 (ppDesc d1) o2 l2 (ppDesc d2) (o1 + l1 - o2)
   where
     hyp1 :: Line -> Bool
     hyp1 (Line _ _ as mi) = all ok as
@@ -678,8 +715,11 @@ lint file = do
     hyp2 n (Line _ _ _ mi) = all (<= n) mi
 
 
+ppDesc :: [String] -> String
+ppDesc = intercalate "/"
 
-printSegment (o,l,desc) = printf "At 0x%08X Size %8d: %s\n" o l desc
+
+printSegment (o,l,desc) = printf "At 0x%08X Size %8d: %s\n" o l (ppDesc desc)
 
 segments :: FilePath -> IO ()
 segments file = do
