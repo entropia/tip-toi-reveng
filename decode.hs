@@ -50,6 +50,8 @@ data Line = Line Offset [Conditional] [Command] PlayList
 data TipToiFile = TipToiFile
     { ttProductId :: Word32
     , ttRawXor :: Word32
+    , ttComment :: B.ByteString
+    , ttDate :: B.ByteString
     , ttInitialRegs :: [Word16]
     , ttScripts :: [(Word16, Maybe [Line])]
     , ttAudioFiles :: [B.ByteString]
@@ -142,10 +144,9 @@ putTipToiFile tt = mdo
     putWord32 (ttProductId tt)
     putWord32 iro
     putWord32 (ttRawXor tt)
-    let text = BC.pack "https://github.com/entropia/tip-toi-reveng"
-    putWord8 (fromIntegral (B.length text))
-    putBS text
-    putBS $ BC.pack "20130101"
+    putWord8 (fromIntegral (B.length (ttComment tt)))
+    putBS (ttComment tt)
+    putBS (ttDate tt)
     seek 0x200 -- Just to be safe
     sto <- getAddress $ putScriptTable (ttScripts tt)
     ast <- getAddress $ putWord16 0x00 -- For now, no additional script table
@@ -470,12 +471,17 @@ getTipToiFile :: SGet TipToiFile
 getTipToiFile = do
     id <- getSegAt 0x0014 "Product id" getWord32le
     raw_xor <- getSegAt 0x001C "Raw XOR value" getWord32le
+    (comment,date) <- getSegAt 0x0020 "Comment and date" $ do
+        l <- getWord8
+        c <- getLazyByteString (fromIntegral l)
+        d <- getLazyByteString 8
+        return (c,d)
     regs <- getInitialRegs
     scripts <- getScripts
     (at, at_doubled, xor) <- getAudios
     checksum <- getChecksum
     checksumCalc <- calcChecksum
-    return (TipToiFile id raw_xor regs scripts at at_doubled xor checksum checksumCalc)
+    return (TipToiFile id raw_xor comment date regs scripts at at_doubled xor checksum checksumCalc)
 
 parseTipToiFile :: B.ByteString -> (TipToiFile, Segments)
 parseTipToiFile = runSGet getTipToiFile
@@ -592,16 +598,18 @@ dumpInfo file = do
     let st = ttScripts tt
 
     printf "Product ID: 0x%08X\n" (ttProductId tt)
-    printf "Checksum found 0x%08X, calculated 0x%08X\n" (ttChecksum tt) (ttChecksumCalc tt)
+    printf "Raw XOR value: 0x%08X\n" (ttRawXor tt)
+    printf "Magic XOR value: 0x%02X\n" (ttAudioXor tt)
+    printf "Comment: %s\n" (BC.unpack (ttComment tt))
+    printf "Date: %s\n" (BC.unpack (ttDate tt))
+    printf "Number of registers: %d\n" (length (ttInitialRegs tt))
+    printf "Initial registers: %s\n" (show (ttInitialRegs tt))
     printf "Scripts for OIDs from %d to %d; %d/%d are disabled.\n"
         (fst (head st)) (fst (last st))
         (length (filter (isNothing . snd) st)) (length st)
-    printf "Raw XOR value: 0x%08X\n" (ttRawXor tt)
-    printf "Magic XOR value: 0x%02X\n" (ttAudioXor tt)
-    when (ttAudioFilesDoubles tt) $ printf "Audio table repeated twice\n"
     printf "Audio Table entries: %d\n" (length (ttAudioFiles tt))
-    printf "Number of registers: %d\n" (length (ttInitialRegs tt))
-    printf "Initial registers: %s\n" (show (ttInitialRegs tt))
+    when (ttAudioFilesDoubles tt) $ printf "Audio table repeated twice\n"
+    printf "Checksum found 0x%08X, calculated 0x%08X\n" (ttChecksum tt) (ttChecksumCalc tt)
 
 lint :: FilePath -> IO ()
 lint file = do
