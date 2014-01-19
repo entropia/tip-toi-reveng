@@ -6,8 +6,9 @@ import System.Environment
 import System.Exit
 import System.FilePath
 import qualified Data.Binary.Builder as Br
-import Data.Binary.Get
+import qualified Data.Binary.Get as G
 import Data.Word
+import Data.Int
 import Text.Printf
 import Data.Bits
 import Data.List
@@ -22,6 +23,7 @@ import qualified Data.Map as M
 import Control.Monad.Writer.Strict
 import Control.Monad.State.Strict
 import Control.Monad.Reader
+import Control.Monad.RWS.Strict
 import Control.Arrow (second)
 import Data.Time
 import System.Locale
@@ -268,17 +270,35 @@ type Offset = Word32
 type Segment = (Offset, Word32, String)
 type Segments = [Segment]
 
-newtype SGet a = SGet (ReaderT B.ByteString (Writer [Segment]) a)
+newtype SGet a = SGet (RWS B.ByteString [Segment] Word32  a)
     deriving (Functor, Monad)
 
-getAt :: Offset -> (Get a) -> SGet a
-getAt offset act = SGet $ runGet (skip (fromIntegral offset) >> act) <$> ask
-
-getSegAt :: Offset -> String -> (Get a) -> SGet a
-getSegAt offset desc act = SGet $ do
+liftGet :: G.Get a -> SGet a
+liftGet act = SGet $ do
+    offset <- get
     bytes <- ask
-    let (a, _, i) = runGetState  (skip (fromIntegral offset) >> act) bytes 0
-    tell [(offset, fromIntegral i - offset, desc)]
+    let (a, _, i) = G.runGetState act (B.drop (fromIntegral offset) bytes) 0
+    put (offset + fromIntegral i)
+    return $ a
+
+jumpTo :: Offset -> SGet ()
+jumpTo offset = SGet (put offset)
+
+lookAhead :: SGet a -> SGet a
+lookAhead (SGet act) = SGet $ do
+    oldOffset <- get
+    a <- act
+    put oldOffset
+    return a
+
+getAt :: Offset -> (SGet a) -> SGet a
+getAt offset act = lookAhead (jumpTo offset >> act)
+
+getSegAt :: Offset -> String -> SGet a -> SGet a
+getSegAt offset desc (SGet act) = getAt offset $ SGet $ do
+    a <- act
+    newOffset <- get
+    tell [(offset, newOffset - offset, desc)]
     return a
 
 getLength :: SGet Word32
@@ -290,22 +310,29 @@ getAllBytes = SGet ask
 runSGet :: SGet a -> B.ByteString -> (a, Segments)
 runSGet (SGet act) bytes =
     second (sort . ((fromIntegral (B.length bytes), 0, "End of file"):)) $
-    runWriter $ runReaderT act bytes
+    evalRWS act bytes 0
+
+getWord8  = liftGet G.getWord8
+getWord16 = liftGet G.getWord16le
+getWord32 = liftGet G.getWord32le
+getBS n   = liftGet $ G.getLazyByteString n
+
+bytesRead = SGet get
 
 -- Parsers
 
 getScriptTableOffset :: SGet Offset
-getScriptTableOffset = getSegAt 0x00 "Script Table Offset" getWord32le
+getScriptTableOffset = getSegAt 0x00 "Script Table Offset" getWord32
 
 getScriptTable :: Offset -> SGet [(Word16, Offset)]
 getScriptTable offset = getSegAt offset "Script table" $ do
-    last_code <- getWord16le
-    0 <- getWord16le
-    first_code <- getWord16le
-    0 <- getWord16le
+    last_code <- getWord16
+    0 <- getWord16
+    first_code <- getWord16
+    0 <- getWord16
 
     offs <- replicateM (fromIntegral (last_code - first_code + 1)) $ do
-        getWord32le
+        getWord32
     return $ zip [first_code .. last_code] offs
 
 getScripts :: SGet [(Word16, Maybe [Line])]
@@ -321,40 +348,40 @@ getScripts = do
         return (i, Just ls)
 
     getLineOffsets i offset = getSegAt offset (printf "Script header for OID %d" i) $ do
-        array getWord16le getWord32le
+        array getWord16 getWord32
 
     getLine i n offset = getSegAt offset (printf "Script Line %d for OID %d" n i) $
         lineParser offset
 
-lineParser :: Offset -> Get Line
+lineParser :: Offset -> SGet Line
 lineParser offset = begin
  where
    -- Find the occurrence of a header
     begin = do
         -- Conditionals
-        conds <- array getWord16le $ do
+        conds <- array getWord16 $ do
             expectWord8 0
             r <- getWord8
             expectWord8 0
-            bytecode <- getLazyByteString 3
-            n <- getWord16le
+            bytecode <- getBS 3
+            n <- getWord16
             case lookup bytecode conditionals of
               Just p -> return $ p r n
               Nothing -> return $ Unknowncond bytecode r n
 
         -- Actions
-        cmds <- array getWord16le $ do
+        cmds <- array getWord16 $ do
             r <- getWord8
             expectWord8 0
-            bytecode <- getLazyByteString 3
+            bytecode <- getBS 3
             case lookup bytecode actions of
               Just p -> p r
               Nothing -> do
-                n <- getWord16le
+                n <- getWord16
                 return $ Unknown bytecode r n
 
         -- Audio links
-        xs <- array getWord16le getWord16le
+        xs <- array getWord16 getWord16
         return $ Line offset conds cmds xs
 
     expectWord8 n = do
@@ -392,24 +419,24 @@ lineParser offset = begin
             expectWord8 0
             return (Game a))
         , (B.pack [0xF0,0xFF,0x01], \r -> do
-            n <- getWord16le
+            n <- getWord16
             return (Inc r n))
         , (B.pack [0xF9,0xFF,0x01], \r -> do
-            n <- getWord16le
+            n <- getWord16
             return (Set r n))
         ]
 
 getAudioTable :: Offset -> SGet [(Word32, Word32)]
 getAudioTable offset = getSegAt offset "Audio Table" $ do
-    until <- lookAhead getWord32le
+    until <- lookAhead getWord32
     let n_entries = fromIntegral ((until - offset) `div` 8)
     replicateM n_entries $ do
-        ptr <- getWord32le
-        len <- getWord32le
+        ptr <- getWord32
+        len <- getWord32
         return (ptr, len)
 
 getAudioTableOffset :: SGet Offset
-getAudioTableOffset = getSegAt 0x4 "Audio table offset" getWord32le
+getAudioTableOffset = getSegAt 0x4 "Audio table offset" getWord32
 
 getAudios :: SGet ([B.ByteString], Bool, Word8)
 getAudios = do
@@ -425,11 +452,11 @@ getAudios = do
 getAudioFile :: Word8 -> Int -> (Offset, Word32) -> SGet B.ByteString
 getAudioFile x n (o,l) =
     getSegAt o (printf "Audio file %d" n) $ do
-        decypher x <$> getLazyByteString (fromIntegral l)
+        decypher x <$> getBS (fromIntegral l)
 
-getXor :: Get Word8
+getXor :: SGet Word8
 getXor = do
-    present <- getLazyByteString 4
+    present <- getBS 4
     -- Brute force, but that's ok here
     case [ n | n <- [0..0xFF]
              , decypher n present `elem` map fst fileMagics ] of
@@ -453,33 +480,33 @@ decypher x = B.map go
 getChecksum :: SGet Word32
 getChecksum = do
     l <- getLength
-    getSegAt (l-4) "Checksum" $ getWord32le
+    getSegAt (l-4) "Checksum" $ getWord32
 
 calcChecksum :: SGet Word32
 calcChecksum = do
     l <- getLength
-    bs <- getAt 0 $ getLazyByteString (fromIntegral l - 4)
+    bs <- getAt 0 $ getBS (fromIntegral l - 4)
     return $ B.foldl' (\s b -> fromIntegral b + s) 0 bs
 
-array :: Integral a => Get a -> Get b -> Get [b]
+array :: Integral a => SGet a -> SGet b -> SGet [b]
 array g1 g2 = do
     n <- g1
     replicateM (fromIntegral n) g2
 
 getInitialRegs :: SGet [Word16]
 getInitialRegs = do
-    offset <- getSegAt 0x0018 "Initial register offset" getWord32le
+    offset <- getSegAt 0x0018 "Initial register offset" getWord32
     getSegAt offset "Initial registers" $
-        array getWord16le getWord16le
+        array getWord16 getWord16
 
 getTipToiFile :: SGet TipToiFile
 getTipToiFile = do
-    id <- getSegAt 0x0014 "Product id" getWord32le
-    raw_xor <- getSegAt 0x001C "Raw XOR value" getWord32le
+    id <- getSegAt 0x0014 "Product id" getWord32
+    raw_xor <- getSegAt 0x001C "Raw XOR value" getWord32
     (comment,date) <- getSegAt 0x0020 "Comment and date" $ do
         l <- getWord8
-        c <- getLazyByteString (fromIntegral l)
-        d <- getLazyByteString 8
+        c <- getBS (fromIntegral l)
+        d <- getBS 8
         return (c,d)
     regs <- getInitialRegs
     scripts <- getScripts
@@ -493,13 +520,10 @@ parseTipToiFile = runSGet getTipToiFile
 
 -- Pretty printing
 
-lineHex bytes l = prettyHex $ runGet (extract (lineOffset l) (lineLength l)) bytes
+lineHex bytes l = prettyHex $ extract (lineOffset l) (lineLength l) bytes
 
-extract :: Offset -> Word32 -> Get (B.ByteString)
-extract off len = do
-    skip (fromIntegral off)
-    getLazyByteString (fromIntegral len)
-
+extract :: Offset -> Word32 -> B.ByteString ->  B.ByteString
+extract off len = B.take  (fromIntegral len) . B.drop (fromIntegral off)
 
 lineOffset (Line o _ _ _) = o
 
@@ -689,7 +713,7 @@ unknown_segments file = do
     let (tt,segments) = parseTipToiFile bytes
     let unknown_segments =
             filter (\(o,l) -> not
-                (l == 2 && runGet (skip (fromIntegral o) >> getWord16le) bytes == 0)) $
+                (l == 2 && G.runGet (G.skip (fromIntegral o) >> G.getWord16le) bytes == 0)) $
             filter (\(o,l) -> l > 0) $
             zipWith (\(o1,l1,_) (o2,_,_) -> (o1+l1, o2-(o1+l1)))
             segments (tail segments)
