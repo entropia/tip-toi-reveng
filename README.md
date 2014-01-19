@@ -27,12 +27,12 @@ The header begins with these 8 32-bit numbers, listed with their offset:
  * `0x000C`: The offset to an *aditional script table*. Purpose unknown.
  * `0x0010`: The offset to the *game table*
  * `0x0014`: Product id code (== OID code of the power on symbol on page 1)
- * `0x0018`: Pointer to register init values. 16bit counter followed by n*16bit values. First value is register $0, followed by $1 and so on
+ * `0x0018`: Pointer to register init values. 16bit counter followed by n×16bit values. First value is register $0, followed by $1 and so on
  * `0x001C`: raw XOR value. This somehow defines how the files in media table are encoded. We know, that they are XORed, and were able to find a way to deduct it before, but the XOR value is not the one seen here. Probably the firmware applies a function on this value that results in the correct XOR value or it uses a lookup table for that. For all seen tiptoi gme files same value here leads to same XOR value. We have found ~55 different combinations as of now.
  * Next (at `0x0020`), is a variable length string, consisting of its length (8-bits), and that many characters. Commonly `CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.4.031`
  * Next is a 8-byte long date (`20111024`). For some books the date contains a language string, e.g `20111024GERMAN` or `20111002DUTCH`. If the language string is given it must match to language of the firmware that is running on the pen (.tiptoi.log is nit used here!) or the pen will ignore it. If the language is missing any tiptoi pen will accept the file. The date string seem optional, only condition is that the language string must be preceded by at least one ASCII number. At the end there is sequence of zeros up to position 0x5f.
  * 0x0060: unknown, some files have a 32bit offset here.
- * 0x0071: pointer to the power-on sound (played, when the book is recognized. If 0, no sound is played.)  This pointer leads to a 16 bit counter with the value 1 followed by one 32bit pointer to a media list (16bit count, n*16bit media number)
+ * 0x0071: pointer to the power-on sound (played, when the book is recognized. If 0, no sound is played.)  This pointer leads to a 16 bit counter with the value 1 followed by one 32bit pointer to a media list (16bit count, n×16bit media number)
 
 The rest of the header is dubious, and contains a few more 16 or 32 bit numbers.
 
@@ -46,9 +46,9 @@ At the position referenced by `0x0000` (commonly `0x0200`), is the play script t
  * Then, 32-bit offsets that point to (what I call) *play script* (see below).
  * These correspond linearly to the OID codes.
    E.g. WWW_Bauernhof: The first piglet has OID code 1499, the corresponding
-   jump table is at `0x766A`. This offset is the 100th entry of the main table (4 bytes for each entry). So possibly `4*(OID - 1401) = main table index + 8`. The value 1401 in this example is taken from the second 32-bit word in the main table, it represents the first used OID code within the current book.
+   jump table is at `0x766A`. This offset is the 100th entry of the main table (4 bytes for each entry). So possibly `4×(OID - 1401) = main table index + 8`. The value 1401 in this example is taken from the second 32-bit word in the main table, it represents the first used OID code within the current book.
  * Some of these offsets are `0xFFFFFFFF`. This indicates that the corresponding OID code is not used within the book.
- * The end of the offsets can be found at (maintable + 8 + 4*(last used OID code - first used OID code).
+ * The end of the offsets can be found at (maintable + 8 + 4×(last used OID code - first used OID code).
 
 A play script contains of another table (16-bit number followed by that many offsets), which points to one or more *script lines*. A script line consists of a list of *conditional*, a list of *actions*, and a list of *media file indices*.
 
@@ -101,7 +101,7 @@ The audio files themselves are encrypted using a simple scheme, using a magic XO
 
 The magic XOR value can be found by finding the number which makes the first 4 bytes of the first media file read `OggS` or `RIFF`.
 
-In `Leserabe_een.gme*`, the audio table is repeated right after itself. Why?
+In `Leserabe_een.gme`, the audio table is repeated right after itself. Why?
 
 Additional script table
 -----------------------
