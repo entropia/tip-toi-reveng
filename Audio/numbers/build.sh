@@ -4,12 +4,12 @@
 # english.
 # Requires flac (package flac) and oggenc (package vorbis-tools)
 
-if test -d numbers/source
+if test -d numbers
 then
-  cd numbers 
+  cd numbers
 fi
 
-if ! test -d source
+if ! test -d ../source
 then
   echo "Please run me in the numbers/ directory"
   exit 1
@@ -23,25 +23,23 @@ function create () {
 	oggenc -Q --downmix --resample 22050 -r - -o $out.ogg
 }
 
-test -d numbers || mkdir numbers
-
 for d4 in $(seq 0 9); do
-create 000$d4 source/blob.flac source/english-$d4.flac
+create 000$d4 ../source/blob.flac ../source/english-$d4.flac
 done
 
 for d3 in $(seq 1 9); do
 for d4 in $(seq 0 9); do
-create 00$d3$d4 source/blob.flac source/english-{$d3,$d4}.flac
+create 00$d3$d4 ../source/blob.flac ../source/english-{$d3,$d4}.flac
 done; done
 
 for d2 in $(seq 1 9); do
 for d3 in $(seq 0 9); do
 for d4 in $(seq 0 9); do
-create 0$d2$d3$d4 source/blob.flac source/english-{$d2,$d3,$d4}.flac
+create 0$d2$d3$d4 ../source/blob.flac ../source/english-{$d2,$d3,$d4}.flac
 done; done; done
 
 for d2 in $(seq 0 9); do
 for d3 in $(seq 0 9); do
 for d4 in $(seq 0 9); do
-create 1$d2$d3$d4 source/blob.flac source/english-{1,$d2,$d3,$d4}.flac
+create 1$d2$d3$d4 ../source/blob.flac ../source/english-{1,$d2,$d3,$d4}.flac
 done; done; done
