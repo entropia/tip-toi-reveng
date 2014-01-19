@@ -48,8 +48,10 @@ type PlayList = [Word16]
 
 data Line = Line Offset [Conditional] [Command] PlayList
 
+type ProductID = Word32
+
 data TipToiFile = TipToiFile
-    { ttProductId :: Word32
+    { ttProductId :: ProductID
     , ttRawXor :: Word32
     , ttComment :: B.ByteString
     , ttDate :: B.ByteString
@@ -94,7 +96,7 @@ data FunSplit m where
 
 
 mapFstMapSnd :: forall m. MonadFix m => [FunSplit m] -> m ()
-mapFstMapSnd xs = const () `liftM` go xs (return ())
+mapFstMapSnd xs = go xs (return ())
   where
     go :: [FunSplit m] -> m b -> m b
     go [] cont = cont
@@ -773,24 +775,24 @@ rewrite inf out = do
     (tt,_) <- parseTipToiFile <$> B.readFile inf
     writeTipToi out tt
 
-debugGame :: IO TipToiFile
-debugGame = do
+debugGame :: ProductID -> IO TipToiFile
+debugGame productID = do
     -- Files orderes so that index 0 says zero, 10 is blob
     files <- mapM B.readFile
-        [ "./Audio/numbers/source/" ++ base ++ ".flac"
+        [ "./Audio/digits/" ++ base ++ ".ogg"
         | base <- [ "english-" ++ [n] | n <- ['0'..'9']] ++ ["blob" ]
         ]
     now <- getCurrentTime
     let date = formatTime defaultTimeLocale "%Y%m%d" now
     return $ TipToiFile
-        { ttProductId = 0x00000001 -- Bauernhof
-        , ttRawXor = 0x00000039 -- dito
+        { ttProductId = productID
+        , ttRawXor = 0x00000039 -- from Bauernhof
         , ttComment = BC.pack "created with tip-toi-reveng"
         , ttDate = BC.pack date
         , ttInitialRegs = [1]
         , ttScripts = [
             (oid, Just [line])
-            | oid <- [1401..1728]
+            | oid <- [1..15000]
             , let chars = [oid `div` 10^p `mod` 10| p <-[3,2,1,0]]
             , let line = Line 0 [] [Play n | n <- [0..4]] ([10] ++ chars)
             ]
@@ -801,10 +803,10 @@ debugGame = do
         , ttChecksumCalc = 0x00
         }
 
-createDebug :: IO ()
-createDebug = do
-    tt <- debugGame
-    writeTipToi "Debug.gme" tt
+createDebug :: FilePath -> ProductID -> IO ()
+createDebug out productID = do
+    tt <- debugGame productID
+    writeTipToi out tt
 
 
 -- The main function
@@ -853,7 +855,9 @@ main' t ("segment": file : n :[])
 main' t ("holes": files)            = withEachFile unknown_segments files
 main' t ("play": file : [])         =              play t file
 main' t ("rewrite": inf : out: [])  =              rewrite inf out
-main' t ("create-debug": [])        =              createDebug
+main' t ("create-debug": out : n :[])
+    | Just int <- readMaybe n       =              createDebug out int
+    | [(int,[])] <- readHex n       =              createDebug out int
 main' t _ = do
     prg <- getProgName
     putStrLn $ "Usage: " ++ prg ++ " [options] command"
@@ -887,8 +891,8 @@ main' t _ = do
     putStrLn $ "       interactively play: Enter OIDs, and see what happens."
     putStrLn $ "    rewrite <infile.gme> <outfile.gme>"
     putStrLn $ "       parses the file and serializes it again (for debugging)."
-    putStrLn $ "    create-debug"
-    putStrLn $ "       creates a special Debug.gme file (compatible with Bauernhof)"
+    putStrLn $ "    create-debug <outfile.gme> <productid>"
+    putStrLn $ "       creates a special Debug.gme file for that productid"
     exitFailure
 
 main = getArgs >>= (main' M.empty)
