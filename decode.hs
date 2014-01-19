@@ -23,7 +23,8 @@ import Control.Monad.Writer.Strict
 import Control.Monad.State.Strict
 import Control.Monad.Reader
 import Control.Arrow (second)
-
+import Data.Time
+import System.Locale
 
 -- Main data types
 data Conditional
@@ -159,6 +160,7 @@ putGameTable :: SPut
 putGameTable = putWord32 0 -- Stub
 
 putScriptTable :: [(Word16, Maybe [Line])] -> SPut
+putScriptTable [] = error "Cannot create file with an empty script table"
 putScriptTable scripts = mdo
     putWord32 (fromIntegral last)
     putWord32 (fromIntegral first)
@@ -411,6 +413,7 @@ getAudios :: SGet ([B.ByteString], Bool, Word8)
 getAudios = do
     ato <- getAudioTableOffset
     at <- getAudioTable ato
+    when (null at) $ fail "No audio files found, aborting"
     let (at', at_doubled) | Just at' <- doubled at = (at', True)
                           | otherwise              = (at, False)
     x <- getAt (fst (head at')) $ getXor
@@ -426,16 +429,16 @@ getXor :: Get Word8
 getXor = do
     present <- getLazyByteString 4
     -- Brute force, but that's ok here
-    return $ head $
-        [ n
-        | n <- [0..0xFF]
-        , decypher n present `elem` map fst fileMagics
-        ]
+    case [ n | n <- [0..0xFF]
+             , decypher n present `elem` map fst fileMagics ] of
+        [] -> fail "Could not find magic hash"
+        (x:_) -> return x
 
 fileMagics :: [(B.ByteString, String)]
 fileMagics =
     [ (BC.pack "RIFF", "wav")
-    , (BC.pack "OggS", "ogg")]
+    , (BC.pack "OggS", "ogg")
+    , (BC.pack "fLaC", "flac")]
 
 decypher :: Word8 -> B.ByteString -> B.ByteString
 decypher x = B.map go
@@ -758,13 +761,50 @@ forEachNumber state action = go state
                 putStrLn "Not a number, please try again"
                 go s
 
-rewrite :: FilePath -> FilePath -> IO ()
-rewrite inf out = do
-    (tt,_) <- parseTipToiFile <$> B.readFile inf
+writeTipToi :: FilePath -> TipToiFile -> IO ()
+writeTipToi out tt = do
     let bytes = runSPut (putTipToiFile tt)
     let checksum = B.foldl' (\s b -> fromIntegral b + s) 0 bytes
     B.writeFile out $ Br.toLazyByteString $
         Br.fromLazyByteString bytes `Br.append` Br.putWord32le checksum
+
+rewrite :: FilePath -> FilePath -> IO ()
+rewrite inf out = do
+    (tt,_) <- parseTipToiFile <$> B.readFile inf
+    writeTipToi out tt
+
+debugGame :: IO TipToiFile
+debugGame = do
+    -- Files orderes so that index 0 says zero, 10 is blob
+    files <- mapM B.readFile
+        [ "./Audio/numbers/source/" ++ base ++ ".flac"
+        | base <- [ "english-" ++ [n] | n <- ['0'..'9']] ++ ["blob" ]
+        ]
+    now <- getCurrentTime
+    let date = formatTime defaultTimeLocale "%Y%m%d" now
+    return $ TipToiFile
+        { ttProductId = 0x00000001 -- Bauernhof
+        , ttRawXor = 0x00000039 -- dito
+        , ttComment = BC.pack "created with tip-toi-reveng"
+        , ttDate = BC.pack date
+        , ttInitialRegs = [1]
+        , ttScripts = [
+            (oid, Just [line])
+            | oid <- [1401..1728]
+            , let chars = [oid `div` 10^p `mod` 10| p <-[3,2,1,0]]
+            , let line = Line 0 [] [Play n | n <- [0..4]] ([10] ++ chars)
+            ]
+        , ttAudioFiles = files
+        , ttAudioXor = 0xAD
+        , ttAudioFilesDoubles = False
+        , ttChecksum = 0x00
+        , ttChecksumCalc = 0x00
+        }
+
+createDebug :: IO ()
+createDebug = do
+    tt <- debugGame
+    writeTipToi "Debug.gme" tt
 
 
 -- The main function
@@ -813,6 +853,7 @@ main' t ("segment": file : n :[])
 main' t ("holes": files)            = withEachFile unknown_segments files
 main' t ("play": file : [])         =              play t file
 main' t ("rewrite": inf : out: [])  =              rewrite inf out
+main' t ("create-debug": [])        =              createDebug
 main' t _ = do
     prg <- getProgName
     putStrLn $ "Usage: " ++ prg ++ " [options] command"
@@ -846,6 +887,8 @@ main' t _ = do
     putStrLn $ "       interactively play: Enter OIDs, and see what happens."
     putStrLn $ "    rewrite <infile.gme> <outfile.gme>"
     putStrLn $ "       parses the file and serializes it again (for debugging)."
+    putStrLn $ "    create-debug"
+    putStrLn $ "       creates a special Debug.gme file (compatible with Bauernhof)"
     exitFailure
 
 main = getArgs >>= (main' M.empty)
