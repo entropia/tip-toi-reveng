@@ -546,8 +546,25 @@ ppLine t (Line _ cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (ma
   where media [] = ""
         media _  = " " ++ ppPlayList t xs
 
+-- Group consecutive runs of numbers, if they do not have a description
+groupRuns :: (Eq a, Enum a) => (a -> Maybe b) -> [a] -> [Either b [a]]
+groupRuns l = go
+  where
+    go []  = []
+    go [x] = case l x of Nothing -> [Right [x]]
+                         Just s  -> [Left s]
+    go (x:xs) = case l x of
+        Just l -> Left l : go xs
+        Nothing -> case go xs of
+            Right (y:ys):r' | succ x == y -> Right (x:y:ys) : r'
+            r                             -> Right [x] : r
+
 ppPlayList :: Transscript -> PlayList -> String
-ppPlayList t xs = "[" ++ commas (map (transcribe t) xs) ++ "]"
+ppPlayList t xs = "[" ++ commas (map go (groupRuns (flip M.lookup t) xs)) ++ "]"
+  where go (Left s) = s
+        go (Right [])  = error "Empty list in groupRuns result"
+        go (Right l)   | length l > 3 = show (head l) ++ ".." ++ show (last l)
+                       | otherwise    = commas (map show l)
 
 ppConditional :: Conditional -> String
 ppConditional (Cond v1 o v2) = printf "%s%s%s?" (ppValue v1) (ppCondOp o) (ppValue v2)
