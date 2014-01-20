@@ -27,6 +27,7 @@ import Control.Monad.RWS.Strict
 import Control.Arrow (second)
 import Data.Time
 import System.Locale
+import Control.Exception
 
 -- Main data types
 
@@ -317,13 +318,19 @@ getAt :: Offset -> (SGet a) -> SGet a
 getAt offset act = lookAhead (jumpTo offset >> act)
 
 getSeg :: String -> SGet a -> SGet a
-getSeg desc (SGet act) = SGet $ do
+getSeg desc (SGet act) = addStack desc $ SGet $ do
     offset <- get
     a <- censor (map addDesc) act
     newOffset <- get
     tell [(offset, newOffset - offset, [desc])]
     return a
   where addDesc (o,l,d) = (o,l,desc : d)
+
+addStack :: String -> SGet a -> SGet a
+addStack desc (SGet act1) = SGet $ rws $ \r s ->
+    mapException annotate (runRWS act1 r s)
+  where
+    annotate (ErrorCall s) = ErrorCall (s ++ "\n when reading segment " ++ desc)
 
 getSegAt :: Offset -> String -> SGet a -> SGet a
 getSegAt offset desc act = getAt offset $ getSeg desc act
