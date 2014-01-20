@@ -337,7 +337,11 @@ getSegAt offset desc act = getAt offset $ getSeg desc act
 
 indirection :: String -> SGet a -> SGet a
 indirection desc act = do
+    position <- bytesRead
     offset <- getWord32
+    l <- getLength
+    when (offset > l) $ do
+        fail $ printf "Trying to read from offset 0x%08X, mentioned at 0x%08X, which is after the end of the file!" offset position
     getSegAt offset desc act
 
 indirectBS :: String -> SGet B.ByteString
