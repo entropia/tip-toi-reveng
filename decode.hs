@@ -665,6 +665,13 @@ ppPlayList t xs = "[" ++ commas (map go (groupRuns (flip M.lookup t) xs)) ++ "]"
         go (Right l)   | length l > 3 = show (head l) ++ ".." ++ show (last l)
                        | otherwise    = commas (map show l)
 
+ppOidList :: [OID] -> String
+ppOidList xs = "[" ++ commas (map go (groupRuns (const Nothing) xs)) ++ "]"
+  where go (Left s) = s
+        go (Right [])  = error "Empty list in groupRuns result"
+        go (Right l)   | length l > 3 = show (head l) ++ ".." ++ show (last l)
+                       | otherwise    = commas (map show l)
+
 ppPlayListList :: Transscript -> PlayListList -> String
 ppPlayListList t xs = "[" ++ commas (map (ppPlayList t) xs) ++ "]"
 
@@ -739,7 +746,7 @@ ppGame t (Game8 u1 c u2 plls sgs u3 pll2s oidl gidl pll1 pll2) =
     (length sgs)    (concatMap (ppSubGame t) sgs)
     (prettyHex u3)
     (length pll2s)  (indent 4 (map (ppPlayListList t) pll2s))
-    (show oidl) (show gidl)
+    (ppOidList oidl) (show gidl)
     (ppPlayListList t pll1) (ppPlayListList t pll2)
 ppGame t (UnknownGame typ u1 c u2 plls sgs u3 pll2s) =
     printf (unlines ["  type: %d",
@@ -772,7 +779,7 @@ ppSubGame t (SubGame u oids1 oids2 oids3 plls) = printf (unlines
     , "      playlistlists: (%d)" , "%s"
     ])
     (prettyHex u)
-    (show oids1) (show oids2) (show oids3)
+    (ppOidList oids1) (ppOidList oids2) (ppOidList oids3)
     (length plls)  (indent 8 (map (ppPlayListList t) plls))
 
 indent n = intercalate "\n" . map (replicate n ' ' ++)
