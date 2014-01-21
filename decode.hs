@@ -609,13 +609,18 @@ prettyHex = intercalate " " . map (printf "%02X") . B.unpack
 
 t .= o = T.pack t Y..= o
 
-instance ToJSON TipToiFile where 
+instance ToJSON TipToiFile where
     toJSON (TipToiFile {..}) = object
         [ "product-id" .= ttProductId
         , "comment"    .= ttComment
-        -- registers
+        , "init"    .= toJSONInitRegs ttInitialRegs
         , "scripts" .= toJSONScipts ttScripts
         ]
+
+toJSONInitRegs regs = toJSON $ spaces
+    [ ppCommand M.empty [] (Set r (Const n))
+    | (r,n) <- zip [0..] regs
+    , n /= 0]
 
 toJSONScipts scripts = object
     [ show oid .= l |(oid,Just l) <- scripts ]
