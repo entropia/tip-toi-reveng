@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, RecursiveDo, ScopedTypeVariables, GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, RecursiveDo, ScopedTypeVariables, GADTs, RecordWildCards #-}
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
@@ -28,6 +28,9 @@ import Control.Monad.RWS.Strict
 import Control.Arrow (second)
 import Data.Time
 import System.Locale
+import Data.Yaml hiding ((.=))
+import qualified Data.Yaml as Y
+import qualified Data.Text as T
 
 -- Main data types
 
@@ -543,9 +546,8 @@ lineLength (Line _ conds cmds audio) = fromIntegral $
     2 + 8 * length conds + 2 + 7 * length cmds + 2 + 2 * length audio
 
 ppLine :: Transscript -> Line -> String
-ppLine t (Line _ cs as xs) = spaces (map ppConditional cs) ++ ": " ++ spaces (map ppCommand as) ++ media xs
-  where media [] = ""
-        media _  = " " ++ ppPlayList t xs
+ppLine t (Line _ cs as xs) = spaces $
+    map ppConditional cs ++ map (ppCommand t xs) as
 
 -- Group consecutive runs of numbers, if they do not have a description
 groupRuns :: (Eq a, Enum a) => (a -> Maybe b) -> [a] -> [Either b [a]]
@@ -581,14 +583,20 @@ ppTVal :: TVal -> String
 ppTVal (Reg n)   =  "$" ++ show n
 ppTVal (Const n) =  show n
 
-ppCommand :: Command -> String
-ppCommand (Play n)        = printf "P(%d)" n
-ppCommand (Random a b)    = printf "P(%d-%d)" b a
-ppCommand (Cancel)        = printf "C"
-ppCommand (Game b)        = printf "G(%d)" b
-ppCommand (Inc r n)       = printf "$%d+=%s" r (ppTVal n)
-ppCommand (Set r n)       = printf "$%d:=%s" r (ppTVal n)
-ppCommand (Unknown b r n) = printf "?($%d,%s) (%s)" r (ppTVal n) (prettyHex b)
+ppCommand :: Transscript -> PlayList -> Command -> String
+ppCommand t xs (Play n)        = printf "P(%s)" (ppPlayIndex t xs (fromIntegral n))
+ppCommand t xs (Random a b)    = printf "P(%s)" $ commas $ map (ppPlayIndex t xs . fromIntegral ) [b..a]
+ppCommand t xs (Cancel)        = printf "C"
+ppCommand t xs (Game b)        = printf "G(%d)" b
+ppCommand t xs (Inc r n)       = printf "$%d+=%s" r (ppTVal n)
+ppCommand t xs (Set r n)       = printf "$%d:=%s" r (ppTVal n)
+ppCommand t xs (Unknown b r n) = printf "?($%d,%s) (%s)" r (ppTVal n) (prettyHex b)
+
+ppPlayIndex :: Transscript -> PlayList -> Int -> String
+ppPlayIndex t xs n
+    = if (n < 0 || length xs <= n)
+      then "invalid_index_" ++ show n
+      else transcribe t (xs !! n)
 
 spaces = intercalate " "
 commas = intercalate ","
@@ -596,6 +604,24 @@ commas = intercalate ","
 
 prettyHex :: B.ByteString -> String
 prettyHex = intercalate " " . map (printf "%02X") . B.unpack
+
+-- YAML file format
+
+t .= o = T.pack t Y..= o
+
+instance ToJSON TipToiFile where 
+    toJSON (TipToiFile {..}) = object
+        [ "product-id" .= ttProductId
+        , "comment"    .= ttComment
+        -- registers
+        , "scripts" .= toJSONScipts ttScripts
+        ]
+
+toJSONScipts scripts = object
+    [ show oid .= l |(oid,Just l) <- scripts ]
+
+instance ToJSON Line where
+    toJSON = toJSON . ppLine M.empty
 
 -- Utilities
 
@@ -873,6 +899,11 @@ rewrite inf out = do
     (tt,_) <- parseTipToiFile <$> B.readFile inf
     writeTipToi out tt
 
+export :: FilePath -> FilePath -> IO ()
+export inf out = do
+    (tt,_) <- parseTipToiFile <$> B.readFile inf
+    encodeFile out tt
+
 debugGame :: ProductID -> IO TipToiFile
 debugGame productID = do
     -- Files orderes so that index 0 says zero, 10 is blob
@@ -935,6 +966,7 @@ main' t ("-t":transscript:args) =
     do t2 <- readTransscriptFile transscript
        main' (t `M.union` t2) args
 
+main' t ("export": inf : [] )       = main' t ("export":inf: dropExtension inf <.> "yaml":[])
 
 main' t ("info": files)             = withEachFile dumpInfo files
 main' t ("media": "-d": dir: files) = withEachFile (dumpAudioTo dir) files
@@ -954,6 +986,7 @@ main' t ("holes": files)            = withEachFile unknown_segments files
 main' t ("explain": files)          = withEachFile explain files
 main' t ("play": file : [])         =              play t file
 main' t ("rewrite": inf : out: [])  =              rewrite inf out
+main' t ("export": inf : out: [] )  =              export inf out
 main' t ("create-debug": out : n :[])
     | Just int <- readMaybe n       =              createDebug out int
     | [(int,[])] <- readHex n       =              createDebug out int
@@ -994,6 +1027,8 @@ main' t _ = do
     putStrLn $ "       parses the file and serializes it again (for debugging)."
     putStrLn $ "    create-debug <outfile.gme> <productid>"
     putStrLn $ "       creates a special Debug.gme file for that productid"
+    putStrLn $ "    export <infile.gme> [<outfile.yaml>]"
+    putStrLn $ "       dumps the file in the human-readable yaml format"
     exitFailure
 
 main = getArgs >>= (main' M.empty)
