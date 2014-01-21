@@ -13,12 +13,13 @@ import Text.Printf
 import Data.Bits
 import Data.List
 import Data.Char
+import Data.Either
 import Data.Functor
 import Data.Maybe
 import Data.Ord
 import Control.Monad
 import System.Directory
-import Numeric (showHex, readHex)
+import Numeric (readHex)
 import qualified Data.Map as M
 import Control.Monad.Writer.Strict
 import Control.Monad.State.Strict
@@ -713,6 +714,39 @@ segments file = do
     (tt,segments) <- parseTipToiFile <$> B.readFile file
     mapM_ printSegment segments
 
+explain :: FilePath -> IO ()
+explain file = do
+    bytes <- B.readFile file
+    let (tt,segments) = parseTipToiFile bytes
+    forM_ (addHoles segments) $ \e -> case e of
+        Left (o,l) -> do
+            printSegment (o,l,["-- unknown --"])
+            printExtract bytes o l
+            putStrLn ""
+        Right s@(o,l,_) -> do
+            printSegment s
+            printExtract bytes o l
+            putStrLn ""
+
+printExtract :: B.ByteString -> Offset -> Word32 -> IO ()
+printExtract b o l = do
+    let o1 = o .&. 0xFFFFFFF0
+    lim_forM_ [o1, o1+0x10 .. (o + l-1)] $ \s -> do
+        let s' = max o s
+        let d  = fromIntegral s' - fromIntegral s
+        let l' = (min (o + l) (s + 0x10)) - s'
+        printf "   0x%08X: %s%s\n"
+            s
+            (replicate (d*3) ' ')
+            (prettyHex (extract s' l' b))
+  where
+    lim_forM_ l act
+        = if length l > 30
+          then do act (head l)
+                  printf "   (skipping %d lines)\n" (length l - 2) :: IO ()
+                  act (last l)
+          else do forM_ l act
+
 findPosition :: Integer -> FilePath -> IO ()
 findPosition pos' file = do
     (tt,segments) <- parseTipToiFile <$> B.readFile file
@@ -734,6 +768,17 @@ findPosition pos' file = do
     where
     pos = fromIntegral pos'
 
+
+addHoles :: [Segment] -> [Either (Offset, Word32) Segment]
+addHoles = go
+   where go [] = []
+         go [s] = [Right s]
+         go (s@(o1,l1,d2):r@((o2,_,_):_))
+            | o1 + l1 == o2 -- no hole
+            = Right s : go r
+            | otherwise -- a hole
+            = Right s : Left (o1+l1, o2 - (o1 + l1)) : go r
+
 unknown_segments :: FilePath -> IO ()
 unknown_segments file = do
     bytes <- B.readFile file
@@ -741,9 +786,7 @@ unknown_segments file = do
     let unknown_segments =
             filter (\(o,l) -> not
                 (l == 2 && G.runGet (G.skip (fromIntegral o) >> G.getWord16le) bytes == 0)) $
-            filter (\(o,l) -> l > 0) $
-            zipWith (\(o1,l1,_) (o2,_,_) -> (o1+l1, o2-(o1+l1)))
-            segments (tail segments)
+            lefts $ addHoles $ segments
     printf "Unknown file segments: %d (%d bytes total)\n"
         (length unknown_segments) (sum (map snd unknown_segments))
     forM_ unknown_segments $ \(o,l) ->
@@ -908,6 +951,7 @@ main' t ("segment": file : n :[])
     | Just int <- readMaybe n       =              findPosition int file
     | [(int,[])] <- readHex n       =              findPosition int file
 main' t ("holes": files)            = withEachFile unknown_segments files
+main' t ("explain": files)          = withEachFile explain files
 main' t ("play": file : [])         =              play t file
 main' t ("rewrite": inf : out: [])  =              rewrite inf out
 main' t ("create-debug": out : n :[])
@@ -942,6 +986,8 @@ main' t _ = do
     putStrLn $ "       which segment contains the given position."
     putStrLn $ "    holes <file.gme>..."
     putStrLn $ "       lists all unknown parts of the file."
+    putStrLn $ "    explain <file.gme>..."
+    putStrLn $ "       lists all parts of the file, with description and hexdum and hexdumpp."
     putStrLn $ "    play <file.gme>"
     putStrLn $ "       interactively play: Enter OIDs, and see what happens."
     putStrLn $ "    rewrite <infile.gme> <outfile.gme>"
