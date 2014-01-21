@@ -336,19 +336,19 @@ getBS n   = liftGet $ G.getLazyByteString (fromIntegral n)
 
 bytesRead = SGet get
 
-array :: Integral a => SGet a -> SGet b -> SGet [b]
-array g1 g2 = do
+getArray :: Integral a => SGet a -> SGet b -> SGet [b]
+getArray g1 g2 = do
     n <- g1
     replicateM (fromIntegral n) g2
 
-arrayN :: Integral a => SGet a -> (Int -> SGet b) -> SGet [b]
-arrayN g1 g2 = do
+getArrayN :: Integral a => SGet a -> (Int -> SGet b) -> SGet [b]
+getArrayN g1 g2 = do
     n <- g1
     mapM g2 [0.. fromIntegral n - 1]
 
 indirections :: Integral a => SGet a -> String -> SGet b -> SGet [b]
 indirections g1 prefix g2 =
-    arrayN g1 (\n -> indirection (prefix ++ show n) g2)
+    getArrayN g1 (\n -> indirection (prefix ++ show n) g2)
 
 -- Parsers
 
@@ -382,7 +382,7 @@ lineParser = begin
         offset <- bytesRead
 
         -- Conditionals
-        conds <- array getWord16 $ do
+        conds <- getArray getWord16 $ do
             v1 <- getTVal
             bytecode <- getBS 2
             let op = fromMaybe (Unknowncond bytecode) $
@@ -391,7 +391,7 @@ lineParser = begin
             return $ Cond v1 op v2
 
         -- Actions
-        cmds <- array getWord16 $ do
+        cmds <- getArray getWord16 $ do
             r <- getWord16
             bytecode <- getBS 2
             case lookup bytecode actions of
@@ -401,7 +401,7 @@ lineParser = begin
                 return $ Unknown bytecode r n
 
         -- Audio links
-        xs <- array getWord16 getWord16
+        xs <- getArray getWord16 getWord16
         return $ Line offset conds cmds xs
 
     expectWord8 n = do
@@ -504,7 +504,7 @@ calcChecksum = do
     return $ B.foldl' (\s b -> fromIntegral b + s) 0 bs
 
 getInitialRegs :: SGet [Word16]
-getInitialRegs = array getWord16 getWord16
+getInitialRegs = getArray getWord16 getWord16
 
 getTipToiFile :: SGet TipToiFile
 getTipToiFile = getSegAt 0x00 "Header" $ do
