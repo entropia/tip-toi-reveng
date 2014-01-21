@@ -32,12 +32,12 @@ import System.Locale
 -- Main data types
 
 type Register = Word16
-data Value
+data TVal
     = Reg Register
     | Const Word16
     deriving Eq
 
-data Conditional = Cond Value CondOp Value
+data Conditional = Cond TVal CondOp TVal
 
 data CondOp
     = Eq
@@ -51,9 +51,9 @@ data Command
     | Random Word8 Word8
     | Cancel
     | Game Word16
-    | Inc Register Value
-    | Set Register Value
-    | Unknown B.ByteString Register Value
+    | Inc Register TVal
+    | Set Register TVal
+    | Unknown B.ByteString Register TVal
     deriving Eq
 
 type PlayList = [Word16]
@@ -202,15 +202,15 @@ putLine (Line _ conds acts idx) = do
 
 putCond :: Conditional -> SPut
 putCond (Cond v1 o v2) = do
-    putValue v1
+    putTVal v1
     putCondOp o
-    putValue v2
+    putTVal v2
 
-putValue :: Value -> SPut
-putValue (Reg r) = do
+putTVal :: TVal -> SPut
+putTVal (Reg r) = do
     putWord8 0
     putWord16 r
-putValue (Const n) = do
+putTVal (Const n) = do
     putWord8 1
     putWord16 n
 
@@ -225,31 +225,31 @@ putCommand :: Command -> SPut
 putCommand (Set r v) = do
     putWord16 r
     mapM_ putWord8 [0xF9, 0xFF]
-    putValue v
+    putTVal v
 putCommand (Inc r v) = do
     putWord16 r
     mapM_ putWord8 [0xF0, 0xFF]
-    putValue v
+    putTVal v
 putCommand (Play n) = do
     putWord16 0
     mapM_ putWord8 [0xE8, 0xFF]
-    putValue (Const (fromIntegral n))
+    putTVal (Const (fromIntegral n))
 putCommand (Random a b) = do
     putWord16 0
     mapM_ putWord8 [0x00, 0xFC]
-    putValue (Const (lowhigh a b))
+    putTVal (Const (lowhigh a b))
 putCommand (Game n) = do
     putWord16 0
     mapM_ putWord8 [0x00, 0xFD]
-    putValue (Const n)
+    putTVal (Const n)
 putCommand Cancel = do
     putWord16 0
     mapM_ putWord8 [0xFF, 0xFA]
-    putValue (Const 0xFFFF)
+    putTVal (Const 0xFFFF)
 putCommand (Unknown b r v) = do
     putWord16 r
     putBS b
-    putValue v
+    putTVal v
 
 putAudioTable :: Word8 -> [B.ByteString] -> SPut
 putAudioTable x as = mapFstMapSnd
@@ -366,8 +366,8 @@ getScripts = do
 getScript :: SGet [Line]
 getScript = indirections getWord16 "Line " lineParser
 
-getValue :: SGet Value
-getValue = do
+getTVal :: SGet TVal
+getTVal = do
     t <- getWord8
     case t of
      0 -> Reg <$> getWord16
@@ -383,11 +383,11 @@ lineParser = begin
 
         -- Conditionals
         conds <- array getWord16 $ do
-            v1 <- getValue
+            v1 <- getTVal
             bytecode <- getBS 2
             let op = fromMaybe (Unknowncond bytecode) $
                      lookup bytecode conditionals
-            v2 <- getValue
+            v2 <- getTVal
             return $ Cond v1 op v2
 
         -- Actions
@@ -397,7 +397,7 @@ lineParser = begin
             case lookup bytecode actions of
               Just p -> p r
               Nothing -> do
-                n <- getValue
+                n <- getTVal
                 return $ Unknown bytecode r n
 
         -- Audio links
@@ -420,25 +420,25 @@ lineParser = begin
     actions =
         [ (B.pack [0xE8,0xFF], \r -> do
             unless (r == 0) $ fail "Non-zero register for Play command"
-            Const n <- getValue
+            Const n <- getTVal
             return (Play n))
         , (B.pack [0x00,0xFC], \r -> do
             unless (r == 0) $ fail "Non-zero register for Random command"
-            Const n <- getValue
+            Const n <- getTVal
             return (Random (lowbyte n) (highbyte n)))
         , (B.pack [0xFF,0xFA], \r -> do
             unless (r == 0) $ fail "Non-zero register for Cancel command"
-            Const 0xFFFF <- getValue
+            Const 0xFFFF <- getTVal
             return Cancel)
         , (B.pack [0x00,0xFD], \r -> do
             unless (r == 0) $ fail "Non-zero register for Game command"
-            Const a <- getValue
+            Const a <- getTVal
             return (Game a))
         , (B.pack [0xF0,0xFF], \r -> do
-            n <- getValue
+            n <- getTVal
             return (Inc r n))
         , (B.pack [0xF9,0xFF], \r -> do
-            n <- getValue
+            n <- getTVal
             return (Set r n))
         ]
 
@@ -568,7 +568,7 @@ ppPlayList t xs = "[" ++ commas (map go (groupRuns (flip M.lookup t) xs)) ++ "]"
                        | otherwise    = commas (map show l)
 
 ppConditional :: Conditional -> String
-ppConditional (Cond v1 o v2) = printf "%s%s%s?" (ppValue v1) (ppCondOp o) (ppValue v2)
+ppConditional (Cond v1 o v2) = printf "%s%s%s?" (ppTVal v1) (ppCondOp o) (ppTVal v2)
 
 ppCondOp :: CondOp -> String
 ppCondOp Eq              = "=="
@@ -577,18 +577,18 @@ ppCondOp Lt              = "< "
 ppCondOp GEq             = ">="
 ppCondOp (Unknowncond b) = printf "?%s?" (prettyHex b)
 
-ppValue :: Value -> String
-ppValue (Reg n)   =  "$" ++ show n
-ppValue (Const n) =  show n
+ppTVal :: TVal -> String
+ppTVal (Reg n)   =  "$" ++ show n
+ppTVal (Const n) =  show n
 
 ppCommand :: Command -> String
 ppCommand (Play n)        = printf "P(%d)" n
 ppCommand (Random a b)    = printf "P(%d-%d)" b a
 ppCommand (Cancel)        = printf "C"
 ppCommand (Game b)        = printf "G(%d)" b
-ppCommand (Inc r n)       = printf "$%d+=%s" r (ppValue n)
-ppCommand (Set r n)       = printf "$%d:=%s" r (ppValue n)
-ppCommand (Unknown b r n) = printf "?($%d,%s) (%s)" r (ppValue n) (prettyHex b)
+ppCommand (Inc r n)       = printf "$%d+=%s" r (ppTVal n)
+ppCommand (Set r n)       = printf "$%d:=%s" r (ppTVal n)
+ppCommand (Unknown b r n) = printf "?($%d,%s) (%s)" r (ppTVal n) (prettyHex b)
 
 spaces = intercalate " "
 commas = intercalate ","
@@ -839,7 +839,7 @@ condTrue s (Cond v1 o v2) = value s v1 =?= value s v2
         GEq -> (>=)
         _   -> \_ _ -> False
 
-value :: PlayState -> Value -> Word16
+value :: PlayState -> TVal -> Word16
 value m (Reg r)   = M.findWithDefault 0 r m
 value m (Const n) = n
 
