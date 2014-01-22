@@ -613,30 +613,6 @@ commas = intercalate ","
 prettyHex :: B.ByteString -> String
 prettyHex = intercalate " " . map (printf "%02X") . B.unpack
 
--- YAML file format
-
-t .= o = T.pack t Y..= o
-
-instance ToJSON TipToiFile where
-    toJSON (TipToiFile {..}) = object
-        [ "product-id" .= ttProductId
-        , "comment"    .= ttComment
-        , "init"    .= toJSONInitRegs ttInitialRegs
-        , "scripts" .= toJSONScipts ttScripts
-        ]
-
-toJSONInitRegs regs = toJSON $ spaces
-    [ ppCommand M.empty [] (Set r (Const n))
-    | (r,n) <- zip [0..] regs
-    , n /= 0]
-
-toJSONScipts scripts = object
-    [ show oid .= l |(oid,Just l) <- scripts ]
-
-instance ToJSON Line where
-    toJSON = toJSON . ppLine M.empty
-
-
 -- Utilities
 
 forMn_ :: Monad m => [a] -> (Int -> a -> m b) -> m ()
@@ -661,7 +637,7 @@ dumpAudioTo directory file = do
     createDirectoryIfMissing False directory
     forMn_ (ttAudioFiles tt) $ \n audio -> do
         let audiotype = fromMaybe "raw" $ lookup (B.take 4 audio) fileMagics
-        let filename = printf "%s/%s_%04d.%s" directory (takeBaseName file) n audiotype
+        let filename = printf "%s/%s_%d.%s" directory (takeBaseName file) n audiotype
         if B.null audio
         then do
             printf "Skipping empty file %s...\n" filename
@@ -916,7 +892,8 @@ rewrite inf out = do
 export :: FilePath -> FilePath -> IO ()
 export inf out = do
     (tt,_) <- parseTipToiFile <$> B.readFile inf
-    encodeFile out tt
+    let tty = tt2ttYaml (printf "media/%s_%%s.ogg" (takeBaseName inf)) tt
+    encodeFile out tty
 
 
 data TipToiYAML = TipToiYAML
@@ -928,12 +905,14 @@ data TipToiYAML = TipToiYAML
     }
     deriving Generic
 
-
-instance FromJSON TipToiYAML where
-     parseJSON = genericParseJSON $ defaultOptions
-        { fieldLabelModifier = map fix . map toLower . drop 3 }
+options = defaultOptions { fieldLabelModifier = map fix . map toLower . drop 3 }
        where fix '_' = '-'
              fix c   = c
+
+instance FromJSON TipToiYAML where
+     parseJSON = genericParseJSON $ options
+instance ToJSON TipToiYAML where
+     toJSON = genericToJSON $ options
 
 lexer       = P.makeTokenParser emptyDef
 
@@ -1021,6 +1000,17 @@ cmdRegs :: Command -> [Register]
 cmdRegs (Inc r v) = r : valRegs v
 cmdRegs (Set r v) = r : valRegs v
 cmdRegs _         = []
+
+tt2ttYaml :: String -> TipToiFile -> TipToiYAML
+tt2ttYaml path (TipToiFile {..}) = TipToiYAML
+    { ttyProduct_Id = ttProductId
+    , ttyInit = Just $ spaces $ [ ppCommand M.empty [] (Set r (Const n))
+                                | (r,n) <- zip [0..] ttInitialRegs , n /= 0]
+    , ttyComment = Just $ BC.unpack ttComment
+    , ttyScripts = M.fromList
+        [ (show oid, map (ppLine M.empty) ls) | (oid, Just ls) <- ttScripts]
+    , ttyMedia_Path = Just path
+    }
 
 ttYaml2tt :: TipToiYAML -> IO TipToiFile
 ttYaml2tt (TipToiYAML {..}) = do
