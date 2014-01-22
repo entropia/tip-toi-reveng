@@ -892,7 +892,7 @@ rewrite inf out = do
 export :: FilePath -> FilePath -> IO ()
 export inf out = do
     (tt,_) <- parseTipToiFile <$> B.readFile inf
-    let tty = tt2ttYaml (printf "media/%s_%%s.ogg" (takeBaseName inf)) tt
+    let tty = tt2ttYaml (printf "media/%s_%%s" (takeBaseName inf)) tt
     encodeFile out tty
 
 
@@ -1048,8 +1048,19 @@ ttYaml2tt (TipToiYAML {..}) = do
         Right l -> return $ M.fromList l
 
     files <- forM filenames' $ \fn -> do
-        let path = printf (fromMaybe "media/%s.ogg" ttyMedia_Path) fn
-        B.readFile path
+        let paths = [ printf (fromMaybe "media/%s" ttyMedia_Path) fn <.> ext
+                    | (_,ext) <- fileMagics ]
+        ex <- filterM doesFileExist paths
+        case ex of
+            [] -> do
+                putStrLn "Could not find any of these files:"
+                mapM_ putStrLn paths
+                exitFailure
+            [f] -> B.readFile f
+            _  -> do
+                putStrLn "Multiple matching files found:"
+                mapM_ putStrLn ex
+                exitFailure
 
     return $ TipToiFile
         { ttProductId = ttyProduct_Id
