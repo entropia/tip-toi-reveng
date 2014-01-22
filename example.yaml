@@ -1,0 +1,36 @@
+# This is an example source file for a TipToi file
+# The basic format is YAML
+
+# You can compile this running
+# ./decode example.yaml example.gme
+
+# The product ID must match that of the book you want to use this with
+product-id: 1
+
+# The media path is optional (the default is "media/%s")
+# Ogg files should be Mono, 22050 Hz.
+# decode will append .wav or .ogg and uses whatever it finds
+media-path: example/%s
+
+# The comment does not really matter
+comment: An example GME file
+
+# Register initalisation. This is simply list of set-commands.
+# Every register not set is initialized to 0
+init: $0:=1
+
+# This is the interesting part: Scripts.
+# Technically, this is an assoiative list with the OID as an index,
+# and a list of strings as the content
+scripts:
+  1401:
+  - $0==1? $0:=2 $1+=1 P(hello)
+  - $0==2? $0+=1 P(one,two,three)
+  - $0==3? $0:=1 P(back)
+  1402:
+  - $1==0?
+  - $1==1? P(one)
+  - $1==2? P(one)
+  - $1==3? P(one)
+  - $1!=1? $1 != 2? $1 != 3? $1:=0 P(back)
+
