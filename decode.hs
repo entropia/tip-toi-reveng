@@ -1012,8 +1012,8 @@ tt2ttYaml path (TipToiFile {..}) = TipToiYAML
     , ttyMedia_Path = Just path
     }
 
-ttYaml2tt :: TipToiYAML -> IO TipToiFile
-ttYaml2tt (TipToiYAML {..}) = do
+ttYaml2tt :: FilePath -> TipToiYAML -> IO TipToiFile
+ttYaml2tt dir (TipToiYAML {..}) = do
     now <- getCurrentTime
     let date = formatTime defaultTimeLocale "%Y%m%d" now
 
@@ -1047,9 +1047,14 @@ ttYaml2tt (TipToiYAML {..}) = do
         Left e ->  fail (show e)
         Right l -> return $ M.fromList l
 
+
+
     files <- forM filenames' $ \fn -> do
-        let paths = [ printf (fromMaybe "media/%s" ttyMedia_Path) fn <.> ext
-                    | (_,ext) <- fileMagics ]
+        let paths = [ combine dir relpath
+                    | (_,ext) <- fileMagics
+                    , let pat = fromMaybe "%s" ttyMedia_Path
+                    , let relpath = printf pat fn <.> ext
+                    ]
         ex <- filterM doesFileExist paths
         case ex of
             [] -> do
@@ -1082,7 +1087,7 @@ assemble inf out = do
     case etty of
         Left e -> print e
         Right tty -> do
-            tt <- ttYaml2tt tty
+            tt <- ttYaml2tt (takeDirectory inf) tty
             writeTipToi out tt
 
 
