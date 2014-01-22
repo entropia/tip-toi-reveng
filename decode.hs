@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, RecursiveDo, ScopedTypeVariables, GADTs, RecordWildCards #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, RecursiveDo, ScopedTypeVariables, GADTs, RecordWildCards, DeriveGeneric #-}
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
@@ -17,10 +17,12 @@ import Data.Either
 import Data.Functor
 import Data.Maybe
 import Data.Ord
+import GHC.Generics
 import Control.Monad
 import System.Directory
 import Numeric (readHex)
 import qualified Data.Map as M
+import qualified Data.Set as S
 import Control.Monad.Writer.Strict
 import Control.Monad.State.Strict
 import Control.Monad.Reader
@@ -28,9 +30,15 @@ import Control.Monad.RWS.Strict
 import Control.Arrow (second)
 import Data.Time
 import System.Locale
-import Data.Yaml hiding ((.=))
+import Data.Yaml hiding ((.=), Parser)
+import Data.Aeson.Types hiding ((.=), Parser)
 import qualified Data.Yaml as Y
 import qualified Data.Text as T
+import Text.Parsec hiding (Line, lookAhead, spaces)
+import Text.Parsec.String
+import qualified Text.Parsec as P
+import qualified Text.Parsec.Token as P
+import Text.Parsec.Language (emptyDef)
 
 -- Main data types
 
@@ -628,6 +636,7 @@ toJSONScipts scripts = object
 instance ToJSON Line where
     toJSON = toJSON . ppLine M.empty
 
+
 -- Utilities
 
 forMn_ :: Monad m => [a] -> (Int -> a -> m b) -> m ()
@@ -909,6 +918,173 @@ export inf out = do
     (tt,_) <- parseTipToiFile <$> B.readFile inf
     encodeFile out tt
 
+
+data TipToiYAML = TipToiYAML
+    { ttyScripts :: M.Map String [String]
+    , ttyComment :: Maybe String
+    , ttyMedia_Path :: Maybe String
+    , ttyInit :: Maybe String
+    , ttyProduct_Id :: Word32
+    }
+    deriving Generic
+
+
+instance FromJSON TipToiYAML where
+     parseJSON = genericParseJSON $ defaultOptions
+        { fieldLabelModifier = map fix . map toLower . drop 3 }
+       where fix '_' = '-'
+             fix c   = c
+
+lexer       = P.makeTokenParser emptyDef
+
+parseLine :: Parser ([Word16] -> Line, [String])
+parseLine = do
+    conds <- many (try parseCond)
+    (acts, filenames) <- parseCommands 0
+    eof
+    return (Line 0 conds acts, filenames)
+
+descP d p = p <?> d
+
+parseCond :: Parser Conditional
+parseCond = descP "Conditional" $ do
+    v1 <- parseTVal
+    op <- parseCondOp
+    v2 <- parseTVal
+    P.lexeme lexer (char '?')
+    return (Cond v1 op v2)
+
+parseWord16 :: Parser Word16
+parseWord16 = fromIntegral <$> P.natural lexer
+
+parseReg :: Parser Word16
+parseReg = char '$' >> parseWord16
+
+parseTVal :: Parser TVal
+parseTVal = (Reg <$> parseReg <|> Const <$> parseWord16) <?> "Value"
+
+parseCondOp :: Parser CondOp
+parseCondOp = choice
+    [ P.reservedOp lexer "==" >> return Eq
+    , P.reservedOp lexer "/=" >> return NEq
+    , P.reservedOp lexer "!=" >> return NEq
+    , P.reservedOp lexer "<"  >> return Lt
+    , P.reservedOp lexer ">=" >> return GEq
+    ]
+
+parseInitRegs :: Parser [(Register, Word16)]
+parseInitRegs = many $ do
+    r <- parseReg
+    P.reservedOp lexer ":="
+    v <- parseWord16
+    return (r,v)
+
+parseCommands :: Int -> Parser ([Command], [String])
+parseCommands i =
+    choice
+    [ eof >> return ([],[])
+    , descP "Register action" $
+      do r <- parseReg
+         op <- choice [ P.reservedOp lexer ":=" >> return Set
+                      , P.reservedOp lexer "+=" >> return Inc ]
+         v <- parseTVal
+         (cmds, filenames) <- parseCommands i
+         return (op r v : cmds, filenames)
+    , descP "Play action" $
+      do char 'P'
+         fns <- P.parens lexer $ P.commaSep1 lexer $ P.lexeme lexer $ many1 (alphaNum <|> char '_')
+         let n = length fns
+         (cmds, filenames) <- parseCommands (i+n)
+         let c = case fns of
+                [fn] -> Play (fromIntegral i)
+                _    -> Random (fromIntegral (i + n - 1)) (fromIntegral i)
+         return (c : cmds, fns ++ filenames)
+    , descP "Cancel" $
+      do char 'C'
+         (cmds, filenames) <- parseCommands i
+         return (Cancel : cmds, filenames)
+    , descP "Start Game" $
+      do char 'G'
+         n <- P.parens lexer $ parseWord16
+         (cmds, filenames) <- parseCommands i
+         return (Game n : cmds, filenames)
+    ]
+
+valRegs :: TVal -> [Register]
+valRegs (Reg r) = [r]
+valRegs _       = []
+
+condRegs :: Conditional -> [Register]
+condRegs (Cond v1 _ v2) = valRegs v1 ++ valRegs v2
+
+cmdRegs :: Command -> [Register]
+cmdRegs (Inc r v) = r : valRegs v
+cmdRegs (Set r v) = r : valRegs v
+cmdRegs _         = []
+
+ttYaml2tt :: TipToiYAML -> IO TipToiFile
+ttYaml2tt (TipToiYAML {..}) = do
+    now <- getCurrentTime
+    let date = formatTime defaultTimeLocale "%Y%m%d" now
+
+    let m = M.mapKeys read ttyScripts
+        first = fst (M.findMin m)
+        last = fst (M.findMax m)
+
+    (prescripts, filenames) <- liftM unzip $ forM [first .. last] $ \oid -> do
+       case M.lookup oid m of
+        Nothing -> return (\_ -> (oid, Nothing), [])
+        Just raw_lines -> do
+            (lines, filenames) <- liftM unzip $ forMn raw_lines $ \i raw_line ->
+                let d = printf "Line %d of OID %d" i oid
+                in case P.parse parseLine d raw_line of
+                    Left e ->       fail (show e)
+                    Right (l, s) -> return (\f -> l (map f s), s)
+            return (\f -> (oid, Just (map ($ f) lines)), concat filenames)
+
+    let filenames' = S.toList $ S.fromList $ concat $ filenames
+    let filename_lookup = (M.fromList (zip filenames' [0..]) M.!)
+
+    let scripts = map ($ filename_lookup) prescripts
+
+    let maxReg = maximum
+            [ r
+            | (_, Just ls) <- scripts
+            , Line _ cs as _ <- ls
+            , r <- concatMap condRegs cs ++ concatMap cmdRegs as ]
+
+    initRegs <- case P.parse parseInitRegs "init" (fromMaybe "" ttyInit) of
+        Left e ->  fail (show e)
+        Right l -> return $ M.fromList l
+
+    files <- forM filenames' $ \fn -> do
+        let path = printf (fromMaybe "media/%s.ogg" ttyMedia_Path) fn
+        B.readFile path
+
+    return $ TipToiFile
+        { ttProductId = ttyProduct_Id
+        , ttRawXor = 0x00000039 -- from Bauernhof
+        , ttComment = BC.pack (fromMaybe "created with tip-toi-reveng" ttyComment)
+        , ttDate = BC.pack date
+        , ttInitialRegs = [fromMaybe 0 (M.lookup r initRegs) | r <- [0..maxReg]]
+        , ttScripts = scripts
+        , ttAudioFiles = files
+        , ttAudioXor = 0xAD
+        , ttAudioFilesDoubles = False
+        , ttChecksum = 0x00
+        , ttChecksumCalc = 0x00
+        }
+
+assemble :: FilePath -> FilePath -> IO ()
+assemble inf out = do
+    etty <- decodeFileEither inf
+    case etty of
+        Left e -> print e
+        Right tty -> do
+            tt <- ttYaml2tt tty
+            writeTipToi out tt
+
+
 debugGame :: ProductID -> IO TipToiFile
 debugGame productID = do
     -- Files orderes so that index 0 says zero, 10 is blob
@@ -972,6 +1148,7 @@ main' t ("-t":transscript:args) =
        main' (t `M.union` t2) args
 
 main' t ("export": inf : [] )       = main' t ("export":inf: dropExtension inf <.> "yaml":[])
+main' t ("assemble": inf : [] )     = main' t ("assemble":inf: dropExtension inf <.> "gme":[])
 
 main' t ("info": files)             = withEachFile dumpInfo files
 main' t ("media": "-d": dir: files) = withEachFile (dumpAudioTo dir) files
@@ -992,6 +1169,7 @@ main' t ("explain": files)          = withEachFile explain files
 main' t ("play": file : [])         =              play t file
 main' t ("rewrite": inf : out: [])  =              rewrite inf out
 main' t ("export": inf : out: [] )  =              export inf out
+main' t ("assemble": inf : out: [] )  =              assemble inf out
 main' t ("create-debug": out : n :[])
     | Just int <- readMaybe n       =              createDebug out int
     | [(int,[])] <- readHex n       =              createDebug out int
@@ -1034,6 +1212,8 @@ main' t _ = do
     putStrLn $ "       creates a special Debug.gme file for that productid"
     putStrLn $ "    export <infile.gme> [<outfile.yaml>]"
     putStrLn $ "       dumps the file in the human-readable yaml format"
+    putStrLn $ "    assemble <infile.yaml> <outfile.gme>"
+    putStrLn $ "       creates a gme file from the given source"
     exitFailure
 
 main = getArgs >>= (main' M.empty)

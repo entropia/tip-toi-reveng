@@ -165,6 +165,13 @@ Use the tool `decode.hs` to investigate the gme files. It supports various subco
                interactively play: Enter OIDs, and see what happens.
         decode rewrite <infile.gme> <outfile.gme>
                parses the file and serializes it again (for debugging).
+	create-debug <outfile.gme> <productid>
+	       creates a special Debug.gme file for that productid
+	export <infile.gme> [<outfile.yaml>]
+	       dumps the file in the human-readable yaml format
+	assemble <infile.yaml> <outfile.gme>
+	       creates a gme file from the given source. See example.yaml for documentation.
+
 
 It is a Haskell program without dependencies and can be easily compiled on all platforms, using these steps:
 
