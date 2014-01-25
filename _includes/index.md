@@ -1,5 +1,7 @@
 
 
+[Live Demo at http://chibicode.github.io/solo/](http://chibicode.github.io/solo/)
+
 [Solo](http://chibicode.github.io/solo) is a Jekyll theme that only supports **single-page websites**, but supports them well. If you want to create a single-page website that's mostly text, like <a href="https://knowyourcompany.com/" target="_blank">Know Your Company</a>, Solo would be a good choice. Solo is also useful if you just want to showcase a single markdown file.
 
 <iframe src="http://ghbtns.com/github-btn.html?user=chibicode&amp;repo=solo&amp;type=watch&amp;count=true&amp;size=large"
