@@ -30,10 +30,6 @@ First, [install Jekyll](http://jekyllrb.com/docs/installation/). Then download S
 * Edit `CNAME` to host on a custom domain.
 * Edit `README.md` before pushing your code.
 
-### Example
-
-My personal page ([chibicode.com](http://chibicode.com)) is also built with Solo.
-
 ### Don't use `<h1>` tags
 
 Wthin `index.md`, do not use `<h1>` tags - `<h1>` is reserved for the site title.
