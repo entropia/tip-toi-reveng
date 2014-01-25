@@ -37,7 +37,7 @@ Wthin `index.md`, do not use `<h1>` tags - `<h1>` is reserved for the site title
 
 ### Supported Tags
 
-Solo supports lists, `<hr>`'s, tables,
+Solo supports lists, `<hr>`s, `<table>`s,
 
 > blockquotes, and...
 
