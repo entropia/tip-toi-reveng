@@ -27,6 +27,7 @@ First, [install Jekyll](http://jekyllrb.com/docs/installation/). Then download S
 * Edit `_includes/head.html` to add custom code to `<head>`.
 * Edit `_includes/scripts.html` to add custom code before `</body>`.
 * Edit `CNAME` to host on a custom domain.
+* Edit `README.md` before pushing your code.
 
 ### Don't use `<h1>` tags
 
