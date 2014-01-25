@@ -7,7 +7,7 @@
 
 ## Example
 
-This page is built using Solo, as well as my <a href="https://chibicode.com/" target="_blank">personal website</a>. Solo supports lists, `<hr>`'s, tables,
+This page is built using Solo, as well as my <a href="http://chibicode.com/" target="_blank">personal website</a>. Solo supports lists, `<hr>`'s, tables,
 
 > blockquotes, and...
 
