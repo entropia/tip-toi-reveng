@@ -1124,6 +1124,7 @@ data TipToiYAML = TipToiYAML
     , ttyComment :: Maybe String
     , ttyMedia_Path :: Maybe String
     , ttyInit :: Maybe String
+    , ttyWelcome :: Maybe String
     , ttyProduct_Id :: Word32
     }
     deriving Generic
@@ -1181,6 +1182,12 @@ parseInitRegs = many $ do
     v <- parseWord16
     return (r,v)
 
+parseWelcome :: Parser [String]
+parseWelcome = P.commaSep lexer $ parseAudioRef
+
+parseAudioRef :: Parser String
+parseAudioRef = P.lexeme lexer $ many1 (alphaNum <|> char '_')
+
 parseCommands :: Int -> Parser ([Command], [String])
 parseCommands i =
     choice
@@ -1194,7 +1201,7 @@ parseCommands i =
          return (op r v : cmds, filenames)
     , descP "Play action" $
       do char 'P'
-         fns <- P.parens lexer $ P.commaSep1 lexer $ P.lexeme lexer $ many1 (alphaNum <|> char '_')
+         fns <- P.parens lexer $ P.commaSep1 lexer parseAudioRef
          let n = length fns
          (cmds, filenames) <- parseCommands (i+n)
          let c = case fns of
@@ -1229,6 +1236,7 @@ tt2ttYaml path (TipToiFile {..}) = TipToiYAML
     { ttyProduct_Id = ttProductId
     , ttyInit = Just $ spaces $ [ ppCommand M.empty [] (Set r (Const n))
                                 | (r,n) <- zip [0..] ttInitialRegs , n /= 0]
+    , ttyWelcome = Just $ commas $ map show $ concat ttWelcome
     , ttyComment = Just $ BC.unpack ttComment
     , ttyScripts = M.fromList
         [ (show oid, map (ppLine M.empty) ls) | (oid, Just ls) <- ttScripts]
@@ -1244,6 +1252,10 @@ ttYaml2tt dir (TipToiYAML {..}) = do
         first = fst (M.findMin m)
         last = fst (M.findMax m)
 
+    welcome_names <- case P.parse parseWelcome "welcome" (fromMaybe "" ttyWelcome) of
+        Left e ->  fail (show e)
+        Right l -> return l
+
     (prescripts, filenames) <- liftM unzip $ forM [first .. last] $ \oid -> do
        case M.lookup oid m of
         Nothing -> return (\_ -> (oid, Nothing), [])
@@ -1255,8 +1267,10 @@ ttYaml2tt dir (TipToiYAML {..}) = do
                     Right (l, s) -> return (\f -> l (map f s), s)
             return (\f -> (oid, Just (map ($ f) lines)), concat filenames)
 
-    let filenames' = S.toList $ S.fromList $ concat $ filenames
+    let filenames' = S.toList $ S.fromList $ welcome_names ++ concat filenames
     let filename_lookup = (M.fromList (zip filenames' [0..]) M.!)
+
+    let welcome = [map filename_lookup welcome_names]
 
     let scripts = map ($ filename_lookup) prescripts
 
@@ -1269,8 +1283,6 @@ ttYaml2tt dir (TipToiYAML {..}) = do
     initRegs <- case P.parse parseInitRegs "init" (fromMaybe "" ttyInit) of
         Left e ->  fail (show e)
         Right l -> return $ M.fromList l
-
-
 
     files <- forM filenames' $ \fn -> do
         let paths = [ combine dir relpath
@@ -1295,7 +1307,7 @@ ttYaml2tt dir (TipToiYAML {..}) = do
         , ttRawXor = 0x00000039 -- from Bauernhof
         , ttComment = BC.pack (fromMaybe "created with tip-toi-reveng" ttyComment)
         , ttDate = BC.pack date
-        , ttWelcome = []
+        , ttWelcome = welcome
         , ttInitialRegs = [fromMaybe 0 (M.lookup r initRegs) | r <- [0..maxReg]]
         , ttScripts = scripts
         , ttGames = []
