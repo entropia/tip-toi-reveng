@@ -31,11 +31,11 @@ First, [install Jekyll](http://jekyllrb.com/docs/installation/). Then download S
 
 ### Don't use `<h1>` tags
 
-Wthin `solo.md`, do not use `<h1>` tags - `<h1>` is reserved for the site title.
+Wthin `index.md`, do not use `<h1>` tags - `<h1>` is reserved for the site title.
 
 ### Keep Solo up to date
 
-Instead of downloading, you can [fork Solo](https://github.com/chibicode/solo/fork) and [use "upstream" strategy described on this page](https://help.github.com/articles/fork-a-repo) to keep Solo up to date.
+Instead of downloading, you can [fork Solo](https://github.com/chibicode/solo/fork) and use the "upstream" strategy described on [this page](https://help.github.com/articles/fork-a-repo) to keep Solo up to date.
 
 ## Author
 
