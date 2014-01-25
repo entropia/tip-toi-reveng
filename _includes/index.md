@@ -1,19 +1,20 @@
 
 
-[Solo](http://chibicode.github.io/solo) is a Jekyll theme that only supports **single-page websites**, but supports them well. If you want to create a single-page website that's mostly text, like <a href="https://knowyourcompany.com/" target="_blank">Know Your Company</a>, Solo would be a good choice. Solo is also useful if you just want to showcase a single markdown file.
+[Solo](http://chibicode.github.io/solo) is a Jekyll theme that only supports **single-page websites**, but supports them well.
 
 <iframe src="http://ghbtns.com/github-btn.html?user=chibicode&amp;repo=solo&amp;type=watch&amp;count=true&amp;size=large"
   allowtransparency="true" frameborder="0" scrolling="0" width="170" height="30"></iframe><br/>
 
-## Example
+## Solo is useful if...
 
-This page is built using Solo, as well as my <a href="http://chibicode.com/" target="_blank">personal website</a>. Solo supports lists, `<hr>`'s, tables,
+* You want to create an "about me" page from a single markdown file and host it under a custom domain name.
+* You want to create a single-page website that's mostly text, like [Know Your Company](https://knowyourcompany.com/).
+* You want to share a single markdown file and tried GitHub Gist ([example](https://gist.github.com/dypsilon/5819504)), but wanted something nicer-looking.
 
-> blockquotes, and...
+## Examples
 
-~~~html
-<pre>code blocks with syntax highlighting.</pre>
-~~~
+* This page itself is built with Solo. Try it out from [the github repo](https://github.com/chibicode/solo).
+* [My personal site](http://chibicode.com) is built with Solo. It's generated from [this markdown file](https://github.com/chibicode/chibicode.com/blob/gh-pages/_includes/index.md).
 
 ## Usage
 
@@ -29,9 +30,23 @@ First, [install Jekyll](http://jekyllrb.com/docs/installation/). Then download S
 * Edit `CNAME` to host on a custom domain.
 * Edit `README.md` before pushing your code.
 
+### Example
+
+My personal page ([chibicode.com](http://chibicode.com)) is also built with Solo.
+
 ### Don't use `<h1>` tags
 
 Wthin `index.md`, do not use `<h1>` tags - `<h1>` is reserved for the site title.
+
+### Supported Tags
+
+Solo supports lists, `<hr>`'s, tables,
+
+> blockquotes, and...
+
+~~~html
+<pre>code blocks with syntax highlighting.</pre>
+~~~
 
 ### Keep Solo up to date
 
