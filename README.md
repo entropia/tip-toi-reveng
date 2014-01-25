@@ -25,7 +25,7 @@ First, [install Jekyll](http://jekyllrb.com/docs/installation/). Then download S
 
 ### Other Files
 
-* Edit `_includes/title` to change the site title.
+* Edit `_config.yml` to change the site title.
 * Edit `_includes/head.html` to add custom code to `<head>`.
 * Edit `_includes/scripts.html` to add custom code before `</body>`.
 * Edit `CNAME` to host on a custom domain.
