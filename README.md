@@ -1,6 +1,6 @@
 # Solo ([Live Demo](http://chibicode.github.io/solo/))
 
-[Solo](http://chibicode.github.io/solo) is a Jekyll theme that only supports **single-page websites**, but supports them well.
+[Solo](http://chibicode.github.io/solo) is a Jekyll theme that supports **single-page websites** only, but supports them well.
 
 <iframe src="http://ghbtns.com/github-btn.html?user=chibicode&amp;repo=solo&amp;type=watch&amp;count=true&amp;size=large"
   allowtransparency="true" frameborder="0" scrolling="0" width="170" height="30"></iframe><br/>
