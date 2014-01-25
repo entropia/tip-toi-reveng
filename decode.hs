@@ -80,6 +80,7 @@ data TipToiFile = TipToiFile
     , ttComment :: B.ByteString
     , ttDate :: B.ByteString
     , ttInitialRegs :: [Word16]
+    , ttWelcome :: [PlayList]
     , ttScripts :: [(Word16, Maybe [Line])]
     , ttGames :: [Game]
     , ttAudioFiles :: [B.ByteString]
@@ -99,7 +100,7 @@ data Game
     | Game9
     | Game10
     | Game16
-    | Game253 PlayListList
+    | Game253
     | UnknownGame Word16 Word16 Word16 B.ByteString [PlayListList] [SubGame] B.ByteString [PlayListList]
     deriving Show
 
@@ -183,24 +184,27 @@ runSPut (SPutM act) = Br.toLazyByteString $ execWriter (evalStateT act 0)
 
 
 putTipToiFile :: TipToiFile -> SPut
-putTipToiFile tt = mdo
+putTipToiFile (TipToiFile {..}) = mdo
     putWord32 sto
     putWord32 mft
     putWord32 0x238b
     putWord32 ast -- Additional script table
     putWord32 gto -- Game table offset
-    putWord32 (ttProductId tt)
+    putWord32 ttProductId
     putWord32 iro
-    putWord32 (ttRawXor tt)
-    putWord8 (fromIntegral (B.length (ttComment tt)))
-    putBS (ttComment tt)
-    putBS (ttDate tt)
-    seek 0x200 -- Just to be safe
-    sto <- getAddress $ putScriptTable (ttScripts tt)
+    putWord32 ttRawXor
+    putWord8 $ fromIntegral (B.length ttComment)
+    putBS ttComment
+    putBS ttDate
+    seek 0x0071 -- Just to be safe
+    putWord32 ipllo
+    seek 0x0200 -- Just to be safe
+    sto <- getAddress $ putScriptTable ttScripts
     ast <- getAddress $ putWord16 0x00 -- For now, no additional script table
     gto <- getAddress $ putGameTable
-    iro <- getAddress $ putInitialRegs (ttInitialRegs tt)
-    mft <- getAddress $ putAudioTable (ttAudioXor tt) (ttAudioFiles tt)
+    iro <- getAddress $ putInitialRegs ttInitialRegs
+    mft <- getAddress $ putAudioTable ttAudioXor ttAudioFiles
+    ipllo <- getAddress $ putOffsets putWord16 $ map putPlayList ttWelcome
     return ()
 
 putGameTable :: SPut
@@ -238,7 +242,10 @@ putLine :: Line -> SPut
 putLine (Line _ conds acts idx) = do
     putArray putWord16 $ map putCond conds
     putArray putWord16 $ map putCommand acts
-    putArray putWord16 $ map putWord16 idx
+    putPlayList idx
+
+putPlayList :: PlayList -> SPut
+putPlayList = putArray putWord16 . map putWord16
 
 putCond :: Conditional -> SPut
 putCond (Cond v1 o v2) = do
@@ -605,9 +612,8 @@ getGame = do
         pll2 <- indirection "playlistlist2" getPlayListList
         return (Game8 u1 c u2 plls sgs u3 pll2s oidl gidl pll1 pll2)
 
-      253 -> do -- Special "Power on game"
-        pls <- indirections getWord16 "playlist-" getPlayList
-        return (Game253 pls)
+      253 -> do
+        return Game253
 
       _ -> do
         (u1,c,u2,plls, sgs, u3, pll2s) <- common
@@ -645,7 +651,8 @@ getTipToiFile = getSegAt 0x00 "Header" $ do
         return (c,d)
     checksum <- getChecksum
     checksumCalc <- calcChecksum
-    return (TipToiFile id raw_xor comment date regs scripts games at at_doubled xor checksum checksumCalc)
+    ipll <- getSegAt 0x71 "After header" $ indirection "initial play lists" $ getPlayListList
+    return (TipToiFile id raw_xor comment date regs ipll scripts games at at_doubled xor checksum checksumCalc)
 
 parseTipToiFile :: B.ByteString -> (TipToiFile, Segments)
 parseTipToiFile = runSGet getTipToiFile
@@ -790,11 +797,9 @@ ppGame t (UnknownGame typ u1 c u2 plls sgs u3 pll2s) =
     (length sgs)    (concatMap (ppSubGame t) sgs)
     (prettyHex u3)
     (length pll2s)  (indent 4 (map (ppPlayListList t) pll2s))
-ppGame t (Game253 pll) =
-    printf (unlines ["  type: 256",
-                     "  lists: %s"
+ppGame t Game253 =
+    printf (unlines ["  type: 256"
                      ])
-    (ppPlayListList t pll)
 ppGame t _ = "TODO"
 
 ppSubGame :: Transscript -> SubGame -> String
@@ -871,8 +876,8 @@ dumpScripts t raw sel file = do
                        else printf "    %s\n" (ppLine t line)
 
 
-dumpInfo :: FilePath -> IO ()
-dumpInfo file = do
+dumpInfo :: Transscript -> FilePath -> IO ()
+dumpInfo t file = do
     (tt,_) <- parseTipToiFile <$> B.readFile file
     let st = ttScripts tt
 
@@ -883,6 +888,7 @@ dumpInfo file = do
     printf "Date: %s\n" (BC.unpack (ttDate tt))
     printf "Number of registers: %d\n" (length (ttInitialRegs tt))
     printf "Initial registers: %s\n" (show (ttInitialRegs tt))
+    printf "Initial sounds: %s\n" (ppPlayListList t (ttWelcome tt))
     printf "Scripts for OIDs from %d to %d; %d/%d are disabled.\n"
         (fst (head st)) (fst (last st))
         (length (filter (isNothing . snd) st)) (length st)
@@ -1289,6 +1295,7 @@ ttYaml2tt dir (TipToiYAML {..}) = do
         , ttRawXor = 0x00000039 -- from Bauernhof
         , ttComment = BC.pack (fromMaybe "created with tip-toi-reveng" ttyComment)
         , ttDate = BC.pack date
+        , ttWelcome = []
         , ttInitialRegs = [fromMaybe 0 (M.lookup r initRegs) | r <- [0..maxReg]]
         , ttScripts = scripts
         , ttGames = []
@@ -1323,6 +1330,7 @@ debugGame productID = do
         , ttRawXor = 0x00000039 -- from Bauernhof
         , ttComment = BC.pack "created with tip-toi-reveng"
         , ttDate = BC.pack date
+        , ttWelcome = []
         , ttInitialRegs = [1]
         , ttScripts = [
             (oid, Just [line])
@@ -1375,7 +1383,7 @@ main' t ("-t":transscript:args) =
 main' t ("export": inf : [] )       = main' t ("export":inf: dropExtension inf <.> "yaml":[])
 main' t ("assemble": inf : [] )     = main' t ("assemble":inf: dropExtension inf <.> "gme":[])
 
-main' t ("info": files)             = withEachFile dumpInfo files
+main' t ("info": files)             = withEachFile (dumpInfo t) files
 main' t ("media": "-d": dir: files) = withEachFile (dumpAudioTo dir) files
 main' t ("media": files)            = withEachFile (dumpAudioTo "media") files
 main' t ("scripts": files)          = withEachFile (dumpScripts t False Nothing) files
