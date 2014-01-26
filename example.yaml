@@ -29,8 +29,13 @@ welcome: bing, hello
 # Technically, this is an assoiative list with the OID as an index,
 # and a list of strings as the content
 scripts:
+  # We begin to specify what to do when the area in the book with the OID code
+  # 1401 is touched
   1401:
+  # The following line means: If register $0 is set to 1, then set it to 2, and
+  # increment register $1 by one, and play the sound example/hello.ogg.
   - $0==1? $0:=2 $1+=1 P(hello)
+  # Here, the pen is going to play one of these three sounds randomly.
   - $0==2? $0+=1 P(one,two,three)
   - $0==3? $0:=1 P(back)
   1402:
@@ -38,5 +43,6 @@ scripts:
   - $1==1? P(one)
   - $1==2? P(two)
   - $1==3? P(three)
+  # Besides == and !=, there are also the comparisons < and >=
   - $1!=1? $1 != 2? $1 != 3? $1:=0 P(back)
 
