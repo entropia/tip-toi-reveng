@@ -64,7 +64,7 @@ supports various subcommands:
 	    assemble <infile.yaml> <outfile.gme>
 	       creates a gme file from the given source
 
-A transscrpit is simply a `;`-separated table of OIDs and some text, see for example [transcript/WWW_Bauernhof.csv].
+A transscrpit is simply a `;`-separated table of OIDs and some text, see for example [`transcript/WWW_Bauernhof.csv`](transcript/WWW_Bauernhof.csv).
 
 
 Installation
@@ -108,8 +108,8 @@ process is as follows
 
  2. Write a `my-book.yaml` file containing some general information, and especially
     the scripts (i.e. what to do) for each OIDs (i.e. the various fields of a
-    book). You can use the [example.yaml] file as a starting point; it contains
-    more information in its comments.
+    book). You can use the [example.yaml](example.yaml) file as a starting
+    point; it contains more information in its comments.
 
  3. Run `./decode assemble my-book.yaml`, and make sure it reports no error, i.e.
     finishes silently.
@@ -122,7 +122,7 @@ you did if you succeded.
 TODO
 ----
 
- * What are all the header fields? (See [wip/Header.md])
- * Finish decoding the games. (See [wip/games.txt])
+ * What are all the header fields? (See [wip/Header.md](wip/Header.md))
+ * Finish decoding the games. (See [wip/games.txt](wip/games.txt))
  * What is the additional script table for.
 
