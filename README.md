@@ -116,8 +116,12 @@ process is as follows
 
  4. Copy the now generated `my-book.gme` to your TipToi pen and enjoy!
 
+If you need to find out what OID code corresponds to what part of the book, you
+can generate a debug gme file using `./decode create-debug` and load that on your pen. It will then read out the codes, as a sequence of english digits.
+
 Again, please let us know if you have problems, but also tell us what fun thigs
 you did if you succeded.
+
 
 TODO
 ----
@@ -125,4 +129,19 @@ TODO
  * What are all the header fields? (See [wip/Header.md](wip/Header.md))
  * Finish decoding the games. (See [wip/games.txt](wip/games.txt))
  * What is the additional script table for.
+
+Other resources in this repository
+----------------------------------
+
+ * [`oid-decoder.html`](http://htmlpreview.github.io/?https://github.com/entropia/tip-toi-reveng/blob/master/oid-decoder.html) allows you to manually decode an OID image.
+ * `scripts/updates.sh` downloads all GME files from the Ravensburger server.
+ * `gameanalyse.c` and `libtiptoi.c` is an alternative tool to investigate GME
+   files. It can also [replace audio files in GME files](Audio/README.md);
+   compile and run it for diagnostic output,
+ * `Audio/` contains some audio files, such as digits read out.
+ * `docs/` collects information about TipToi found elsewhere.
+ * `matlab/` contains scripts to analysie GME files in Matlab
+ * `wip/` contains notes about the parts of the GME files that we have not
+   fully understood.
+
 
