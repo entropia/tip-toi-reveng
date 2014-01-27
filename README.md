@@ -16,6 +16,7 @@
 
 * This page itself is built with Solo. Try it out from [the github repo](https://github.com/chibicode/solo).
 * [My personal site](http://chibicode.com) is built with Solo. It's generated from [this markdown file](https://github.com/chibicode/chibicode.com/blob/gh-pages/_includes/index.md).
+* Two of my Japanese personal sites ([#1](http://j.chibicode.com/) and [#2](http://waza.chibicode.com/)) are also built with Solo.
 
 ## Usage
 
