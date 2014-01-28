@@ -108,8 +108,13 @@ hr {
   top: -1px;
 }
 
-img {
+.container img, .container iframe {
   max-width: 100%;
+}
+
+.container img {
+  margin: 0 auto;
+  display: block;
 }
 
 table {
