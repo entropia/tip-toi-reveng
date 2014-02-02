@@ -117,7 +117,11 @@ process is as follows
  4. Copy the now generated `my-book.gme` to your TipToi pen and enjoy!
 
 If you need to find out what OID code corresponds to what part of the book, you
-can generate a debug gme file using `./decode create-debug` and load that on your pen. It will then read out the codes, as a sequence of english digits.
+can generate a debug gme file using `./decode create-debug` and load that on
+your pen. It will then read out the codes, as a sequence of english digits.
+
+We are also collecting template files, where the OIDs are commented; these can
+be found in the `./templates` directory. Please improve and contribute!
 
 Again, please let us know if you have problems, but also tell us what fun thigs
 you did if you succeded.
