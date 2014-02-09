@@ -1,0 +1,48 @@
+# This is an example source file for a TipToi file
+# The basic format is YAML
+
+# You can compile this running
+# ./decode example.yaml example.gme
+
+# The product ID must match that of the book you want to use this with
+product-id: 1
+
+# The media path is optional
+# The default is "%s", i.e. to look in the current directory
+# If you use "example/Buch1_%s", here then P(test) will use
+# the file "example/Buch1_test.ogg".
+# Ogg files should be Mono, 22050 Hz.
+# decode will append .wav or .ogg and uses whatever it finds
+media-path: example/%s
+
+# The comment does not really matter
+comment: An example GME file
+
+# Register initalisation. This is simply list of set-commands.
+# Every register not set is initialized to 0
+init: $0:=1
+
+# The sounds to play on start-up
+welcome: bing, hello
+
+# This is the interesting part: Scripts.
+# Technically, this is an assoiative list with the OID as an index,
+# and a list of strings as the content
+scripts:
+  # We begin to specify what to do when the area in the book with the OID code
+  # 1401 is touched
+  1401:
+  # The following line means: If register $0 is set to 1, then set it to 2, and
+  # increment register $1 by one, and play the sound example/hello.ogg.
+  - $0==1? $0:=2 $1+=1 P(hello)
+  # Here, the pen is going to play one of these three sounds randomly.
+  - $0==2? $0+=1 P(one,two,three)
+  - $0==3? $0:=1 P(back)
+  1402:
+  - $1==0?
+  - $1==1? P(one)
+  - $1==2? P(two)
+  - $1==3? P(three)
+  # Besides == and !=, there are also the comparisons < and >=
+  - $1!=1? $1 != 2? $1 != 3? $1:=0 P(back)
+

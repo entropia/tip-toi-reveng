@@ -1,5 +1,5 @@
-game table
-----------
+Gametable
+--------
 Offset to the game table lies at '0x0010'
 
 Example from WWW Bauernhof
@@ -16,7 +16,7 @@ Example from WWW Bauernhof
 a = 32 bit counter (number of games)
 b = a * 32 bit pointer to game header
 
-game header
+Game Header
 -----------
 00017071  01 00 0b 00 05 00 00 00  04 00 81 05 00 00 6f 00
           aa aa bb bb rr rr cc cc  zz zz yy yy xx xx ww ww   
@@ -45,27 +45,28 @@ y = 16 bit: this defines the OID that triggers the "repeat last audio" action
 x = 16 bit unknown
 w = 16 bit unknown (111 in all Bauernhof games)
 v = 16 bit unknown, sometimes v=2*w (222 in all Bauernhof games)
-d = 5 (if type != 6) or 7 (if type == 6) * 32 bit pointer to playlistlist (where is the count from? So far found in every block) 
-e = b * 32 bit pointer to subgame  
-f = c * 32 bit pointer to subgame (not existant in this example game)
-u = 10 (this seems hardcoded) * 16 bit. For each playlist in the playlistlist g u contains a 16 bit value. At the end of the game u is checked from left to right. Each number in u is compared against the number of correct answers that the player has achieved throughout the game. The first number in u that is <= the number of correct answers defines the playlist to be played. u must be ordered in descending order. Example: When u looks like [5,3,1,0,0,0,0,0,0,0] this means: if the player has 5 or more correct answers, the first playlist of g is played, when the player has 3 or 4 correct answers, the second playlist is played, if he has at least one correct answer, playlist 3 is played else playlist 4.  g = 10 (this seems hardcoded) * 32 bit pointer to playlistlist
+d = 5 (if type != 6) or 7 (if type == 6) * 32 bit pointer to playlistpointer (where is the count from? So far found in every block) 
+e = b * 32 bit pointer to subgame blocks 
+f = c * 32 bit pointer to subgame blocks (not existant in this example game)
+u = 10 (this seems hardcoded) * 16 bit. For each playlist in the playlistlist g f contains a 16 bit value. At the end of the game f is checked from left to right. Each number in f is compared against the number of correct answers that the player has achieved throughout the game. The first number in f that i < that the number of correct answers defined the playlist to be played. This list must be ordered in descending order. Example: When this list looks like 5,3,1,0,0,0,0,0,0,0 this means: if the player hat 5 or more correct answers, the first playlist of g is played, when the player has 3 or 4 correct answers, the second playlist is played, if he has at least one correct answer, playlist 3 get played else playlist 4.      
+g = 10 (this seems hardcoded) * 32 bit pointer to playlistpointer
 
 now it differs on type 
 if ( type == 6 )
           1 * 32 bit pointer to playlist
 if ( type == 7 )
-          1 * 32 bit pointer to playlistlist
+          1 * 32 bit pointer to playlistpointer
 if ( type == 8 )
           1 * 32 bit pointer to oidlist
           1 * 32 bit pointer to gameidlist
-          2 * 32 bit pointer to playlistlist
+          2 * 32 bit pointer to playlistpointer
 if ( type == 9 )
-          75 * 32 bit pointer to playlistlist
+          75 * 32 bit pointer to playlistpointer
 if ( type == 10 )
-          1 * 32 bit pointer to playlistlist
+          1 * 32 bit pointer to playlistpointer
 if ( type == 16 )
           1 * 32 bit pointer to oidlist
-          3 * 32 bit pointer to playlistlist
+          3 * 32 bit pointer to playlistpointer
 nothing for other types
 end of block
 
@@ -73,10 +74,10 @@ type 253
 --------
 
 Type 253 is special and only consists of the value 0x00fd. It is supposed that this is some kind of (additional) "end of games" marker although this is redundant because the number of games can be found in the game table, too.
-[In an earlier version of this document it was noted that the playlistlist for the power on sound that directly follows the 0x00fd belongs to this game. But as this playlistlist is referenced in the header (0x0071) this seems wrong now.]
+[In an earlier version of this document it was noted that the playlistpointer for the power on sound that directly follows the 0x00fd belongs to this game. But as this playlistpointer is referenced in the header (0x0071) this seems wrong now.]
 
-subgame
--------
+Subgameblock
+------
 000170ff  00 00 00 00 00 00 01 00  01 00 00 00 00 00 00 00 
 0001710f  00 00 00 00 02 00 8e 05  9f 05 00 00 21 00 79 05 
                       aa aa bb bb  bb bb cc cc ee ee ff ff
@@ -97,23 +98,23 @@ subgame
 
 unknown = 20 byte
 a = 16 bit count
-b = a * 16bit oids : OIDs that must be pointed at for the correct answer 
+b = a * 16bit oids
 c = 16 bit count
-d = c * 16 bit oid : unknown
+d = c * 16 bit oid
 e = 16 bit count
-f = c * 16 bit oid : OIDs of the page the game belongs to. Pointing at an OID that is not contained in this list results in a sound being played that tells you to flip back to the right page (4th playlist in g) 
-g = 9 (seems hardcoded) * 32 bit pointer to playlistlist
+f = c * 16 bit oid
+g = 9 (where is the count from? so far 9 in every block) * 32 bit pointer to playlistpointer
 
-playlistlist
-------------
+Playlistpointer
+------
 000176f1 01 00 f7 76 01 00 
          aa aa bb bb bb bb
          
 a = 16 bit count (can be zero than no b is present)
 b = a * 32 bit pointer to playlist
 
-playlist
---------
+Playlist
+------
 000176f7 02 00 b3 01 ba 01
          aa aa bb bb bb bb
 
@@ -121,7 +122,7 @@ a = 16 bit count
 b = a * 16 bit id of media to be played
 
 oidlist
---------
+------
 no live example sry can search for one
 
 Example:
@@ -131,7 +132,7 @@ a = 16 bit count
 b = a * 16 bit oids
 
 gameidlist
-----------
+------
 no live example sry can search for one
 
 Example:
