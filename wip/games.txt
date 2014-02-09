@@ -1,5 +1,5 @@
-Gametable
---------
+game table
+----------
 Offset to the game table lies at '0x0010'
 
 Example from WWW Bauernhof
@@ -13,10 +13,11 @@ Example from WWW Bauernhof
 0001706d  fb b2 01 00 
           bb bb bb bb
 
-a = 32 bit counter (number of games)
-b = a * 32 bit pointer to game header
+a = 32bit counter (number of games)
+b = a * 32bit pointer to game header
 
-Game Header
+
+game header
 -----------
 00017071  01 00 0b 00 05 00 00 00  04 00 81 05 00 00 6f 00
           aa aa bb bb rr rr cc cc  zz zz yy yy xx xx ww ww   
@@ -36,48 +37,52 @@ Game Header
           gg gg gg gg gg gg gg gg  gg gg gg gg gg gg gg gg
 000170f1  01 00 eb 76 01 00 ed 76  01 00 ef 76 01 00 
           gg gg gg gg gg gg gg gg  gg gg gg gg gg gg
-a = 16 bit type (type 253 is special see below)
-b = 16 bit count: number of subgame blocks
-r = 16 bit number of rounds to play in this game
-c = 16 bit count (if type == 6) followed by c*16bit; (if type != 6) c=0 or c=1 followed by additional 16bit 0 
-z = 16 bit: number of rounds to start with the "pre next round" sound, after that play the "last round" sound  
-y = 16 bit: this defines the OID that triggers the "repeat last audio" action
-x = 16 bit unknown
-w = 16 bit unknown (111 in all Bauernhof games)
-v = 16 bit unknown, sometimes v=2*w (222 in all Bauernhof games)
-d = 5 (if type != 6) or 7 (if type == 6) * 32 bit pointer to playlistpointer (where is the count from? So far found in every block) 
-e = b * 32 bit pointer to subgame blocks 
-f = c * 32 bit pointer to subgame blocks (not existant in this example game)
-u = 10 (this seems hardcoded) * 16 bit. For each playlist in the playlistlist g f contains a 16 bit value. At the end of the game f is checked from left to right. Each number in f is compared against the number of correct answers that the player has achieved throughout the game. The first number in f that i < that the number of correct answers defined the playlist to be played. This list must be ordered in descending order. Example: When this list looks like 5,3,1,0,0,0,0,0,0,0 this means: if the player hat 5 or more correct answers, the first playlist of g is played, when the player has 3 or 4 correct answers, the second playlist is played, if he has at least one correct answer, playlist 3 get played else playlist 4.      
-g = 10 (this seems hardcoded) * 32 bit pointer to playlistpointer
+a = 16bit type (type 253 is special see below)
+b = 16bit count: number of subgames
+r = 16bit number of rounds to play in this game
+c = 16bit count (if type == 6) followed by c*16bit; (if type != 6) c=0 or c=1 
+z = 16bit: number of rounds to start with the "pre next round" sound, after that play the "pre last round" sound  
+y = 16bit: this defines the OID that triggers the "repeat last media" action
+x = 16bit unknown
+w = 16bit unknown (111 in all Bauernhof games)
+v = 16bit unknown, sometimes v=2*w (222 in all Bauernhof games)
+d = 5 (seems hardcoded) * 32bit pointers to playlistlist
+h = 2 * 32bit pointers to playlistlist (only for game type 6, not in this example)
+e = b * 32bit pointers to subgame  
+f = c * 32bit pointers to subgame (not existant in this example game)
+u = 10 (this seems hardcoded) * 16bit. For each playlist in the playlistlist g u contains a 16bit value. At the end of the game u is checked from left to right. Each number in u is compared against the number of correct answers that the player has achieved throughout the game. The first number in u that is <= the number of correct answers defines the playlist to be played. u must be ordered in descending order. Example: u contains [5,3,1,0,0,0,0,0,0,0]. This means: if the player has 5 or more correct answers, the first playlist of g is played, when the player has 3 or 4 correct answers, the second playlist is played, if he has at least one correct answer, playlist 3 is played else playlist 4. 
+g = 10 (this seems hardcoded) * 32bit pointer to playlistlist
 
 now it differs on type 
 if ( type == 6 )
-          1 * 32 bit pointer to playlist
+          1 * 32bit pointer to playlist
 if ( type == 7 )
-          1 * 32 bit pointer to playlistpointer
+          1 * 32bit pointer to playlistlist
 if ( type == 8 )
-          1 * 32 bit pointer to oidlist
-          1 * 32 bit pointer to gameidlist
-          2 * 32 bit pointer to playlistpointer
+          1 * 32bit pointer to oidlist
+          1 * 32bit pointer to gameidlist
+          2 * 32bit pointer to playlistlist
 if ( type == 9 )
-          75 * 32 bit pointer to playlistpointer
+          75 * 32bit pointer to playlistlist
 if ( type == 10 )
-          1 * 32 bit pointer to playlistpointer
+          1 * 32bit pointer to playlistlist
 if ( type == 16 )
-          1 * 32 bit pointer to oidlist
-          3 * 32 bit pointer to playlistpointer
+          1 * 32bit pointer to oidlist
+          3 * 32bit pointer to playlistlist
 nothing for other types
 end of block
+
 
 type 253
 --------
 
 Type 253 is special and only consists of the value 0x00fd. It is supposed that this is some kind of (additional) "end of games" marker although this is redundant because the number of games can be found in the game table, too.
-[In an earlier version of this document it was noted that the playlistpointer for the power on sound that directly follows the 0x00fd belongs to this game. But as this playlistpointer is referenced in the header (0x0071) this seems wrong now.]
 
-Subgameblock
-------
+[In an earlier version of this document it was noted that the playlistlist for the power on sound that directly follows the 0x00fd belongs to this game. But as this playlistlist is referenced in the header (0x0071) this seems wrong now.]
+
+
+subgame
+-------
 000170ff  00 00 00 00 00 00 01 00  01 00 00 00 00 00 00 00 
 0001710f  00 00 00 00 02 00 8e 05  9f 05 00 00 21 00 79 05 
                       aa aa bb bb  bb bb cc cc ee ee ff ff
@@ -97,48 +102,52 @@ Subgameblock
           gg gg gg gg
 
 unknown = 20 byte
-a = 16 bit count
-b = a * 16bit oids
-c = 16 bit count
-d = c * 16 bit oid
-e = 16 bit count
-f = c * 16 bit oid
-g = 9 (where is the count from? so far 9 in every block) * 32 bit pointer to playlistpointer
+a = 16bit count
+b = a * 16bit oids : OIDs that represent a correct answer 
+c = 16bit count
+d = c * 16bit oid : unknown
+e = 16bit count
+f = e * 16bit oid : all OIDs of the page the game belongs to. Pointing at an OID that is not contained in this list results in "please flip back to page xx" being played (4th playlist in g) 
+g = 9 (seems hardcoded) * 32bit pointer to playlistlist
 
-Playlistpointer
-------
+
+playlistlist
+------------
 000176f1 01 00 f7 76 01 00 
          aa aa bb bb bb bb
          
-a = 16 bit count (can be zero than no b is present)
-b = a * 32 bit pointer to playlist
+a = 16bit count (can be zero than no b is present)
+b = a * 32bit pointer to playlist
 
-Playlist
-------
+
+playlist
+--------
 000176f7 02 00 b3 01 ba 01
          aa aa bb bb bb bb
 
-a = 16 bit count
-b = a * 16 bit id of media to be played
+a = 16bit count
+b = a * 16bit id of media to be played
+
 
 oidlist
-------
-no live example sry can search for one
-
+--------
 Example:
           03 00 b2 06 b3 06 b4 06
           aa aa bb bb bb bb bb bb
-a = 16 bit count
-b = a * 16 bit oids
+a = 16bit count
+b = a * 16bit oids
+
+TODO: add live example
+
 
 gameidlist
-------
-no live example sry can search for one
+----------
 
 Example:
           03 00 0a 00 0b 00 0c 00
           aa aa bb bb bb bb bb bb
-a = 16 bit count
-b = a * 16 bit game ids
+a = 16bit count
+b = a * 16bit game ids
 
+TODO: add live example
 
