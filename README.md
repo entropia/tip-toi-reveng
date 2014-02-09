@@ -13,8 +13,8 @@ The tool can also be used to generate completely new files from scratch; see
 below for details.
 
 If you want to learn more, here are some relevant links:
- * Discussion about Tip-Toi: http://www.quadrierer.de/geekythinking/blog/?itemid=368
- * Discussion about Tip-Toi and the related TING pen, including discussion on how to print your own books: http://www.mikrocontroller.net/topic/214479
+ * Discussion about Tip-Toi: http://www.quadrierer.de/geekythinking/blog/?itemid=368 (German)
+ * Discussion about Tip-Toi and the related TING pen, including discussion on how to print your own books: http://www.mikrocontroller.net/topic/214479 (German)
 
 The decode tool
 ---------------
@@ -64,13 +64,13 @@ supports various subcommands:
 	    assemble <infile.yaml> <outfile.gme>
 	       creates a gme file from the given source
 
-A transscrpit is simply a `;`-separated table of OIDs and some text, see for example [`transcript/WWW_Bauernhof.csv`](transcript/WWW_Bauernhof.csv).
+A transscript is simply a `;`-separated table of OIDs and some text, see for example [`transcript/WWW_Bauernhof.csv`](transcript/WWW_Bauernhof.csv).
 
 
 Installation
 ------------
 
-This program is written in Haskell an can be installed on Windows, MacOS or Linux.
+This program is written in Haskell and can be installed on Windows, MacOS or Linux.
 
  1. First install the *Haskell platform*, see http://www.haskell.org/platform/
     for details for your system. Users of Debian or Ubuntu simply run `apt-get
@@ -100,7 +100,7 @@ Building your own gme files
 Once you have installed `decode`, you can create your own `.gme` files. The
 process is as follows
 
- 1. Record the audio samples you want to include, as Ogg Vorbils files, mono, 22050Hz. I use
+ 1. Record the audio samples you want to include, as Ogg Vorbis files, mono, 22050Hz. I use
 
        arecord -r 22050 foo.wav
        oggenc foo.wav
@@ -123,8 +123,7 @@ your pen. It will then read out the codes, as a sequence of english digits.
 We are also collecting template files, where the OIDs are commented; these can
 be found in the `./templates` directory. Please improve and contribute!
 
-Again, please let us know if you have problems, but also tell us what fun thigs
-you did if you succeded.
+Again, please let us know if you have problems, but also tell us what fun things you did if you succeded.
 
 
 TODO
@@ -132,20 +131,21 @@ TODO
 
  * What are all the header fields? (See [wip/Header.md](wip/Header.md))
  * Finish decoding the games. (See [wip/games.txt](wip/games.txt))
- * What is the additional script table for.
+ * What is the purpose of the additional script table?
+ * Find a DIY way to print in a TipToi compatible way.  
 
 Other resources in this repository
 ----------------------------------
 
  * [`oid-decoder.html`](http://htmlpreview.github.io/?https://github.com/entropia/tip-toi-reveng/blob/master/oid-decoder.html) allows you to manually decode an OID image.
- * `scripts/updates.sh` downloads all GME files from the Ravensburger server.
- * `gameanalyse.c` and `libtiptoi.c` is an alternative tool to investigate GME
-   files. It can also [replace audio files in GME files](Audio/README.md);
-   compile and run it for diagnostic output,
+ * `scripts/updates.sh` downloads all gme files from the Ravensburger server.
+ * `gameanalyse.c` and `libtiptoi.c` is an alternative tool to investigate gme
+   files. It can also [replace audio files in gme files](Audio/README.md);
+   compile and run it for diagnostic output.
  * `Audio/` contains some audio files, such as digits read out.
  * `docs/` collects information about TipToi found elsewhere.
- * `matlab/` contains scripts to analysie GME files in Matlab
- * `wip/` contains notes about the parts of the GME files that we have not
-   fully understood.
+ * `matlab/` contains scripts to analyse gme files in Matlab
+ * `wip/` (work in progess) contains notes about the parts of the gme files that are not
+   fully understood yet.
 
 
