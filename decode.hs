@@ -688,7 +688,7 @@ groupRuns l = go
             r                             -> Right [x] : r
 
 ppPlayList :: Transscript -> PlayList -> String
-ppPlayList t xs = "[" ++ commas (map go (groupRuns (flip M.lookup t) xs)) ++ "]"
+ppPlayList t xs = "['" ++ quotes (map go (groupRuns (flip M.lookup t) xs)) ++ "']"
   where go (Left s) = s
         go (Right [])  = error "Empty list in groupRuns result"
         go (Right l)   | length l > 3 = show (head l) ++ ".." ++ show (last l)
@@ -735,6 +735,7 @@ ppPlayIndex t xs n
 
 spaces = intercalate " "
 commas = intercalate ","
+quotes = intercalate "','"
 
 ppGame :: Transscript -> Game -> String
 ppGame t (Game6 u1 u2 plls sg1s sg2s u3 pll2s pl) =
@@ -798,7 +799,7 @@ ppGame t (UnknownGame typ u1 c u2 plls sgs u3 pll2s) =
     (prettyHex u3)
     (length pll2s)  (indent 4 (map (ppPlayListList t) pll2s))
 ppGame t Game253 =
-    printf (unlines ["  type: 256"
+    printf (unlines ["  type: 253"
                      ])
 ppGame t _ = "TODO"
 
