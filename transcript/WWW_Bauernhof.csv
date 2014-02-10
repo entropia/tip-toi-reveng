@@ -2,13 +2,13 @@ ID;VALUE;REFERENCEVALUE
 0000;NOISE: Wind rauschen, Bellen, Zwitschern, Kraehen;
 0001;NOISE: Tuedelue;
 0002;NOISE: Tuedelue;
-0003;Was ist das Besondere an dem Kuhstall, die Antwort hoerst du wenn du auf den Kuhstall tippst.;
-0004;Wenn du auf den Nebenstall tippst, hoerst du welche Tier Maries Eltern noch haben.;
+0003;Was ist das Besondere an dem Kuhstall? Die Antwort hoerst du, wenn du auf den Kuhstall tippst.;
+0004;Wenn du auf den Nebenstall tippst, hoerst du welche Tiere Maries Eltern noch haben.;
 0005;Tippe doch Mal auf den Hahn, da erfaehrst du mehr ueber seine Rolle auf dem Hof.;
 0006;NOISE: Tuedelue;
 0007;Warum Maries Mutter so frueh aufsteht, erzaehlt sie dir, wenn du sie antippst.;
-0008;Warum ist Marie heute aufgeregt? Die Antwort kannst du hoeren wenn du sie antippst.;
-0009;Paul ist unterwegs zu Marie. Hoer dir doch an worauf er sich freut.;
+0008;Warum ist Marie heute aufgeregt? Die Antwort kannst du hoeren, wenn du sie antippst.;
+0009;Paul ist unterwegs zu Marie. Hoer dir doch an, worauf er sich freut.;
 0010;Der Bauernhof wacht auf.;
 0011;;
 0012;NOISE: Storch (Klappern);
@@ -16,7 +16,7 @@ ID;VALUE;REFERENCEVALUE
 0014;Silence;
 0015;;
 0016;;
-0017;NOISE: Fliessen;
+0017;NOISE: fliessendes Wasser;
 0018;;
 0019;NOISE: Kuh (Muhen);
 0020;;
@@ -155,7 +155,7 @@ ID;VALUE;REFERENCEVALUE
 0153;;
 0154;;
 0155;;
-0156;NOISE: Schwein (Grunzen, Quiecken);
+0156;NOISE: Schwein (Grunzen, Quieken);
 0157;;
 0158;;
 0159;;
@@ -432,7 +432,7 @@ ID;VALUE;REFERENCEVALUE
 0430;NOISE: Tuedelue;
 0431;Jetzt spielen wir ein Geraeuschespiel!;
 0432;Hoer genau zu!;
-0433;Wenn du weist woher das Geraeusch kommt, beruehre es im Bild!;
+0433;Wenn du weißt, woher das Geraeusch kommt, beruehre es im Bild!;
 0434;Achtung es geht los!;
 0435;#0014#;Silence
 0436;Hier kommt das naechste Geraeusch!;
@@ -453,9 +453,9 @@ ID;VALUE;REFERENCEVALUE
 0451;#0047#;NOISE: Morsen
 0452;#0057#;NOISE: Katze (Miauen)
 0453;#0017#;NOISE: Fliessen
-0454;#0076#;NOISE: Kuckkuck
+0454;#0076#;NOISE: Kuckuck
 0455;#0012#;NOISE: Storch (Klappern)
-0456;Wir spielen 'Ich sehe was, was du nicht siehts'. Versuche herauszufinden welches Objekt gesucht ist. Nach jedem falschen Treffer bekommst du einen weiteren Hinweis.;
+0456;Wir spielen 'Ich sehe was, was du nicht siehst'. Versuche herauszufinden, welches Objekt gesucht ist. Nach jedem falschen Treffer bekommst du einen weiteren Hinweis.;
 0457;Es geht los.;
 0458;Willst du noch einmal spielen?;
 0459;Dann gehe auf SPIELEN.;
@@ -468,7 +468,7 @@ ID;VALUE;REFERENCEVALUE
 0466;Es gehoert einem Tier.;
 0467;Es kommt Milch heraus.;
 0468;und das ist blau.;
-0469;Das ist Moritzs T-Shirt.;
+0469;Das ist Moritz T-Shirt.;
 0470;Das ist weich.;
 0471;Das hat vier Loecher.;
 0472;Das gehoert Moritz.;
@@ -490,7 +490,7 @@ ID;VALUE;REFERENCEVALUE
 0488;Die Tierkinder spielen Verstecken.;
 0489;Klasse!;
 0490;Du hast alle Tierkinder gefunden.;
-0491;Hoer doch mal was es auf der naechsten Seite alles gibt.;
+0491;Hoer doch mal, was es auf der naechsten Seite alles gibt.;
 0492;Und jetzt;
 0493;suche die vier Ferkel;
 0494;Tippe sie nacheinander an!;
@@ -538,7 +538,7 @@ ID;VALUE;REFERENCEVALUE
 0536;Hier kommt das naechste Fahrzeug.;
 0537;Hier kommt das letzte Fahrzeug.;
 0538;Super, du bist ein echter Fahrzeugprofi.;
-0539;Ich denk du bist bereit fuer das superschwere zweite Level.;
+0539;Ich denke, du bist bereit fuer das superschwere zweite Level.;
 0540;Los geht?s!;
 0541;Hoer doch noch einmal alles bei WISSEN an und gehe dann wieder auf SPIELEN, wenn du das Quiz nocheinmal spielen moechtest.;
 0542;Auf den anderen Seiten haben wir noch mehr Spiele. Probiere sie aus!;
@@ -586,7 +586,7 @@ ID;VALUE;REFERENCEVALUE
 0584;O jemine! O jemine! Die Katze lief im Schnee.;
 0585;Tippst du auf den roten Stern, findest du dort ein lustiges Maeusesuchspiel. Tippst du auf den gruenen Stern, wartet ein Geraeuschesuchspiel auf dich. Bei dem blauen Stern kannst du ein Spiel mit englischen Tiernamen spielen.;
 0586;Im Bild haben sich zehn Maeuse versteckt.;
-0587;Probiere doch mal das Englishspiel. Tippe dazu nochmals auf den Wuerfel und dann auf den blauen Stern.;
+0587;Probiere doch mal das Englischspiel. Tippe dazu nochmals auf den Wuerfel und dann auf den blauen Stern.;
 0588;Probiere doch mal das Geraeuschesuchspiel. Tippe dazu nochmals auf den Wuerfel und dann auf den gruenen Stern.;
 0589;#0381#;Auf dem Bauernhof ist viel los.
 0590;Die hattest du schon gefunden.;
@@ -602,7 +602,7 @@ ID;VALUE;REFERENCEVALUE
 0600;#0195#;NOISE: Huehner (Gackern)
 0601;#0326#;NOISE: Kraehe (Kraechzen)
 0602;#0097#;NOISE: Vogel (Tschilpen)
-0603;Du hoerst gleich den Namen eines Tieres in English und dann den Tierlaut. Findest du das richtige Tier?;
+0603;Du hoerst gleich den Namen eines Tieres in Englisch und dann den Tierlaut. Findest du das richtige Tier?;
 0604;Hier kommt das naechste Tier.;
 0605;Hier kommt das letzte Tier.;
 0606;The Horse;
@@ -614,8 +614,8 @@ ID;VALUE;REFERENCEVALUE
 0612;The Pig;
 0613;Auf Englisch heisst das Schwein Pig.;
 0614;The Cat;
-0615;Cat heisst Katze auf English.;
+0615;Cat heisst Katze auf Englisch.;
 0616;The Cow;
-0617;Cow ist das englishe Wort fuer Kuh.;
+0617;Cow ist das englische Wort fuer Kuh.;
 0618;NOISE: Tuedelue;
-0619;Willkommen in Bauernhofbuch. Du bist jetzt angemeldet. Gehe auf die Maus, sie erklaert dir wie das Buch funktioniert. Dann kann es losgehe.; 
+0619;Willkommen in Bauernhofbuch. Du bist jetzt angemeldet. Gehe auf die Maus, sie erklaert dir wie das Buch funktioniert. Dann kann es losgehen.; 
