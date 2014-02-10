@@ -688,8 +688,8 @@ groupRuns l = go
             r                             -> Right [x] : r
 
 ppPlayList :: Transscript -> PlayList -> String
-ppPlayList t xs = "[" ++ commas (map (quote . go) (groupRuns (flip M.lookup t) xs)) ++ "]"
-  where go (Left s) = s
+ppPlayList t xs = "[" ++ commas (map go (groupRuns (flip M.lookup t) xs)) ++ "]"
+  where go (Left s) = quote s
         go (Right [])  = error "Empty list in groupRuns result"
         go (Right l)   | length l > 3 = show (head l) ++ ".." ++ show (last l)
                        | otherwise    = commas (map show l)
