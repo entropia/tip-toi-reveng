@@ -46,8 +46,15 @@ y = 16bit: this defines the OID that triggers the "repeat last media" action
 x = 16bit unknown
 w = 16bit unknown (111 in all Bauernhof games)
 v = 16bit unknown, sometimes v=2*w (222 in all Bauernhof games)
-d = 5 (seems hardcoded) * 32bit pointers to playlistlist
-h = 2 * 32bit pointers to playlistlist (only for game type 6, not in this example)
+d = 5 (seems hardcoded) * 32bit pointers to playlistlist. These are
+    - playlists played when the game starts
+    - playlists played when the next level has been reached (game types 1, 4 and 40)
+    - playlists played after the game is finished (one playlist is selected randomly) 
+    - playlists played at the beginning of a round
+    - playlists played at beginning to the last round
+h = 2 * 32bit pointers to playlistlist (only for game type 6, not in this example). Judging from the referenced media found here in some products these playlists seem to be ignored. Sometimes the playlists are identical to the last two of the d. 
+    - playlists at the beginning of a round
+    - playlists played at beginning to the last round
 e = b * 32bit pointers to subgame  
 f = c * 32bit pointers to subgame (not existant in this example game)
 u = 10 (this seems hardcoded) * 16bit. For each playlist in the playlistlist g u contains a 16bit value. At the end of the game u is checked from left to right. Each number in u is compared against the number of correct answers that the player has achieved throughout the game. The first number in u that is <= the number of correct answers defines the playlist to be played. u must be ordered in descending order. Example: u contains [5,3,1,0,0,0,0,0,0,0]. This means: if the player has 5 or more correct answers, the first playlist of g is played, when the player has 3 or 4 correct answers, the second playlist is played, if he has at least one correct answer, playlist 3 is played else playlist 4. 
