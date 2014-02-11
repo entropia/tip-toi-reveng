@@ -16,13 +16,13 @@ If you want to learn more, here are some relevant links:
  * Discussion about Tip-Toi: http://www.quadrierer.de/geekythinking/blog/?itemid=368 (German)
  * Discussion about Tip-Toi and the related TING pen, including discussion on how to print your own books: http://www.mikrocontroller.net/topic/214479 (German)
 
-The decode tool
+The tttool tool
 ---------------
 
-Use the tool `decode.hs` to investigate the gme files and build new ones. It
+Use the tool `tttool.hs` to investigate the gme files and build new ones. It
 supports various subcommands:
 
-	Usage: decode [options] command
+	Usage: tttool [options] command
 
 	Options:
 	    -t <transcriptfile>
@@ -86,9 +86,9 @@ This program is written in Haskell and can be installed on Windows, MacOS or Lin
 
         make
 
- 4. At this point, `decode` should be ready to go. If you run
+ 4. At this point, `tttool` should be ready to go. If you run
 
-        ./decode
+        ./tttool
 
     you should see the list of commands shown above.
 
@@ -97,7 +97,7 @@ If you have any problems, you can [report an issue via GitHub](https://github.co
 Building your own gme files
 ---------------------------
 
-Once you have installed `decode`, you can create your own `.gme` files. The
+Once you have installed `tttool`, you can create your own `.gme` files. The
 process is as follows
 
  1. Record the audio samples you want to include, as Ogg Vorbis files, mono, 22050Hz. I use
@@ -111,13 +111,13 @@ process is as follows
     book). You can use the [example.yaml](example.yaml) file as a starting
     point; it contains more information in its comments.
 
- 3. Run `./decode assemble my-book.yaml`, and make sure it reports no error, i.e.
+ 3. Run `./tttool assemble my-book.yaml`, and make sure it reports no error, i.e.
     finishes silently.
 
  4. Copy the now generated `my-book.gme` to your TipToi pen and enjoy!
 
 If you need to find out what OID code corresponds to what part of the book, you
-can generate a debug gme file using `./decode create-debug` and load that on
+can generate a debug gme file using `./tttool create-debug` and load that on
 your pen. It will then read out the codes, as a sequence of english digits.
 
 We are also collecting template files, where the OIDs are commented; these can

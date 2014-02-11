@@ -2,7 +2,7 @@
 # The basic format is YAML
 
 # You can compile this running
-# ./decode example.yaml example.gme
+# ./tttool example.yaml example.gme
 
 # The product ID must match that of the book you want to use this with
 product-id: 1
@@ -12,7 +12,7 @@ product-id: 1
 # If you use "example/Buch1_%s", here then P(test) will use
 # the file "example/Buch1_test.ogg".
 # Ogg files should be Mono, 22050 Hz.
-# decode will append .wav or .ogg and uses whatever it finds
+# tttool will append .wav or .ogg and uses whatever it finds
 media-path: example/%s
 
 # The comment does not really matter

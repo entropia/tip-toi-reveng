@@ -1,2 +1,2 @@
-decode: decode.hs
-	ghc -O -with-rtsopts=-K100M  decode.hs
+tttool: tttool.hs
+	ghc -O -with-rtsopts=-K100M  tttool.hs
