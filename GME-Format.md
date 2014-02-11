@@ -27,7 +27,7 @@ The header begins with these 8 32-bit numbers, listed with their offset:
  * `0x0018`: 32bit. Pointer to register init values (16bit counter followed by n×16bit values. First value is register $0, followed by $1 and so on.)
  * `0x001C`: raw XOR value (8bit), see below at media table explanation. 
  * `0x001D`: three bytes with unknown meaning, 0 for all products seen so far. 
- * `0x0020`: a variable length string, consisting of its length (8bit), and that many characters. Commonly `CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.x.yyy` (varies between products)
+ * `0x0020`: a variable length string, consisting of its length (8bit), and that many characters. Commonly `CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.xx.yyyy` (varies between products, xx can also be one digit only)
  * Next is a 8 date string (`20111024`). The date string seems optional with one condition: if a language string follows the date must consist of at least one ASCII number.
  * Next is an optional language string (currently known: `GERMAN`, `DUTCH`, `FRENCH`, `ITALIAN`. If the language string is provided it must match the language of the firmware that is running on the pen (it is unclear where is is checked; the file .tiptoi.log is NOT taken into account here!) or the pen will ignore it. If the language is missing any TipToi pen will accept the file. 
  * Next there is sequence of zeros up to and including to position 0x5f.
