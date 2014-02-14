@@ -672,7 +672,12 @@ lineLength (Line _ conds cmds audio) = fromIntegral $
 
 ppLine :: Transscript -> Line -> String
 ppLine t (Line _ cs as xs) = spaces $
-    map ppConditional cs ++ map (ppCommand t xs) as
+    map ppConditional cs ++ map (ppCommand False t xs) as
+
+-- Varaint that does not generate invalid play commands
+exportLine :: Line -> String
+exportLine (Line _ cs as xs) = spaces $
+    map ppConditional cs ++ map (ppCommand True M.empty xs) as
 
 -- Group consecutive runs of numbers, if they do not have a description
 groupRuns :: (Eq a, Enum a) => (a -> Maybe b) -> [a] -> [Either b [a]]
@@ -718,20 +723,24 @@ ppTVal :: TVal -> String
 ppTVal (Reg n)   =  "$" ++ show n
 ppTVal (Const n) =  show n
 
-ppCommand :: Transscript -> PlayList -> Command -> String
-ppCommand t xs (Play n)        = printf "P(%s)" (ppPlayIndex t xs (fromIntegral n))
-ppCommand t xs (Random a b)    = printf "P(%s)" $ commas $ map (ppPlayIndex t xs . fromIntegral ) [b..a]
-ppCommand t xs (Cancel)        = printf "C"
-ppCommand t xs (Game b)        = printf "G(%d)" b
-ppCommand t xs (Inc r n)       = printf "$%d+=%s" r (ppTVal n)
-ppCommand t xs (Set r n)       = printf "$%d:=%s" r (ppTVal n)
-ppCommand t xs (Unknown b r n) = printf "?($%d,%s) (%s)" r (ppTVal n) (prettyHex b)
+ppCommand :: Bool -> Transscript -> PlayList -> Command -> String
+ppCommand True t xs (Play n)     | not (validIndex xs (fromIntegral n)) = ""
+ppCommand True t xs (Random a b) | any (not . validIndex xs . fromIntegral) [b..a] = ""
+
+ppCommand _ t xs (Play n)        = printf "P(%s)" (ppPlayIndex t xs (fromIntegral n))
+ppCommand _ t xs (Random a b)    = printf "P(%s)" $ commas $ map (ppPlayIndex t xs . fromIntegral ) [b..a]
+ppCommand _ t xs (Cancel)        = printf "C"
+ppCommand _ t xs (Game b)        = printf "G(%d)" b
+ppCommand _ t xs (Inc r n)       = printf "$%d+=%s" r (ppTVal n)
+ppCommand _ t xs (Set r n)       = printf "$%d:=%s" r (ppTVal n)
+ppCommand _ t xs (Unknown b r n) = printf "?($%d,%s) (%s)" r (ppTVal n) (prettyHex b)
+
+validIndex :: PlayList -> Int -> Bool
+validIndex xs n = n >= 0 && n < length xs
 
 ppPlayIndex :: Transscript -> PlayList -> Int -> String
-ppPlayIndex t xs n
-    = if (n < 0 || length xs <= n)
-      then "invalid_index_" ++ show n
-      else transcribe t (xs !! n)
+ppPlayIndex t xs n | validIndex xs n = transcribe t (xs !! n)
+                   | otherwise       = "invalid_index_" ++ show n
 
 spaces = intercalate " "
 commas = intercalate ","
@@ -1235,12 +1244,12 @@ cmdRegs _         = []
 tt2ttYaml :: String -> TipToiFile -> TipToiYAML
 tt2ttYaml path (TipToiFile {..}) = TipToiYAML
     { ttyProduct_Id = ttProductId
-    , ttyInit = Just $ spaces $ [ ppCommand M.empty [] (Set r (Const n))
+    , ttyInit = Just $ spaces $ [ ppCommand True M.empty [] (Set r (Const n))
                                 | (r,n) <- zip [0..] ttInitialRegs , n /= 0]
     , ttyWelcome = Just $ commas $ map show $ concat ttWelcome
     , ttyComment = Just $ BC.unpack ttComment
     , ttyScripts = M.fromList
-        [ (show oid, map (ppLine M.empty) ls) | (oid, Just ls) <- ttScripts]
+        [ (show oid, map exportLine ls) | (oid, Just ls) <- ttScripts]
     , ttyMedia_Path = Just path
     }
 
