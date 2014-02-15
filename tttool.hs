@@ -543,6 +543,9 @@ fileMagics =
     , (BC.pack "OggS", "ogg")
     , (BC.pack "fLaC", "flac")]
 
+decodeOnlyFiles :: [String]
+decodeOnlyFiles = ["mp3"]
+
 decypher :: Word8 -> B.ByteString -> B.ByteString
 decypher x = B.map go
     where go 0 = 0
@@ -1296,7 +1299,7 @@ ttYaml2tt dir (TipToiYAML {..}) = do
 
     files <- forM filenames' $ \fn -> do
         let paths = [ combine dir relpath
-                    | (_,ext) <- fileMagics
+                    | ext <- map snd fileMagics ++ decodeOnlyFiles
                     , let pat = fromMaybe "%s" ttyMedia_Path
                     , let relpath = printf pat fn <.> ext
                     ]
