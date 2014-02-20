@@ -1,7 +1,7 @@
 The GME file format
 ===================
 
-This is the result of reverse engineering (i.e. staring at hex codes for a long time), and might not always be accurate. Also, it is not complete; see the TODO list in [README.md].
+This is the result of reverse engineering (i.e. staring at hex codes for a long time), and might not always be accurate. Also, it is not complete; see the TODO list in [README.md](README.md).
 
 
 The file format consists of these parts
