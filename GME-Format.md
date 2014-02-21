@@ -117,7 +117,7 @@ Registers can hold 16bit values and are referenced in the play scripts.
 The media file table
 --------------------
 
-The media file table consists of pairs of offsets and length (both 16bit), and ends right before the position referenced by the the first entry. There is no explicit definition of the number of records in this list. 
+The media file table consists of pairs of offsets and length (both 32bit), and ends right before the position referenced by the the first entry. There is no explicit definition of the number of records in this list. 
 
 The media files themselves are encrypted using a simple scheme, using a magic XOR value (`x`):
    - The values `0x00`, `0xFF`, `x` and `x XOR 0xFF` are left alone
