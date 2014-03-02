@@ -541,10 +541,11 @@ fileMagics :: [(B.ByteString, String)]
 fileMagics =
     [ (BC.pack "RIFF", "wav")
     , (BC.pack "OggS", "ogg")
-    , (BC.pack "fLaC", "flac")]
+    , (BC.pack "fLaC", "flac")
+    , (BC.pack "ID3",  "mp3")]
 
 decodeOnlyFiles :: [String]
-decodeOnlyFiles = ["mp3"]
+decodeOnlyFiles = []
 
 decypher :: Word8 -> B.ByteString -> B.ByteString
 decypher x = B.map go
@@ -863,7 +864,7 @@ dumpAudioTo directory file = do
 
     createDirectoryIfMissing False directory
     forMn_ (ttAudioFiles tt) $ \n audio -> do
-        let audiotype = fromMaybe "raw" $ lookup (B.take 4 audio) fileMagics
+        let audiotype = maybe "raw" snd $ find (\(m,t) -> m `B.isPrefixOf` audio) fileMagics
         let filename = printf "%s/%s_%d.%s" directory (takeBaseName file) n audiotype
         if B.null audio
         then do
