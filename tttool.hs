@@ -1361,8 +1361,8 @@ debugGame productID = do
         , ttScripts = [
             (oid, Just [line])
             | oid <- [1..15000]
-            , let chars = [oid `div` 10^p `mod` 10| p <-[3,2,1,0]]
-            , let line = Line 0 [] [Play n | n <- [0..4]] ([10] ++ chars)
+            , let chars = [oid `div` 10^p `mod` 10| p <-[4,3,2,1,0]]
+            , let line = Line 0 [] [Play n | n <- [0..5]] ([10] ++ chars)
             ]
         , ttGames = []
         , ttAudioFiles = files
