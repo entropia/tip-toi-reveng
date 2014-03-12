@@ -72,6 +72,12 @@ Installation
 
 This program is written in Haskell and can be installed on Windows, MacOS or Linux.
 
+For Windows users, we create zipfile containing `tttool`, you can find them in
+the [releases section](https://github.com/entropia/tip-toi-reveng/releases) of
+the github project.
+
+Otherwise, installation from source is not difficult either:
+
  1. First install the *Haskell platform*, see http://www.haskell.org/platform/
     for details for your system. Users of Debian or Ubuntu simply run `apt-get
     install haskell-platform`.
