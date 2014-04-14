@@ -12,11 +12,7 @@
 * You want to share a single markdown file and tried GitHub Gist ([example](https://gist.github.com/dypsilon/5819504)), but would like something nicer-looking.
 * You want something like GitHub's [automatic page generator](http://pages.github.com/) for a non-code repository.
 
-## Examples
-
-* This page itself is built with Solo. Try it out from [the github repo](https://github.com/chibicode/solo).
-* [My personal site](http://chibicode.com) is built with Solo. It's generated from [this markdown file](https://github.com/chibicode/chibicode.com/blob/gh-pages/_includes/index.md).
-* Two of my Japanese personal sites ([#1](http://j.chibicode.com/) and [#2](http://waza.chibicode.com/)) are also built with Solo.
+This page itself is built with Solo. It's generated from [this markdown file](https://github.com/chibicode/solo/blob/gh-pages/_includes/index.md).
 
 ## Usage
 
