@@ -16,7 +16,7 @@ This page itself is built with Solo. It's generated from [this markdown file](ht
 
 ## Usage
 
-First, [install Jekyll](http://jekyllrb.com/docs/installation/). Then download Solo from its [GitHub Repository](https://github.com/poole/poole). Start Jekyll and you should see this page up and running.
+First, [install Jekyll](http://jekyllrb.com/docs/installation/). Then download Solo from its [GitHub Repository](https://github.com/chibicode/solo). Start Jekyll and you should see this page up and running.
 
 **The main file you'll be editing is `_includes/index.md`**. This becomes the content for the main `index.html`.
 
