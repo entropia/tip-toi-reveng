@@ -135,10 +135,15 @@ pre, code {
 
 pre {
   padding: .5rem 1rem;
+  font-size: 0.8rem;
 }
 
 code {
   padding: .1rem .25rem;
+}
+
+pre > code {
+  padding: 0;
 }
 
 .container {
