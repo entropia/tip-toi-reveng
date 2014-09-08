@@ -137,7 +137,7 @@ Printing your own books
 With the code in this repository, you can create GME files. This is even more
 fun if you can also create your own books! „Pronwan“ found out how that works,
 as you can see in [this video demonstration](http://youtu.be/KC97F4PfNhk). He
-also published 30 minute [video tutorial](http://youtu.be/raWepWe5TW8) (in
+also published 30 minute [video tutorial](http://youtu.be/4AjvjFM8GzM) (in
 German).
 
 TODO
