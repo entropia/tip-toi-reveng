@@ -161,4 +161,3 @@ Other resources in this repository
  * `wip/` (work in progess) contains notes about the parts of the gme files that are not
    fully understood yet.
 
-
