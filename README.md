@@ -131,6 +131,14 @@ be found in the `./templates` directory. Please improve and contribute!
 
 Again, please let us know if you have problems, but also tell us what fun things you did if you succeded.
 
+Printing your own books
+-----------------------
+
+With the code in this repository, you can create GME files. This is even more
+fun if you can also create your own books! „Pronwan“ found out how that works,
+as you can see in [this video demonstration](http://youtu.be/KC97F4PfNhk). He
+also published 30 minute [video tutorial](http://youtu.be/raWepWe5TW8) (in
+German).
 
 TODO
 ----
@@ -138,7 +146,6 @@ TODO
  * What are all the header fields? (See [wip/Header.md](wip/Header.md))
  * Finish decoding the games. (See [wip/games.txt](wip/games.txt))
  * What is the purpose of the additional script table?
- * Find a DIY way to print in a TipToi compatible way.  
 
 Other resources in this repository
 ----------------------------------
