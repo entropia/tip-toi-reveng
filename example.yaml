@@ -38,6 +38,8 @@ scripts:
   # Here, the pen is going to play one of these three sounds randomly.
   - $mode==2? $mode+=1 P(one,two,three)
   - $mode==3? $mode:=1 P(back)
+  # You can either refer to a concrete register ($1), or a named register.
+  # tttool will map these to otherwise unused registers.
   1402:
   - $1==0?
   - $1==1? P(one)
