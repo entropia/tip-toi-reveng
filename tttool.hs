@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, RecursiveDo, ScopedTypeVariables, GADTs, RecordWildCards, DeriveGeneric #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, RecursiveDo, ScopedTypeVariables, GADTs, RecordWildCards, DeriveGeneric, DeriveDataTypeable #-}
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
@@ -17,7 +17,6 @@ import Data.Either
 import Data.Functor
 import Data.Maybe
 import Data.Ord
-import GHC.Generics
 import Control.Monad
 import System.Directory
 import Numeric (readHex)
@@ -40,16 +39,22 @@ import qualified Text.Parsec as P
 import qualified Text.Parsec.Token as P
 import Text.Parsec.Language (emptyDef)
 import Control.Exception
+import GHC.Generics
+import Data.Generics hiding (Generic)
+import Debug.Trace
 
 -- Main data types
 
-type Register = Word16
+data Register = RegPos Word16 | RegName String
+    deriving (Show, Eq, Ord, Data, Typeable)
+
 data TVal
     = Reg Register
     | Const Word16
-    deriving Eq
+    deriving (Eq, Data, Typeable)
 
 data Conditional = Cond TVal CondOp TVal
+    deriving (Eq, Data, Typeable)
 
 data CondOp
     = Eq
@@ -57,6 +62,7 @@ data CondOp
     | Lt
     | GEq
     | Unknowncond B.ByteString
+    deriving (Eq, Data, Typeable)
 
 data Command
     = Play Word16
@@ -66,11 +72,12 @@ data Command
     | Inc Register TVal
     | Set Register TVal
     | Unknown B.ByteString Register TVal
-    deriving Eq
+    deriving (Eq, Data, Typeable)
 
 type PlayList = [Word16]
 
 data Line = Line Offset [Conditional] [Command] PlayList
+    deriving (Data, Typeable)
 
 type ProductID = Word32
 
@@ -256,10 +263,14 @@ putCond (Cond v1 o v2) = do
 putTVal :: TVal -> SPut
 putTVal (Reg r) = do
     putWord8 0
-    putWord16 r
+    putReg r
 putTVal (Const n) = do
     putWord8 1
     putWord16 n
+
+putReg :: Register -> SPut
+putReg (RegPos n) = putWord16 n
+putReg (RegName n) = error $ printf "Register name %s left while serialzing" n
 
 putCondOp :: CondOp -> SPut
 putCondOp Eq  = mapM_ putWord8 [0xF9, 0xFF]
@@ -270,11 +281,11 @@ putCondOp (Unknowncond b) = putBS b
 
 putCommand :: Command -> SPut
 putCommand (Set r v) = do
-    putWord16 r
+    putReg r
     mapM_ putWord8 [0xF9, 0xFF]
     putTVal v
 putCommand (Inc r v) = do
-    putWord16 r
+    putReg r
     mapM_ putWord8 [0xF0, 0xFF]
     putTVal v
 putCommand (Play n) = do
@@ -294,7 +305,7 @@ putCommand Cancel = do
     mapM_ putWord8 [0xFF, 0xFA]
     putTVal (Const 0xFFFF)
 putCommand (Unknown b r v) = do
-    putWord16 r
+    putReg r
     putBS b
     putTVal v
 
@@ -429,7 +440,7 @@ getTVal :: SGet TVal
 getTVal = do
     t <- getWord8
     case t of
-     0 -> Reg <$> getWord16
+     0 -> Reg . RegPos <$> getWord16
      1 -> Const <$> getWord16
      _ -> fail $ "Unknown value tag " ++ show t
 
@@ -451,7 +462,7 @@ lineParser = begin
 
         -- Actions
         cmds <- getArray getWord16 $ do
-            r <- getWord16
+            r <- RegPos <$> getWord16
             bytecode <- getBS 2
             case lookup bytecode actions of
               Just p -> p r
@@ -478,19 +489,19 @@ lineParser = begin
 
     actions =
         [ (B.pack [0xE8,0xFF], \r -> do
-            unless (r == 0) $ fail "Non-zero register for Play command"
+            unless (r == RegPos 0) $ fail "Non-zero register for Play command"
             Const n <- getTVal
             return (Play n))
         , (B.pack [0x00,0xFC], \r -> do
-            unless (r == 0) $ fail "Non-zero register for Random command"
+            unless (r == RegPos 0) $ fail "Non-zero register for Random command"
             Const n <- getTVal
             return (Random (lowbyte n) (highbyte n)))
         , (B.pack [0xFF,0xFA], \r -> do
-            unless (r == 0) $ fail "Non-zero register for Cancel command"
+            unless (r == RegPos 0) $ fail "Non-zero register for Cancel command"
             Const 0xFFFF <- getTVal
             return Cancel)
         , (B.pack [0x00,0xFD], \r -> do
-            unless (r == 0) $ fail "Non-zero register for Game command"
+            unless (r == RegPos 0) $ fail "Non-zero register for Game command"
             Const a <- getTVal
             return (Game a))
         , (B.pack [0xF0,0xFF], \r -> do
@@ -724,8 +735,12 @@ ppCondOp GEq             = ">="
 ppCondOp (Unknowncond b) = printf "?%s?" (prettyHex b)
 
 ppTVal :: TVal -> String
-ppTVal (Reg n)   =  "$" ++ show n
+ppTVal (Reg r)   =  ppRegister r
 ppTVal (Const n) =  show n
+
+ppRegister :: Register -> String
+ppRegister (RegPos n) = "$" ++ show n
+ppRegister (RegName n) = "$" ++ n
 
 ppCommand :: Bool -> Transscript -> PlayList -> Command -> String
 ppCommand True t xs (Play n)     | not (validIndex xs (fromIntegral n)) = ""
@@ -735,9 +750,9 @@ ppCommand _ t xs (Play n)        = printf "P(%s)" (ppPlayIndex t xs (fromIntegra
 ppCommand _ t xs (Random a b)    = printf "P(%s)" $ commas $ map (ppPlayIndex t xs . fromIntegral ) [b..a]
 ppCommand _ t xs (Cancel)        = printf "C"
 ppCommand _ t xs (Game b)        = printf "G(%d)" b
-ppCommand _ t xs (Inc r n)       = printf "$%d+=%s" r (ppTVal n)
-ppCommand _ t xs (Set r n)       = printf "$%d:=%s" r (ppTVal n)
-ppCommand _ t xs (Unknown b r n) = printf "?($%d,%s) (%s)" r (ppTVal n) (prettyHex b)
+ppCommand _ t xs (Inc r n)       = printf "%s+=%s" (ppRegister r) (ppTVal n)
+ppCommand _ t xs (Set r n)       = printf "%s:=%s" (ppRegister r) (ppTVal n)
+ppCommand _ t xs (Unknown b r n) = printf "?(%s,%s) (%s)" (ppRegister r) (ppTVal n) (prettyHex b)
 
 validIndex :: PlayList -> Int -> Bool
 validIndex xs n = n >= 0 && n < length xs
@@ -1085,13 +1100,14 @@ condTrue s (Cond v1 o v2) = value s v1 =?= value s v2
         _   -> \_ _ -> False
 
 value :: PlayState -> TVal -> Word16
-value m (Reg r)   = M.findWithDefault 0 r m
+value m (Reg (RegPos r)) = M.findWithDefault 0 r m
+value m (Reg (RegName n)) = error $ printf "Unresolved register name %s in function value" n
 value m (Const n) = n
 
 applyLine :: Line -> PlayState -> PlayState
 applyLine (Line _ _ act _) s = foldl' go s act
-  where go s (Set r n) = M.insert r (s `value` n) s
-        go s (Inc r n) = M.insert r (s `value` (Reg r) + s `value` n) s
+  where go s (Set (RegPos r) n) = M.insert r (s `value` n) s
+        go s (Inc (RegPos r) n) = M.insert r (s `value` (Reg (RegPos r)) + s `value` n) s
         go s _         = s
 
 forEachNumber :: s -> (Int -> s -> IO s) -> IO ()
@@ -1174,8 +1190,8 @@ parseCond = descP "Conditional" $ do
 parseWord16 :: Parser Word16
 parseWord16 = fromIntegral <$> P.natural lexer
 
-parseReg :: Parser Word16
-parseReg = char '$' >> parseWord16
+parseReg :: Parser Register
+parseReg = char '$' >> (RegPos <$> parseWord16 <|> RegName <$> many1 (alphaNum <|> char '_'))
 
 parseTVal :: Parser TVal
 parseTVal = (Reg <$> parseReg <|> Const <$> parseWord16) <?> "Value"
@@ -1245,10 +1261,21 @@ cmdRegs (Inc r v) = r : valRegs v
 cmdRegs (Set r v) = r : valRegs v
 cmdRegs _         = []
 
+resolveRegs :: Data a => a -> a
+resolveRegs x = everywhere (mkT resolve) x
+  where
+    regs = S.fromList (listify (const True) x :: [Register])
+    regNums = S.fromList [ n | RegPos n <- S.toList regs ]
+    regNames = [ n | RegName n <- S.toList regs ]
+    mapping = M.fromList $ zip regNames [n | n <- [0..], n `S.notMember` regNums]
+    resolve (RegPos n) = (RegPos n)
+    resolve (RegName n) = RegPos $ fromMaybe (error "resolveRegs broken") (M.lookup n mapping)
+
+
 tt2ttYaml :: String -> TipToiFile -> TipToiYAML
 tt2ttYaml path (TipToiFile {..}) = TipToiYAML
     { ttyProduct_Id = ttProductId
-    , ttyInit = Just $ spaces $ [ ppCommand True M.empty [] (Set r (Const n))
+    , ttyInit = Just $ spaces $ [ ppCommand True M.empty [] (Set (RegPos r) (Const n))
                                 | (r,n) <- zip [0..] ttInitialRegs , n /= 0]
     , ttyWelcome = Just $ commas $ map show $ concat ttWelcome
     , ttyComment = Just $ BC.unpack ttComment
@@ -1286,17 +1313,19 @@ ttYaml2tt dir (TipToiYAML {..}) = do
 
     let welcome = [map filename_lookup welcome_names]
 
-    let scripts = map ($ filename_lookup) prescripts
+    preInitRegs <- case P.parse parseInitRegs "init" (fromMaybe "" ttyInit) of
+        Left e ->  fail (show e)
+        Right l -> return $ M.fromList l
+
+    -- resolve registers
+    let (initRegs, scripts) = resolveRegs (preInitRegs, map ($ filename_lookup) prescripts)
 
     let maxReg = maximum
             [ r
             | (_, Just ls) <- scripts
             , Line _ cs as _ <- ls
-            , r <- concatMap condRegs cs ++ concatMap cmdRegs as ]
+            , RegPos r <- concatMap condRegs cs ++ concatMap cmdRegs as ]
 
-    initRegs <- case P.parse parseInitRegs "init" (fromMaybe "" ttyInit) of
-        Left e ->  fail (show e)
-        Right l -> return $ M.fromList l
 
     files <- forM filenames' $ \fn -> do
         let paths = [ combine dir relpath
@@ -1322,7 +1351,7 @@ ttYaml2tt dir (TipToiYAML {..}) = do
         , ttComment = BC.pack (fromMaybe "created with tip-toi-reveng" ttyComment)
         , ttDate = BC.pack date
         , ttWelcome = welcome
-        , ttInitialRegs = [fromMaybe 0 (M.lookup r initRegs) | r <- [0..maxReg]]
+        , ttInitialRegs = [fromMaybe 0 (M.lookup (RegPos r) initRegs) | r <- [0..maxReg]]
         , ttScripts = scripts
         , ttGames = []
         , ttAudioFiles = files
