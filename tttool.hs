@@ -1249,11 +1249,11 @@ parseCommands i =
                 _    -> Random (fromIntegral (i + n - 1)) (fromIntegral i)
          return (c : cmds, fns ++ filenames)
     , descP "Cancel" $
-      do char 'C'
+      do P.lexeme lexer $ char 'C'
          (cmds, filenames) <- parseCommands i
          return (Cancel : cmds, filenames)
     , descP "Start Game" $
-      do char 'G'
+      do P.lexeme lexer $ char 'G'
          n <- P.parens lexer $ parseWord16
          (cmds, filenames) <- parseCommands i
          return (Game n : cmds, filenames)
