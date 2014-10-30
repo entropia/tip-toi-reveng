@@ -44,6 +44,13 @@ import Debug.Trace
 import Data.Foldable (Foldable)
 import qualified Data.Foldable as F
 import Control.Arrow
+-- import Codec.Picture
+import Control.Applicative ((<*>) )
+import Data.Monoid (mconcat, Any)
+import Text.Blaze.Svg11 ((!), mkPath, rotate, l, m)
+import qualified Text.Blaze.Svg11 as S
+import qualified Text.Blaze.Svg11.Attributes as A
+import Text.Blaze.Svg.Renderer.String (renderSvg)
 
 -- Main data types
 
@@ -879,6 +886,96 @@ readMaybe :: (Read a) => String -> Maybe a
 readMaybe s = case reads s of
               [(x, "")] -> Just x
               _ -> Nothing
+
+
+-- Image generation
+
+checksum :: Int -> Int
+checksum dec = c3
+  where
+    c1  =       (((dec >> 2) ^ (dec >> 8) ^ (dec >> 12) ^ (dec >> 14)) & 0x01) << 1
+    c2 = c1 .|. (((dec) ^ (dec >> 4) ^ (dec >>  6) ^ (dec >> 10)) & 0x01)
+    c3 = c2  ^  0x02
+
+    (>>) = shiftR
+    (<<) = shiftL
+    (^) = xor
+    (&) = (.&.)
+
+oidSVG :: Int -> S.Svg
+oidSVG code | code >= 4^8 = error $ printf "Code %d too large to draw" code
+oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
+                           ! A.width (S.toValue "100mm")
+                           ! A.height (S.toValue "100mm")
+                           ! A.viewbox (S.toValue "0 0 6400 6400") $ do
+    pattern
+    S.rect ! A.width (S.toValue "100%") ! A.height (S.toValue "100%")
+           ! A.fill (S.toValue "url(#pat)")
+  where
+    quart 8 = checksum code
+    quart n = (code `div` 4^n) `mod` 4
+
+    pattern = S.pattern ! A.width (S.toValue "64")
+                        ! A.height (S.toValue "64")
+                        ! A.id_ (S.toValue "pat")
+                        ! A.patternunits (S.toValue "userSpaceOnUse") $ S.g f
+    f = mconcat $ map position $
+        zip (flip (,) <$> [3,2,1] <*> [3,2,1])
+            [ value (quart n) | n <- [0..8] ] ++
+        [ (p, plain) | p <- [(0,0), (1,0), (2,0), (3,0), (0,1), (0,3) ] ] ++
+        [ ((0,2), special) ]
+
+    pixel = S.rect ! A.width (S.toValue "2") ! A.height (S.toValue "2") ! pos (7,7)
+
+    plain = at (7,7) $ S.rect ! A.width (S.toValue (2::Int)) ! A.height (S.toValue (2::Int))
+    value 0 = at (2,2)   plain
+    value 1 = at (-2,2)  plain
+    value 2 = at (-2,-2) plain
+    value 3 = at (2,-2)  plain
+    special = at (3,0)   plain
+
+    p1 = maxBound :: Word8
+    p0 = minBound :: Word8
+
+    position ((n,m), p) = at (n*16, m*16) p
+
+    -- Drawing combinators
+    at (x, y) f = S.g ! pos (x,y) $ f
+    pos (x,y) = A.transform (S.translate x y)
+
+{-
+oidImage :: Integer -> Image Pixel8
+oidImage code | code >= 4^9 = error $ printf "Code %d too large to draw" code
+oidImage code = generateImage (\x y -> if getAny (f x y) then p0 else p1) (4*16) (4*16)
+  where
+    quart n = (code `div` 4^n) `mod` 4
+    f = mconcat $ map position $
+        zip (flip (,) <$> [3,2,1] <*> [3,2,1])
+            [ value (quart n) | n <- [0..8] ] ++
+        [ (p, plain) | p <- [(0,0), (1,0), (2,0), (3,0), (0,1), (0,3) ] ] ++
+        [ ((0,2), special) ]
+
+    plain = mconcat [ at (7,7) pixel
+                    , at (7,8) pixel
+                    , at (8,7) pixel
+                    , at (8,8) pixel
+                    ]
+    value 0 = at (1,1)   plain
+    value 1 = at (-1,1)  plain
+    value 2 = at (-1,-1) plain
+    value 3 = at (1,-1)  plain
+    special = at (2,0)   plain
+
+    p1 = maxBound :: Word8
+    p0 = minBound :: Word8
+
+    position ((n,m), p) = at (n*16, m*16) p
+
+    -- Drawing combinators
+
+    pixel x y = Any $ x == 0 && y == 0
+    at (x, y) f = \ x' y' -> f (x'-x) (y'-y)
+-}
 
 -- Main commands
 
