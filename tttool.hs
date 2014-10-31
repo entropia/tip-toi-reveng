@@ -50,7 +50,7 @@ import Data.Monoid (mconcat, Any)
 import Text.Blaze.Svg11 ((!), mkPath, rotate, l, m)
 import qualified Text.Blaze.Svg11 as S
 import qualified Text.Blaze.Svg11.Attributes as A
-import Text.Blaze.Svg.Renderer.String (renderSvg)
+import Text.Blaze.Svg.Renderer.Utf8 (renderSvg)
 
 -- Main data types
 
@@ -905,8 +905,8 @@ checksum dec = c3
 oidSVG :: Int -> S.Svg
 oidSVG code | code >= 4^8 = error $ printf "Code %d too large to draw" code
 oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
-                           ! A.width (S.toValue "100mm")
-                           ! A.height (S.toValue "100mm")
+                           ! A.width (S.toValue "101.5mm")
+                           ! A.height (S.toValue "101.5mm")
                            ! A.viewbox (S.toValue "0 0 6400 6400") $ do
     pattern
     S.rect ! A.width (S.toValue "100%") ! A.height (S.toValue "100%")
@@ -942,6 +942,9 @@ oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
     -- Drawing combinators
     at (x, y) f = S.g ! pos (x,y) $ f
     pos (x,y) = A.transform (S.translate x y)
+
+genSVG :: Int -> FilePath -> IO ()
+genSVG code filename = B.writeFile filename (renderSvg (oidSVG code))
 
 {-
 oidImage :: Integer -> Image Pixel8
@@ -1565,6 +1568,9 @@ main' t ("assemble": inf : out: [] )  =              assemble inf out
 main' t ("create-debug": out : n :[])
     | Just int <- readMaybe n       =              createDebug out int
     | [(int,[])] <- readHex n       =              createDebug out int
+main' t ("oid-code": code: [])      = main' t ["oid-code", code, code <.> "svg"]
+main' t ("oid-code": code: filename : []) 
+    | Just int <- readMaybe code    =              genSVG int filename
 main' _ _ = do
     prg <- getProgName
     putStrLn $ "Usage: " ++ prg ++ " [options] command"
@@ -1608,6 +1614,9 @@ main' _ _ = do
     putStrLn $ "       dumps the file in the human-readable yaml format"
     putStrLn $ "    assemble <infile.yaml> <outfile.gme>"
     putStrLn $ "       creates a gme file from the given source"
+    putStrLn $ "    oid-code <code> <file.svg>"
+    putStrLn $ "       creates a SVG file with this optical code."
+    putStrLn $ "       Uses <code>.svg as the default file name"
     exitFailure
 
 main = getArgs >>= (main' M.empty)

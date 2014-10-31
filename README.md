@@ -86,7 +86,7 @@ Otherwise, installation from source is not difficult either:
     `cabal`, and you should run the two commands
 
         cabal update
-        cabal install yaml
+        cabal install yaml blaze-svg
 
  3. Now you can build the program using
 
