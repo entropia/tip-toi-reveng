@@ -902,6 +902,27 @@ checksum dec = c3
     (^) = xor
     (&) = (.&.)
 
+parseRange :: String -> IO [Int]
+parseRange input = do
+    case P.parse rangeParser "command line" input of
+        Left e ->  fail (show e)
+        Right r -> return r
+
+rangeParser :: Parser [Int]
+rangeParser = concat <$> oneRangeParser `sepBy1` many1 (P.char ' ' <|> P.char ',')
+
+oneRangeParser = do
+    n <- fromIntegral `fmap` P.natural lexer <?> "Number"
+    skipMany (char ' ')
+    choice
+        [ do char '-'
+             n' <- fromIntegral `fmap` P.natural lexer <?> "Number"
+             unless (n' > n) $ fail $ printf "%d is not larger than %d" n' n
+             return [n..n']
+        ,    return [n]
+        ]
+
+
 oidSVG :: Int -> S.Svg
 oidSVG code | code >= 4^8 = error $ printf "Code %d too large to draw" code
 oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
@@ -948,6 +969,14 @@ oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
 
     -- Drawing combinators
     at (x, y) f = f . ((+x) *** (+y))
+
+genSVGs :: String -> IO ()
+genSVGs code_str = do
+    codes <- parseRange code_str
+    forM_ codes $ \c -> do
+        let filename = printf "oid%d.svg" c
+        printf "Writing %s...\n" filename
+        genSVG c filename
 
 genSVG :: Int -> FilePath -> IO ()
 genSVG code filename = B.writeFile filename (renderSvg (oidSVG code))
@@ -1574,9 +1603,7 @@ main' t ("assemble": inf : out: [] )  =              assemble inf out
 main' t ("create-debug": out : n :[])
     | Just int <- readMaybe n       =              createDebug out int
     | [(int,[])] <- readHex n       =              createDebug out int
-main' t ("oid-code": code: [])      = main' t ["oid-code", code, code <.> "svg"]
-main' t ("oid-code": code: filename : []) 
-    | Just int <- readMaybe code    =              genSVG int filename
+main' t ("oid-code": codes@(_:_))   =              genSVGs (unwords codes)
 main' _ _ = do
     prg <- getProgName
     putStrLn $ "Usage: " ++ prg ++ " [options] command"
@@ -1620,9 +1647,10 @@ main' _ _ = do
     putStrLn $ "       dumps the file in the human-readable yaml format"
     putStrLn $ "    assemble <infile.yaml> <outfile.gme>"
     putStrLn $ "       creates a gme file from the given source"
-    putStrLn $ "    oid-code <code> <file.svg>"
-    putStrLn $ "       creates a SVG file with this optical code."
-    putStrLn $ "       Uses <code>.svg as the default file name"
+    putStrLn $ "    oid-code <codes>"
+    putStrLn $ "       creates a SVG file for each given optical code."
+    putStrLn $ "       <codes> can be a range, e.g 1,3,1000-1085."
+    putStrLn $ "       Uses oid<code>.svg as the file name."
     exitFailure
 
 main = getArgs >>= (main' M.empty)

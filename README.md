@@ -22,47 +22,52 @@ The tttool tool
 Use the tool `tttool.hs` to investigate the gme files and build new ones. It
 supports various subcommands:
 
-	Usage: tttool [options] command
+    Usage: tttool [options] command
 
-	Options:
-	    -t <transcriptfile>
-	       replaces media file indices by a transscript
+    Options:
+        -t <transcriptfile>
+           replaces media file indices by a transscript
 
-	Commands:
-	    info <file.gme>...
-	       general information
-	    media [-d dir] <file.gme>...
-	       dumps all audio samples to the given directory (default: media/)
-	    scripts <file.gme>...
-	       prints the decoded scripts for each OID
-	    script <file.gme> <n>
-	       prints the decoded scripts for the given OID
-	    raw-scripts <file.gme>...
-	       prints the scripts for each OID, in their raw form
-	    raw-script <file.gme> <n>
-	       prints the scripts for the given OID, in their raw form
-	    games <file.gme>...
-	       prints the decoded games
-	    lint <file.gme>
-	       checks for errors in the file or in this program
-	    segments <file.gme>...
-	       lists all known parts of the file, with description.
-	    segment <file.gme> <pos>
-	       which segment contains the given position.
-	    holes <file.gme>...
-	       lists all unknown parts of the file.
-	    explain <file.gme>...
-	       lists all parts of the file, with description and hexdum and hexdumpp.
-	    play <file.gme>
-	       interactively play: Enter OIDs, and see what happens.
-	    rewrite <infile.gme> <outfile.gme>
-	       parses the file and serializes it again (for debugging).
-	    create-debug <outfile.gme> <productid>
-	       creates a special Debug.gme file for that productid
-	    export <infile.gme> [<outfile.yaml>]
-	       dumps the file in the human-readable yaml format
-	    assemble <infile.yaml> <outfile.gme>
-	       creates a gme file from the given source
+    Commands:
+        info <file.gme>...
+           general information
+        media [-d dir] <file.gme>...
+           dumps all audio samples to the given directory (default: media/)
+        scripts <file.gme>...
+           prints the decoded scripts for each OID
+        script <file.gme> <n>
+           prints the decoded scripts for the given OID
+        raw-scripts <file.gme>...
+           prints the scripts for each OID, in their raw form
+        raw-script <file.gme> <n>
+           prints the scripts for the given OID, in their raw form
+        games <file.gme>...
+           prints the decoded games
+        lint <file.gme>
+           checks for errors in the file or in this program
+        segments <file.gme>...
+           lists all known parts of the file, with description.
+        segment <file.gme> <pos>
+           which segment contains the given position.
+        holes <file.gme>...
+           lists all unknown parts of the file.
+        explain <file.gme>...
+           lists all parts of the file, with description and hexdum and hexdumpp.
+        play <file.gme>
+           interactively play: Enter OIDs, and see what happens.
+        rewrite <infile.gme> <outfile.gme>
+           parses the file and serializes it again (for debugging).
+        create-debug <outfile.gme> <productid>
+           creates a special Debug.gme file for that productid
+        export <infile.gme> [<outfile.yaml>]
+           dumps the file in the human-readable yaml format
+        assemble <infile.yaml> <outfile.gme>
+           creates a gme file from the given source
+        oid-code <codes>
+           creates a SVG file for each given optical code.
+           <codes> can be a range, e.g 1,3,1000-1085.
+           Uses oid<code>.svg as the file name.
+
 
 A transscript is simply a `;`-separated table of OIDs and some text, see for example [`transcript/WWW_Bauernhof.csv`](transcript/WWW_Bauernhof.csv).
 
