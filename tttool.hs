@@ -918,16 +918,23 @@ oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
     pattern = S.pattern ! A.width (S.toValue "64")
                         ! A.height (S.toValue "64")
                         ! A.id_ (S.toValue "pat")
-                        ! A.patternunits (S.toValue "userSpaceOnUse") $ S.g f
+                        ! A.patternunits (S.toValue "userSpaceOnUse") $ S.g (f (0,0))
     f = mconcat $ map position $
         zip (flip (,) <$> [3,2,1] <*> [3,2,1])
             [ value (quart n) | n <- [0..8] ] ++
         [ (p, plain) | p <- [(0,0), (1,0), (2,0), (3,0), (0,1), (0,3) ] ] ++
         [ ((0,2), special) ]
 
-    pixel = S.rect ! A.width (S.toValue "2") ! A.height (S.toValue "2") ! pos (7,7)
+    -- pixel = S.rect ! A.width (S.toValue "2") ! A.height (S.toValue "2") ! pos (7,7)
+    pixel (x,y) = S.path ! A.d path
+      where path = mkPath $ do
+            S.m (x+7) (y+7)
+            S.hr 2
+            S.vr 2
+            S.hr (-2)
+            S.z
 
-    plain = at (7,7) $ S.rect ! A.width (S.toValue (2::Int)) ! A.height (S.toValue (2::Int))
+    plain = pixel
     value 0 = at (2,2)   plain
     value 1 = at (-2,2)  plain
     value 2 = at (-2,-2) plain
@@ -940,8 +947,7 @@ oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
     position ((n,m), p) = at (n*16, m*16) p
 
     -- Drawing combinators
-    at (x, y) f = S.g ! pos (x,y) $ f
-    pos (x,y) = A.transform (S.translate x y)
+    at (x, y) f = f . ((+x) *** (+y))
 
 genSVG :: Int -> FilePath -> IO ()
 genSVG code filename = B.writeFile filename (renderSvg (oidSVG code))
