@@ -926,19 +926,20 @@ oneRangeParser = do
 oidSVG :: Int -> S.Svg
 oidSVG code | code >= 4^8 = error $ printf "Code %d too large to draw" code
 oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
-                           ! A.width (S.toValue "101.5mm")
-                           ! A.height (S.toValue "101.5mm")
-                           ! A.viewbox (S.toValue "0 0 6400 6400") $ do
-    pattern
-    S.rect ! A.width (S.toValue "100%") ! A.height (S.toValue "100%")
-           ! A.fill (S.toValue "url(#pat)")
+                           ! A.width (S.toValue "1mm")
+                           ! A.height (S.toValue "1mm")
+                           ! A.viewbox (S.toValue "0 0 4800 4800") $ do
+    S.defs pattern
+    S.rect ! A.width (S.toValue "1mm") ! A.height (S.toValue "1mm")
+           ! A.fill (S.toValue $ "url(#"++patid++")")
   where
     quart 8 = checksum code
     quart n = (code `div` 4^n) `mod` 4
+    patid = "pat-" ++ show code
 
-    pattern = S.pattern ! A.width (S.toValue "64")
-                        ! A.height (S.toValue "64")
-                        ! A.id_ (S.toValue "pat")
+    pattern = S.pattern ! A.width (S.toValue "48")
+                        ! A.height (S.toValue "48")
+                        ! A.id_ (S.toValue patid)
                         ! A.patternunits (S.toValue "userSpaceOnUse") $ S.g (f (0,0))
     f = mconcat $ map position $
         zip (flip (,) <$> [3,2,1] <*> [3,2,1])
@@ -949,7 +950,7 @@ oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
     -- pixel = S.rect ! A.width (S.toValue "2") ! A.height (S.toValue "2") ! pos (7,7)
     pixel (x,y) = S.path ! A.d path
       where path = mkPath $ do
-            S.m (x+7) (y+7)
+            S.m (x+5) (y+5)
             S.hr 2
             S.vr 2
             S.hr (-2)
