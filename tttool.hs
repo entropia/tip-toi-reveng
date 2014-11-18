@@ -44,13 +44,16 @@ import Debug.Trace
 import Data.Foldable (Foldable)
 import qualified Data.Foldable as F
 import Control.Arrow
--- import Codec.Picture
+import Codec.Picture
 import Control.Applicative ((<*>) )
 import Data.Monoid (mconcat, Any)
+import qualified Data.Vector as V
+{-
 import Text.Blaze.Svg11 ((!), mkPath, rotate, l, m)
 import qualified Text.Blaze.Svg11 as S
 import qualified Text.Blaze.Svg11.Attributes as A
 import Text.Blaze.Svg.Renderer.Utf8 (renderSvg)
+-}
 
 -- Main data types
 
@@ -923,14 +926,15 @@ oneRangeParser = do
         ]
 
 
+{-
 oidSVG :: Int -> S.Svg
 oidSVG code | code >= 4^8 = error $ printf "Code %d too large to draw" code
 oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
                            ! A.width (S.toValue "1mm")
                            ! A.height (S.toValue "1mm")
-                           ! A.viewbox (S.toValue "0 0 4800 4800") $ do
+                           ! A.viewbox (S.toValue "0 0 48 48") $ do
     S.defs pattern
-    S.rect ! A.width (S.toValue "1mm") ! A.height (S.toValue "1mm")
+    S.rect ! A.width (S.toValue "48") ! A.height (S.toValue "48")
            ! A.fill (S.toValue $ "url(#"++patid++")")
   where
     quart 8 = checksum code
@@ -963,10 +967,7 @@ oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
     value 3 = at (2,-2)  plain
     special = at (3,0)   plain
 
-    p1 = maxBound :: Word8
-    p0 = minBound :: Word8
-
-    position ((n,m), p) = at (n*16, m*16) p
+    position ((n,m), p) = at (n*12, m*12) p
 
     -- Drawing combinators
     at (x, y) f = f . ((+x) *** (+y))
@@ -981,23 +982,29 @@ genSVGs code_str = do
 
 genSVG :: Int -> FilePath -> IO ()
 genSVG code filename = B.writeFile filename (renderSvg (oidSVG code))
+-}
 
-{-
-oidImage :: Integer -> Image Pixel8
-oidImage code | code >= 4^9 = error $ printf "Code %d too large to draw" code
-oidImage code = generateImage (\x y -> if getAny (f x y) then p0 else p1) (4*16) (4*16)
+oidImage :: Int -> Image Pixel8
+oidImage code | code >= 4^8 = error $ printf "Code %d too large to draw" code
+oidImage code =
+    generateImage (\x y -> if getAny (f x y) then p0 else p1) (width*4*12) (height*4*12)
   where
+    width = 100 -- in mm
+    height = 100 -- in mm
+
+    quart 8 = checksum code
     quart n = (code `div` 4^n) `mod` 4
-    f = mconcat $ map position $
+
+    f = tile $ mconcat $ map position $
         zip (flip (,) <$> [3,2,1] <*> [3,2,1])
             [ value (quart n) | n <- [0..8] ] ++
         [ (p, plain) | p <- [(0,0), (1,0), (2,0), (3,0), (0,1), (0,3) ] ] ++
         [ ((0,2), special) ]
 
-    plain = mconcat [ at (7,7) pixel
-                    , at (7,8) pixel
-                    , at (8,7) pixel
-                    , at (8,8) pixel
+    plain = mconcat [ at (5,5) pixel
+                    , at (5,6) pixel
+                    , at (6,5) pixel
+                    , at (6,6) pixel
                     ]
     value 0 = at (1,1)   plain
     value 1 = at (-1,1)  plain
@@ -1008,13 +1015,26 @@ oidImage code = generateImage (\x y -> if getAny (f x y) then p0 else p1) (4*16)
     p1 = maxBound :: Word8
     p0 = minBound :: Word8
 
-    position ((n,m), p) = at (n*16, m*16) p
+    position ((n,m), p) = at (n*12, m*12) p
 
     -- Drawing combinators
 
     pixel x y = Any $ x == 0 && y == 0
     at (x, y) f = \ x' y' -> f (x'-x) (y'-y)
--}
+    tile f x y = memo f (x `mod` (4*12)) (y `mod` (4*12))
+    memo f = \ x y -> v V.! x V.! y
+      where v = V.fromList [V.fromList [ f x y | y <- [0..(4*12-1)]] | x <- [0..(4*12-1)]]
+
+genPNGs :: String -> IO ()
+genPNGs code_str = do
+    codes <- parseRange code_str
+    forM_ codes $ \c -> do
+        let filename = printf "oid%d.png" c
+        printf "Writing %s...\n" filename
+        genPNG c filename
+
+genPNG :: Int -> FilePath -> IO ()
+genPNG code filename = writePng filename (oidImage code)
 
 -- Main commands
 
@@ -1604,7 +1624,7 @@ main' t ("assemble": inf : out: [] )  =              assemble inf out
 main' t ("create-debug": out : n :[])
     | Just int <- readMaybe n       =              createDebug out int
     | [(int,[])] <- readHex n       =              createDebug out int
-main' t ("oid-code": codes@(_:_))   =              genSVGs (unwords codes)
+main' t ("oid-code": codes@(_:_))   =              genPNGs (unwords codes)
 main' _ _ = do
     prg <- getProgName
     putStrLn $ "Usage: " ++ prg ++ " [options] command"
@@ -1649,9 +1669,10 @@ main' _ _ = do
     putStrLn $ "    assemble <infile.yaml> <outfile.gme>"
     putStrLn $ "       creates a gme file from the given source"
     putStrLn $ "    oid-code <codes>"
-    putStrLn $ "       creates a SVG file for each given optical code."
+    putStrLn $ "       creates a PNG file for each given optical code"
+    putStrLn $ "       cale this to 10cm×10cm resp. 1200dpi."
     putStrLn $ "       <codes> can be a range, e.g 1,3,1000-1085."
-    putStrLn $ "       Uses oid<code>.svg as the file name."
+    putStrLn $ "       Uses oid<code>.png as the file name."
     exitFailure
 
 main = getArgs >>= (main' M.empty)

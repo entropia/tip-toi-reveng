@@ -64,9 +64,10 @@ supports various subcommands:
         assemble <infile.yaml> <outfile.gme>
            creates a gme file from the given source
         oid-code <codes>
-           creates a SVG file for each given optical code.
+	   creates a PNG file for each given optical code.
+	   Scale this to 10cm×10cm resp. 1200dpi.
            <codes> can be a range, e.g 1,3,1000-1085.
-           Uses oid<code>.svg as the file name.
+           Uses oid<code>.png as the file name.
 
 
 A transscript is simply a `;`-separated table of OIDs and some text, see for example [`transcript/WWW_Bauernhof.csv`](transcript/WWW_Bauernhof.csv).
@@ -91,7 +92,7 @@ Otherwise, installation from source is not difficult either:
     `cabal`, and you should run the two commands
 
         cabal update
-        cabal install yaml blaze-svg
+        cabal install yaml JuicyPixels
 
  3. Now you can build the program using
 
