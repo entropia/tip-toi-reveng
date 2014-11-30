@@ -1,3 +1,10 @@
+/*
+ * OID image generator by Matthias Bilger <matthias@bilger.info>
+ *
+ * This is an alternative to `tttool oid-code`
+ */
+
+
 #include <png.h>
 #include <stdio.h>
 #include <stdlib.h>
