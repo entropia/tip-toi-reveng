@@ -1671,7 +1671,8 @@ main' _ _ = do
     putStrLn $ "    oid-code <codes>"
     putStrLn $ "       creates a PNG file for each given optical code"
     putStrLn $ "       cale this to 10cm×10cm resp. 1200dpi."
-    putStrLn $ "       <codes> can be a range, e.g 1,3,1000-1085."
+    putStrLn $ "       <codes> can be a range, e.g. 1,3,1000-1085."
+    putStrLn $ "       The code refers to the *raw* code, not the one read by the pen."
     putStrLn $ "       Uses oid<code>.png as the file name."
     exitFailure
 

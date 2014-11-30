@@ -66,7 +66,8 @@ supports various subcommands:
         oid-code <codes>
 	   creates a PNG file for each given optical code.
 	   Scale this to 10cm×10cm resp. 1200dpi.
-           <codes> can be a range, e.g 1,3,1000-1085.
+           <codes> can be a range, e.g. 1,3,1000-1085.
+	   The code refers to the *raw* code, not the one read by the pen.
            Uses oid<code>.png as the file name.
 
 
