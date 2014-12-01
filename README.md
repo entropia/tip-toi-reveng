@@ -20,15 +20,15 @@ This page itself is built with Solo. It's generated from [this markdown file](ht
 
 First, [install Jekyll](http://jekyllrb.com/docs/installation/). Then download Solo from its [GitHub Repository](https://github.com/chibicode/solo). Start Jekyll and you should see this page up and running.
 
-**The main file you'll be editing is `_includes/index.md`**. This becomes the content for the main `index.html`.
+**The main file you'll be editing is `index.md`**. This becomes the content for the main `index.html`.
 
 ### Other Files
 
 * Edit `_config.yml` to change the site title.
 * Edit `_includes/head.html` to add custom code to `<head>`.
 * Edit `_includes/scripts.html` to add custom code before `</body>`.
-* Edit `CNAME` to host on a custom domain.
 * Edit `README.md` before pushing your code.
+* Optional: Add `CNAME` to host on a custom domain.
 
 ### Don't use `<h1>` tags
 
