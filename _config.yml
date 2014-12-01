@@ -1,4 +1,8 @@
-title_tag_text: Solo, a Jekyll Theme
-h1_tag_text: Solo
+# Site settings
+title: Solo, a Jekyll Theme
+tag_text: Solo
 
-exclude: ["Procfile", "Gruntfile.js", "README.md", "package.json", "CNAME", "node_modules"]
+# Build settings
+markdown: kramdown
+
+exclude: ["README.md"]
