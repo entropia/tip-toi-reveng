@@ -24,7 +24,7 @@ First, [install Jekyll](http://jekyllrb.com/docs/installation/). Then download S
 
 ### Other Files
 
-* Edit `_config.yml` to change the site title.
+* Edit `_config.yml` to change the site's title and description.
 * Edit `_includes/head.html` to add custom code to `<head>`.
 * Edit `_includes/scripts.html` to add custom code before `</body>`.
 * Edit `README.md` before pushing your code.
