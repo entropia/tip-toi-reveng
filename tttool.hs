@@ -1631,7 +1631,7 @@ main' _ _ = do
     putStrLn $ ""
     putStrLn $ "Options:"
     putStrLn $ "    -t <transcriptfile>"
-    putStrLn $ "       replaces media file indices by a transscript"
+    putStrLn $ "       in the screen output, replaces media file indices by a transscript"
     putStrLn $ ""
     putStrLn $ "Commands:"
     putStrLn $ "    info <file.gme>..."

@@ -26,7 +26,7 @@ supports various subcommands:
 
     Options:
         -t <transcriptfile>
-           replaces media file indices by a transscript
+           in the screen output, replaces media file indices by a transscript
 
     Commands:
         info <file.gme>...
