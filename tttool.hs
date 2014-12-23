@@ -26,7 +26,6 @@ import Control.Monad.Writer.Strict
 import Control.Monad.State.Strict
 import Control.Monad.Reader
 import Control.Monad.RWS.Strict
-import Control.Arrow (second)
 import Data.Time
 import System.Locale
 import Data.Yaml hiding ((.=), Parser)
@@ -46,7 +45,7 @@ import Data.Foldable (Foldable)
 import qualified Data.Foldable as F
 import Control.Arrow
 import Codec.Picture
-import Control.Applicative ((<*>) )
+import Control.Applicative ((<*>), (<*))
 import Data.Monoid (mconcat, Any)
 import qualified Data.Vector as V
 {-
@@ -1386,6 +1385,17 @@ parseWelcome = P.commaSep lexer $ parseAudioRef
 parseAudioRef :: Parser String
 parseAudioRef = P.lexeme lexer $ many1 (alphaNum <|> char '_')
 
+parsePrettyHex :: Parser B.ByteString
+parsePrettyHex = B.pack <$> many1 (P.lexeme lexer nibble)
+  where
+    nibble = fromIntegral <$> number 16 hexDigit
+    number base baseDigit
+        = do{ digits <- many1 baseDigit
+            ; let n = foldl (\x d -> base*x + toInteger (digitToInt d)) 0 digits
+            ; seq n (return n)
+            }
+
+
 parseCommands :: Int -> Parser ([Command Register], [String])
 parseCommands i =
     choice
@@ -1397,6 +1407,14 @@ parseCommands i =
          v <- parseTVal
          (cmds, filenames) <- parseCommands i
          return (op r v : cmds, filenames)
+    , descP "Unknown action" $
+      do P.lexeme lexer $ char '?'
+         (r,v) <- P.parens lexer $
+            (,) <$> parseReg <* P.comma lexer <*> parseTVal
+         h <- P.parens lexer parsePrettyHex
+         (cmds, filenames) <- parseCommands i
+         return (Unknown h r v : cmds, filenames)
+
     , descP "Play action" $
       do char 'P'
          fns <- P.parens lexer $ P.commaSep1 lexer parseAudioRef
