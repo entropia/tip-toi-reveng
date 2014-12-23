@@ -22,7 +22,7 @@ This page itself is built with Solo. It's generated from [this markdown file](ht
 
 First, [install Jekyll](http://jekyllrb.com/docs/installation/). Then download Solo from its [GitHub Repository](https://github.com/chibicode/solo). Start Jekyll and you should see this page up and running.
 
-**The main file you'll be editing is `_includes/index.md`**. This becomes the content for the main `index.html`.
+**The main file you'll be editing is `index.md`**. This becomes the content for the page.
 
 ### Other Files
 
