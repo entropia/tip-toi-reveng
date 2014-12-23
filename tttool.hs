@@ -1519,7 +1519,7 @@ ttYaml2tt dir (TipToiYAML {..}) = do
     -- resolve registers
     let (initRegs, scripts) = resolveRegs (preInitRegs, map ($ filename_lookup) prescripts)
 
-    let maxReg = maximum
+    let maxReg = maximum $ 0:
             [ r
             | (_, Just ls) <- scripts
             , Line _ cs as _ <- ls
