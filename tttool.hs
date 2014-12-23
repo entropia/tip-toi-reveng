@@ -35,6 +35,7 @@ import qualified Data.Yaml as Y
 import qualified Data.Text as T
 import Text.Parsec hiding (Line, lookAhead, spaces)
 import Text.Parsec.String
+import Text.Parsec.Error
 import qualified Text.Parsec as P
 import qualified Text.Parsec.Token as P
 import Text.Parsec.Language (emptyDef)
@@ -906,10 +907,7 @@ checksum dec = c3
     (&) = (.&.)
 
 parseRange :: String -> IO [Int]
-parseRange input = do
-    case P.parse rangeParser "command line" input of
-        Left e ->  fail (show e)
-        Right r -> return r
+parseRange = parseOneLine rangeParser "command line"
 
 rangeParser :: Parser [Int]
 rangeParser = concat <$> oneRangeParser `sepBy1` many1 (P.char ' ' <|> P.char ',')
@@ -1334,7 +1332,11 @@ instance FromJSON TipToiYAML where
 instance ToJSON TipToiYAML where
      toJSON = genericToJSON $ options
 
-lexer       = P.makeTokenParser emptyDef
+lexer       = P.makeTokenParser $
+    emptyDef
+        { P.reservedOpNames = words ":= == /= < >="
+        , P.opLetter       = oneOf ":!#%&*+./<=>?@\\^|-~" -- Removed $, used for registers
+        }
 
 parseLine :: Parser ([Word16] -> Line Register, [String])
 parseLine = do
@@ -1445,6 +1447,29 @@ tt2ttYaml path (TipToiFile {..}) = TipToiYAML
     , ttyMedia_Path = Just path
     }
 
+-- | A nicer way to print an error message
+printLineParserErrorMessage :: String -> ParseError -> IO a
+printLineParserErrorMessage input err = do
+    putStrLn (lineParserErrorMessage input err)
+    exitFailure
+
+lineParserErrorMessage :: String -> ParseError -> String
+lineParserErrorMessage input err =
+    "In " ++ sourceName pos ++ " column " ++ show (sourceColumn pos) ++ ":\n" ++
+    input ++ "\n" ++
+    replicate (sourceColumn pos - 1) ' ' ++ "↑" ++
+    showErrorMessages "or" "unknown parse err" "expecting"
+                      "unexpected" "end of input"
+                      (errorMessages err)
+  where pos = errorPos err
+
+parseOneLine :: Parser a -> String -> String -> IO a
+parseOneLine p name input =
+    case P.parse p name input of
+        Left e ->  printLineParserErrorMessage input e
+        Right l -> return l
+
+
 ttYaml2tt :: FilePath -> TipToiYAML -> IO TipToiFile
 ttYaml2tt dir (TipToiYAML {..}) = do
     now <- getCurrentTime
@@ -1454,19 +1479,16 @@ ttYaml2tt dir (TipToiYAML {..}) = do
         first = fst (M.findMin m)
         last = fst (M.findMax m)
 
-    welcome_names <- case P.parse parseWelcome "welcome" (fromMaybe "" ttyWelcome) of
-        Left e ->  fail (show e)
-        Right l -> return l
+    welcome_names <- parseOneLine parseWelcome "welcome" (fromMaybe "" ttyWelcome)
 
     (prescripts, filenames) <- liftM unzip $ forM [first .. last] $ \oid -> do
        case M.lookup oid m of
         Nothing -> return (\_ -> (oid, Nothing), [])
         Just raw_lines -> do
-            (lines, filenames) <- liftM unzip $ forMn raw_lines $ \i raw_line ->
+            (lines, filenames) <- liftM unzip $ forMn raw_lines $ \i raw_line -> do
                 let d = printf "Line %d of OID %d" i oid
-                in case P.parse parseLine d raw_line of
-                    Left e ->       fail (show e)
-                    Right (l, s) -> return (\f -> l (map f s), s)
+                (l,s) <- parseOneLine parseLine d raw_line
+                return (\f -> l (map f s), s)
             return (\f -> (oid, Just (map ($ f) lines)), concat filenames)
 
     let filenames' = S.toList $ S.fromList $ welcome_names ++ concat filenames
@@ -1474,9 +1496,7 @@ ttYaml2tt dir (TipToiYAML {..}) = do
 
     let welcome = [map filename_lookup welcome_names]
 
-    preInitRegs <- case P.parse parseInitRegs "init" (fromMaybe "" ttyInit) of
-        Left e ->  fail (show e)
-        Right l -> return $ M.fromList l
+    preInitRegs <- M.fromList <$> parseOneLine parseInitRegs "init" (fromMaybe "" ttyInit)
 
     -- resolve registers
     let (initRegs, scripts) = resolveRegs (preInitRegs, map ($ filename_lookup) prescripts)
