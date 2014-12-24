@@ -1003,11 +1003,11 @@ oidImage code =
                     , at (6,5) pixel
                     , at (6,6) pixel
                     ]
-    value 0 = at (1,1)   plain
-    value 1 = at (-1,1)  plain
-    value 2 = at (-1,-1) plain
-    value 3 = at (1,-1)  plain
-    special = at (2,0)   plain
+    value 0 = at (2,2)   plain
+    value 1 = at (-2,2)  plain
+    value 2 = at (-2,-2) plain
+    value 3 = at (2,-2)  plain
+    special = at (3,0)   plain
 
     p1 = maxBound :: Word8
     p0 = minBound :: Word8
