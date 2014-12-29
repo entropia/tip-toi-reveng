@@ -147,6 +147,13 @@ as you can see in [this video demonstration](http://youtu.be/KC97F4PfNhk). He
 also published 30 minute [video tutorial](http://youtu.be/4AjvjFM8GzM) (in
 German).
 
+Press Review
+------------
+
+ * [tiptoi hacking](https://blogs.fsfe.org/guido/2014/05/tiptoi-hacking-und-systemanforderungen/) by Guido Arnold
+ * [TipToi Hacking](http://www.nerd.junetz.de/blogbox/index.php?/archives/1377-TipToi-Hacking.html) and [TipToi Hacking II](http://www.nerd.junetz.de/blogbox/index.php?/archives/1378-TipToi-Hacking-II.html) by Mr. Blog
+ * [Various posts](https://www.joachim-breitner.de/blog/tag/Tiptoi) by Joachim “nomeata” Breitner (the main author of `tttool`)
+
 TODO
 ----
 
