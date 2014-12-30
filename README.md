@@ -93,7 +93,7 @@ Otherwise, installation from source is not difficult either:
     `cabal`, and you should run the two commands
 
         cabal update
-        cabal install yaml JuicyPixels
+        cabal install yaml JuicyPixels parsec
 
  3. Now you can build the program using
 
@@ -115,9 +115,9 @@ process is as follows
 
  1. Record the audio samples you want to include, as Ogg Vorbis files, mono, 22050Hz. I use
 
-       arecord -r 22050 foo.wav
-       oggenc foo.wav
-       rm foo.wav
+        arecord -r 22050 foo.wav
+        oggenc foo.wav
+        rm foo.wav
 
  2. Write a `my-book.yaml` file containing some general information, and especially
     the scripts (i.e. what to do) for each OIDs (i.e. the various fields of a
