@@ -186,6 +186,10 @@ GME_AUDIO_FILE_TABLE *createAudioTable(GME_FILE *gme, char *filepath,int useNumb
 		if (useNumbers){
 			sprintf(audioFileName,"%s/%04d.ogg", filepath, i);
 		}else{
+			if (fplist == NULL) {
+				fprintf(stderr,"Could not open file %s\n", filepath);
+				exit(1);
+			}
 			fscanf(fplist, "%s", audioFileName);
 		}
 		aft[i].offset = nextOffset;
@@ -209,6 +213,10 @@ void addAudioFiles(GME_FILE *gme, GME_AUDIO_FILE_TABLE *aft, uint8_t *data, char
 		if (useNumbers){
 			sprintf(audioFileName,"%s/%04d.ogg", filepath, i);
 		}else{
+			if (fplist == NULL) {
+				fprintf(stderr,"Could not open file %s\n", filepath);
+				exit(1);
+			}
 			fscanf(fplist, "%s", audioFileName);
 		}
 		
@@ -354,6 +362,10 @@ void replaceAudio(char *inputfile, char *outputfile, char *filepath, int useNumb
 	*((uint32_t*)dataPos) = calculateChecksum(data, dataPos-data);
 
 	fp = fopen(outputfile, "wb");
+	if (fp == NULL) {
+		fprintf(stderr,"Could not open file %s for writing\n", outputfile);
+		exit(1);
+	}
 	fwrite(data, 1, dataLength, fp);
 	fclose(fp);
 }
@@ -374,7 +386,7 @@ void exportAudioFiles(char *inputfile, char *path, int filelistOnly){
 	sprintf(filename, "%sfilelist.txt", path);
 	if ((fplist = fopen(filename, "wb")) == NULL){
 		fprintf(stderr, "Could not open outputfile '%s'", filename);
-		exit(0);
+		exit(1);
 	}
 	for (i = 0; i < gme->audioFileTableEntries; i++){
 		duplicate = 0;
