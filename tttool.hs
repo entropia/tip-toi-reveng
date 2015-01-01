@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, RecursiveDo, ScopedTypeVariables, GADTs, RecordWildCards, DeriveGeneric, DeriveFoldable, DeriveFunctor, TypeSynonymInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, RecursiveDo, ScopedTypeVariables, GADTs, RecordWildCards, DeriveGeneric, DeriveFoldable, DeriveFunctor, TypeSynonymInstances, BangPatterns #-}
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
@@ -45,6 +45,8 @@ import Data.Foldable (Foldable)
 import qualified Data.Foldable as F
 import Control.Arrow
 import Codec.Picture
+import Codec.Picture.Types
+import Control.Monad.ST
 import Control.Applicative ((<*>), (<*))
 import Data.Monoid (mconcat, Any)
 import qualified Data.Vector as V
@@ -981,57 +983,69 @@ genSVG :: Int -> FilePath -> IO ()
 genSVG code filename = B.writeFile filename (renderSvg (oidSVG code))
 -}
 
-oidImage :: Int -> Image Pixel8
-oidImage code | code >= 4^8 = error $ printf "Code %d too large to draw" code
-oidImage code =
-    generateImage (\x y -> if getAny (f x y) then p0 else p1) (width*4*12) (height*4*12)
+data DPI = D1200 | D600
+
+imageFromBlackPixels :: Int -> Int -> [(Int, Int)] -> Image Pixel8
+imageFromBlackPixels width height pixels = runST $ do 
+    i <- createMutableImage width height maxBound
+    forM_ pixels $ \(x,y) -> do
+        writePixel i x y minBound
+    freezeImage i
+
+oidImage :: DPI -> Int -> Image Pixel8
+oidImage _ code | code >= 4^8 = error $ printf "Code %d too large to draw" code
+oidImage dpi code =
+    imageFromBlackPixels
+        (width *4*dotsPerPoint)
+        (height*4*dotsPerPoint)
+        (tile f)
   where
     width = 100 -- in mm
     height = 100 -- in mm
+    !dotsPerPoint | D1200 <- dpi = 12
+                  |  D600 <- dpi =  6
+
 
     quart 8 = checksum code
     quart n = (code `div` 4^n) `mod` 4
 
-    f = tile $ mconcat $ map position $
+    f = mconcat $ map position $
         zip (flip (,) <$> [3,2,1] <*> [3,2,1])
             [ value (quart n) | n <- [0..8] ] ++
         [ (p, plain) | p <- [(0,0), (1,0), (2,0), (3,0), (0,1), (0,3) ] ] ++
         [ ((0,2), special) ]
 
-    plain = mconcat [ at (5,5) pixel
-                    , at (5,6) pixel
-                    , at (6,5) pixel
-                    , at (6,6) pixel
-                    ]
-    value 0 = at (2,2)   plain
-    value 1 = at (-2,2)  plain
-    value 2 = at (-2,-2) plain
-    value 3 = at (2,-2)  plain
-    special = at (3,0)   plain
+    plain | D1200 <- dpi = [ (5,5), (5,6), (6,5), (6,6) ]
+          | D600 <- dpi  = [ (3,3) ]
 
-    p1 = maxBound :: Word8
-    p0 = minBound :: Word8
+    s  | D1200 <- dpi = 2
+       | D600  <- dpi = 1
+    ss | D1200 <- dpi = 3
+       | D600  <- dpi = 2
+    value 0 = at ( s, s) plain
+    value 1 = at (-s, s) plain
+    value 2 = at (-s,-s) plain
+    value 3 = at ( s,-s) plain
+    special = at (ss,0)  plain
 
-    position ((n,m), p) = at (n*12, m*12) p
+    position ((n,m), p) = at (n*dotsPerPoint, m*dotsPerPoint) p
 
     -- Drawing combinators
 
-    pixel x y = Any $ x == 0 && y == 0
-    at (x, y) f = \ x' y' -> f (x'-x) (y'-y)
-    tile f x y = memo f (x `mod` (4*12)) (y `mod` (4*12))
-    memo f = \ x y -> v V.! x V.! y
-      where v = V.fromList [V.fromList [ f x y | y <- [0..(4*12-1)]] | x <- [0..(4*12-1)]]
+    at (x, y) = map (\(x', y') -> (x + x', y + y'))
+    tile f = concat [ at (x*4*dotsPerPoint, y*4*dotsPerPoint) f
+                    | x <- [0..width-1], y <- [0..height-1]]
 
-genPNGs :: String -> IO ()
-genPNGs code_str = do
+genPNGs :: DPI -> String -> IO ()
+genPNGs dpi code_str = do
     codes <- parseRange code_str
     forM_ codes $ \c -> do
         let filename = printf "oid%d.png" c
         printf "Writing %s...\n" filename
-        genPNG c filename
+        genPNG dpi c filename
 
-genPNG :: Int -> FilePath -> IO ()
-genPNG code filename = writePng filename (oidImage code)
+genPNG :: DPI -> Int -> FilePath -> IO ()
+genPNG dpi code filename = writePng filename (oidImage dpi code)
 
 -- Main commands
 
@@ -1662,7 +1676,14 @@ main' t ("assemble": inf : out: [] )  =              assemble inf out
 main' t ("create-debug": out : n :[])
     | Just int <- readMaybe n       =              createDebug out int
     | [(int,[])] <- readHex n       =              createDebug out int
-main' t ("oid-code": codes@(_:_))   =              genPNGs (unwords codes)
+main' t ("oid-code": "-d" : "600" : codes@(_:_))
+                                    =              genPNGs  D600 (unwords codes)
+main' t ("oid-code": "-d" : "1200" : codes@(_:_))
+                                    =              genPNGs D1200 (unwords codes)
+main' t ("oid-code": "-d" : _)      = do
+    putStrLn $ "The parameter to -d has to be 600 or 1200"
+    exitFailure
+main' t ("oid-code": codes@(_:_))   =              genPNGs D1200 (unwords codes)
 main' _ _ = do
     prg <- getProgName
     putStrLn $ "Usage: " ++ prg ++ " [options] command"
@@ -1706,9 +1727,11 @@ main' _ _ = do
     putStrLn $ "       dumps the file in the human-readable yaml format"
     putStrLn $ "    assemble <infile.yaml> <outfile.gme>"
     putStrLn $ "       creates a gme file from the given source"
-    putStrLn $ "    oid-code <codes>"
+    putStrLn $ "    oid-code [-d DPI] <codes>"
     putStrLn $ "       creates a PNG file for each given optical code"
-    putStrLn $ "       cale this to 10cm×10cm resp. 1200dpi."
+    putStrLn $ "       scale this to 10cm×10cm"
+    putStrLn $ "       By default, it creates a 1200 dpi image. With -d 600, you"
+    putStrLn $ "       obtain a 600 dpi image."
     putStrLn $ "       <codes> can be a range, e.g. 1,3,1000-1085."
     putStrLn $ "       The code refers to the *raw* code, not the one read by the pen."
     putStrLn $ "       Uses oid<code>.png as the file name."
