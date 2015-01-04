@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, RecursiveDo, ScopedTypeVariables, GADTs, RecordWildCards, DeriveGeneric #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, RecursiveDo, ScopedTypeVariables, GADTs, RecordWildCards, DeriveGeneric, DeriveFoldable, DeriveFunctor, TypeSynonymInstances, BangPatterns #-}
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
@@ -17,7 +17,6 @@ import Data.Either
 import Data.Functor
 import Data.Maybe
 import Data.Ord
-import GHC.Generics
 import Control.Monad
 import System.Directory
 import Numeric (readHex)
@@ -27,7 +26,6 @@ import Control.Monad.Writer.Strict
 import Control.Monad.State.Strict
 import Control.Monad.Reader
 import Control.Monad.RWS.Strict
-import Control.Arrow (second)
 import Data.Time
 import System.Locale
 import Data.Yaml hiding ((.=), Parser)
@@ -36,20 +34,43 @@ import qualified Data.Yaml as Y
 import qualified Data.Text as T
 import Text.Parsec hiding (Line, lookAhead, spaces)
 import Text.Parsec.String
+import Text.Parsec.Error
 import qualified Text.Parsec as P
 import qualified Text.Parsec.Token as P
 import Text.Parsec.Language (emptyDef)
 import Control.Exception
+import GHC.Generics
+import Debug.Trace
+import Data.Foldable (Foldable)
+import qualified Data.Foldable as F
+import Control.Arrow
+import Codec.Picture
+import Codec.Picture.Types
+import Control.Monad.ST
+import Control.Applicative ((<*>), (<*))
+import Data.Monoid (mconcat, Any)
+import qualified Data.Vector as V
+{-
+import Text.Blaze.Svg11 ((!), mkPath, rotate, l, m)
+import qualified Text.Blaze.Svg11 as S
+import qualified Text.Blaze.Svg11.Attributes as A
+import Text.Blaze.Svg.Renderer.Utf8 (renderSvg)
+-}
 
 -- Main data types
 
-type Register = Word16
-data TVal
-    = Reg Register
-    | Const Word16
-    deriving Eq
+data Register = RegPos Word16 | RegName String
+    deriving (Show, Eq, Ord)
 
-data Conditional = Cond TVal CondOp TVal
+type ResReg = Word16
+
+data TVal r
+    = Reg r
+    | Const Word16
+    deriving (Eq, Functor, Foldable)
+
+data Conditional r = Cond (TVal r) CondOp (TVal r)
+    deriving (Eq, Functor, Foldable)
 
 data CondOp
     = Eq
@@ -57,20 +78,22 @@ data CondOp
     | Lt
     | GEq
     | Unknowncond B.ByteString
+    deriving (Eq)
 
-data Command
+data Command r
     = Play Word16
     | Random Word8 Word8
     | Cancel
     | Game Word16
-    | Inc Register TVal
-    | Set Register TVal
-    | Unknown B.ByteString Register TVal
-    deriving Eq
+    | Inc r (TVal r)
+    | Set r (TVal r)
+    | Unknown B.ByteString r (TVal r)
+    deriving (Eq, Functor, Foldable)
 
 type PlayList = [Word16]
 
-data Line = Line Offset [Conditional] [Command] PlayList
+data Line r = Line Offset [Conditional r] [Command r] PlayList
+    deriving (Functor, Foldable)
 
 type ProductID = Word32
 
@@ -81,7 +104,7 @@ data TipToiFile = TipToiFile
     , ttDate :: B.ByteString
     , ttInitialRegs :: [Word16]
     , ttWelcome :: [PlayList]
-    , ttScripts :: [(Word16, Maybe [Line])]
+    , ttScripts :: [(Word16, Maybe [Line ResReg])]
     , ttGames :: [Game]
     , ttAudioFiles :: [B.ByteString]
     , ttAudioFilesDoubles :: Bool
@@ -217,7 +240,7 @@ putGameTable = mdo
     return ()
 
 
-putScriptTable :: [(Word16, Maybe [Line])] -> SPut
+putScriptTable :: [(Word16, Maybe [Line ResReg])] -> SPut
 putScriptTable [] = error "Cannot create file with an empty script table"
 putScriptTable scripts = mdo
     putWord32 (fromIntegral last)
@@ -235,10 +258,10 @@ putScriptTable scripts = mdo
 putInitialRegs :: [Word16] -> SPut
 putInitialRegs = putArray putWord16 . map putWord16
 
-putLines :: [Line] -> SPut
+putLines :: [Line ResReg] -> SPut
 putLines = putOffsets putWord16 . map putLine
 
-putLine :: Line -> SPut
+putLine :: Line ResReg -> SPut
 putLine (Line _ conds acts idx) = do
     putArray putWord16 $ map putCond conds
     putArray putWord16 $ map putCommand acts
@@ -247,16 +270,16 @@ putLine (Line _ conds acts idx) = do
 putPlayList :: PlayList -> SPut
 putPlayList = putArray putWord16 . map putWord16
 
-putCond :: Conditional -> SPut
+putCond :: Conditional ResReg -> SPut
 putCond (Cond v1 o v2) = do
     putTVal v1
     putCondOp o
     putTVal v2
 
-putTVal :: TVal -> SPut
-putTVal (Reg r) = do
+putTVal :: TVal ResReg -> SPut
+putTVal (Reg n) = do
     putWord8 0
-    putWord16 r
+    putWord16 n
 putTVal (Const n) = do
     putWord8 1
     putWord16 n
@@ -268,7 +291,7 @@ putCondOp GEq = mapM_ putWord8 [0xFD, 0xFF]
 putCondOp NEq = mapM_ putWord8 [0xFF, 0xFF]
 putCondOp (Unknowncond b) = putBS b
 
-putCommand :: Command -> SPut
+putCommand :: Command ResReg -> SPut
 putCommand (Set r v) = do
     putWord16 r
     mapM_ putWord8 [0xF9, 0xFF]
@@ -411,7 +434,7 @@ indirections g1 prefix g2 =
 
 -- Parsers
 
-getScripts :: SGet [(Word16, Maybe [Line])]
+getScripts :: SGet [(Word16, Maybe [Line ResReg])]
 getScripts = do
     last_code <- getWord16
     0 <- getWord16
@@ -422,10 +445,10 @@ getScripts = do
         l <- maybeIndirection (show oid) $ getScript
         return (oid,l)
 
-getScript :: SGet [Line]
+getScript :: SGet [Line ResReg]
 getScript = indirections getWord16 "Line " lineParser
 
-getTVal :: SGet TVal
+getTVal :: SGet (TVal ResReg)
 getTVal = do
     t <- getWord8
     case t of
@@ -433,7 +456,7 @@ getTVal = do
      1 -> Const <$> getWord16
      _ -> fail $ "Unknown value tag " ++ show t
 
-lineParser :: SGet Line
+lineParser :: SGet (Line ResReg)
 lineParser = begin
  where
    -- Find the occurrence of a header
@@ -670,16 +693,16 @@ extract off len = B.take  (fromIntegral len) . B.drop (fromIntegral off)
 
 lineOffset (Line o _ _ _) = o
 
-lineLength :: Line -> Word32
+lineLength :: Line r -> Word32
 lineLength (Line _ conds cmds audio) = fromIntegral $
     2 + 8 * length conds + 2 + 7 * length cmds + 2 + 2 * length audio
 
-ppLine :: Transscript -> Line -> String
+ppLine :: Transscript -> Line ResReg -> String
 ppLine t (Line _ cs as xs) = spaces $
     map ppConditional cs ++ map (ppCommand False t xs) as
 
 -- Varaint that does not generate invalid play commands
-exportLine :: Line -> String
+exportLine :: Line ResReg -> String
 exportLine (Line _ cs as xs) = spaces $
     map ppConditional cs ++ map (ppCommand True M.empty xs) as
 
@@ -713,7 +736,7 @@ ppOidList xs = "[" ++ commas (map go (groupRuns (const Nothing) xs)) ++ "]"
 ppPlayListList :: Transscript -> PlayListList -> String
 ppPlayListList t xs = "[" ++ commas (map (ppPlayList t) xs) ++ "]"
 
-ppConditional :: Conditional -> String
+ppConditional :: Conditional ResReg -> String
 ppConditional (Cond v1 o v2) = printf "%s%s%s?" (ppTVal v1) (ppCondOp o) (ppTVal v2)
 
 ppCondOp :: CondOp -> String
@@ -723,11 +746,26 @@ ppCondOp Lt              = "< "
 ppCondOp GEq             = ">="
 ppCondOp (Unknowncond b) = printf "?%s?" (prettyHex b)
 
-ppTVal :: TVal -> String
-ppTVal (Reg n)   =  "$" ++ show n
+ppTVal :: Reg r => TVal r -> String
+ppTVal (Reg r)   =  ppReg r
 ppTVal (Const n) =  show n
 
-ppCommand :: Bool -> Transscript -> PlayList -> Command -> String
+
+ppResReg :: ResReg -> String
+ppResReg n = "$" ++ show n
+
+ppRegister :: Register -> String
+ppRegister (RegPos n) = "$" ++ show n
+ppRegister (RegName n) = "$" ++ n
+
+class Reg a where
+  ppReg :: a -> String
+
+instance Reg ResReg   where ppReg = ppResReg
+instance Reg Register where ppReg = ppRegister
+
+
+ppCommand :: Reg r => Bool -> Transscript -> PlayList -> Command r -> String
 ppCommand True t xs (Play n)     | not (validIndex xs (fromIntegral n)) = ""
 ppCommand True t xs (Random a b) | any (not . validIndex xs . fromIntegral) [b..a] = ""
 
@@ -735,9 +773,9 @@ ppCommand _ t xs (Play n)        = printf "P(%s)" (ppPlayIndex t xs (fromIntegra
 ppCommand _ t xs (Random a b)    = printf "P(%s)" $ commas $ map (ppPlayIndex t xs . fromIntegral ) [b..a]
 ppCommand _ t xs (Cancel)        = printf "C"
 ppCommand _ t xs (Game b)        = printf "G(%d)" b
-ppCommand _ t xs (Inc r n)       = printf "$%d+=%s" r (ppTVal n)
-ppCommand _ t xs (Set r n)       = printf "$%d:=%s" r (ppTVal n)
-ppCommand _ t xs (Unknown b r n) = printf "?($%d,%s) (%s)" r (ppTVal n) (prettyHex b)
+ppCommand _ t xs (Inc r n)       = printf "%s+=%s" (ppReg r) (ppTVal n)
+ppCommand _ t xs (Set r n)       = printf "%s:=%s" (ppReg r) (ppTVal n)
+ppCommand _ t xs (Unknown b r n) = printf "?(%s,%s) (%s)" (ppReg r) (ppTVal n) (prettyHex b)
 
 validIndex :: PlayList -> Int -> Bool
 validIndex xs n = n >= 0 && n < length xs
@@ -831,7 +869,7 @@ ppSubGame t (SubGame u oids1 oids2 oids3 plls) = printf (unlines
 
 indent n = intercalate "\n" . map (replicate n ' ' ++)
 
-checkLine :: Int -> Line -> [String]
+checkLine :: Int -> Line ResReg -> [String]
 checkLine n_audio l@(Line _ _ _ xs)
     | any (>= fromIntegral n_audio) xs
     = return $ "Invalid audio index in line " ++ ppLine M.empty l
@@ -853,6 +891,161 @@ readMaybe :: (Read a) => String -> Maybe a
 readMaybe s = case reads s of
               [(x, "")] -> Just x
               _ -> Nothing
+
+
+-- Image generation
+
+checksum :: Int -> Int
+checksum dec = c3
+  where
+    c1  =       (((dec >> 2) ^ (dec >> 8) ^ (dec >> 12) ^ (dec >> 14)) & 0x01) << 1
+    c2 = c1 .|. (((dec) ^ (dec >> 4) ^ (dec >>  6) ^ (dec >> 10)) & 0x01)
+    c3 = c2  ^  0x02
+
+    (>>) = shiftR
+    (<<) = shiftL
+    (^) = xor
+    (&) = (.&.)
+
+parseRange :: String -> IO [Int]
+parseRange = parseOneLine rangeParser "command line"
+
+rangeParser :: Parser [Int]
+rangeParser = concat <$> oneRangeParser `sepBy1` many1 (P.char ' ' <|> P.char ',')
+
+oneRangeParser = do
+    n <- fromIntegral `fmap` P.natural lexer <?> "Number"
+    skipMany (char ' ')
+    choice
+        [ do char '-'
+             n' <- fromIntegral `fmap` P.natural lexer <?> "Number"
+             unless (n' > n) $ fail $ printf "%d is not larger than %d" n' n
+             return [n..n']
+        ,    return [n]
+        ]
+
+
+{-
+oidSVG :: Int -> S.Svg
+oidSVG code | code >= 4^8 = error $ printf "Code %d too large to draw" code
+oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
+                           ! A.width (S.toValue "1mm")
+                           ! A.height (S.toValue "1mm")
+                           ! A.viewbox (S.toValue "0 0 48 48") $ do
+    S.defs pattern
+    S.rect ! A.width (S.toValue "48") ! A.height (S.toValue "48")
+           ! A.fill (S.toValue $ "url(#"++patid++")")
+  where
+    quart 8 = checksum code
+    quart n = (code `div` 4^n) `mod` 4
+    patid = "pat-" ++ show code
+
+    pattern = S.pattern ! A.width (S.toValue "48")
+                        ! A.height (S.toValue "48")
+                        ! A.id_ (S.toValue patid)
+                        ! A.patternunits (S.toValue "userSpaceOnUse") $ S.g (f (0,0))
+    f = mconcat $ map position $
+        zip (flip (,) <$> [3,2,1] <*> [3,2,1])
+            [ value (quart n) | n <- [0..8] ] ++
+        [ (p, plain) | p <- [(0,0), (1,0), (2,0), (3,0), (0,1), (0,3) ] ] ++
+        [ ((0,2), special) ]
+
+    -- pixel = S.rect ! A.width (S.toValue "2") ! A.height (S.toValue "2") ! pos (7,7)
+    pixel (x,y) = S.path ! A.d path
+      where path = mkPath $ do
+            S.m (x+5) (y+5)
+            S.hr 2
+            S.vr 2
+            S.hr (-2)
+            S.z
+
+    plain = pixel
+    value 0 = at (2,2)   plain
+    value 1 = at (-2,2)  plain
+    value 2 = at (-2,-2) plain
+    value 3 = at (2,-2)  plain
+    special = at (3,0)   plain
+
+    position ((n,m), p) = at (n*12, m*12) p
+
+    -- Drawing combinators
+    at (x, y) f = f . ((+x) *** (+y))
+
+genSVGs :: String -> IO ()
+genSVGs code_str = do
+    codes <- parseRange code_str
+    forM_ codes $ \c -> do
+        let filename = printf "oid%d.svg" c
+        printf "Writing %s...\n" filename
+        genSVG c filename
+
+genSVG :: Int -> FilePath -> IO ()
+genSVG code filename = B.writeFile filename (renderSvg (oidSVG code))
+-}
+
+data DPI = D1200 | D600
+
+imageFromBlackPixels :: Int -> Int -> [(Int, Int)] -> Image Pixel8
+imageFromBlackPixels width height pixels = runST $ do 
+    i <- createMutableImage width height maxBound
+    forM_ pixels $ \(x,y) -> do
+        writePixel i x y minBound
+    freezeImage i
+
+oidImage :: DPI -> Int -> Image Pixel8
+oidImage _ code | code >= 4^8 = error $ printf "Code %d too large to draw" code
+oidImage dpi code =
+    imageFromBlackPixels
+        (width *4*dotsPerPoint)
+        (height*4*dotsPerPoint)
+        (tile f)
+  where
+    width = 100 -- in mm
+    height = 100 -- in mm
+    !dotsPerPoint | D1200 <- dpi = 12
+                  |  D600 <- dpi =  6
+
+
+    quart 8 = checksum code
+    quart n = (code `div` 4^n) `mod` 4
+
+    f = mconcat $ map position $
+        zip (flip (,) <$> [3,2,1] <*> [3,2,1])
+            [ value (quart n) | n <- [0..8] ] ++
+        [ (p, plain) | p <- [(0,0), (1,0), (2,0), (3,0), (0,1), (0,3) ] ] ++
+        [ ((0,2), special) ]
+
+    plain | D1200 <- dpi = [ (5,5), (5,6), (6,5), (6,6) ]
+          | D600 <- dpi  = [ (3,3) ]
+
+    s  | D1200 <- dpi = 2
+       | D600  <- dpi = 1
+    ss | D1200 <- dpi = 3
+       | D600  <- dpi = 2
+    value 0 = at ( s, s) plain
+    value 1 = at (-s, s) plain
+    value 2 = at (-s,-s) plain
+    value 3 = at ( s,-s) plain
+    special = at (ss,0)  plain
+
+    position ((n,m), p) = at (n*dotsPerPoint, m*dotsPerPoint) p
+
+    -- Drawing combinators
+
+    at (x, y) = map (\(x', y') -> (x + x', y + y'))
+    tile f = concat [ at (x*4*dotsPerPoint, y*4*dotsPerPoint) f
+                    | x <- [0..width-1], y <- [0..height-1]]
+
+genPNGs :: DPI -> String -> IO ()
+genPNGs dpi code_str = do
+    codes <- parseRange code_str
+    forM_ codes $ \c -> do
+        let filename = printf "oid%d.png" c
+        printf "Writing %s...\n" filename
+        genPNG dpi c filename
+
+genPNG :: DPI -> Int -> FilePath -> IO ()
+genPNG dpi code filename = writePng filename (oidImage dpi code)
 
 -- Main commands
 
@@ -937,14 +1130,14 @@ lint file = do
             printf "   Offset %08X Size %d (%s) overlaps Offset %08X Size %d (%s) by %d\n"
             o1 l1 (ppDesc d1) o2 l2 (ppDesc d2) (o1 + l1 - o2)
   where
-    hyp1 :: Line -> Bool
+    hyp1 :: Line ResReg -> Bool
     hyp1 (Line _ _ as mi) = all ok as
       where ok (Play n)   = 0 <= n && n < fromIntegral (length mi)
             ok (Random a b) = 0 <= a && a < fromIntegral (length mi) &&
                          0 <= b && b < fromIntegral (length mi)
             ok _ = True
 
-    hyp2 :: Word16 -> Line -> Bool
+    hyp2 :: Word16 -> Line ResReg -> Bool
     hyp2 n (Line _ _ _ mi) = all (<= n) mi
 
 
@@ -1045,9 +1238,9 @@ withEachFile a fs = forM_ fs $ \f -> do
     printf "%s:\n" f 
     a f
 
-type PlayState = M.Map Word16 Word16
+type PlayState r = M.Map r Word16
 
-formatState :: PlayState -> String
+formatState :: PlayState ResReg -> String
 formatState s = spaces $
     map (\(k,v) -> printf "$%d=%d" k v) $
     filter (\(k,v) -> k == 0 || v /= 0) $
@@ -1071,10 +1264,10 @@ play t file = do
                         printf "State now: %s\n" (formatState s')
                         return s'
 
-enabledLine :: PlayState -> Line -> Bool
+enabledLine :: Ord r => PlayState r -> Line r -> Bool
 enabledLine s (Line _ cond _ _) = all (condTrue s) cond
 
-condTrue :: PlayState -> Conditional -> Bool
+condTrue :: Ord r => PlayState r -> Conditional r -> Bool
 condTrue s (Cond v1 o v2) = value s v1 =?= value s v2
   where
     (=?=) = case o of
@@ -1084,11 +1277,11 @@ condTrue s (Cond v1 o v2) = value s v1 =?= value s v2
         GEq -> (>=)
         _   -> \_ _ -> False
 
-value :: PlayState -> TVal -> Word16
-value m (Reg r)   = M.findWithDefault 0 r m
+value :: Ord r => PlayState r -> TVal r -> Word16
+value m (Reg r) = M.findWithDefault 0 r m
 value m (Const n) = n
 
-applyLine :: Line -> PlayState -> PlayState
+applyLine :: Ord r => Line r -> PlayState r -> PlayState r
 applyLine (Line _ _ act _) s = foldl' go s act
   where go s (Set r n) = M.insert r (s `value` n) s
         go s (Inc r n) = M.insert r (s `value` (Reg r) + s `value` n) s
@@ -1152,9 +1345,13 @@ instance FromJSON TipToiYAML where
 instance ToJSON TipToiYAML where
      toJSON = genericToJSON $ options
 
-lexer       = P.makeTokenParser emptyDef
+lexer       = P.makeTokenParser $
+    emptyDef
+        { P.reservedOpNames = words ":= == /= < >="
+        , P.opLetter       = oneOf ":!#%&*+./<=>?@\\^|-~" -- Removed $, used for registers
+        }
 
-parseLine :: Parser ([Word16] -> Line, [String])
+parseLine :: Parser ([Word16] -> Line Register, [String])
 parseLine = do
     conds <- many (P.try parseCond)
     (acts, filenames) <- parseCommands 0
@@ -1163,7 +1360,7 @@ parseLine = do
 
 descP d p = p <?> d
 
-parseCond :: Parser Conditional
+parseCond :: Parser (Conditional Register)
 parseCond = descP "Conditional" $ do
     v1 <- parseTVal
     op <- parseCondOp
@@ -1174,10 +1371,10 @@ parseCond = descP "Conditional" $ do
 parseWord16 :: Parser Word16
 parseWord16 = fromIntegral <$> P.natural lexer
 
-parseReg :: Parser Word16
-parseReg = char '$' >> parseWord16
+parseReg :: Parser Register
+parseReg = char '$' >> (RegPos <$> parseWord16 <|> RegName <$> many1 (alphaNum <|> char '_'))
 
-parseTVal :: Parser TVal
+parseTVal :: Parser (TVal Register)
 parseTVal = (Reg <$> parseReg <|> Const <$> parseWord16) <?> "Value"
 
 parseCondOp :: Parser CondOp
@@ -1202,7 +1399,18 @@ parseWelcome = P.commaSep lexer $ parseAudioRef
 parseAudioRef :: Parser String
 parseAudioRef = P.lexeme lexer $ many1 (alphaNum <|> char '_')
 
-parseCommands :: Int -> Parser ([Command], [String])
+parsePrettyHex :: Parser B.ByteString
+parsePrettyHex = B.pack <$> many1 (P.lexeme lexer nibble)
+  where
+    nibble = fromIntegral <$> number 16 hexDigit
+    number base baseDigit
+        = do{ digits <- many1 baseDigit
+            ; let n = foldl (\x d -> base*x + toInteger (digitToInt d)) 0 digits
+            ; seq n (return n)
+            }
+
+
+parseCommands :: Int -> Parser ([Command Register], [String])
 parseCommands i =
     choice
     [ eof >> return ([],[])
@@ -1213,6 +1421,14 @@ parseCommands i =
          v <- parseTVal
          (cmds, filenames) <- parseCommands i
          return (op r v : cmds, filenames)
+    , descP "Unknown action" $
+      do P.lexeme lexer $ char '?'
+         (r,v) <- P.parens lexer $
+            (,) <$> parseReg <* P.comma lexer <*> parseTVal
+         h <- P.parens lexer parsePrettyHex
+         (cmds, filenames) <- parseCommands i
+         return (Unknown h r v : cmds, filenames)
+
     , descP "Play action" $
       do char 'P'
          fns <- P.parens lexer $ P.commaSep1 lexer parseAudioRef
@@ -1223,32 +1439,38 @@ parseCommands i =
                 _    -> Random (fromIntegral (i + n - 1)) (fromIntegral i)
          return (c : cmds, fns ++ filenames)
     , descP "Cancel" $
-      do char 'C'
+      do P.lexeme lexer $ char 'C'
          (cmds, filenames) <- parseCommands i
          return (Cancel : cmds, filenames)
     , descP "Start Game" $
-      do char 'G'
+      do P.lexeme lexer $ char 'G'
          n <- P.parens lexer $ parseWord16
          (cmds, filenames) <- parseCommands i
          return (Game n : cmds, filenames)
     ]
 
-valRegs :: TVal -> [Register]
-valRegs (Reg r) = [r]
-valRegs _       = []
+resolveRegs :: (M.Map Register Word16, [(t0, Maybe [Line Register])]) -> (M.Map ResReg Word16, [(t0, Maybe [Line ResReg])])
+resolveRegs x = everywhere x
+  where
+    -- Could use generics somehow
+    regs = S.fromList $
+        M.keys (fst x) ++ concatMap (maybe [] (concatMap F.toList) . snd) (snd x)
+    -- Could use generics somehow
+    everywhere = M.mapKeys resolve *** map (second (fmap (map (fmap resolve))))
 
-condRegs :: Conditional -> [Register]
-condRegs (Cond v1 _ v2) = valRegs v1 ++ valRegs v2
 
-cmdRegs :: Command -> [Register]
-cmdRegs (Inc r v) = r : valRegs v
-cmdRegs (Set r v) = r : valRegs v
-cmdRegs _         = []
+    regNums = S.fromList [ n | RegPos n <- S.toList regs ]
+    regNames = [ n | RegName n <- S.toList regs ]
+    mapping = M.fromList $ zip regNames [n | n <- [0..], n `S.notMember` regNums]
+    resolve (RegPos n) = n
+    resolve (RegName n) = fromMaybe (error "resolveRegs broken") (M.lookup n mapping)
+
+
 
 tt2ttYaml :: String -> TipToiFile -> TipToiYAML
 tt2ttYaml path (TipToiFile {..}) = TipToiYAML
     { ttyProduct_Id = ttProductId
-    , ttyInit = Just $ spaces $ [ ppCommand True M.empty [] (Set r (Const n))
+    , ttyInit = Just $ spaces $ [ ppCommand True M.empty [] (Set (RegPos r) (Const n))
                                 | (r,n) <- zip [0..] ttInitialRegs , n /= 0]
     , ttyWelcome = Just $ commas $ map show $ concat ttWelcome
     , ttyComment = Just $ BC.unpack ttComment
@@ -1256,6 +1478,29 @@ tt2ttYaml path (TipToiFile {..}) = TipToiYAML
         [ (show oid, map exportLine ls) | (oid, Just ls) <- ttScripts]
     , ttyMedia_Path = Just path
     }
+
+-- | A nicer way to print an error message
+printLineParserErrorMessage :: String -> ParseError -> IO a
+printLineParserErrorMessage input err = do
+    putStrLn (lineParserErrorMessage input err)
+    exitFailure
+
+lineParserErrorMessage :: String -> ParseError -> String
+lineParserErrorMessage input err =
+    "In " ++ sourceName pos ++ " column " ++ show (sourceColumn pos) ++ ":\n" ++
+    input ++ "\n" ++
+    replicate (sourceColumn pos - 1) ' ' ++ "↑" ++
+    showErrorMessages "or" "unknown parse err" "expecting"
+                      "unexpected" "end of input"
+                      (errorMessages err)
+  where pos = errorPos err
+
+parseOneLine :: Parser a -> String -> String -> IO a
+parseOneLine p name input =
+    case P.parse p name input of
+        Left e ->  printLineParserErrorMessage input e
+        Right l -> return l
+
 
 ttYaml2tt :: FilePath -> TipToiYAML -> IO TipToiFile
 ttYaml2tt dir (TipToiYAML {..}) = do
@@ -1266,19 +1511,16 @@ ttYaml2tt dir (TipToiYAML {..}) = do
         first = fst (M.findMin m)
         last = fst (M.findMax m)
 
-    welcome_names <- case P.parse parseWelcome "welcome" (fromMaybe "" ttyWelcome) of
-        Left e ->  fail (show e)
-        Right l -> return l
+    welcome_names <- parseOneLine parseWelcome "welcome" (fromMaybe "" ttyWelcome)
 
     (prescripts, filenames) <- liftM unzip $ forM [first .. last] $ \oid -> do
        case M.lookup oid m of
         Nothing -> return (\_ -> (oid, Nothing), [])
         Just raw_lines -> do
-            (lines, filenames) <- liftM unzip $ forMn raw_lines $ \i raw_line ->
+            (lines, filenames) <- liftM unzip $ forMn raw_lines $ \i raw_line -> do
                 let d = printf "Line %d of OID %d" i oid
-                in case P.parse parseLine d raw_line of
-                    Left e ->       fail (show e)
-                    Right (l, s) -> return (\f -> l (map f s), s)
+                (l,s) <- parseOneLine parseLine d raw_line
+                return (\f -> l (map f s), s)
             return (\f -> (oid, Just (map ($ f) lines)), concat filenames)
 
     let filenames' = S.toList $ S.fromList $ welcome_names ++ concat filenames
@@ -1286,17 +1528,18 @@ ttYaml2tt dir (TipToiYAML {..}) = do
 
     let welcome = [map filename_lookup welcome_names]
 
-    let scripts = map ($ filename_lookup) prescripts
+    preInitRegs <- M.fromList <$> parseOneLine parseInitRegs "init" (fromMaybe "" ttyInit)
 
-    let maxReg = maximum
+    -- resolve registers
+    let (initRegs, scripts) = resolveRegs (preInitRegs, map ($ filename_lookup) prescripts)
+
+    let maxReg = maximum $ 0:
             [ r
             | (_, Just ls) <- scripts
             , Line _ cs as _ <- ls
-            , r <- concatMap condRegs cs ++ concatMap cmdRegs as ]
+            , r <- concatMap F.toList cs ++ concatMap F.toList as ]
 
-    initRegs <- case P.parse parseInitRegs "init" (fromMaybe "" ttyInit) of
-        Left e ->  fail (show e)
-        Right l -> return $ M.fromList l
+
 
     files <- forM filenames' $ \fn -> do
         let paths = [ combine dir relpath
@@ -1433,13 +1676,21 @@ main' t ("assemble": inf : out: [] )  =              assemble inf out
 main' t ("create-debug": out : n :[])
     | Just int <- readMaybe n       =              createDebug out int
     | [(int,[])] <- readHex n       =              createDebug out int
+main' t ("oid-code": "-d" : "600" : codes@(_:_))
+                                    =              genPNGs  D600 (unwords codes)
+main' t ("oid-code": "-d" : "1200" : codes@(_:_))
+                                    =              genPNGs D1200 (unwords codes)
+main' t ("oid-code": "-d" : _)      = do
+    putStrLn $ "The parameter to -d has to be 600 or 1200"
+    exitFailure
+main' t ("oid-code": codes@(_:_))   =              genPNGs D1200 (unwords codes)
 main' _ _ = do
     prg <- getProgName
     putStrLn $ "Usage: " ++ prg ++ " [options] command"
     putStrLn $ ""
     putStrLn $ "Options:"
     putStrLn $ "    -t <transcriptfile>"
-    putStrLn $ "       replaces media file indices by a transscript"
+    putStrLn $ "       in the screen output, replaces media file indices by a transscript"
     putStrLn $ ""
     putStrLn $ "Commands:"
     putStrLn $ "    info <file.gme>..."
@@ -1465,7 +1716,7 @@ main' _ _ = do
     putStrLn $ "    holes <file.gme>..."
     putStrLn $ "       lists all unknown parts of the file."
     putStrLn $ "    explain <file.gme>..."
-    putStrLn $ "       lists all parts of the file, with description and hexdum and hexdumpp."
+    putStrLn $ "       lists all parts of the file, with description and hexdum and hexdump."
     putStrLn $ "    play <file.gme>"
     putStrLn $ "       interactively play: Enter OIDs, and see what happens."
     putStrLn $ "    rewrite <infile.gme> <outfile.gme>"
@@ -1476,6 +1727,14 @@ main' _ _ = do
     putStrLn $ "       dumps the file in the human-readable yaml format"
     putStrLn $ "    assemble <infile.yaml> <outfile.gme>"
     putStrLn $ "       creates a gme file from the given source"
+    putStrLn $ "    oid-code [-d DPI] <codes>"
+    putStrLn $ "       creates a PNG file for each given optical code"
+    putStrLn $ "       scale this to 10cm×10cm"
+    putStrLn $ "       By default, it creates a 1200 dpi image. With -d 600, you"
+    putStrLn $ "       obtain a 600 dpi image."
+    putStrLn $ "       <codes> can be a range, e.g. 1,3,1000-1085."
+    putStrLn $ "       The code refers to the *raw* code, not the one read by the pen."
+    putStrLn $ "       Uses oid<code>.png as the file name."
     exitFailure
 
 main = getArgs >>= (main' M.empty)

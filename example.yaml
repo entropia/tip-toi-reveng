@@ -20,7 +20,7 @@ comment: An example GME file
 
 # Register initalisation. This is simply list of set-commands.
 # Every register not set is initialized to 0
-init: $0:=1
+init: $mode:=1
 
 # The sounds to play on start-up
 welcome: bing, hello
@@ -32,12 +32,14 @@ scripts:
   # We begin to specify what to do when the area in the book with the OID code
   # 1401 is touched
   1401:
-  # The following line means: If register $0 is set to 1, then set it to 2, and
+  # The following line means: If register $mode is set to 1, then set it to 2, and
   # increment register $1 by one, and play the sound example/hello.ogg.
-  - $0==1? $0:=2 $1+=1 P(hello)
+  - $mode==1? $mode:=2 $1+=1 P(hello)
   # Here, the pen is going to play one of these three sounds randomly.
-  - $0==2? $0+=1 P(one,two,three)
-  - $0==3? $0:=1 P(back)
+  - $mode==2? $mode+=1 P(one,two,three)
+  - $mode==3? $mode:=1 P(back)
+  # You can either refer to a concrete register ($1), or a named register.
+  # tttool will map these to otherwise unused registers.
   1402:
   - $1==0?
   - $1==1? P(one)
