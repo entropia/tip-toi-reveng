@@ -1,7 +1,7 @@
 # Site settings
-title: Solo, a Jekyll Theme
-tag_text: Solo
-description: Solo is a Jekyll theme that supports single-page websites only, but supports them well. Yes, it’s responsive.
+title: tttool, das Schweizer Taschenmesser für den Tiptoi-Bastler
+tag_text: tttool, das Tiptoi-Bastler-Tool
+description: tttool, das Schweizer Taschenmesser für den Tiptoi-Bastler
 
 # Build settings
 markdown: kramdown
