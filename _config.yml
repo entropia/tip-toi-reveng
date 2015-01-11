@@ -1,6 +1,7 @@
 # Site settings
 title: tttool, das Schweizer Taschenmesser für den Tiptoi-Bastler
-tag_text: tttool, das Tiptoi-Bastler-Tool
+tag_text: tttool
+tag_subtitle: Das Schweizer Taschenmesser für den Tiptoi-Bastler
 description: tttool, das Schweizer Taschenmesser für den Tiptoi-Bastler
 
 # Build settings
