@@ -52,7 +52,7 @@ supports various subcommands:
         holes <file.gme>...
            lists all unknown parts of the file.
         explain <file.gme>...
-           lists all parts of the file, with description and hexdum and hexdumpp.
+           lists all parts of the file, with description and hexdump.
         play <file.gme>
            interactively play: Enter OIDs, and see what happens.
         rewrite <infile.gme> <outfile.gme>

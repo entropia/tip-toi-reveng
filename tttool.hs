@@ -1716,7 +1716,7 @@ main' _ _ = do
     putStrLn $ "    holes <file.gme>..."
     putStrLn $ "       lists all unknown parts of the file."
     putStrLn $ "    explain <file.gme>..."
-    putStrLn $ "       lists all parts of the file, with description and hexdum and hexdump."
+    putStrLn $ "       lists all parts of the file, with description and hexdump."
     putStrLn $ "    play <file.gme>"
     putStrLn $ "       interactively play: Enter OIDs, and see what happens."
     putStrLn $ "    rewrite <infile.gme> <outfile.gme>"
