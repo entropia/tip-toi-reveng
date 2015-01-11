@@ -1,4 +1,5 @@
 ---
+layout: default
 title: tttool
 tagline: Das Schweizer Taschenmesser für den Tiptoi-Bastler
 ---
