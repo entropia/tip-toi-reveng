@@ -74,9 +74,11 @@ data Conditional r = Cond (TVal r) CondOp (TVal r)
 
 data CondOp
     = Eq
-    | NEq
+    | Gt
     | Lt
     | GEq
+    | LEq
+    | NEq
     | Unknowncond B.ByteString
     deriving (Eq)
 
@@ -288,8 +290,10 @@ putTVal (Const n) = do
 
 putCondOp :: CondOp -> SPut
 putCondOp Eq  = mapM_ putWord8 [0xF9, 0xFF]
+putCondOp Gt  = mapM_ putWord8 [0xFA, 0xFF]
 putCondOp Lt  = mapM_ putWord8 [0xFB, 0xFF]
 putCondOp GEq = mapM_ putWord8 [0xFD, 0xFF]
+putCondOp LEq = mapM_ putWord8 [0xFE, 0xFF]
 putCondOp NEq = mapM_ putWord8 [0xFF, 0xFF]
 putCondOp (Unknowncond b) = putBS b
 
@@ -503,10 +507,12 @@ lineParser = begin
             fail $ printf "At position 0x%08X, expected %d/%02X, got %d/%02X" (b-1) n n n' n'
 
     conditionals =
-        [ (B.pack [0xF9,0xFF], Eq  )
-        , (B.pack [0xFF,0xFF], NEq )
-        , (B.pack [0xFB,0xFF], Lt )
-        , (B.pack [0xFD,0xFF], GEq )
+        [ (B.pack [0xF9,0xFF], Eq)
+        , (B.pack [0xFA,0xFF], Gt)
+        , (B.pack [0xFB,0xFF], Lt)
+        , (B.pack [0xFD,0xFF], GEq)
+        , (B.pack [0xFE,0xFF], LEq)
+        , (B.pack [0xFF,0xFF], NEq)
         ]
 
     actions =
@@ -1401,10 +1407,12 @@ parseTVal = (Reg <$> parseReg <|> Const <$> parseWord16) <?> "Value"
 parseCondOp :: Parser CondOp
 parseCondOp = choice
     [ P.reservedOp lexer "==" >> return Eq
+    , P.reservedOp lexer "<"  >> return Lt
+    , P.reservedOp lexer ">"  >> return Gt
+    , P.reservedOp lexer ">=" >> return GEq
+    , P.reservedOp lexer "<=" >> return LEq
     , P.reservedOp lexer "/=" >> return NEq
     , P.reservedOp lexer "!=" >> return NEq
-    , P.reservedOp lexer "<"  >> return Lt
-    , P.reservedOp lexer ">=" >> return GEq
     ]
 
 parseInitRegs :: Parser [(Register, Word16)]

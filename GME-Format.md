@@ -68,14 +68,16 @@ The conditionals are of the format `t1 aaaa cccc t2 bbbb`
  * `t1` & `t2` (uint8) type of `a` and `b` resp. (0 == register, 1 == value)
  * `a` & `b` (uint16) value or id of register
  * `c` (uint16) is the comparison operator
+The rest of the line is only considered when the comparison between the
+register and the value or other register holds.
 
 Known comparison operators are:
- * `FFF9`  equal == (written `$r==m?` in decode's output): Only continue with this line if register `$r` has value `m`.
- * `FFFB`  lesser < (written `$r<m?` in decode's output): Only continue with this line if register `$r` has a value lower than `m`.
- * `FFFD`  greater or equal >= (written `$r>=m?` in decode's output): Only continue with this line if register `$r` has a value greater or equal `m`.
- * `FFFF` not equal !=  (written `$r!=m?` in decode's output): Only continue with this line if register `$r` has not value `m`.
-
-Currently unknown comparison operators are `FFFA` & `FFFE`.
+ * `FFF9` (written `$r==m?` in decode's output and the yaml files): Equality
+ * `FFFA` (written `$r>m?` in decode's output): Greather than
+ * `FFFB` (written `$r<m?` in decode's output): Less than
+ * `FFFD` (written `$r>=m?` in decode's output): Greater or equal
+ * `FFFE` (written `$r<=?` in decode's output): Less or equal
+ * `FFFF` (written `$r!=m?` in decode's output): Not equal
 
 The actions are of the format `rrrr cccc tt mmmm`
  * `r` (uint16) id of register
