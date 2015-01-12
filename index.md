@@ -130,7 +130,7 @@ spielt `wir_spielen.ogg` nur dann ab, wenn das Register `$modus` auf 1 gesetzt i
   - $modus==2? P(wir_hoeren_zu)
 ~~~
 
-Neben der Abfage `$register == zahl?` gibt es noch weitere Vergleichsoperatoren wie `!=`, `>` und `<=`.
+Neben der Abfage `$register == zahl?` gibt es noch die üblichen Vergleichsoperatoren `!=`, `>`, `<`, `>=` und `<=`.
 
 Um ein Register zu setzen schreibt man etwa `$modus := 2`. Ein Code, der zwischen drei Modi durchschaltet, sähe also wie folgt aus:
 
@@ -141,7 +141,21 @@ Um ein Register zu setzen schreibt man etwa `$modus := 2`. Ein Code, der zwische
   - $modus==3? $modus:=1 P(jetzt_gibt_es_geraeusche)
 ~~~
 
-Neben `:=` kann man mit dem Befehl `$register+=zahl` auch eine Zahl auf ein Register draufaddieren. Es gibt sicher noch mehr Befehle, aber es sind noch nicht alle entschlüsselt.
+Neben `:=` kann man mit dem Befehl `$register+=zahl` auch eine Zahl auf ein Register draufaddieren und mit `$regiser-=zahl` davon abgezogen werden.
+
+Richtig aufwendige Programmierung geht mit dem Jump-Befehl, mit dem der Stift zum Skript eines anderen Codes springt:
+
+~~~
+  8066:
+  - $modus==1? J(8067)
+  8067:
+  - P(hallo)
+~~~
+
+Hier wird sowohl bei 8066 als auch bei 8067 die Datei `hallo.ogg` ausgegeben.
+
+
+Es gibt sicher noch mehr Befehle, aber es sind noch nicht alle entschlüsselt.
 
 ## Eigene Tiptoi-Produkte erstellen
 
