@@ -89,6 +89,7 @@ data Command r
     | Inc r (TVal r)
     | Dec r (TVal r)
     | Unknown B.ByteString r (TVal r)
+    | Jump (TVal r)
     deriving (Eq, Functor, Foldable)
 
 type PlayList = [Word16]
@@ -321,6 +322,10 @@ putCommand Cancel = do
     putWord16 0
     mapM_ putWord8 [0xFF, 0xFA]
     putTVal (Const 0xFFFF)
+putCommand (Jump v) = do
+    putWord16 0
+    mapM_ putWord8 [0xFF, 0xF8]
+    putTVal v
 putCommand (Unknown b r v) = do
     putWord16 r
     putBS b
@@ -517,6 +522,10 @@ lineParser = begin
             unless (r == 0) $ fail "Non-zero register for Cancel command"
             Const 0xFFFF <- getTVal
             return Cancel)
+        , (B.pack [0xFF,0xF8], \r -> do
+            unless (r == 0) $ fail "Non-zero register for Jump command"
+            v <- getTVal
+            return (Jump v))
         , (B.pack [0x00,0xFD], \r -> do
             unless (r == 0) $ fail "Non-zero register for Game command"
             Const a <- getTVal
@@ -780,6 +789,7 @@ ppCommand True t xs (Random a b) | any (not . validIndex xs . fromIntegral) [b..
 ppCommand _ t xs (Play n)        = printf "P(%s)" (ppPlayIndex t xs (fromIntegral n))
 ppCommand _ t xs (Random a b)    = printf "P(%s)" $ commas $ map (ppPlayIndex t xs . fromIntegral ) [b..a]
 ppCommand _ t xs (Cancel)        = printf "C"
+ppCommand _ t xs (Jump v)        = printf "J(%s)" (ppTVal v)
 ppCommand _ t xs (Game b)        = printf "G(%d)" b
 ppCommand _ t xs (Inc r n)       = printf "%s+=%s" (ppReg r) (ppTVal n)
 ppCommand _ t xs (Dec r n)       = printf "%s-=%s" (ppReg r) (ppTVal n)
@@ -1295,6 +1305,7 @@ applyLine (Line _ _ act _) s = foldl' go s act
   where go s (Set r n) = M.insert r (s `value` n) s
         go s (Inc r n) = M.insert r (s `value` (Reg r) + s `value` n) s
         go s (Dec r n) = M.insert r (s `value` (Reg r) - s `value` n) s
+        go s (Jump n)  = error "Playing scripts with the J command is not yet implemented. Please file a bug."
         go s _         = s
 
 forEachNumber :: s -> (Int -> s -> IO s) -> IO ()
@@ -1454,6 +1465,11 @@ parseCommands i =
       do P.lexeme lexer $ char 'C'
          (cmds, filenames) <- parseCommands i
          return (Cancel : cmds, filenames)
+    , descP "Jump action" $
+      do P.lexeme lexer $ char 'J'
+         n <- P.parens lexer $ parseTVal
+         (cmds, filenames) <- parseCommands i
+         return (Jump n : cmds, filenames)
     , descP "Start Game" $
       do P.lexeme lexer $ char 'G'
          n <- P.parens lexer $ parseWord16

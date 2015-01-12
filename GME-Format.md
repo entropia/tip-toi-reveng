@@ -91,6 +91,7 @@ Known commands are:
  * `FC00` (written `P(b-a)`): Play a random sample from that inclusive range. `a` := lowbyte(`m`), `b` := highbyte(`m`)
  * `FD00` (written `G(m)`): Begin game `m`.
  * `FAFF` (written `C`): Cancel game mode.
+ * `FFF8` (written `J(m)`): Jump to script `m`.
 
 Currently unknown commands are `F8FF`, `FB00`, `FE00`, `FF00`, `FFE0`, `FFE1`, `FFF1`, `FFF3` & `FFF4`.
 
