@@ -72,12 +72,12 @@ The rest of the line is only considered when the comparison between the
 register and the value or other register holds.
 
 Known comparison operators are:
- * `FFF9` (written `$r==m?` in decode's output and the yaml files): Equality
- * `FFFA` (written `$r>m?` in decode's output): Greather than
- * `FFFB` (written `$r<m?` in decode's output): Less than
- * `FFFD` (written `$r>=m?` in decode's output): Greater or equal
- * `FFFE` (written `$r<=?` in decode's output): Less or equal
- * `FFFF` (written `$r!=m?` in decode's output): Not equal
+ * `FFF9` (written `$r==m?` in tttool's output and the yaml files): Equality
+ * `FFFA` (written `$r>m?` in tttool's output): Greather than
+ * `FFFB` (written `$r<m?` in tttool's output): Less than
+ * `FFFD` (written `$r>=m?` in tttool's output): Greater or equal
+ * `FFFE` (written `$r<=?` in tttool's output): Less or equal
+ * `FFFF` (written `$r!=m?` in tttool's output): Not equal
 
 The actions are of the format `rrrr cccc tt mmmm`
  * `r` (uint16) id of register
