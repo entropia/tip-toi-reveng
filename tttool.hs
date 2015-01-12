@@ -85,8 +85,9 @@ data Command r
     | Random Word8 Word8
     | Cancel
     | Game Word16
-    | Inc r (TVal r)
     | Set r (TVal r)
+    | Inc r (TVal r)
+    | Dec r (TVal r)
     | Unknown B.ByteString r (TVal r)
     deriving (Eq, Functor, Foldable)
 
@@ -299,6 +300,10 @@ putCommand (Set r v) = do
 putCommand (Inc r v) = do
     putWord16 r
     mapM_ putWord8 [0xF0, 0xFF]
+    putTVal v
+putCommand (Dec r v) = do
+    putWord16 r
+    mapM_ putWord8 [0xF1, 0xFF]
     putTVal v
 putCommand (Play n) = do
     putWord16 0
@@ -519,6 +524,9 @@ lineParser = begin
         , (B.pack [0xF0,0xFF], \r -> do
             n <- getTVal
             return (Inc r n))
+        , (B.pack [0xF1,0xFF], \r -> do
+            n <- getTVal
+            return (Dec r n))
         , (B.pack [0xF9,0xFF], \r -> do
             n <- getTVal
             return (Set r n))
@@ -774,6 +782,7 @@ ppCommand _ t xs (Random a b)    = printf "P(%s)" $ commas $ map (ppPlayIndex t 
 ppCommand _ t xs (Cancel)        = printf "C"
 ppCommand _ t xs (Game b)        = printf "G(%d)" b
 ppCommand _ t xs (Inc r n)       = printf "%s+=%s" (ppReg r) (ppTVal n)
+ppCommand _ t xs (Dec r n)       = printf "%s-=%s" (ppReg r) (ppTVal n)
 ppCommand _ t xs (Set r n)       = printf "%s:=%s" (ppReg r) (ppTVal n)
 ppCommand _ t xs (Unknown b r n) = printf "?(%s,%s) (%s)" (ppReg r) (ppTVal n) (prettyHex b)
 
@@ -1285,6 +1294,7 @@ applyLine :: Ord r => Line r -> PlayState r -> PlayState r
 applyLine (Line _ _ act _) s = foldl' go s act
   where go s (Set r n) = M.insert r (s `value` n) s
         go s (Inc r n) = M.insert r (s `value` (Reg r) + s `value` n) s
+        go s (Dec r n) = M.insert r (s `value` (Reg r) - s `value` n) s
         go s _         = s
 
 forEachNumber :: s -> (Int -> s -> IO s) -> IO ()
@@ -1417,7 +1427,9 @@ parseCommands i =
     , descP "Register action" $
       do r <- parseReg
          op <- choice [ P.reservedOp lexer ":=" >> return Set
-                      , P.reservedOp lexer "+=" >> return Inc ]
+                      , P.reservedOp lexer "+=" >> return Inc
+                      , P.reservedOp lexer "-=" >> return Dec
+                      ]
          v <- parseTVal
          (cmds, filenames) <- parseCommands i
          return (op r v : cmds, filenames)
