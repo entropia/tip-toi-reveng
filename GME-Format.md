@@ -99,7 +99,7 @@ Known commands are:
 
 Currently unknown commands are `FB00`, `FE00`, `FF00`, `FFE0` & `FFE1`.
 
-The commands `P`, `G` and `C` seem to ignore their registers, `C` also its parameter (which always is `FFFF`).
+The commands `P`, `G` , `J` and `C` seem to ignore their registers, `C` also its parameter (which always is `FFFF`).
 
 The playlist
 ------------
