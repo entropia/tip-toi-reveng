@@ -90,6 +90,8 @@ data Command r
     | Set r (TVal r)
     | Inc r (TVal r)
     | Dec r (TVal r)
+    | Mod r (TVal r)
+    | Div r (TVal r)
     | Unknown B.ByteString r (TVal r)
     | Jump (TVal r)
     deriving (Eq, Functor, Foldable)
@@ -309,6 +311,14 @@ putCommand (Inc r v) = do
 putCommand (Dec r v) = do
     putWord16 r
     mapM_ putWord8 [0xF1, 0xFF]
+    putTVal v
+putCommand (Mod r v) = do
+    putWord16 r
+    mapM_ putWord8 [0xF4, 0xFF]
+    putTVal v
+putCommand (Div r v) = do
+    putWord16 r
+    mapM_ putWord8 [0xF3, 0xFF]
     putTVal v
 putCommand (Play n) = do
     putWord16 0
@@ -542,6 +552,12 @@ lineParser = begin
         , (B.pack [0xF1,0xFF], \r -> do
             n <- getTVal
             return (Dec r n))
+        , (B.pack [0xF4,0xFF], \r -> do
+            n <- getTVal
+            return (Mod r n))
+        , (B.pack [0xF3,0xFF], \r -> do
+            n <- getTVal
+            return (Div r n))
         , (B.pack [0xF9,0xFF], \r -> do
             n <- getTVal
             return (Set r n))
@@ -799,6 +815,8 @@ ppCommand _ t xs (Jump v)        = printf "J(%s)" (ppTVal v)
 ppCommand _ t xs (Game b)        = printf "G(%d)" b
 ppCommand _ t xs (Inc r n)       = printf "%s+=%s" (ppReg r) (ppTVal n)
 ppCommand _ t xs (Dec r n)       = printf "%s-=%s" (ppReg r) (ppTVal n)
+ppCommand _ t xs (Mod r n)       = printf "%s%%=%s" (ppReg r) (ppTVal n)
+ppCommand _ t xs (Div r n)       = printf "%s/=%s" (ppReg r) (ppTVal n)
 ppCommand _ t xs (Set r n)       = printf "%s:=%s" (ppReg r) (ppTVal n)
 ppCommand _ t xs (Unknown b r n) = printf "?(%s,%s) (%s)" (ppReg r) (ppTVal n) (prettyHex b)
 
@@ -1311,6 +1329,8 @@ applyLine (Line _ _ act _) s = foldl' go s act
   where go s (Set r n) = M.insert r (s `value` n) s
         go s (Inc r n) = M.insert r (s `value` (Reg r) + s `value` n) s
         go s (Dec r n) = M.insert r (s `value` (Reg r) - s `value` n) s
+        go s (Mod r n) = M.insert r ((s `value` (Reg r)) `mod` (s `value` n)) s
+        go s (Div r n) = M.insert r ((s `value` (Reg r)) `div` (s `value` n)) s
         go s (Jump n)  = error "Playing scripts with the J command is not yet implemented. Please file a bug."
         go s _         = s
 
@@ -1448,6 +1468,8 @@ parseCommands i =
          op <- choice [ P.reservedOp lexer ":=" >> return Set
                       , P.reservedOp lexer "+=" >> return Inc
                       , P.reservedOp lexer "-=" >> return Dec
+                      , P.reservedOp lexer "%=" >> return Mod
+                      , P.reservedOp lexer "/=" >> return Div
                       ]
          v <- parseTVal
          (cmds, filenames) <- parseCommands i

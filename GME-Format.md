@@ -89,6 +89,8 @@ Known commands are:
  * `FFF9` (written `$r:=m`): Set register `$r` to `m` or value of `$m`
  * `FFF0` (written `$r+=m`): Increment register `$r` by `m` or value of `$m`
  * `FFF1` (written `$r-=m`): Decrement register `$r` by `m` or value of `$m`
+ * `F4FF` (written `$r%=m`): Set register `$r` to `$r` mod `m`
+ * `F3FF` (written `$r/=m`): Set register `$r` to `$r` div `m`
  * `FFE8` (written `P(m)`): Play audio referenced by the `m`th entry in the indices list.
  * `FC00` (written `P(b-a)`): Play a random sample from that inclusive range. `a` := lowbyte(`m`), `b` := highbyte(`m`)
  * `FD00` (written `G(m)`): Begin game `m`.
