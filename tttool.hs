@@ -776,7 +776,9 @@ ppCondOp :: CondOp -> String
 ppCondOp Eq              = "=="
 ppCondOp NEq             = "!="
 ppCondOp Lt              = "< "
+ppCondOp Gt              = "> "
 ppCondOp GEq             = ">="
+ppCondOp LEq             = "<="
 ppCondOp (Unknowncond b) = printf "?%s?" (prettyHex b)
 
 ppTVal :: Reg r => TVal r -> String
