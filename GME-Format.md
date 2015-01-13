@@ -86,18 +86,18 @@ The actions are of the format `rrrr cccc tt mmmm`
  * `m` (uint16) value or id of register
 
 Known commands are:
- * `FFF9` (written `$r:=m`): Set register `$r` to `m` or value of `$m`
  * `FFF0` (written `$r+=m`): Increment register `$r` by `m` or value of `$m`
  * `FFF1` (written `$r-=m`): Decrement register `$r` by `m` or value of `$m`
- * `F4FF` (written `$r%=m`): Set register `$r` to `$r` mod `m`
- * `F3FF` (written `$r/=m`): Set register `$r` to `$r` div `m`
+ * `FFF3` (written `$r%=m`): Set register `$r` to `$r` mod `m`
+ * `FFF4` (written `$r/=m`): Set register `$r` to `$r` div `m`
+ * `FFF9` (written `$r:=m`): Set register `$r` to `m` or value of `$m`
  * `FFE8` (written `P(m)`): Play audio referenced by the `m`th entry in the indices list.
  * `FC00` (written `P(b-a)`): Play a random sample from that inclusive range. `a` := lowbyte(`m`), `b` := highbyte(`m`)
  * `FD00` (written `G(m)`): Begin game `m`.
+ * `F8FF` (written `J(m)`): Jump to script `m`.
  * `FAFF` (written `C`): Cancel game mode.
- * `FFF8` (written `J(m)`): Jump to script `m`.
 
-Currently unknown commands are `F8FF`, `FB00`, `FE00`, `FF00`, `FFE0`, `FFE1`, `FFF1`, `FFF3` & `FFF4`.
+Currently unknown commands are `FB00`, `FE00`, `FF00`, `FFE0` & `FFE1`.
 
 The commands `P`, `G` and `C` seem to ignore their registers, `C` also its parameter (which always is `FFFF`).
 
