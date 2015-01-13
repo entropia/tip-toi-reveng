@@ -88,8 +88,13 @@ The actions are of the format `rrrr cccc tt mmmm`
 Known commands are:
  * `FFF0` (written `$r+=m`): Increment register `$r` by `m` or value of `$m`
  * `FFF1` (written `$r-=m`): Decrement register `$r` by `m` or value of `$m`
+ * `FFF2` (written `$r*=m`): Multiply register `$r` by `m` or value of `$m`
  * `FFF3` (written `$r%=m`): Set register `$r` to `$r` mod `m`
  * `FFF4` (written `$r/=m`): Set register `$r` to `$r` div `m`
+ * `FFF5` (written `$r&=m`): Bitwise add to register `$r` the value of `m`
+ * `FFF6` (written `$r|=m`): Bitwise or to register `$r` the value of `m`
+ * `FFF7` (written `$r^=m`): Bitwise xor to register `$r` the value of `m`
+ * `FFF8` (written `Neg($r)`): Negate register `$r`.
  * `FFF9` (written `$r:=m`): Set register `$r` to `m` or value of `$m`
  * `FFE8` (written `P(m)`): Play audio referenced by the `m`th entry in the indices list.
  * `FC00` (written `P(b-a)`): Play a random sample from that inclusive range. `a` := lowbyte(`m`), `b` := highbyte(`m`)

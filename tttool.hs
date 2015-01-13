@@ -82,16 +82,17 @@ data CondOp
     | Unknowncond B.ByteString
     deriving (Eq)
 
+data ArithOp
+    = Inc | Dec | Mult | Div | Mod | And | Or | XOr | Set
+    deriving (Eq, Bounded, Enum)
+
 data Command r
     = Play Word16
     | Random Word8 Word8
     | Cancel
     | Game Word16
-    | Set r (TVal r)
-    | Inc r (TVal r)
-    | Dec r (TVal r)
-    | Mod r (TVal r)
-    | Div r (TVal r)
+    | ArithOp ArithOp r (TVal r)
+    | Neg r
     | Unknown B.ByteString r (TVal r)
     | Jump (TVal r)
     deriving (Eq, Functor, Foldable)
@@ -299,27 +300,27 @@ putCondOp LEq = mapM_ putWord8 [0xFE, 0xFF]
 putCondOp NEq = mapM_ putWord8 [0xFF, 0xFF]
 putCondOp (Unknowncond b) = putBS b
 
+arithOpCode :: ArithOp -> [Word8]
+arithOpCode Inc  = [0xF0, 0xFF]
+arithOpCode Dec  = [0xF1, 0xFF]
+arithOpCode Mult = [0xF2, 0xFF]
+arithOpCode Div  = [0xF3, 0xFF]
+arithOpCode Mod  = [0xF4, 0xFF]
+arithOpCode And  = [0xF5, 0xFF]
+arithOpCode Or   = [0xF6, 0xFF]
+arithOpCode XOr  = [0xF7, 0xFF]
+-- Neg is unary, hence a Command
+arithOpCode Set  = [0xF9, 0xFF]
+
 putCommand :: Command ResReg -> SPut
-putCommand (Set r v) = do
+putCommand (ArithOp o r v) = do
     putWord16 r
-    mapM_ putWord8 [0xF9, 0xFF]
+    mapM_ putWord8 $ arithOpCode o
     putTVal v
-putCommand (Inc r v) = do
+putCommand (Neg r) = do
     putWord16 r
-    mapM_ putWord8 [0xF0, 0xFF]
-    putTVal v
-putCommand (Dec r v) = do
-    putWord16 r
-    mapM_ putWord8 [0xF1, 0xFF]
-    putTVal v
-putCommand (Mod r v) = do
-    putWord16 r
-    mapM_ putWord8 [0xF4, 0xFF]
-    putTVal v
-putCommand (Div r v) = do
-    putWord16 r
-    mapM_ putWord8 [0xF3, 0xFF]
-    putTVal v
+    mapM_ putWord8 [0xF8, 0xFF]
+    putTVal (Const 0)
 putCommand (Play n) = do
     putWord16 0
     mapM_ putWord8 [0xE8, 0xFF]
@@ -546,21 +547,14 @@ lineParser = begin
             unless (r == 0) $ fail "Non-zero register for Game command"
             Const a <- getTVal
             return (Game a))
-        , (B.pack [0xF0,0xFF], \r -> do
+        , (B.pack [0xF8,0xFF], \r -> do
+            _ <- getTVal
+            return (Neg r))
+        ] ++ 
+        [ (B.pack (arithOpCode o), \r -> do
             n <- getTVal
-            return (Inc r n))
-        , (B.pack [0xF1,0xFF], \r -> do
-            n <- getTVal
-            return (Dec r n))
-        , (B.pack [0xF4,0xFF], \r -> do
-            n <- getTVal
-            return (Mod r n))
-        , (B.pack [0xF3,0xFF], \r -> do
-            n <- getTVal
-            return (Div r n))
-        , (B.pack [0xF9,0xFF], \r -> do
-            n <- getTVal
-            return (Set r n))
+            return (ArithOp o r n))
+        | o <- [minBound..maxBound]
         ]
 
 lowbyte, highbyte :: Word16 -> Word8
@@ -803,6 +797,16 @@ class Reg a where
 instance Reg ResReg   where ppReg = ppResReg
 instance Reg Register where ppReg = ppRegister
 
+ppArithOp :: ArithOp -> String
+ppArithOp Inc  = "+="
+ppArithOp Dec  = "-="
+ppArithOp Mult = "*="
+ppArithOp Div  = "/="
+ppArithOp Mod  = "%="
+ppArithOp And  = "&="
+ppArithOp Or   = "|="
+ppArithOp XOr  = "^="
+ppArithOp Set  = ":="
 
 ppCommand :: Reg r => Bool -> Transscript -> PlayList -> Command r -> String
 ppCommand True t xs (Play n)     | not (validIndex xs (fromIntegral n)) = ""
@@ -813,11 +817,8 @@ ppCommand _ t xs (Random a b)    = printf "P(%s)" $ commas $ map (ppPlayIndex t 
 ppCommand _ t xs (Cancel)        = printf "C"
 ppCommand _ t xs (Jump v)        = printf "J(%s)" (ppTVal v)
 ppCommand _ t xs (Game b)        = printf "G(%d)" b
-ppCommand _ t xs (Inc r n)       = printf "%s+=%s" (ppReg r) (ppTVal n)
-ppCommand _ t xs (Dec r n)       = printf "%s-=%s" (ppReg r) (ppTVal n)
-ppCommand _ t xs (Mod r n)       = printf "%s%%=%s" (ppReg r) (ppTVal n)
-ppCommand _ t xs (Div r n)       = printf "%s/=%s" (ppReg r) (ppTVal n)
-ppCommand _ t xs (Set r n)       = printf "%s:=%s" (ppReg r) (ppTVal n)
+ppCommand _ t xs (ArithOp o r n) = ppReg r ++ ppArithOp o ++ ppTVal n
+ppCommand _ t xs (Neg r)       = printf "Neg(%s)" (ppReg r)
 ppCommand _ t xs (Unknown b r n) = printf "?(%s,%s) (%s)" (ppReg r) (ppTVal n) (prettyHex b)
 
 validIndex :: PlayList -> Int -> Bool
@@ -1326,13 +1327,26 @@ value m (Const n) = n
 
 applyLine :: Ord r => Line r -> PlayState r -> PlayState r
 applyLine (Line _ _ act _) s = foldl' go s act
-  where go s (Set r n) = M.insert r (s `value` n) s
-        go s (Inc r n) = M.insert r (s `value` (Reg r) + s `value` n) s
-        go s (Dec r n) = M.insert r (s `value` (Reg r) - s `value` n) s
-        go s (Mod r n) = M.insert r ((s `value` (Reg r)) `mod` (s `value` n)) s
-        go s (Div r n) = M.insert r ((s `value` (Reg r)) `div` (s `value` n)) s
-        go s (Jump n)  = error "Playing scripts with the J command is not yet implemented. Please file a bug."
-        go s _         = s
+  where
+    go s (Neg r) = M.insert r (neg (s `value` Reg r)) s
+    go s (ArithOp o r n) = M.insert r (applyOp o (s `value` Reg r) (s `value` n)) s
+    go s (Jump n)  = error "Playing scripts with the J command is not yet implemented. Please file a bug."
+    go s _         = s
+
+    neg 0 = 1
+    neg _ = 0
+
+    applyOp Inc = (+)
+    applyOp Dec = (-)
+    applyOp Mult = (*)
+    applyOp Div = div
+    applyOp Mod = mod
+    applyOp And = (.&.)
+    applyOp Or  = (.|.)
+    applyOp XOr = xor
+    applyOp Set = \_ v -> v
+
+
 
 forEachNumber :: s -> (Int -> s -> IO s) -> IO ()
 forEachNumber state action = go state
@@ -1470,10 +1484,21 @@ parseCommands i =
                       , P.reservedOp lexer "-=" >> return Dec
                       , P.reservedOp lexer "%=" >> return Mod
                       , P.reservedOp lexer "/=" >> return Div
+                      , P.reservedOp lexer "*=" >> return Mult
+                      , P.reservedOp lexer "&=" >> return And
+                      , P.reservedOp lexer "|=" >> return Or
+                      , P.reservedOp lexer "^=" >> return XOr
                       ]
          v <- parseTVal
          (cmds, filenames) <- parseCommands i
-         return (op r v : cmds, filenames)
+         return (ArithOp op r v : cmds, filenames)
+
+    , descP "Negation" $
+      do P.lexeme lexer $ string "Neg"
+         r <- P.parens lexer $ parseReg
+         (cmds, filenames) <- parseCommands i
+         return (Neg r : cmds, filenames)
+
     , descP "Unknown action" $
       do P.lexeme lexer $ char '?'
          (r,v) <- P.parens lexer $
@@ -1528,7 +1553,7 @@ resolveRegs x = everywhere x
 tt2ttYaml :: String -> TipToiFile -> TipToiYAML
 tt2ttYaml path (TipToiFile {..}) = TipToiYAML
     { ttyProduct_Id = ttProductId
-    , ttyInit = Just $ spaces $ [ ppCommand True M.empty [] (Set (RegPos r) (Const n))
+    , ttyInit = Just $ spaces $ [ ppCommand True M.empty [] (ArithOp Set (RegPos r) (Const n))
                                 | (r,n) <- zip [0..] ttInitialRegs , n /= 0]
     , ttyWelcome = Just $ commas $ map show $ concat ttWelcome
     , ttyComment = Just $ BC.unpack ttComment
