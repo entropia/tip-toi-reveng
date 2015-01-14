@@ -22,47 +22,56 @@ The tttool tool
 Use the tool `tttool.hs` to investigate the gme files and build new ones. It
 supports various subcommands:
 
-	Usage: tttool [options] command
+    Usage: tttool [options] command
 
-	Options:
-	    -t <transcriptfile>
-	       replaces media file indices by a transscript
+    Options:
+        -t <transcriptfile>
+           in the screen output, replaces media file indices by a transscript
 
-	Commands:
-	    info <file.gme>...
-	       general information
-	    media [-d dir] <file.gme>...
-	       dumps all audio samples to the given directory (default: media/)
-	    scripts <file.gme>...
-	       prints the decoded scripts for each OID
-	    script <file.gme> <n>
-	       prints the decoded scripts for the given OID
-	    raw-scripts <file.gme>...
-	       prints the scripts for each OID, in their raw form
-	    raw-script <file.gme> <n>
-	       prints the scripts for the given OID, in their raw form
-	    games <file.gme>...
-	       prints the decoded games
-	    lint <file.gme>
-	       checks for errors in the file or in this program
-	    segments <file.gme>...
-	       lists all known parts of the file, with description.
-	    segment <file.gme> <pos>
-	       which segment contains the given position.
-	    holes <file.gme>...
-	       lists all unknown parts of the file.
-	    explain <file.gme>...
-	       lists all parts of the file, with description and hexdum and hexdumpp.
-	    play <file.gme>
-	       interactively play: Enter OIDs, and see what happens.
-	    rewrite <infile.gme> <outfile.gme>
-	       parses the file and serializes it again (for debugging).
-	    create-debug <outfile.gme> <productid>
-	       creates a special Debug.gme file for that productid
-	    export <infile.gme> [<outfile.yaml>]
-	       dumps the file in the human-readable yaml format
-	    assemble <infile.yaml> <outfile.gme>
-	       creates a gme file from the given source
+    Commands:
+        info <file.gme>...
+           general information
+        media [-d dir] <file.gme>...
+           dumps all audio samples to the given directory (default: media/)
+        scripts <file.gme>...
+           prints the decoded scripts for each OID
+        script <file.gme> <n>
+           prints the decoded scripts for the given OID
+        raw-scripts <file.gme>...
+           prints the scripts for each OID, in their raw form
+        raw-script <file.gme> <n>
+           prints the scripts for the given OID, in their raw form
+        games <file.gme>...
+           prints the decoded games
+        lint <file.gme>
+           checks for errors in the file or in this program
+        segments <file.gme>...
+           lists all known parts of the file, with description.
+        segment <file.gme> <pos>
+           which segment contains the given position.
+        holes <file.gme>...
+           lists all unknown parts of the file.
+        explain <file.gme>...
+           lists all parts of the file, with description and hexdump.
+        play <file.gme>
+           interactively play: Enter OIDs, and see what happens.
+        rewrite <infile.gme> <outfile.gme>
+           parses the file and serializes it again (for debugging).
+        create-debug <outfile.gme> <productid>
+           creates a special Debug.gme file for that productid
+        export <infile.gme> [<outfile.yaml>]
+           dumps the file in the human-readable yaml format
+        assemble <infile.yaml> <outfile.gme>
+           creates a gme file from the given source
+        oid-code [-d DPI] <codes>
+           creates a PNG file for each given optical code
+           scale this to 10cm×10cm
+           By default, it creates a 1200 dpi image. With -d 600, you
+           obtain a 600 dpi image.
+           <codes> can be a range, e.g. 1,3,1000-1085.
+           The code refers to the *raw* code, not the one read by the pen.
+           Uses oid<code>.png as the file name.
+
 
 A transscript is simply a `;`-separated table of OIDs and some text, see for example [`transcript/WWW_Bauernhof.csv`](transcript/WWW_Bauernhof.csv).
 
@@ -86,7 +95,7 @@ Otherwise, installation from source is not difficult either:
     `cabal`, and you should run the two commands
 
         cabal update
-        cabal install yaml
+        cabal install yaml JuicyPixels parsec
 
  3. Now you can build the program using
 
@@ -108,9 +117,9 @@ process is as follows
 
  1. Record the audio samples you want to include, as Ogg Vorbis files, mono, 22050Hz. I use
 
-       arecord -r 22050 foo.wav
-       oggenc foo.wav
-       rm foo.wav
+        arecord -r 22050 foo.wav
+        oggenc foo.wav
+        rm foo.wav
 
  2. Write a `my-book.yaml` file containing some general information, and especially
     the scripts (i.e. what to do) for each OIDs (i.e. the various fields of a
@@ -139,6 +148,13 @@ fun if you can also create your own books! „Pronwan“ found out how that work
 as you can see in [this video demonstration](http://youtu.be/KC97F4PfNhk). He
 also published 30 minute [video tutorial](http://youtu.be/4AjvjFM8GzM) (in
 German).
+
+Press Review
+------------
+
+ * [tiptoi hacking](https://blogs.fsfe.org/guido/2014/05/tiptoi-hacking-und-systemanforderungen/) by Guido Arnold
+ * [TipToi Hacking](http://www.nerd.junetz.de/blogbox/index.php?/archives/1377-TipToi-Hacking.html) and [TipToi Hacking II](http://www.nerd.junetz.de/blogbox/index.php?/archives/1378-TipToi-Hacking-II.html) by Mr. Blog
+ * [Various posts](https://www.joachim-breitner.de/blog/tag/Tiptoi) by Joachim “nomeata” Breitner (the main author of `tttool`)
 
 TODO
 ----

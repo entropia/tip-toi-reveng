@@ -68,14 +68,16 @@ The conditionals are of the format `t1 aaaa cccc t2 bbbb`
  * `t1` & `t2` (uint8) type of `a` and `b` resp. (0 == register, 1 == value)
  * `a` & `b` (uint16) value or id of register
  * `c` (uint16) is the comparison operator
+The rest of the line is only considered when the comparison between the
+register and the value or other register holds.
 
 Known comparison operators are:
- * `FFF9`  equal == (written `$r==m?` in decode's output): Only continue with this line if register `$r` has value `m`.
- * `FFFB`  lesser < (written `$r<m?` in decode's output): Only continue with this line if register `$r` has a value lower than `m`.
- * `FFFD`  greater or equal >= (written `$r>=m?` in decode's output): Only continue with this line if register `$r` has a value greater or equal `m`.
- * `FFFF` not equal !=  (written `$r!=m?` in decode's output): Only continue with this line if register `$r` has not value `m`.
-
-Currently unknown comparison operators are `FFFA` & `FFFE`.
+ * `FFF9` (written `$r==m?` in tttool's output and the yaml files): Equality
+ * `FFFA` (written `$r>m?` in tttool's output): Greather than
+ * `FFFB` (written `$r<m?` in tttool's output): Less than
+ * `FFFD` (written `$r>=m?` in tttool's output): Greater or equal
+ * `FFFE` (written `$r<=?` in tttool's output): Less or equal
+ * `FFFF` (written `$r!=m?` in tttool's output): Not equal
 
 The actions are of the format `rrrr cccc tt mmmm`
  * `r` (uint16) id of register
@@ -84,16 +86,25 @@ The actions are of the format `rrrr cccc tt mmmm`
  * `m` (uint16) value or id of register
 
 Known commands are:
- * `FFF9` (written `$r:=m`): Set register `$r` to `m` or value of `$m`
  * `FFF0` (written `$r+=m`): Increment register `$r` by `m` or value of `$m`
+ * `FFF1` (written `$r-=m`): Decrement register `$r` by `m` or value of `$m`
+ * `FFF2` (written `$r*=m`): Multiply register `$r` by `m` or value of `$m`
+ * `FFF3` (written `$r%=m`): Set register `$r` to `$r` mod `m`
+ * `FFF4` (written `$r/=m`): Set register `$r` to `$r` div `m`
+ * `FFF5` (written `$r&=m`): Bitwise add to register `$r` the value of `m`
+ * `FFF6` (written `$r|=m`): Bitwise or to register `$r` the value of `m`
+ * `FFF7` (written `$r^=m`): Bitwise xor to register `$r` the value of `m`
+ * `FFF8` (written `Neg($r)`): Negate register `$r`.
+ * `FFF9` (written `$r:=m`): Set register `$r` to `m` or value of `$m`
  * `FFE8` (written `P(m)`): Play audio referenced by the `m`th entry in the indices list.
  * `FC00` (written `P(b-a)`): Play a random sample from that inclusive range. `a` := lowbyte(`m`), `b` := highbyte(`m`)
  * `FD00` (written `G(m)`): Begin game `m`.
+ * `F8FF` (written `J(m)`): Jump to script `m`.
  * `FAFF` (written `C`): Cancel game mode.
 
-Currently unknown commands are `F8FF`, `FB00`, `FE00`, `FF00`, `FFE0`, `FFE1`, `FFF1`, `FFF3` & `FFF4`.
+Currently unknown commands are `FB00`, `FE00`, `FF00`, `FFE0` & `FFE1`.
 
-The commands `P`, `G` and `C` seem to ignore their registers, `C` also its parameter (which always is `FFFF`).
+The commands `P`, `G` , `J` and `C` seem to ignore their registers, `C` also its parameter (which always is `FFFF`).
 
 The playlist
 ------------
