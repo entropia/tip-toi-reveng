@@ -95,6 +95,7 @@ data Command r
     | Neg r
     | Unknown B.ByteString r (TVal r)
     | Jump (TVal r)
+    | NamedJump String -- Only in YAML files, never read from GMEs
     deriving (Eq, Functor, Foldable)
 
 type PlayList = [Word16]
@@ -341,6 +342,7 @@ putCommand (Jump v) = do
     putWord16 0
     mapM_ putWord8 [0xFF, 0xF8]
     putTVal v
+putCommand (NamedJump s) = error "putCommand: Unresolved NamedJump"
 putCommand (Unknown b r v) = do
     putWord16 r
     putBS b
@@ -818,6 +820,7 @@ ppCommand _ t xs (Play n)        = printf "P(%s)" (ppPlayIndex t xs (fromIntegra
 ppCommand _ t xs (Random a b)    = printf "P(%s)" $ commas $ map (ppPlayIndex t xs . fromIntegral ) [b..a]
 ppCommand _ t xs (Cancel)        = printf "C"
 ppCommand _ t xs (Jump v)        = printf "J(%s)" (ppTVal v)
+ppCommand _ t xs (NamedJump v)   = printf "J(%s)" v
 ppCommand _ t xs (Game b)        = printf "G(%d)" b
 ppCommand _ t xs (ArithOp o r n) = ppReg r ++ ppArithOp o ++ ppTVal n
 ppCommand _ t xs (Neg r)       = printf "Neg(%s)" (ppReg r)
@@ -1435,7 +1438,7 @@ parseWord16 :: Parser Word16
 parseWord16 = fromIntegral <$> P.natural lexer
 
 parseReg :: Parser Register
-parseReg = char '$' >> (RegPos <$> parseWord16 <|> RegName <$> many1 (alphaNum <|> char '_'))
+parseReg = P.lexeme lexer $ char '$' >> (RegPos <$> parseWord16 <|> RegName <$> many1 (alphaNum <|> char '_'))
 
 parseTVal :: Parser (TVal Register)
 parseTVal = (Reg <$> parseReg <|> Const <$> parseWord16) <?> "Value"
@@ -1463,6 +1466,9 @@ parseWelcome = P.commaSep lexer $ parseAudioRef
 
 parseAudioRef :: Parser String
 parseAudioRef = P.lexeme lexer $ many1 (alphaNum <|> char '_')
+
+parseScriptRef :: Parser String
+parseScriptRef = P.lexeme lexer $ many1 (alphaNum <|> char '_')
 
 parsePrettyHex :: Parser B.ByteString
 parsePrettyHex = B.pack <$> many1 (P.lexeme lexer nibble)
@@ -1524,9 +1530,12 @@ parseCommands i =
          return (Cancel : cmds, filenames)
     , descP "Jump action" $
       do P.lexeme lexer $ char 'J'
-         n <- P.parens lexer $ parseTVal
+         cmd <- P.parens lexer $ choice
+            [ Jump <$> parseTVal
+            , NamedJump <$> parseScriptRef
+            ]
          (cmds, filenames) <- parseCommands i
-         return (Jump n : cmds, filenames)
+         return (cmd : cmds, filenames)
     , descP "Start Game" $
       do P.lexeme lexer $ char 'G'
          n <- P.parens lexer $ parseWord16
@@ -1550,6 +1559,13 @@ resolveRegs x = everywhere x
     resolve (RegPos n) = n
     resolve (RegName n) = fromMaybe (error "resolveRegs broken") (M.lookup n mapping)
 
+resolveJumps :: (String -> Word16) -> [(a, Maybe [Line b])] -> [(a, Maybe [Line b])]
+resolveJumps m = everywhere
+    where 
+    everywhere = map (second (fmap (map resolveLine)))
+    resolveLine (Line o cond cmds acts) = (Line o cond (map resolve cmds) acts)
+    resolve (NamedJump n) = Jump (Const (m n))
+    resolve c = c
 
 
 tt2ttYaml :: String -> TipToiFile -> TipToiYAML
@@ -1586,13 +1602,43 @@ parseOneLine p name input =
         Left e ->  printLineParserErrorMessage input e
         Right l -> return l
 
+scriptCodes :: [String] -> Either String (String -> Word16)
+scriptCodes [] = Right (error "scriptCodes []")
+scriptCodes codes
+    | null strs = Right readCode
+    | length strs > length knownCodes = Left "Too many codes used"
+    | null nums = Right lookupCode
+    | otherwise = Left "Cannot mix numbers and names in scripts."
+  where
+    (strs, nums) = partitionEithers $ map f codes
+    f s = case readMaybe s of
+            Nothing -> Left s 
+            Just n -> Right (n::Word16)
+    m = M.fromList (zip strs knownCodes)
+
+    readCode s = case readMaybe s of
+        Nothing -> error $ printf "Cannot jump to named script \"%s\" in a yaml with numbered scripts." s
+        Just c -> c
+    lookupCode s = case M.lookup s m of
+        Nothing -> error $ printf "Cannot jump to unknown script \"%s\"." s
+        Just c -> c
+
+
+knownCodes :: [Word16]
+knownCodes = [0, 1, 2, 3, 8, 9, 10, 11, 13, 14, 16, 17, 18, 19, 24, 25, 26, 27, 29, 30, 31, 32, 33, 34, 35, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 61, 62, 63, 64, 65, 66, 67, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121]
+--knownCodes = [8066..8081]
+
 
 ttYaml2tt :: FilePath -> TipToiYAML -> IO TipToiFile
 ttYaml2tt dir (TipToiYAML {..}) = do
     now <- getCurrentTime
     let date = formatTime defaultTimeLocale "%Y%m%d" now
 
-    let m = M.mapKeys read ttyScripts
+    scriptMap <- case scriptCodes (M.keys ttyScripts) of
+        Left e -> fail e
+        Right f -> return f
+
+    let m = M.mapKeys scriptMap ttyScripts
         first = fst (M.findMin m)
         last = fst (M.findMax m)
 
@@ -1618,9 +1664,12 @@ ttYaml2tt dir (TipToiYAML {..}) = do
     -- resolve registers
     let (initRegs, scripts) = resolveRegs (preInitRegs, map ($ filename_lookup) prescripts)
 
+    -- resolve named jumps
+    let scripts' = resolveJumps scriptMap scripts
+
     let maxReg = maximum $ 0:
             [ r
-            | (_, Just ls) <- scripts
+            | (_, Just ls) <- scripts'
             , Line _ cs as _ <- ls
             , r <- concatMap F.toList cs ++ concatMap F.toList as ]
 
@@ -1651,7 +1700,7 @@ ttYaml2tt dir (TipToiYAML {..}) = do
         , ttDate = BC.pack date
         , ttWelcome = welcome
         , ttInitialRegs = [fromMaybe 0 (M.lookup r initRegs) | r <- [0..maxReg]]
-        , ttScripts = scripts
+        , ttScripts = scripts'
         , ttGames = []
         , ttAudioFiles = files
         , ttAudioXor = 0xAD
