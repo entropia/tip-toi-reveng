@@ -2,7 +2,7 @@
 # The basic format is YAML
 
 # You can compile this running
-# ./tttool example.yaml example.gme
+# ./tttool assemble example.yaml example.gme
 
 # The product ID must match that of the book you want to use this with
 # If you generate your own codes, then this corresponds to "tttool oid-code 272".
