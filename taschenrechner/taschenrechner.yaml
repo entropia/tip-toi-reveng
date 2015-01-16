@@ -1,9 +1,59 @@
 product-id: 42
 comment: Ein akustischer Taschenrechner
-init: $zahl := 0
+init: $zahl := 0 $eingabe := 0
 scripts:
-  go:
-  - $zahl -= 1 J(sag_zahl)
+
+  eins:
+  - $eingabe *= 10 $eingabe += 1 $zahl := $eingabe J(sag_zahl)
+  zwei:
+  - $eingabe *= 10 $eingabe += 2 $zahl := $eingabe J(sag_zahl)
+  drei:
+  - $eingabe *= 10 $eingabe += 3 $zahl := $eingabe J(sag_zahl)
+  vier:
+  - $eingabe *= 10 $eingabe += 4 $zahl := $eingabe J(sag_zahl)
+  fuenf:
+  - $eingabe *= 10 $eingabe += 5 $zahl := $eingabe J(sag_zahl)
+  sechs:
+  - $eingabe *= 10 $eingabe += 6 $zahl := $eingabe J(sag_zahl)
+  sieben:
+  - $eingabe *= 10 $eingabe += 7 $zahl := $eingabe J(sag_zahl)
+  acht:
+  - $eingabe *= 10 $eingabe += 8 $zahl := $eingabe J(sag_zahl)
+  neun:
+  - $eingabe *= 10 $eingabe += 9 $zahl := $eingabe J(sag_zahl)
+  null:
+  - $eingabe *= 10               $zahl := $eingabe J(sag_zahl)
+
+  auswerten:
+  - $operator == 0? $wert := $eingabe $eingabe := 0 J(ausgewertet)
+  - $operator == 1? $wert += $eingabe $eingabe := 0 J(ausgewertet)
+  - $operator == 2? $wert -= $eingabe $eingabe := 0 J(ausgewertet)
+  - $operator == 3? $wert *= $eingabe $eingabe := 0 J(ausgewertet)
+  - $operator == 4? $wert /= $eingabe $eingabe := 0 J(ausgewertet)
+
+  ausgewertet:
+  - $neuer_operator == 0? $operator := 0 $zahl := $wert J(sag_zahl)
+  - $neuer_operator == 1? $operator := 1 P(plus)
+  - $neuer_operator == 2? $operator := 2 P(minus)
+  - $neuer_operator == 2? $operator := 2 P(minus)
+  - $neuer_operator == 4? $operator := 4 P(minus)
+
+  gleich:
+  - $neuer_operator := 0 J(auswerten)
+  plus:
+  - $neuer_operator := 1 J(auswerten)
+  minus:
+  - $neuer_operator := 2 J(auswerten)
+  mal:
+  - $neuer_operator := 3 J(auswerten)
+  geteilt:
+  - $neuer_operator := 4 J(auswerten)
+
+
+#
+# Ab hier kommt der Code, um eine Zahl zu spreche. $zahl muss die Zahl
+# enthalten, und dann gehts mit J(sag_zahl) los
+#
 
   # einer, sowie kleine zweistellige Zahlen (bis 19)
   einer:
