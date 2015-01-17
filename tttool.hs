@@ -1394,6 +1394,7 @@ export inf out = do
     let tty = tt2ttYaml (printf "media/%s_%%s" (takeBaseName inf)) tt
     encodeFile out tty
 
+type CodeMap = M.Map String Word16
 
 data TipToiYAML = TipToiYAML
     { ttyScripts :: M.Map String [String]
@@ -1402,6 +1403,12 @@ data TipToiYAML = TipToiYAML
     , ttyInit :: Maybe String
     , ttyWelcome :: Maybe String
     , ttyProduct_Id :: Word32
+    , ttyScriptCodes :: Maybe CodeMap
+    }
+    deriving Generic
+
+data TipToiCodesYAML = TipToiCodesYAML
+    { ttcScriptCodes :: CodeMap
     }
     deriving Generic
 
@@ -1412,6 +1419,10 @@ options = defaultOptions { fieldLabelModifier = map fix . map toLower . drop 3 }
 instance FromJSON TipToiYAML where
      parseJSON = genericParseJSON $ options
 instance ToJSON TipToiYAML where
+     toJSON = genericToJSON $ options
+instance FromJSON TipToiCodesYAML where
+     parseJSON = genericParseJSON $ options
+instance ToJSON TipToiCodesYAML where
      toJSON = genericToJSON $ options
 
 lexer       = P.makeTokenParser $
@@ -1581,6 +1592,7 @@ tt2ttYaml path (TipToiFile {..}) = TipToiYAML
     , ttyScripts = M.fromList
         [ (show oid, map exportLine ls) | (oid, Just ls) <- ttScripts]
     , ttyMedia_Path = Just path
+    , ttyScriptCodes = Nothing
     }
 
 -- | A nicer way to print an error message
@@ -1605,24 +1617,30 @@ parseOneLine p name input =
         Left e ->  printLineParserErrorMessage input e
         Right l -> return l
 
-scriptCodes :: [String] -> Either String (String -> Word16)
-scriptCodes [] = Right (error "scriptCodes []")
-scriptCodes codes
-    | null strs = Right readCode
-    | length strs > length knownCodes = Left "Too many codes used"
-    | null nums = Right lookupCode
+scriptCodes :: [String] -> CodeMap -> Either String (String -> Word16, CodeMap)
+scriptCodes [] codeMap = Right (error "scriptCodes []", codeMap)
+scriptCodes codes codeMap
+    | null strs = Right (readCode, codeMap)
+    | length strs > length availableCodes = Left "Too many codes used"
+    | null nums = Right (lookupCode, totalMap)
     | otherwise = Left "Cannot mix numbers and names in scripts."
   where
     (strs, nums) = partitionEithers $ map f codes
+    newStrs = filter (`M.notMember` codeMap) strs
+    usedCodes = S.fromList $ M.elems codeMap
+
+    availableCodes = filter (`S.notMember` usedCodes) knownCodes
+
     f s = case readMaybe s of
             Nothing -> Left s 
             Just n -> Right (n::Word16)
-    m = M.fromList (zip strs knownCodes)
+    newAssignments = M.fromList (zip newStrs availableCodes)
+    totalMap = M.unionWithKey (\_ _ _ -> error "scriptCodes: conflict!") codeMap newAssignments
 
     readCode s = case readMaybe s of
         Nothing -> error $ printf "Cannot jump to named script \"%s\" in a yaml with numbered scripts." s
         Just c -> c
-    lookupCode s = case M.lookup s m of
+    lookupCode s = case M.lookup s totalMap of
         Nothing -> error $ printf "Cannot jump to unknown script \"%s\"." s
         Just c -> c
 
@@ -1631,15 +1649,24 @@ knownCodes :: [Word16]
 knownCodes = [0, 1, 2, 3, 8, 9, 10, 11, 13, 14, 16, 17, 18, 19, 24, 25, 26, 27, 29, 30, 31, 32, 33, 34, 35, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 61, 62, 63, 64, 65, 66, 67, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121]
 --knownCodes = [8066..8081]
 
+mergeOnlyEqual :: String -> Word16 -> Word16 -> Word16
+mergeOnlyEqual _ c1 c2 | c1 == c2 = c1
+mergeOnlyEqual s c1 c2 = error $ printf "The .yaml file specifies code %d for script \"%s\", but the .codes.yamls file specifies %d. Please fix this!" c2 s c1
 
-ttYaml2tt :: FilePath -> TipToiYAML -> IO TipToiFile
-ttYaml2tt dir (TipToiYAML {..}) = do
+ttYaml2tt :: FilePath -> TipToiYAML -> CodeMap -> IO (TipToiFile, CodeMap)
+ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
     now <- getCurrentTime
     let date = formatTime defaultTimeLocale "%Y%m%d" now
 
-    scriptMap <- case scriptCodes (M.keys ttyScripts) of
+    let codeMap = M.unionWithKey mergeOnlyEqual
+                                 extCodeMap
+                                 (fromMaybe M.empty ttyScriptCodes)
+
+    (scriptMap, newCodes) <- case scriptCodes (M.keys ttyScripts) codeMap of
         Left e -> fail e
         Right f -> return f
+
+    let newCodes' = newCodes M.\\ (fromMaybe M.empty ttyScriptCodes)
 
     let m = M.mapKeys scriptMap ttyScripts
         first = fst (M.findMin m)
@@ -1696,7 +1723,7 @@ ttYaml2tt dir (TipToiYAML {..}) = do
                 mapM_ putStrLn ex
                 exitFailure
 
-    return $ TipToiFile
+    return $ (TipToiFile
         { ttProductId = ttyProduct_Id
         , ttRawXor = 0x00000039 -- from Bauernhof
         , ttComment = BC.pack (fromMaybe "created with tip-toi-reveng" ttyComment)
@@ -1710,17 +1737,39 @@ ttYaml2tt dir (TipToiYAML {..}) = do
         , ttAudioFilesDoubles = False
         , ttChecksum = 0x00
         , ttChecksumCalc = 0x00
-        }
+        }, newCodes)
 
 assemble :: FilePath -> FilePath -> IO ()
 assemble inf out = do
     etty <- decodeFileEither inf
-    case etty of
-        Left e -> print e
-        Right tty -> do
-            tt <- ttYaml2tt (takeDirectory inf) tty
-            writeTipToi out tt
+    tty <- case etty of
+        Left e -> print e >> exitFailure
+        Right tty -> return tty
 
+    let infCodes = codeFileName inf
+    ex <- doesFileExist infCodes
+    codeMap <-
+        if ex
+        then do
+            ettcy <- decodeFileEither infCodes
+            case ettcy of
+                Left e -> print e >> exitFailure
+                Right ttcy -> return (ttcScriptCodes ttcy)
+        else return M.empty
+
+    (tt, newCodeMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
+    if M.null newCodeMap && ex
+        then removeFile infCodes
+        else when (codeMap /= newCodeMap) $
+            encodeFile infCodes (TipToiCodesYAML { ttcScriptCodes = newCodeMap })
+    writeTipToi out tt
+
+
+codeFileName :: FilePath -> FilePath
+codeFileName fn = base <.> "codes" <.> ext
+  where
+    base = dropExtension fn
+    ext  = takeExtension fn
 
 debugGame :: ProductID -> IO TipToiFile
 debugGame productID = do
