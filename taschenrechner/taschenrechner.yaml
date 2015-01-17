@@ -3,6 +3,8 @@ comment: Ein akustischer Taschenrechner
 init: $zahl := 0 $eingabe := 0
 scripts:
 
+# Das Photo ist © Joe Haupt, CC-BY-SA, https://flic.kr/p/ehiwxe
+
   eins:
   - $eingabe *= 10 $eingabe += 1 $zahl := $eingabe J(sag_zahl)
   zwei:

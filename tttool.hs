@@ -1663,11 +1663,9 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
                                  extCodeMap
                                  (fromMaybe M.empty ttyScriptCodes)
 
-    (scriptMap, newCodes) <- case scriptCodes (M.keys ttyScripts) codeMap of
+    (scriptMap, totalMap) <- case scriptCodes (M.keys ttyScripts) codeMap of
         Left e -> fail e
         Right f -> return f
-
-    let newCodes' = newCodes M.\\ (fromMaybe M.empty ttyScriptCodes)
 
     let m = M.mapKeys scriptMap ttyScripts
         first = fst (M.findMin m)
@@ -1738,20 +1736,19 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
         , ttAudioFilesDoubles = False
         , ttChecksum = 0x00
         , ttChecksumCalc = 0x00
-        }, newCodes)
+        }, totalMap)
 
 encodeFileCommented :: ToJSON a => FilePath -> String -> a -> IO ()
 encodeFileCommented fn c v = do
     SBC.writeFile fn $ SBC.pack c <> encode v
 
-assemble :: FilePath -> FilePath -> IO ()
-assemble inf out = do
+readTipToiYaml :: FilePath -> IO (TipToiYAML, CodeMap)
+readTipToiYaml inf = do
     etty <- decodeFileEither inf
     tty <- case etty of
         Left e -> print e >> exitFailure
         Right tty -> return tty
 
-    let infCodes = codeFileName inf
     ex <- doesFileExist infCodes
     codeMap <-
         if ex
@@ -1761,12 +1758,27 @@ assemble inf out = do
                 Left e -> print e >> exitFailure
                 Right ttcy -> return (ttcScriptCodes ttcy)
         else return M.empty
+    return (tty, codeMap)
+  where
+    infCodes = codeFileName inf
 
-    (tt, newCodeMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
-    if M.null newCodeMap && ex
-        then removeFile infCodes
-        else when (codeMap /= newCodeMap) $
-            encodeFileCommented infCodes codesComment (TipToiCodesYAML { ttcScriptCodes = newCodeMap })
+writeTipToiCodeYaml :: FilePath -> TipToiYAML -> CodeMap -> CodeMap -> IO ()
+writeTipToiCodeYaml inf tty oldMap totalMap = do
+    let newCodeMap = totalMap M.\\ fromMaybe M.empty (ttyScriptCodes tty)
+
+    ex <- doesFileExist infCodes
+
+    if M.null newCodeMap
+    then when ex $ removeFile infCodes
+    else when (newCodeMap /= oldMap) $ encodeFileCommented infCodes codesComment (TipToiCodesYAML { ttcScriptCodes = newCodeMap })
+  where
+    infCodes = codeFileName inf
+
+assemble :: FilePath -> FilePath -> IO ()
+assemble inf out = do
+    (tty, codeMap) <- readTipToiYaml inf
+    (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
+    writeTipToiCodeYaml inf tty codeMap totalMap
     writeTipToi out tt
 
 
