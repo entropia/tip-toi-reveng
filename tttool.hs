@@ -2,6 +2,7 @@
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
+import qualified Data.ByteString.Char8 as SBC
 import System.Environment
 import System.Exit
 import System.FilePath
@@ -1739,6 +1740,10 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
         , ttChecksumCalc = 0x00
         }, newCodes)
 
+encodeFileCommented :: ToJSON a => FilePath -> String -> a -> IO ()
+encodeFileCommented fn c v = do
+    SBC.writeFile fn $ SBC.pack c <> encode v
+
 assemble :: FilePath -> FilePath -> IO ()
 assemble inf out = do
     etty <- decodeFileEither inf
@@ -1761,9 +1766,23 @@ assemble inf out = do
     if M.null newCodeMap && ex
         then removeFile infCodes
         else when (codeMap /= newCodeMap) $
-            encodeFile infCodes (TipToiCodesYAML { ttcScriptCodes = newCodeMap })
+            encodeFileCommented infCodes codesComment (TipToiCodesYAML { ttcScriptCodes = newCodeMap })
     writeTipToi out tt
 
+
+codesComment :: String
+codesComment = unlines $ map ("# " ++)
+    [ "This file contains a mapping from script names to oid codes."
+    , "This way the existing scripts are always assigned to the the"
+    , "same codes, even if you add further scripts."
+    , ""
+    , "You can copy the contents of this file into the main .yaml file,"
+    , "if you want to have both together."
+    , ""
+    , "If you delete this file, the next run of \"ttool assemble\" might"
+    , "use different codes for your scripts, and you might have to re-"
+    , "create the images for your product."
+    ]
 
 codeFileName :: FilePath -> FilePath
 codeFileName fn = base <.> "codes" <.> ext
