@@ -1034,14 +1034,17 @@ genSVG code filename = B.writeFile filename (renderSvg (oidSVG code))
 
 data DPI = D1200 | D600
 
-imageFromBlackPixels :: Int -> Int -> [(Int, Int)] -> Image Pixel8
+imageFromBlackPixels :: Int -> Int -> [(Int, Int)] -> Image PixelYA8
 imageFromBlackPixels width height pixels = runST $ do 
-    i <- createMutableImage width height maxBound
+    i <- createMutableImage width height background
     forM_ pixels $ \(x,y) -> do
-        writePixel i x y minBound
+        writePixel i x y black
     freezeImage i
+  where
+    black =      PixelYA8 minBound maxBound
+    background = PixelYA8 maxBound minBound
 
-oidImage :: DPI -> Int -> Image Pixel8
+oidImage :: DPI -> Int -> Image PixelYA8
 oidImage _ code | code >= 4^8 = error $ printf "Code %d too large to draw" code
 oidImage dpi code =
     imageFromBlackPixels
