@@ -1159,7 +1159,7 @@ dumpInfo t file = do
     (tt,_) <- parseTipToiFile <$> B.readFile file
     let st = ttScripts tt
 
-    printf "Product ID: 0x%08X\n" (ttProductId tt)
+    printf "Product ID: %d\n" (ttProductId tt)
     printf "Raw XOR value: 0x%08X\n" (ttRawXor tt)
     printf "Magic XOR value: 0x%02X\n" (ttAudioXor tt)
     printf "Comment: %s\n" (BC.unpack (ttComment tt))
