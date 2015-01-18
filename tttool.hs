@@ -945,7 +945,7 @@ readMaybe s = case reads s of
 
 -- Image generation
 
-checksum :: Int -> Int
+checksum :: Word16 -> Word16
 checksum dec = c3
   where
     c1  =       (((dec >> 2) ^ (dec >> 8) ^ (dec >> 12) ^ (dec >> 14)) & 0x01) << 1
@@ -957,10 +957,10 @@ checksum dec = c3
     (^) = xor
     (&) = (.&.)
 
-parseRange :: String -> IO [Int]
+parseRange :: String -> IO [Word16]
 parseRange = parseOneLine rangeParser "command line"
 
-rangeParser :: Parser [Int]
+rangeParser :: Parser [Word16]
 rangeParser = concat <$> oneRangeParser `sepBy1` many1 (P.char ' ' <|> P.char ',')
 
 oneRangeParser = do
@@ -1045,8 +1045,7 @@ imageFromBlackPixels width height pixels = runST $ do
     black =      PixelYA8 minBound maxBound
     background = PixelYA8 maxBound minBound
 
-oidImage :: DPI -> Int -> Image PixelYA8
-oidImage _ code | code >= 4^8 = error $ printf "Code %d too large to draw" code
+oidImage :: DPI -> Word16 -> Image PixelYA8
 oidImage dpi code =
     imageFromBlackPixels
         (width *4*dotsPerPoint)
@@ -1089,15 +1088,34 @@ oidImage dpi code =
     tile f = concat [ at (x*4*dotsPerPoint, y*4*dotsPerPoint) f
                     | x <- [0..width-1], y <- [0..height-1]]
 
+
 genPNGs :: DPI -> String -> IO ()
-genPNGs dpi code_str = do
+genPNGs dpi arg = do
+    ex <- doesFileExist arg
+    if ex then genPNGsForFile dpi arg
+          else genPNGsForCodes dpi arg
+
+genPNGsForFile :: DPI -> FilePath -> IO ()
+genPNGsForFile dpi inf = do
+    (tty, codeMap) <- readTipToiYaml inf
+    (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
+    forM_ (M.toList totalMap) $ \(s,c) -> do
+        let filename = printf "oid-%d-%s.png" (ttyProduct_Id tty) s
+        case code2RawCode c of
+            Nothing -> printf "Skipping %s, code %d not known." filename c
+            Just r -> do
+                printf "Writing %s.. (Code %d, raw code %d)\n" filename c r
+                genPNG dpi r filename
+
+genPNGsForCodes :: DPI -> String -> IO ()
+genPNGsForCodes dpi code_str = do
     codes <- parseRange code_str
     forM_ codes $ \c -> do
         let filename = printf "oid%d.png" c
         printf "Writing %s...\n" filename
         genPNG dpi c filename
 
-genPNG :: DPI -> Int -> FilePath -> IO ()
+genPNG :: DPI -> Word16 -> FilePath -> IO ()
 genPNG dpi code filename = writePng filename (oidImage dpi code)
 
 -- Main commands
@@ -1647,8 +1665,17 @@ scriptCodes codes codeMap
 
 
 knownCodes :: [Word16]
-knownCodes = [0, 1, 2, 3, 8, 9, 10, 11, 13, 14, 16, 17, 18, 19, 24, 25, 26, 27, 29, 30, 31, 32, 33, 34, 35, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 61, 62, 63, 64, 65, 66, 67, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121]
+knownCodes = [4716, 4717, 4718, 4719, 4720, 4721, 4722, 4723, 4724, 4725, 4726, 4727, 4728, 4729, 4730, 4731, 4732, 4733, 4734, 4735, 4736, 4737, 4738, 4739, 4740, 4741, 4742, 4743, 4744, 4745, 4746, 4747, 4748, 4749, 4750, 4751, 4752, 4753, 4754, 4755, 4756, 4757, 4758, 4759, 4760, 4761, 4762, 4763, 4764, 4765, 4766, 4767, 4768, 4769, 4770, 4771, 4772, 4773, 4774, 4775, 4776, 4777, 4778, 4779, 4780, 4781, 4782, 4783, 4784, 4785, 4786, 4787, 4788, 4789, 4790, 4791, 4792, 4793, 4794, 4795, 4796, 4797, 4798, 4799, 4800, 4801, 4802, 4803, 4804, 4805, 4806, 4807, 4808, 4809, 4810, 4811, 4812, 4813, 4814, 4815]
 --knownCodes = [8066..8081]
+
+knownRawCodes :: [Word16]
+knownRawCodes = [0, 1, 2, 3, 8, 9, 10, 11, 13, 14, 16, 17, 18, 19, 24, 25, 26, 27, 29, 30, 31, 32, 33, 34, 35, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 61, 62, 63, 64, 65, 66, 67, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121]
+
+code2RawCode :: Word16 -> Maybe Word16
+code2RawCode =
+    let m = M.fromList (zip knownCodes knownRawCodes)
+    in \c -> M.lookup c m
+
 
 mergeOnlyEqual :: String -> Word16 -> Word16 -> Word16
 mergeOnlyEqual _ c1 c2 | c1 == c2 = c1
@@ -1952,6 +1979,9 @@ main' _ _ = do
     putStrLn $ "       <codes> can be a range, e.g. 1,3,1000-1085."
     putStrLn $ "       The code refers to the *raw* code, not the one read by the pen."
     putStrLn $ "       Uses oid<code>.png as the file name."
+    putStrLn $ "    oid-code [-d DPI] <infile.yaml>"
+    putStrLn $ "       Like above, but creates one file for each code in the yaml file."
+    putStrLn $ "       Uses oid-<product-id>-<scriptname or code>.png as the file name."
     exitFailure
 
 main = getArgs >>= (main' M.empty)
