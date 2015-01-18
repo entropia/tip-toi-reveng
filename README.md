@@ -98,11 +98,11 @@ Otherwise, installation from source is not difficult either:
     `cabal`, and you should run the two commands
 
         cabal update
-        cabal install yaml JuicyPixels parsec
+        cabal install --dependencies-only
 
  3. Now you can build the program using
 
-        make
+        cabal install --bindir=.
 
  4. At this point, `tttool` should be ready to go. If you run
 
