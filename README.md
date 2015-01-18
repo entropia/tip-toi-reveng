@@ -1,5 +1,8 @@
+Das tttool hat jetzt eine deutsche Webseite für Anwender: http://tttool.entropia.de/
+
 tip-toi-reveng
 ==============
+
 
 The goal of this project is to understand the file and paper format for the
 Ravensburger TipToi pen. The ultimate goal is that everyone can create their
