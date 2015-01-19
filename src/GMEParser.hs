@@ -7,6 +7,7 @@ import qualified Data.Binary.Get as G
 import Text.Printf
 import Data.List
 import Data.Functor
+import Control.Applicative (Applicative)
 import Data.Maybe
 import Control.Monad
 import Control.Monad.Writer.Strict
@@ -23,7 +24,7 @@ import Cypher
 -- Reverse Engineering Monad
 
 newtype SGet a = SGet (RWS B.ByteString [Segment] Word32  a)
-    deriving (Functor, Monad)
+    deriving (Functor, Applicative, Monad)
 
 liftGet :: G.Get a -> SGet a
 liftGet act = SGet $ do

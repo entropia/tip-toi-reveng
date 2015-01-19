@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
 import System.Environment
@@ -16,8 +18,13 @@ import Control.Monad
 import System.Directory
 import Numeric (readHex)
 import qualified Data.Map as M
-import Data.Time
-import System.Locale
+
+#if MIN_VERSION_time(1,5,0)
+import Data.Time.Format (defaultTimeLocale)
+#else
+import System.Locale (defaultTimeLocale)
+#endif
+import Data.Time (getCurrentTime, formatTime)
 {-
 import Text.Blaze.Svg11 ((!), mkPath, rotate, l, m)
 import qualified Text.Blaze.Svg11 as S

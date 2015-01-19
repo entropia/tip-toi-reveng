@@ -6,6 +6,7 @@ import qualified Data.ByteString.Lazy as B
 import qualified Data.Binary.Builder as Br
 import Text.Printf
 import Control.Monad
+import Control.Applicative (Applicative)
 import qualified Data.Map as M
 import Control.Monad.Writer.Strict
 import Control.Monad.State.Strict
@@ -21,7 +22,8 @@ import Cypher
 -- We need a data structure that we can extract its length from before we know its values
 -- So we will use a lazy pair of length (Int) and builder
 
-newtype SPutM a = SPutM (StateT Word32 (Writer Br.Builder) a) deriving (Functor, Monad, MonadFix)
+newtype SPutM a = SPutM (StateT Word32 (Writer Br.Builder) a)
+    deriving (Functor, Applicative, Monad, MonadFix)
 type SPut = SPutM ()
 
 putWord8 :: Word8 -> SPut

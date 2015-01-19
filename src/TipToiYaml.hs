@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards, DeriveGeneric #-}
+{-# LANGUAGE RecordWildCards, DeriveGeneric, CPP #-}
 
 module TipToiYaml
     ( tt2ttYaml, ttYaml2tt
@@ -22,8 +22,12 @@ import System.Directory
 import qualified Data.Map as M
 import qualified Data.Set as S
 import Control.Monad.Writer.Strict
-import Data.Time
-import System.Locale
+#if MIN_VERSION_time(1,5,0)
+import Data.Time.Format (defaultTimeLocale)
+#else
+import System.Locale (defaultTimeLocale)
+#endif
+import Data.Time (getCurrentTime, formatTime)
 import Data.Yaml hiding ((.=), Parser)
 import Data.Aeson.Types hiding ((.=), Parser)
 import Text.Parsec hiding (Line, lookAhead, spaces)
