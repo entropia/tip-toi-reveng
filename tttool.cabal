@@ -58,7 +58,7 @@ executable tttool
     mtl         == 2.1.*   ||  == 2.2.*,
     text        == 0.11.*  ||  == 1.2.*,
     parsec      == 3.1.*,
-    process     == 1.1.*,  ||  == 1.2.*,
+    process     == 1.1.*   ||  == 1.2.*,
     yaml        == 0.8.*
 
   if flag(old-locale)
