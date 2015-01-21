@@ -1,0 +1,23 @@
+# This is an example source file for a TipToi file, showing the text-to-speech
+# feature
+
+# You write your yaml file as usual:
+product-id: 42
+welcome: hello
+scripts:
+  8066:
+  - $mode==1? P(mode_one)
+  - $mode==2? P(mode_two)
+
+# But instead of manually creating files hello.ogg, mode_one.ogg and
+# mode_two.ogg, you can specify text to be spoken for them.
+speak:
+  hello:   "Hello!"
+  mode_one: "We are in mode one."
+  mode_two: "We are in mode two."
+
+# tttool will write the synthesized files to disk, so that the next execution
+# of "tttool assemble" will be quick.
+  
+# You can mix synthesized and normal files; if there is no entry in the speak
+# section, tttool will look for an ogg file as normal.

@@ -40,6 +40,7 @@ import qualified Data.Foldable as F
 import Control.Arrow
 import Control.Applicative ((<*>), (<*))
 
+import TextToSpeech
 import Types
 import Constants
 import PrettyPrint
@@ -56,6 +57,7 @@ data TipToiYAML = TipToiYAML
     , ttyWelcome :: Maybe String
     , ttyProduct_Id :: Word32
     , ttyScriptCodes :: Maybe CodeMap
+    , ttySpeak :: Maybe (M.Map String String)
     }
     deriving Generic
 
@@ -89,6 +91,7 @@ tt2ttYaml path (TipToiFile {..}) = TipToiYAML
         [ (show oid, map exportLine ls) | (oid, Just ls) <- ttScripts]
     , ttyMedia_Path = Just path
     , ttyScriptCodes = Nothing
+    , ttySpeak = Nothing
     }
 
 
@@ -198,25 +201,30 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
             , Line _ cs as _ <- ls
             , r <- concatMap F.toList cs ++ concatMap F.toList as ]
 
+    -- Generate text-to-spech files
+    forM (maybe [] M.elems ttySpeak) $ \txt -> do
+        textToSpeech (ttsFileName txt) txt
 
-
-    files <- forM filenames' $ \fn -> do
-        let paths = [ combine dir relpath
+    files <- forM filenames' $ \fn -> case ttySpeak >>= M.lookup fn of
+        Just txt -> do
+            B.readFile (ttsFileName txt)
+        Nothing -> do
+            let paths = [ combine dir relpath
                     | ext <- map snd fileMagics
                     , let pat = fromMaybe "%s" ttyMedia_Path
                     , let relpath = printf pat fn <.> ext
                     ]
-        ex <- filterM doesFileExist paths
-        case ex of
-            [] -> do
-                putStrLn "Could not find any of these files:"
-                mapM_ putStrLn paths
-                exitFailure
-            [f] -> B.readFile f
-            _  -> do
-                putStrLn "Multiple matching files found:"
-                mapM_ putStrLn ex
-                exitFailure
+            ex <- filterM doesFileExist paths
+            case ex of
+                [] -> do
+                    putStrLn "Could not find any of these files:"
+                    mapM_ putStrLn paths
+                    exitFailure
+                [f] -> B.readFile f
+                _  -> do
+                    putStrLn "Multiple matching files found:"
+                    mapM_ putStrLn ex
+                    exitFailure
 
     return $ (TipToiFile
         { ttProductId = ttyProduct_Id

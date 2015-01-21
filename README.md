@@ -141,7 +141,15 @@ your pen. It will then read out the codes, as a sequence of english digits.
 We are also collecting template files, where the OIDs are commented; these can
 be found in the `./templates` directory. Please improve and contribute!
 
-Again, please let us know if you have problems, but also tell us what fun things you did if you succeded.
+Again, please let us know if you have problems, but also tell us what fun
+things you did if you succeded.
+
+Text to speech
+--------------
+
+If you have libttspico-utils and vorbis-tools installed, you can have tttool
+generate audio files from text for you, which makes developing your yaml file
+much easier. See [text2speech.yaml](text2speech.yaml) for more information.
 
 Printing your own books
 -----------------------
