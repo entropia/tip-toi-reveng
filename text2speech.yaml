@@ -8,6 +8,7 @@ scripts:
   8066:
   - $mode==1? P(mode_one)
   - $mode==2? P(mode_two)
+  - $mode==3? P(mode_three)
 
 # But instead of manually creating files hello.ogg, mode_one.ogg and
 # mode_two.ogg, you can specify text to be spoken for them.
@@ -15,6 +16,7 @@ speak:
   hello:   "Hello!"
   mode_one: "We are in mode one."
   mode_two: "We are in mode two."
+  mode_three: "We are in mode three, where I have a little bit more to talk about."
 
 # tttool will write the synthesized files to disk, so that the next execution
 # of "tttool assemble" will be quick.

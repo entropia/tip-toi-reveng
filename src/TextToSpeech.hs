@@ -8,19 +8,25 @@ import System.FilePath
 import System.Process
 import System.Exit
 import Control.Monad
+import Data.Hashable
+import Text.Printf
 
-ttsFileName txt = "tts-" ++ map go txt ++ ".ogg"
+ttsFileName txt = "tts-cache" </> "tts-" ++ map go (shorten txt) <.> "ogg"
   where go '/'         = '_'
         go c | c < ' ' = '_'
         go c           = c
+        shorten x | length x > 20 = printf "%s-%016X" (take 20 x) (hash x)
+        shorten x                 = x
 
 textToSpeech :: FilePath -> String -> IO ()
 textToSpeech fn txt = do
     ex <- doesFileExist fn
     if ex then return () else do
 
+    createDirectoryIfMissing True (takeDirectory fn)
+
     putStrLn $ "Speaking \"" ++ txt ++ "\"."  
-    (tmp,h) <- openTempFile (takeDirectory fn) (replaceExtension fn "wav")
+    (tmp,h) <- openTempFile (takeDirectory fn) (takeBaseName fn <.> "wav")
     hClose h
 
     (ret, _, err) <- readProcessWithExitCode "pico2wave" ["--wave", tmp, "--lang", "en-GB", txt] ""
