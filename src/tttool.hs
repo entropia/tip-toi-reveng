@@ -121,12 +121,12 @@ dumpInfo t file = do
         (fst (head st)) (fst (last st))
         (length (filter (isNothing . snd) st)) (length st)
     printf "Audio table entries: %d\n" (length ttAudioFiles)
+    when ttAudioFilesDoubles $ printf "Audio table repeated twice\n"
     printf "Binary tables entries: %d/%d/%d/%d\n"
         (length ttBinaries1)
         (length ttBinaries2)
         (length ttBinaries3)
         (length ttBinaries4)
-    when ttAudioFilesDoubles $ printf "Audio table repeated twice\n"
     for_ ttSpecialOIDs $ \(oid1, oid2) ->
         printf "Speical OIDs: %d, %d\n" oid1 oid2
     printf "Checksum found 0x%08X, calculated 0x%08X\n" ttChecksum ttChecksumCalc

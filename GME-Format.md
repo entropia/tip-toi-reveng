@@ -136,7 +136,12 @@ Registers can hold 16bit values and are referenced in the play scripts.
 The media file table
 --------------------
 
-The media file table consists of pairs of offsets and length (both 32bit), and ends right before the position referenced by the the first entry. There is no explicit definition of the number of records in this list. 
+The media file table consists of pairs of offsets and length (both 32bit).
+There seems to be no explicit definition of the number of records in this list,
+so we simply look until either
+ * the first media content referenced in the list begins,
+ * or the *additional audio table* appears, which is then followed by the first
+   media content.
 
 The media files themselves are encrypted using a simple scheme, using a magic XOR value (`x`):
    - The values `0x00`, `0xFF`, `x` and `x XOR 0xFF` are left alone
@@ -146,7 +151,8 @@ The magic XOR value can be found by finding the number which makes the first 4 b
 
 In the header at position `0x001c` there is raw XOR value that is used by the firmware to deduct the real XOR value. It might use some algorithm or a lookup table for that. For all seen TipToi gme files same raw XOR value here leads to same real XOR value. As of now ~55 different combinations have been identified by looking at exisiting gme files.
 
-In `Leserabe_een.gme`, the audio table is repeated right after itself. The reason is unknown, it might be a bug in Ravensburger's creation software.
+The purpose of the *additional audio table* is unknown, and so far it has been
+equal to the main audio table in all instances.
 
 
 Additional script table
