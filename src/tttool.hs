@@ -106,30 +106,30 @@ dumpScripts t raw sel file = do
 
 dumpInfo :: Transscript -> FilePath -> IO ()
 dumpInfo t file = do
-    (tt,_) <- parseTipToiFile <$> B.readFile file
-    let st = ttScripts tt
+    (TipToiFile {..},_) <- parseTipToiFile <$> B.readFile file
+    let st = ttScripts
 
-    printf "Product ID: %d\n" (ttProductId tt)
-    printf "Raw XOR value: 0x%08X\n" (ttRawXor tt)
-    printf "Magic XOR value: 0x%02X\n" (ttAudioXor tt)
-    printf "Comment: %s\n" (BC.unpack (ttComment tt))
-    printf "Date: %s\n" (BC.unpack (ttDate tt))
-    printf "Number of registers: %d\n" (length (ttInitialRegs tt))
-    printf "Initial registers: %s\n" (show (ttInitialRegs tt))
-    printf "Initial sounds: %s\n" (ppPlayListList t (ttWelcome tt))
+    printf "Product ID: %d\n" ttProductId
+    printf "Raw XOR value: 0x%08X\n" ttRawXor
+    printf "Magic XOR value: 0x%02X\n" ttAudioXor
+    printf "Comment: %s\n" (BC.unpack ttComment)
+    printf "Date: %s\n" (BC.unpack ttDate)
+    printf "Number of registers: %d\n" (length ttInitialRegs)
+    printf "Initial registers: %s\n" (show ttInitialRegs)
+    printf "Initial sounds: %s\n" (ppPlayListList t ttWelcome)
     printf "Scripts for OIDs from %d to %d; %d/%d are disabled.\n"
         (fst (head st)) (fst (last st))
         (length (filter (isNothing . snd) st)) (length st)
-    printf "Audio table entries: %d\n" (length (ttAudioFiles tt))
+    printf "Audio table entries: %d\n" (length ttAudioFiles)
     printf "Binary tables entries: %d/%d/%d/%d\n"
-        (length (ttBinaries1 tt))
-        (length (ttBinaries2 tt))
-        (length (ttBinaries3 tt))
-        (length (ttBinaries4 tt))
-    when (ttAudioFilesDoubles tt) $ printf "Audio table repeated twice\n"
-    for_ (ttSpecialOIDs tt) $ \(oid1, oid2) ->
+        (length ttBinaries1)
+        (length ttBinaries2)
+        (length ttBinaries3)
+        (length ttBinaries4)
+    when ttAudioFilesDoubles $ printf "Audio table repeated twice\n"
+    for_ ttSpecialOIDs $ \(oid1, oid2) ->
         printf "Speical OIDs: %d, %d\n" oid1 oid2
-    printf "Checksum found 0x%08X, calculated 0x%08X\n" (ttChecksum tt) (ttChecksumCalc tt)
+    printf "Checksum found 0x%08X, calculated 0x%08X\n" ttChecksum ttChecksumCalc
 
 lint :: FilePath -> IO ()
 lint file = do
