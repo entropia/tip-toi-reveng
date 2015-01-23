@@ -77,6 +77,7 @@ data TipToiFile = TipToiFile
     , ttBinaries2 :: [(B.ByteString, B.ByteString)]
     , ttBinaries3 :: [(B.ByteString, B.ByteString)]
     , ttBinaries4 :: [(B.ByteString, B.ByteString)]
+    , ttSpecialOIDs :: Maybe (Word16, Word16)
     , ttChecksum :: Word32
     , ttChecksumCalc :: Word32
     }

@@ -8,7 +8,7 @@ import qualified Data.Binary.Get as G
 import Text.Printf
 import Data.List
 import Data.Functor
-import Control.Applicative (Applicative)
+import Control.Applicative (Applicative, (<*>))
 import Data.Maybe
 import Control.Monad
 import Control.Monad.Writer.Strict
@@ -47,7 +47,7 @@ lookAhead (SGet act) = SGet $ do
     put oldOffset
     return a
 
-getAt :: Offset -> (SGet a) -> SGet a
+getAt :: Offset -> SGet a -> SGet a
 getAt offset act = lookAhead (jumpTo offset >> act)
 
 getSeg :: String -> SGet a -> SGet a
@@ -350,6 +350,9 @@ getGame = do
 getInitialRegs :: SGet [Word16]
 getInitialRegs = getArray getWord16 getWord16
 
+getSpecials :: SGet (Word16, Word16)
+getSpecials = (,) <$> getWord16 <*> getWord16
+
 getTipToiFile :: SGet TipToiFile
 getTipToiFile = getSegAt 0x00 "Header" $ do
     ttScripts <- indirection "Scripts" getScripts
@@ -371,14 +374,12 @@ getTipToiFile = getSegAt 0x00 "Header" $ do
 
     jumpTo 0x0090
     ttBinaries1 <- fromMaybe [] <$> maybeIndirection "Binaries 1" getBinaries
-
-    jumpTo 0x0098
+    ttSpecialOIDs <- maybeIndirection "specials symbols" getSpecials
     ttBinaries2 <- fromMaybe [] <$> maybeIndirection "Binaries 1" getBinaries
 
     jumpTo 0x00A0
     ttBinaries3 <- fromMaybe [] <$> maybeIndirection "Single binary 1" getBinaries
-
-    jumpTo 0x00A8
+    getWord32 --ignored
     ttBinaries4 <- fromMaybe [] <$> maybeIndirection "Single binary 2" getBinaries
 
     ttChecksum <- getChecksum

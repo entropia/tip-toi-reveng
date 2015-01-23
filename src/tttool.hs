@@ -18,6 +18,7 @@ import Control.Monad
 import System.Directory
 import Numeric (readHex)
 import qualified Data.Map as M
+import Data.Foldable (for_)
 
 #if MIN_VERSION_time(1,5,0)
 import Data.Time.Format (defaultTimeLocale)
@@ -119,8 +120,15 @@ dumpInfo t file = do
     printf "Scripts for OIDs from %d to %d; %d/%d are disabled.\n"
         (fst (head st)) (fst (last st))
         (length (filter (isNothing . snd) st)) (length st)
-    printf "Audio Table entries: %d\n" (length (ttAudioFiles tt))
+    printf "Audio table entries: %d\n" (length (ttAudioFiles tt))
+    printf "Binary tables entries: %d/%d/%d/%d\n"
+        (length (ttBinaries1 tt))
+        (length (ttBinaries2 tt))
+        (length (ttBinaries3 tt))
+        (length (ttBinaries4 tt))
     when (ttAudioFilesDoubles tt) $ printf "Audio table repeated twice\n"
+    for_ (ttSpecialOIDs tt) $ \(oid1, oid2) ->
+        printf "Speical OIDs: %d, %d\n" oid1 oid2
     printf "Checksum found 0x%08X, calculated 0x%08X\n" (ttChecksum tt) (ttChecksumCalc tt)
 
 lint :: FilePath -> IO ()
@@ -296,6 +304,7 @@ debugGame productID = do
         , ttBinaries2 = []
         , ttBinaries3 = []
         , ttBinaries4 = []
+        , ttSpecialOIDs = Nothing
         }
 
 
