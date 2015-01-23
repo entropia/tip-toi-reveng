@@ -31,10 +31,18 @@ The header begins with these 8 32-bit numbers, listed with their offset:
  * Next is a 8 date string (`20111024`). The date string seems optional with one condition: if a language string follows the date must consist of at least one ASCII number.
  * Next is an optional language string (currently known: `GERMAN`, `DUTCH`, `FRENCH`, `ITALIAN`. If the language string is provided it must match the language of the firmware that is running on the pen (it is unclear where is is checked; the file .tiptoi.log is NOT taken into account here!) or the pen will ignore it. If the language is missing any TipToi pen will accept the file. 
  * Next there is sequence of zeros up to and including to position 0x5f.
- * `0x0060`: 32bit offset, purpose unknown. Some products have 0 here.
- * `0x0071`: 32bit offset to the playlistlist for the the power-on sound (played, when the product is recognized. If 0, no sound is played.) 
+ * `0x0060`: 32bit offset to an *additional media file table*
+ * `0x0071`: 32bit offset to the playlistlist for the the power-on sound (played, when the product is recognized. If 0, no sound is played.)
 
-The rest of the header is dubious, and contains a few more 16 or 32 bit numbers.
+ The following entries might exist only from Version 2.10.0901
+ * `0x008C`: 32bit offset purpose unknown. Some products have 0 here.
+ * `0x0090`: 32bit offset to the *game binaries table*
+ * `0x0094`: 32bit offset to the two OIDs for the Restart symbol and the Stop symbol
+ * `0x0098`: 32bit offset to an *additional game binaries table*
+ * `0x009C`: 32bit. purpose unknown, can be 0.
+ * `0x00A0`: 32bit offset to a game binaries table, which consists of a single binary
+ * `0x00A4`: 32bit number, purpose unknown (it might be the number of offsets to follow).
+ * `0x00A8`: 32bit offset to another game binaries table, which also consists of a single binary
 
 
 The script table
@@ -150,6 +158,17 @@ it is an empty play script, i.e. simply `0x0000` . In 'Reise durch die
 Jahreszeiten' it is a playscript with empty script lines.
 
 TODO: When is this executed?
+
+The game binaries table
+-----------------------
+
+Existing at least in 'WWW Weltatlas', this table holds (ARM) binary data, recognizable from the different strings contained in the binaries.
+The table consists of a 16bit? length and another 112bit (14 bytes) padding, adding up to 16 bytes. Then, the entries of the table follow:
+Each entry consists of a 32bit pointer to the binary data, a 32bit length of the binary data and 8bytes for an abbreviated binary name (Non-zero terminated).
+
+Very likely, the `0`-th entry of the table is skipped, because it starts in the same place as the table length entry.
+The same layout can be found in the additional game binaries table.
+
 
 
 The checksum
