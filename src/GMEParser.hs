@@ -1,8 +1,9 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, RecordWildCards #-}
 
 module GMEParser (parseTipToiFile) where
 
 import qualified Data.ByteString.Lazy as B
+import qualified Data.ByteString.Lazy.Char8 as BC
 import qualified Data.Binary.Get as G
 import Text.Printf
 import Data.List
@@ -85,7 +86,7 @@ indirectBS desc = do
 maybeIndirection :: String -> SGet a -> SGet (Maybe a)
 maybeIndirection desc act = do
     offset <- getWord32
-    if offset == 0xFFFFFFFF
+    if offset == 0xFFFFFFFF || offset == 0x00000000
     then return Nothing
     else Just <$> getSegAt offset desc act
 
@@ -226,6 +227,17 @@ lowbyte, highbyte :: Word16 -> Word8
 lowbyte n = fromIntegral (n `mod` 2^8)
 highbyte n = fromIntegral (n `div` 2^8)
 
+getBinaries :: SGet [(B.ByteString, B.ByteString)]
+getBinaries = do
+    n <- getWord16
+    _ <- getBS 14 -- padding
+    forM [0..n - 1] $ \n -> do
+        offset <- getWord32
+        length <- getWord32
+        desc <- getBS 8
+        binary <- getSegAt offset (BC.unpack desc) (getBS length)
+        return (desc, binary)
+
 getAudios :: SGet ([B.ByteString], Bool, Word8)
 getAudios = do
     until <- lookAhead getWord32
@@ -340,23 +352,38 @@ getInitialRegs = getArray getWord16 getWord16
 
 getTipToiFile :: SGet TipToiFile
 getTipToiFile = getSegAt 0x00 "Header" $ do
-    scripts <- indirection "Scripts" getScripts
-    (at, at_doubled, xor) <- indirection "Media" getAudios
+    ttScripts <- indirection "Scripts" getScripts
+    (ttAudioFiles, ttAudioFilesDoubles, ttAudioXor) <- indirection "Media" getAudios
     _ <- getWord32 -- Usually 0x0000238b
     _ <- indirection "Additional script" getScript
-    games <- indirection "Games" $ indirections getWord32 "" getGame
-    id <- getWord32
-    regs <- indirection "Initial registers" getInitialRegs
-    raw_xor <- getWord32
-    (comment,date) <- do
+    ttGames <- indirection "Games" $ indirections getWord32 "" getGame
+    ttProductId <- getWord32
+    ttInitialRegs <- indirection "Initial registers" getInitialRegs
+    ttRawXor <- getWord32
+    (ttComment, ttDate) <- do
         l <- getWord8
         c <- getBS (fromIntegral l)
         d <- getBS 8
         return (c,d)
-    checksum <- getChecksum
-    checksumCalc <- calcChecksum
-    ipll <- getSegAt 0x71 "After header" $ indirection "initial play lists" $ getPlayListList
-    return (TipToiFile id raw_xor comment date regs ipll scripts games at at_doubled xor checksum checksumCalc)
+
+    jumpTo 0x0071
+    ttWelcome <- indirection "initial play lists" $ getPlayListList
+
+    jumpTo 0x0090
+    ttBinaries1 <- fromMaybe [] <$> maybeIndirection "Binaries 1" getBinaries
+
+    jumpTo 0x0098
+    ttBinaries2 <- fromMaybe [] <$> maybeIndirection "Binaries 1" getBinaries
+
+    jumpTo 0x00A0
+    ttBinaries3 <- fromMaybe [] <$> maybeIndirection "Single binary 1" getBinaries
+
+    jumpTo 0x00A8
+    ttBinaries4 <- fromMaybe [] <$> maybeIndirection "Single binary 2" getBinaries
+
+    ttChecksum <- getChecksum
+    ttChecksumCalc <- calcChecksum
+    return $ TipToiFile {..}
 
 parseTipToiFile :: B.ByteString -> (TipToiFile, Segments)
 parseTipToiFile = runSGet getTipToiFile

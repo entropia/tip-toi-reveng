@@ -44,6 +44,8 @@ supports various subcommands:
            prints the scripts for each OID, in their raw form
         raw-script <file.gme> <n>
            prints the scripts for the given OID, in their raw form
+        binaries [-d dir] <file.gme>...
+           dumps all binaries to the given directory (default: binaries/)
         games <file.gme>...
            prints the decoded games
         lint <file.gme>

@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP, RecordWildCards, TupleSections #-}
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
@@ -63,6 +63,28 @@ dumpAudioTo directory file = do
         else do
             B.writeFile filename audio
             printf "Dumped sample %d as %s\n" n filename
+
+dumpBinariesTo :: FilePath -> FilePath -> IO ()
+dumpBinariesTo directory file = do
+    (TipToiFile {..},_) <- parseTipToiFile <$> B.readFile file
+
+    let binaries =
+            map (1,) ttBinaries1 ++
+            map (2,) ttBinaries2 ++
+            map (3,) ttBinaries3 ++
+            map (4,) ttBinaries4
+
+    printf "Binary Table entries: %d\n" (length binaries)
+
+    createDirectoryIfMissing False directory
+    forM_ binaries $ \(n,(desc,binary)) -> do
+        let filename = printf "%s/%d_%s" directory (n::Int) (BC.unpack desc)
+        if B.null binary
+        then do
+            printf "Skipping empty file %s...\n" filename
+        else do
+            B.writeFile filename binary
+            printf "Dumped binary %s from block %d as %s\n" (BC.unpack desc) n filename
 
 dumpScripts :: Transscript -> Bool -> Maybe Int -> FilePath -> IO ()
 dumpScripts t raw sel file = do
@@ -270,6 +292,10 @@ debugGame productID = do
         , ttAudioFilesDoubles = False
         , ttChecksum = 0x00
         , ttChecksumCalc = 0x00
+        , ttBinaries1 = []
+        , ttBinaries2 = []
+        , ttBinaries3 = []
+        , ttBinaries4 = []
         }
 
 
@@ -341,6 +367,8 @@ main' t ("script":  file : n:[])
 main' t ("raw-scripts": files)      = withEachFile (dumpScripts t True Nothing) files
 main' t ("raw-script": file : n:[])
     | Just int <- readMaybe n       =              dumpScripts t True (Just int) file
+main' t ("binaries": "-d": dir: files) = withEachFile (dumpBinariesTo dir) files
+main' t ("binaries": files)            = withEachFile (dumpBinariesTo "binaries") files
 main' t ("games": files)            = withEachFile (dumpGames t) files
 main' t ("lint": files)             = withEachFile lint files
 main' t ("segments": files)         = withEachFile segments files
@@ -385,6 +413,8 @@ main' _ _ = do
     putStrLn $ "       prints the scripts for each OID, in their raw form"
     putStrLn $ "    raw-script <file.gme> <n>"
     putStrLn $ "       prints the scripts for the given OID, in their raw form"
+    putStrLn $ "    binaries [-d dir] <file.gme>..."
+    putStrLn $ "       dumps all binaries to the given directory (default: binaries/)"
     putStrLn $ "    games <file.gme>..."
     putStrLn $ "       prints the decoded games"
     putStrLn $ "    lint <file.gme>"

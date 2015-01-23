@@ -73,6 +73,10 @@ data TipToiFile = TipToiFile
     , ttAudioFiles :: [B.ByteString]
     , ttAudioFilesDoubles :: Bool
     , ttAudioXor :: Word8
+    , ttBinaries1 :: [(B.ByteString, B.ByteString)]
+    , ttBinaries2 :: [(B.ByteString, B.ByteString)]
+    , ttBinaries3 :: [(B.ByteString, B.ByteString)]
+    , ttBinaries4 :: [(B.ByteString, B.ByteString)]
     , ttChecksum :: Word32
     , ttChecksumCalc :: Word32
     }
