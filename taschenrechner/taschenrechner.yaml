@@ -37,8 +37,8 @@ scripts:
   - $neuer_operator == 0? $operator := 0 $zahl := $wert J(sag_zahl)
   - $neuer_operator == 1? $operator := 1 P(plus)
   - $neuer_operator == 2? $operator := 2 P(minus)
-  - $neuer_operator == 2? $operator := 2 P(minus)
-  - $neuer_operator == 4? $operator := 4 P(minus)
+  - $neuer_operator == 3? $operator := 3 P(mal)
+  - $neuer_operator == 4? $operator := 4 P(geteilt)
 
   gleich:
   - $neuer_operator := 0 J(auswerten)
