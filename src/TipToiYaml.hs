@@ -10,7 +10,7 @@ where
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
 import qualified Data.ByteString.Char8 as SBC
-import qualified Data.Vector.Unboxed as V
+import qualified Data.Vector.Storable as V
 import System.Exit
 import System.FilePath
 import Text.Printf
