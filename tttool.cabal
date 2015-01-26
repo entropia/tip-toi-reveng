@@ -41,6 +41,7 @@ executable tttool
     RangeParser,
     TipToiYaml,
     TextToSpeech,
+    KnownCodes,
     Types,
     Utils
         
