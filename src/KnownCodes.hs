@@ -13,7 +13,7 @@ code2RawCode code = go (0, V.length knownCodes - 1)
       | high < low = Nothing
       | otherwise =
           let mid = (low + high) `div` 2 in
-          case compare code (knownCodes V.! mid) of
+          case compare code (knownCodes `V.unsafeIndex` mid) of
             LT -> go (low, mid-1)
             GT -> go (mid+1, high)
             EQ -> Just $ knownRawCodes V.! mid
