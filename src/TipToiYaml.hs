@@ -10,6 +10,7 @@ where
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
 import qualified Data.ByteString.Char8 as SBC
+import qualified Data.Vector.Unboxed as V
 import System.Exit
 import System.FilePath
 import Text.Printf
@@ -43,6 +44,7 @@ import Control.Applicative ((<*>), (<*))
 import TextToSpeech
 import Types
 import Constants
+import KnownCodes
 import PrettyPrint
 import OneLineParser
 import Utils
@@ -104,22 +106,30 @@ mergeOnlyEqual s c1 c2 = error $
 scriptCodes :: [String] -> CodeMap -> Either String (String -> Word16, CodeMap)
 scriptCodes [] codeMap = Right (error "scriptCodes []", codeMap)
 scriptCodes codes codeMap
-    | null strs = Right (readCode, codeMap)
-    | length strs > length availableCodes = Left "Too many codes used"
-    | null nums = Right (lookupCode, totalMap)
+    | null strs || null nums = Right (lookupCode, totalMap)
     | otherwise = Left "Cannot mix numbers and names in scripts."
   where
     (strs, nums) = partitionEithers $ map f codes
     newStrs = filter (`M.notMember` codeMap) strs
     usedCodes = S.fromList $ M.elems codeMap
 
-    availableCodes = filter (`S.notMember` usedCodes) knownCodes
-
     f s = case readMaybe s of
             Nothing -> Left s 
             Just n -> Right (n::Word16)
-    newAssignments = M.fromList (zip newStrs availableCodes)
-    totalMap = M.unionWithKey (\_ _ _ -> error "scriptCodes: conflict!") codeMap newAssignments
+
+    newAssignments =
+        M.fromList $
+        zip newStrs $
+        filter (`S.notMember` usedCodes) $
+        V.toList knownObjectCodes
+
+    totalMap = M.fromList
+        [ (str, fromJust $
+                readMaybe str `mplus`
+                M.lookup str codeMap `mplus`
+                M.lookup str newAssignments)
+        | str <- codes
+        ]
 
     readCode s = case readMaybe s of
         Nothing -> error $ printf "Cannot jump to named script \"%s\" in a yaml with numbered scripts." s
@@ -240,6 +250,11 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
         , ttAudioFilesDoubles = False
         , ttChecksum = 0x00
         , ttChecksumCalc = 0x00
+        , ttBinaries1 = []
+        , ttBinaries2 = []
+        , ttBinaries3 = []
+        , ttBinaries4 = []
+        , ttSpecialOIDs = Nothing
         }, totalMap)
 
 
@@ -407,12 +422,13 @@ writeTipToiYaml out tty = encodeFile out tty
 
 writeTipToiCodeYaml :: FilePath -> TipToiYAML -> CodeMap -> CodeMap -> IO ()
 writeTipToiCodeYaml inf tty oldMap totalMap = do
-    let newCodeMap = totalMap M.\\ fromMaybe M.empty (ttyScriptCodes tty)
-
-    ex <- doesFileExist infCodes
-
+    let newCodeMap =
+            M.filterWithKey (\s v -> readMaybe s /= Just v) totalMap
+            M.\\ fromMaybe M.empty (ttyScriptCodes tty)
     if M.null newCodeMap
-    then when ex $ removeFile infCodes
+    then do
+        ex <- doesFileExist infCodes
+        when ex $ removeFile infCodes
     else when (newCodeMap /= oldMap) $ encodeFileCommented infCodes codesComment (TipToiCodesYAML { ttcScriptCodes = newCodeMap })
   where
     infCodes = codeFileName inf

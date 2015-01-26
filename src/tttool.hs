@@ -35,6 +35,7 @@ import Text.Blaze.Svg.Renderer.Utf8 (renderSvg)
 
 import Types
 import Constants
+import KnownCodes
 import GMEParser
 import GMEWriter
 import GMERun
@@ -323,8 +324,9 @@ genPNGsForFile :: DPI -> FilePath -> IO ()
 genPNGsForFile dpi inf = do
     (tty, codeMap) <- readTipToiYaml inf
     (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
-    forM_ (M.toList totalMap) $ \(s,c) -> do
-        let filename = printf "oid-%d-%s.png" (ttyProduct_Id tty) s
+    let codes = ("START", fromIntegral (ttProductId tt)) : M.toList totalMap
+    forM_  codes $ \(s,c) -> do
+        let filename = printf "oid-%d-%s.png" (ttProductId tt) s
         case code2RawCode c of
             Nothing -> printf "Skipping %s, code %d not known." filename c
             Just r -> do
@@ -389,7 +391,7 @@ main' t ("explain": files)          = withEachFile explain files
 main' t ("play": file : [])         =              play t file
 main' t ("rewrite": inf : out: [])  =              rewrite inf out
 main' t ("export": inf : out: [] )  =              export inf out
-main' t ("assemble": inf : out: [] )  =              assemble inf out
+main' t ("assemble": inf : out: []) =              assemble inf out
 main' t ("create-debug": out : n :[])
     | Just int <- readMaybe n       =              createDebug out int
     | [(int,[])] <- readHex n       =              createDebug out int
