@@ -31,6 +31,33 @@ Quartz:
 1.0 Watt Audio power Amplifier:
 8891UL
 
+(as found in Tiptoi pen sold in 2010 in Germany)
+That model is labeled "Tiptoi, 2010.3.26, 1391A4".
+The PCB has a different layout ans partly other components.
+DIC print is difficult to read because of glue. Most parts have been identifed:
+
+* Main processor:
+  64-pin LQFP, Chomptech ZC3201
+  (instead of Chomptech ZC3202N)
+* NAND Flash:
+  4Gbit (512Mx8bit) NAND Flash HY27UF084G2B
+  (instead of 16GBit)
+* EEPROM:
+  2 Kbit (256 x 8 bit) SERIAL EEPROM (FM24C02B)
+  (same)
+* a ZC90 (without B)
+* a 8891UL audio amplifier
+  (alldatasheet specifies two versions: 1.0W and 2.0 W;
+  1.0 W seems more plausible
+* bad speaker 8 Ohm, 0.3W
+* Quartz: nothing to read on this
+* Sonix, LQFP48, type not readable
+
+Voltage could be 3.3V. The NAND falsh likes that, the audio amp takes from 2.5V to 5.5V. Two
+LR03/AAA with 1.5V each fit into that theory. There seems to be now voltage converter as an IC, maybe that IC with the four pins (C33H; 33 = 3.3V?)?
+
+There are obvious test pads but two big interlaxer connects.
+
 
 OID 1.5 Spec
 ------------
