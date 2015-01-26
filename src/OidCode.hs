@@ -1,6 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
 
-module OidCode where
+module OidCode (genRawPNG, DPI(..)) where
 
 import Data.Word
 import Data.Bits
@@ -142,6 +142,6 @@ oidImage dpi code =
 
 
 
-genPNG :: DPI -> Word16 -> FilePath -> IO ()
-genPNG dpi code filename = writePng filename (oidImage dpi code)
+genRawPNG :: DPI -> Word16 -> FilePath -> IO ()
+genRawPNG dpi code filename = writePng filename (oidImage dpi code)
 

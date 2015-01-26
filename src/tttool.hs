@@ -326,20 +326,30 @@ genPNGsForFile dpi inf = do
     (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
     let codes = ("START", fromIntegral (ttProductId tt)) : M.toList totalMap
     forM_  codes $ \(s,c) -> do
-        let filename = printf "oid-%d-%s.png" (ttProductId tt) s
-        case code2RawCode c of
-            Nothing -> printf "Skipping %s, code %d not known." filename c
-            Just r -> do
-                printf "Writing %s.. (Code %d, raw code %d)\n" filename c r
-                genPNG dpi r filename
+        genPNG dpi c $ printf "oid-%d-%s.png" (ttProductId tt) s
 
 genPNGsForCodes :: DPI -> String -> IO ()
 genPNGsForCodes dpi code_str = do
     codes <- parseRange code_str
     forM_ codes $ \c -> do
-        let filename = printf "oid%d.png" c
-        printf "Writing %s...\n" filename
-        genPNG dpi c filename
+        genPNG dpi c $ printf "oid-%d.png" c
+
+genPNG :: DPI -> Word16 -> String -> IO ()
+genPNG dpi c filename =
+    case code2RawCode c of
+        Nothing -> printf "Skipping %s, code %d not known.\n" filename c
+        Just r -> do
+            printf "Writing %s.. (Code %d, raw code %d)\n" filename c r
+            genRawPNG dpi r filename
+
+
+genPNGsForRawCodes :: DPI -> String -> IO ()
+genPNGsForRawCodes dpi code_str = do
+    codes <- parseRange code_str
+    forM_ codes $ \r -> do
+        let filename = printf "oid-raw-%d.png" r
+        printf "Writing %s... (raw code %d)\n" filename r
+        genRawPNG dpi r filename
 
 
 -- The main function
@@ -396,13 +406,21 @@ main' t ("create-debug": out : n :[])
     | Just int <- readMaybe n       =              createDebug out int
     | [(int,[])] <- readHex n       =              createDebug out int
 main' t ("oid-code": "-d" : "600" : codes@(_:_))
-                                    =              genPNGs  D600 (unwords codes)
+                                    =              genPNGs D600 (unwords codes)
 main' t ("oid-code": "-d" : "1200" : codes@(_:_))
                                     =              genPNGs D1200 (unwords codes)
 main' t ("oid-code": "-d" : _)      = do
     putStrLn $ "The parameter to -d has to be 600 or 1200"
     exitFailure
 main' t ("oid-code": codes@(_:_))   =              genPNGs D1200 (unwords codes)
+main' t ("raw-oid-code": "-d" : "600" : codes@(_:_))
+                                    =              genPNGsForRawCodes D600 (unwords codes)
+main' t ("raw-oid-code": "-d" : "1200" : codes@(_:_))
+                                    =              genPNGsForRawCodes D1200 (unwords codes)
+main' t ("raw-oid-code": "-d" : _)  = do
+    putStrLn $ "The parameter to -d has to be 600 or 1200"
+    exitFailure
+main' t ("raw-oid-code": codes@(_:_)) =            genPNGsForRawCodes D1200 (unwords codes)
 main' _ _ = do
     prg <- getProgName
     putStrLn $ "Usage: " ++ prg ++ " [options] command"
@@ -449,16 +467,18 @@ main' _ _ = do
     putStrLn $ "    assemble <infile.yaml> <outfile.gme>"
     putStrLn $ "       creates a gme file from the given source"
     putStrLn $ "    oid-code [-d DPI] <codes>"
-    putStrLn $ "       creates a PNG file for each given optical code"
+    putStrLn $ "       creates a PNG file for each given code"
     putStrLn $ "       scale this to 10cm×10cm"
     putStrLn $ "       By default, it creates a 1200 dpi image. With -d 600, you"
     putStrLn $ "       obtain a 600 dpi image."
     putStrLn $ "       <codes> can be a range, e.g. 1,3,1000-1085."
-    putStrLn $ "       The code refers to the *raw* code, not the one read by the pen."
-    putStrLn $ "       Uses oid<code>.png as the file name."
+    putStrLn $ "       Uses oid-<code>.png as the file name."
     putStrLn $ "    oid-code [-d DPI] <infile.yaml>"
     putStrLn $ "       Like above, but creates one file for each code in the yaml file."
     putStrLn $ "       Uses oid-<product-id>-<scriptname or code>.png as the file name."
+    putStrLn $ "    raw-oid-code [-d DPI] <raw codes>"
+    putStrLn $ "       creates a PNG file with the given \"raw code\". Usually not needed."
+    putStrLn $ "       Uses oid-raw-<code>.png as the file name."
     exitFailure
 
 main = getArgs >>= (main' M.empty)

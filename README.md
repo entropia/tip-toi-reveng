@@ -69,14 +69,18 @@ supports various subcommands:
         assemble <infile.yaml> <outfile.gme>
            creates a gme file from the given source
         oid-code [-d DPI] <codes>
-           creates a PNG file for each given optical code
+           creates a PNG file for each given code
            scale this to 10cm×10cm
            By default, it creates a 1200 dpi image. With -d 600, you
            obtain a 600 dpi image.
            <codes> can be a range, e.g. 1,3,1000-1085.
-           The code refers to the *raw* code, not the one read by the pen.
-           Uses oid<code>.png as the file name.
-
+           Uses oid-<code>.png as the file name.
+        oid-code [-d DPI] <infile.yaml>
+           Like above, but creates one file for each code in the yaml file.
+           Uses oid-<product-id>-<scriptname or code>.png as the file name.
+        raw-oid-code [-d DPI] <raw codes>
+           creates a PNG file with the given "raw code". Usually not needed.
+           Uses oid-raw-<code>.png as the file name.
 
 A transscript is simply a `;`-separated table of OIDs and some text, see for example [`transcript/WWW_Bauernhof.csv`](transcript/WWW_Bauernhof.csv).
 
