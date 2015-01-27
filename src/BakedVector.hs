@@ -14,9 +14,9 @@ import Foreign.ForeignPtr
 import GHC.Ptr
 import Language.Haskell.TH.Quote
 import Language.Haskell.TH.Syntax
-import Text.Read
 import System.IO.Unsafe
 import Data.Word
+import Utils
 
 -- Compiled-in Storable Vectors.
 -- Example: [intVector| 1, 2, 4, 6, 7 |]
