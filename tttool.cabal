@@ -29,6 +29,7 @@ flag old-locale
 executable tttool
   main-is:             tttool.hs
   other-modules:
+    BakedVector,
     Constants,
     Cypher,
     GMEParser,
@@ -52,10 +53,12 @@ executable tttool
     containers  == 0.4.*   ||  == 0.5.*,
     directory   == 1.2.*,
     filepath    == 1.3.*,
+    template-haskell,
     ghc-prim,
 
     JuicyPixels == 3.1.*   ||  == 3.2.*,
     aeson       == 0.7.*   ||  == 0.8.*,
+    bytestring-builder >= 0.10.4.1.1,
     hashable    == 1.2.*,
     mtl         == 2.1.*   ||  == 2.2.*,
     text        == 0.11.*  ||  == 1.2.*,
