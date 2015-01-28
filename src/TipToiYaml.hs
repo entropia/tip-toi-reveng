@@ -4,6 +4,7 @@ module TipToiYaml
     ( tt2ttYaml, ttYaml2tt
     , readTipToiYaml, writeTipToiYaml,writeTipToiCodeYaml
     , ttyProduct_Id
+    , debugGame
     )
 where
 
@@ -451,3 +452,24 @@ codeFileName fn = base <.> "codes" <.> ext
   where
     base = dropExtension fn
     ext  = takeExtension fn
+
+debugGame :: ProductID -> IO TipToiYAML
+debugGame productID = do
+    return $ TipToiYAML
+        { ttyProduct_Id = productID
+        , ttyMedia_Path = Just "Audio/digits/%s"
+        , ttyInit = Nothing
+        , ttyScriptCodes = Nothing
+        , ttySpeak = Nothing
+        , ttyComment = Nothing
+        , ttyWelcome = Just $ "blob"
+        , ttyScripts = M.fromList [
+            (show oid, [line])
+            | oid <- [1..15000]
+            , let chars = [oid `div` 10^p `mod` 10| p <-[4,3,2,1,0]]
+            , let line = ppLine t $ Line 0 [] [Play n | n <- [0..5]] ([10] ++ chars)
+            ]
+        }
+  where
+    t= M.fromList $
+        [ (n, "english_" ++ show n) | n <- [0..9]] ++ [(10, "blob")]

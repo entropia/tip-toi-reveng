@@ -20,5 +20,5 @@ function create () {
 
 create blob ../source/blob.flac
 for d in {0..9}; do
-	create english-$d ../source/english-$d.flac
+	create english_$d ../source/english_$d.flac
 done

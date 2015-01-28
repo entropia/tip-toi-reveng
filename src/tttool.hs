@@ -20,12 +20,6 @@ import Numeric (readHex)
 import qualified Data.Map as M
 import Data.Foldable (for_)
 
-#if MIN_VERSION_time(1,5,0)
-import Data.Time.Format (defaultTimeLocale)
-#else
-import System.Locale (defaultTimeLocale)
-#endif
-import Data.Time (getCurrentTime, formatTime)
 {-
 import Text.Blaze.Svg11 ((!), mkPath, rotate, l, m)
 import qualified Text.Blaze.Svg11 as S
@@ -271,49 +265,6 @@ assemble inf out = do
     writeTipToi out tt
 
 
-
-
-debugGame :: ProductID -> IO TipToiFile
-debugGame productID = do
-    -- Files orderes so that index 0 says zero, 10 is blob
-    files <- mapM B.readFile
-        [ "./Audio/digits/" ++ base ++ ".ogg"
-        | base <- [ "english-" ++ [n] | n <- ['0'..'9']] ++ ["blob" ]
-        ]
-    now <- getCurrentTime
-    let date = formatTime defaultTimeLocale "%Y%m%d" now
-    return $ TipToiFile
-        { ttProductId = productID
-        , ttRawXor = 0x00000039 -- from Bauernhof
-        , ttComment = BC.pack "created with tip-toi-reveng"
-        , ttDate = BC.pack date
-        , ttWelcome = []
-        , ttInitialRegs = [1]
-        , ttScripts = [
-            (oid, Just [line])
-            | oid <- [1..15000]
-            , let chars = [oid `div` 10^p `mod` 10| p <-[4,3,2,1,0]]
-            , let line = Line 0 [] [Play n | n <- [0..5]] ([10] ++ chars)
-            ]
-        , ttGames = []
-        , ttAudioFiles = files
-        , ttAudioXor = 0xAD
-        , ttAudioFilesDoubles = False
-        , ttChecksum = 0x00
-        , ttChecksumCalc = 0x00
-        , ttBinaries1 = []
-        , ttBinaries2 = []
-        , ttBinaries3 = []
-        , ttBinaries4 = []
-        , ttSpecialOIDs = Nothing
-        }
-
-
-createDebug :: FilePath -> ProductID -> IO ()
-createDebug out productID = do
-    tt <- debugGame productID
-    writeTipToi out tt
-
 genPNGs :: DPI -> String -> IO ()
 genPNGs dpi arg = do
     ex <- doesFileExist arg
@@ -402,9 +353,6 @@ main' t ("play": file : [])         =              play t file
 main' t ("rewrite": inf : out: [])  =              rewrite inf out
 main' t ("export": inf : out: [] )  =              export inf out
 main' t ("assemble": inf : out: []) =              assemble inf out
-main' t ("create-debug": out : n :[])
-    | Just int <- readMaybe n       =              createDebug out int
-    | [(int,[])] <- readHex n       =              createDebug out int
 main' t ("oid-code": "-d" : "600" : codes@(_:_))
                                     =              genPNGs D600 (unwords codes)
 main' t ("oid-code": "-d" : "1200" : codes@(_:_))
@@ -460,8 +408,6 @@ main' _ _ = do
     putStrLn $ "       interactively play: Enter OIDs, and see what happens."
     putStrLn $ "    rewrite <infile.gme> <outfile.gme>"
     putStrLn $ "       parses the file and serializes it again (for debugging)."
-    putStrLn $ "    create-debug <outfile.gme> <productid>"
-    putStrLn $ "       creates a special Debug.gme file for that productid"
     putStrLn $ "    export <infile.gme> [<outfile.yaml>]"
     putStrLn $ "       dumps the file in the human-readable yaml format"
     putStrLn $ "    assemble <infile.yaml> <outfile.gme>"

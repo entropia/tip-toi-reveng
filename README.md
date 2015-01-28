@@ -62,8 +62,6 @@ supports various subcommands:
            interactively play: Enter OIDs, and see what happens.
         rewrite <infile.gme> <outfile.gme>
            parses the file and serializes it again (for debugging).
-        create-debug <outfile.gme> <productid>
-           creates a special Debug.gme file for that productid
         export <infile.gme> [<outfile.yaml>]
            dumps the file in the human-readable yaml format
         assemble <infile.yaml> <outfile.gme>
@@ -141,8 +139,10 @@ process is as follows
  4. Copy the now generated `my-book.gme` to your TipToi pen and enjoy!
 
 If you need to find out what OID code corresponds to what part of the book, you
-can generate a debug gme file using `./tttool create-debug` and load that on
-your pen. It will then read out the codes, as a sequence of english digits.
+can generate a debug gme using the `debug.yaml` file, adjusting its
+`Product-Id` to your product’s id, building it with `./tttool assemble
+debug.yaml` and loading the resulting `debug.gme` on your pen.  It will then
+read out the codes, as a sequence of english digits.
 
 We are also collecting template files, where the OIDs are commented; these can
 be found in the `./templates` directory. Please improve and contribute!
