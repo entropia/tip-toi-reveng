@@ -1,11 +1,15 @@
-{-# LANGUAGE QuasiQuotes, TemplateHaskell, ScopedTypeVariables #-}
+{-# LANGUAGE QuasiQuotes, TemplateHaskell, ScopedTypeVariables, CPP #-}
 
 -- © 2015 Patrick Chilton
 
 module BakedVector where
 
 import qualified Data.ByteString.Lazy as BSL
+#if __GLASGOW_HASKELL__ <= 704
+import Data.ByteString.Lazy.Char8 (unpack)
+#else
 import Data.ByteString.Lazy (unpack)
+#endif
 import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Builder.Prim
 import Foreign.Storable
