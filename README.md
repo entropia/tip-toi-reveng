@@ -172,6 +172,7 @@ Press Review
  * [tiptoi hacking](https://blogs.fsfe.org/guido/2014/05/tiptoi-hacking-und-systemanforderungen/) by Guido Arnold
  * [TipToi Hacking](http://www.nerd.junetz.de/blogbox/index.php?/archives/1377-TipToi-Hacking.html) and [TipToi Hacking II](http://www.nerd.junetz.de/blogbox/index.php?/archives/1378-TipToi-Hacking-II.html) by Mr. Blog
  * [Various posts](https://www.joachim-breitner.de/blog/tag/Tiptoi) by Joachim “nomeata” Breitner (the main author of `tttool`)
+ * [Self-made animal figures](https://www.youtube.com/watch?v=Yic57Y9VORA&app=desktop) demonstration video
 
 TODO
 ----
