@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-wine ghc -O -with-rtsopts=-K100M  tttool.hs
+wine cabal install --bindir=.
 (cd Audio/digits/; ./build.sh)
 
 rev=$(git describe --always)
@@ -14,6 +14,8 @@ zip $zipfile \
 	oid-decoder.html \
 	example \
 	example.yaml \
+	debug.yaml \
+	oid-table.png \
 	templates/README.md \
 	templates/*.yaml \
 	transcript/*.csv \
