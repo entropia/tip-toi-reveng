@@ -254,7 +254,10 @@ export :: FilePath -> FilePath -> IO ()
 export inf out = do
     (tt,_) <- parseTipToiFile <$> B.readFile inf
     let tty = tt2ttYaml (printf "media/%s_%%s" (takeBaseName inf)) tt
-    writeTipToiYaml out tty
+    ex <- doesFileExist out
+    if ex
+        then printf "File \"%s\" does already exist. Please remove it first\nif you want to export \"%s\" again.\n" out inf >> exitFailure
+        else writeTipToiYaml out tty
 
 
 assemble :: FilePath -> FilePath -> IO ()
