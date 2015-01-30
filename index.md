@@ -239,7 +239,7 @@ Allerdings klappt insbesondere der letzte Schritt nicht immer problemlos.
 
 Um einen Code zu erzeugen, etwa für den Start-Knopf für unsere selbst erstellte GME-Datei mit Product-ID 42, führt man `./tttool oid-code 42` aus. Nach der Meldung
 
-    Writing oid-43.png.. (Code 43, raw code 273)
+    Writing oid-43.png.. (Code 43, raw code 272)
 
 findet man diese Datei im aktuellen Verzeichnis. Sie enhält das Muster zum Code 42, vielfach wiederholt. Sie soll eine Fläche von 10×10cm abdecken, was bei den empfohlenen 1200dpi eine Auflösung von 4800×4800 Pixeln ergibt.
 
