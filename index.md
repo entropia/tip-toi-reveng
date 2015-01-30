@@ -2,15 +2,17 @@
 layout: default
 ---
 
-Hier finden Sie Information zum `tttool`, einem Werkzeug zum analysieren und
-erstellen von GME-Dateien für den Tiptoi-Stift. Damit können Sie
-Tiptoi-Produkte umprogrammieren und eigene Produkte erstellen.
+Diese Seite enthält Information zum `tttool`, einem Werkzeug zum
+Analysieren und Erstellen von GME-Dateien für den Tiptoi-Stift von
+Ravensburger. Damit kann man Tiptoi-Produkte umprogrammieren und
+eigene Produkte erstellen.
 
-> **Achtung:** Das tttool ist kein offizielles Produkt von Ravensburger,
-> sondern von unabhängigen Bastlern entwickelt. Wenn Sie damit ihren
-> Tiptoi-Stift kaputt machen, ist das Ihr Problem. Und wenn Sie selbst
-> erstellte Tiptoi-Produkte verkaufen, verletzen Sie vermutlich eine Reihe von
-> Patenten und anderen Schutzrechten.
+> **Achtung:** Das tttool ist kein offizielles Produkt von
+> Ravensburger, sondern von unabhängigen Bastlern entwickelt. Wenn es
+> zu einem Defekt am Tiptoi-Stift kommt, dann ist das auf eigenes
+> Risiko geschehen. Und wer selbst erstellte Tiptoi-Produkte verkauft,
+> verletzt vermutlich eine Reihe von Patenten und anderen
+> Schutzrechten.
 
 ## Was kann ich hier machen
 
@@ -29,9 +31,9 @@ Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
 [Weihnachtsgeschenke-Verteilung]: https://www.joachim-breitner.de/blog/666-Geschenke_mit_dem_Tiptoi-Stift_verteilen
 [Taschenrechner]: https://www.joachim-breitner.de/blog/669-Ein_Tiptoi-Taschenrechner
 
-## Installation
+## Installation (Windows)
 
-Die Zip-Dateien auf der [Release-Seite] enthält die Datei `tttool.exe`, die man
+Die Zip-Datei auf der [Release-Seite] enthält die Datei `tttool.exe`, die man
 direkt ausführen kann.
 
 Allerdings ist zu beachten, dass das ein Kommadozeilenprogramm ist. Doppelt
@@ -39,10 +41,10 @@ klicken bringt also nichts, sondern man muss die Eingabeaufforderung starten,
 in das Verzeichnis mit `tttool.exe` wechseln und dann Befehle wie `./tttool info
 WWW_Bauernhof.gme` eintippen. Ein vorangestelltes `$` in folgenden Listings
 wird nicht mit eingegeben, sondern markiert die Zeilen, die einzugebenen sind.
-Wem das neu ist sei ein kleines [Tutorial zur Kommandozeile] empfohlen.
+Wem das neu ist dem sei ein kleines [Tutorial zur Kommandozeile] empfohlen.
 
 Wer kein Windows verwendet oder aus anderen Gründen das `tttool` selber
-kompilieren will findet die Anleitung dazu in der [README des
+kompilieren will, findet die Anleitung dazu in der [README des
 Github-Projektes].
 
 [Release-Seite]: https://github.com/entropia/tip-toi-reveng/releases
@@ -104,15 +106,13 @@ Die Umwandlung der YAML-Datei in eine GME-Datei geschieht mit dem Befehl
 
     $ ./tttool assemble mein_produkt.yaml
 
-Wenn es keine Fehler gab dann verrichtet `tttool` schweigend seinen Dienst und danach liegt eine Datei namens `mein_produkt.gme` im aktuellen Verzeichnis, die man auf den Stift kopieren kann. Diese Schritte muss man natürlich nach jeder Änderung an der YAML-Datei oder den Audio-Dateien erneut durchführen.
+Wenn es keine Fehler gab dann verrichtet `tttool` schweigend seinen Dienst und danch liegt eine Datei namens `mein_produkt.gme` im Verzeichnis, die man auf den Stift kopieren kann. Diese Schritte muss man natürlich nach jeder Änderung an der YAML-Datei oder den Audio-Dateien neu durchführen. Wenn man eine bestehende GME-Datei als Ausgangspunkt genommen hat, sollte man sicherstellen, diese nicht auch noch auf dem Speicher des Stifts liegen zu haben. Ansonsten hat man zwei Dateien für das gleiche Produkt (die gleiche `product-id`, s.u.) vorliegen. Welche der Stift dann nimmt, ist dann Glückssache...
 
-### Eine einfache GME-Datei
+In der Datei legt man zuerst ein paar allgemeine Einstellungen fest. Die einzig zwingend notwendige ist die `product-id`. Hier wird der Code des *Einschaltknopfes* festgelegt, den jedes Tiptoi-Produkt hat. Will man ein vorhandenes Tiptoi-Produkt neu besprechen, muss man natürlich den Einschaltcode dieses Produktes nehmen. Erstellt man etwas komplett neues, sollte man hier eine Nummer nehmen, die keinem offiziellen Produkt entspricht. Zur Zeit bietet sich da die 42 an.
 
-In der Datei legt man zuerst ein paar allgemeine Einstellungen fest. Die einzig zwingend notwendige ist die `product-id`. Hier wird der Code des *Einschaltknopfes* festgelegt, den jedes Tiptoi-Produkt hat. Will man ein vorhandenes Tiptoi-Produkt neu besprechen, muss man natürlich den Einschaltcode dieses Produktes nehmen. Erstellt man etwas komplett neues sollte man hier eine Nummer nehmen, die keinem offiziellen Produkt entspricht. Zur Zeit bietet sich da die 42 an.
+Damit man mitbekommt, dass der Stift das eigene Produkt auch erkannt hat, kann man im Feld `welcome` einen oder - durch Kommas getrennt - mehrere Dateinamen von Audio-Dateien angeben. Diese Dateien sollten im gleichen Verzeichnis wie die YAML-Datei liegen, und im OGG- oder MP3-Format sein. In der YAML-Datei lässt man die Dateiendung allerdings weg. 
 
-Damit man mitbekommt, dass der Stift das eigene Produkt auch erkannt hat, kann man im Feld `welcome` einen oder, durch Kommas getrennt, mehrere Dateinamen von Audio-Dateien angeben. Diese Dateien sollten im gleichen Verzeichnis wie die YAML-Datei liegen, und im OGG- oder MP3-Format sein. In der YAML-Datei lässt man die Dateiendung allerdings weg. 
-
-Die eigentliche Logik landet dann in dem Abschnitt `scripts`. Hier gibt man, mit Einrückung, die Codes des Tip-Toi-Produktes an und zu jedem Code, mit Spiegelstrichen aufgelistet, die auszuführenden Skripte. Dies lässt sich am besten an einem Beispiel illustrieren:
+Die eigentliche Logik landet dann in dem Abschnitt `scripts`. Hier gibt man - mit Einrückung - die Codes des Tiptoi-Produktes an und zu jedem Code, mit Spiegelstrichen aufgelistet, die auszuführenden Skripte. Dies lässt sich am besten an einem Beispiel illustrieren:
 
 ~~~
 product-id: 42
@@ -124,7 +124,7 @@ scripts:
   - P(zweites_feld)
 ~~~
 
-Diese Datei definiert ein Produkt mit Einschaltcode 42. Wenn man es aktiviert spielt der Stift die Datei `hallo.ogg` (oder `hallo.mp3`, wenn er das findet) ab. Es gibt zwei aktive Felder, mit Codes 8066 resp. 8067. Wenn man auf diese Felder geht wird `erstes_feld.ogg` resp. `zweites_feld`.ogg` abgespielt.
+Diese Datei definiert ein Produkt mit Einschaltcode 42. Wenn man es aktiviert, spielt der Stift die Datei `hallo.ogg` (oder `hallo.mp3`, falls er das findet) ab. Es gibt zwei aktive Felder, mit Codes 8066 resp. 8067. Wenn man auf diese Felder geht, wird `erstes_feld.ogg` bzw. `zweites_feld.ogg` abgespielt.
 
 Man kann mit dem *Play-Befehl* `P` auch mehrere Dateien angeben, etwa `P(gut,super,toll)`, dann wird jedesmal zufällig eine der Dateien `gut.ogg`, `super.ogg` oder `toll.ogg` abgespielt.
 
@@ -159,6 +159,8 @@ Um ein Register zu setzen schreibt man etwa `$modus := 2`. Ein Code, der zwische
 ~~~
 
 Neben `:=` kann man mit dem Befehl `$register+=zahl` auch eine Zahl auf ein Register draufaddieren und mit `$regiser-=zahl` davon abgezogen werden.
+
+Statt einer `zahl` kann auf der rechten Seite einer Zuweisung oder eines Befehles auch ein Register stehen, etwa `$punkte += $gefundene_objekte`.
 
 Richtig aufwendige Programmierung geht mit dem Jump-Befehl, mit dem der Stift zum Skript eines anderen Codes springt:
 
@@ -223,7 +225,6 @@ speak:
 
 Die Trennung macht es einfach, dies später durch eigene Aufnahmen zu ersetzen: Kommentieren Sie einfach die entsprechende Zeile in der `speak`-Sektion aus.
 
-
 ## Eigene Tiptoi-Produkte erstellen
 
 Man kann auch seine eigenen Tiptoi-Produkte gestalten. Das geht im Grund in drei einfachen Schritten:
@@ -281,15 +282,13 @@ Auch wenn Ihr Drucker nur die Codes ohne Motiv drucken kann, können Sie viele s
 
 ## Community
 
-Wer mit dem `tttool` herumspielt sollte sich auf der [tiptoi-Mailingliste]
+Wer mit dem `tttool` herumspielt, sollte sich auf der [tiptoi-Mailingliste]
 eintragen. Hier sind auch andere Bastler, die einem eventuell weiterhelfen
-können. Auch freuen wir uns immer wenn Ihr erzählt was Ihr mit dem `tttool`
-auf die Beine gestellt habt.
+können. Auch freuen wir uns immer, wenn wir erfahren, was andere mit dem `tttool` auf die Beine gestellt haben.
 
 [tiptoi-Mailingliste]: https://lists.nomeata.de/mailman/listinfo/tiptoi
 
-Wenn Ihr Fehler im `tttool` findet oder Verbesserungsvorschläge habt, dürft Ihr
-die über den [Github-Bugtracker] melden.
+Fehler im `tttool` oder Verbesserungsvorschläge dürfen gerne über den [Github-Bugtracker] gemeldet werden.
 
 [Github-Bugtracker]: https://github.com/entropia/tip-toi-reveng/issues
 
@@ -299,4 +298,4 @@ Ansonsten wird der Tiptoi-Stift auch im [Mikrocontroller-Forum] besprochen.
 
 ## Sonstiges
 
-Dieses Website wurde mit [Jekyll](http://jekyllrb.com/) und dem Theme [Solo](http://solo.chibi.io) erzeugt und wird von [Github Pages](https://pages.github.com/) gehostet.
+Diese Website wurde mit [Jekyll](http://jekyllrb.com/) und dem Theme [Solo](http://solo.chibi.io) erzeugt und wird von [Github Pages](https://pages.github.com/) gehostet.
