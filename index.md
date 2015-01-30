@@ -2,7 +2,7 @@
 layout: default
 ---
 
-Hier finden Sie Information zum tttool, einem Werkzeug zum analysieren und
+Hier finden Sie Information zum `tttool`, einem Werkzeug zum analysieren und
 erstellen von GME-Dateien für den Tiptoi-Stift. Damit können Sie
 Tiptoi-Produkte umprogrammieren und eigene Produkte erstellen.
 
@@ -12,17 +12,34 @@ Tiptoi-Produkte umprogrammieren und eigene Produkte erstellen.
 > erstellte Tiptoi-Produkte verkaufen, verletzen Sie vermutlich eine Reihe von
 > Patenten und anderen Schutzrechten.
 
+## Was kann ich hier machen
+
+Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
+
+ * [Selbstgemachte Tier-Figuren], ein 4-minütiges Youtube-Video von Pronwan
+ * Joachim Breitner, der Hauptentwicker des `tttool` berichtet auf seinem [Blog] von seinen Basteleien:
+   * Der [neu besprochene Weltatlas]
+   * [Weihnachtsgeschenke-Verteilung]
+   * Ein [Taschenrechner]
+
+
+[Selbstgemachte Tier-Figuren]: https://www.youtube.com/watch?v=Yic57Y9VORA&app=desktop
+[Blog]: https://www.joachim-breitner.de/blog/
+[neu besprochene Weltatlas]: https://www.joachim-breitner.de/blog/641-Personalisierte_Tip-Toi-Datei_als_Geschenk
+[Weihnachtsgeschenke-Verteilung]: https://www.joachim-breitner.de/blog/666-Geschenke_mit_dem_Tiptoi-Stift_verteilen
+[Taschenrechner]: https://www.joachim-breitner.de/blog/669-Ein_Tiptoi-Taschenrechner
+
 ## Installation
 
 Die Zip-Dateien auf der [Release-Seite] enthält die Datei `tttool.exe`, die man
 direkt ausführen kann.
 
-
 Allerdings ist zu beachten, dass das ein Kommadozeilenprogramm ist. Doppelt
 klicken bringt also nichts, sondern man muss die Eingabeaufforderung starten,
-in das Verzeichnis mit `tttool.exe` wechseln und dann Befehle wie `tttool info
-WWW_Bauernhof.gme` eintippen. Wem das neu ist sei ein kleines [Tutorial zur
-Kommandozeile] empfohlen.
+in das Verzeichnis mit `tttool.exe` wechseln und dann Befehle wie `./tttool info
+WWW_Bauernhof.gme` eintippen. Ein vorangestelltes `$` in folgenden Listings
+wird nicht mit eingegeben, sondern markiert die Zeilen, die einzugebenen sind.
+Wem das neu ist sei ein kleines [Tutorial zur Kommandozeile] empfohlen.
 
 Wer kein Windows verwendet oder aus anderen Gründen das `tttool` selber
 kompilieren will findet die Anleitung dazu in der [README des
@@ -35,7 +52,7 @@ Github-Projektes].
 ## GME-Dateien analysieren
 
 Das `tttool` stellt eine Reihe von Befehlen bereit; die komplette Liste sieht
-man, wenn man einfach nur `tttool` ausführt.
+man, wenn man einfach nur `./tttool` ausführt.
 
 Die Befehle zur Analyse von GME-Dateien erwarten, dass man den Dateinamen mit
 eintippt. Hat man etwa die Datei `WWW_Bauernhof.gme` in das gleiche Verzeichnis
@@ -44,22 +61,22 @@ paar Informationen anzeigen.
 
 Besonders interessant sind die folgenden Befehle.
 
- * `tttool media Dateiname.gme`:
+ * `./tttool media Dateiname.gme`:
 
    Dieser Befehl extrahiert alle Audio-Dateien in der GME-Datei und legt sie
    fortlaufend durchnummeriert im Unterverzeichnis `media` ab.
 
- * `tttool scripts Dateiname.gme`:
+ * `./tttool scripts Dateiname.gme`:
 
    Dies gibt die in der GME-Datei gespeicherten Befehle für die einzelnen
    optischen Codes aus. Das Befehlsformat wird im nächsten Abschnitt erklärt.
 
- * `tttool explain Dateiname.gme`
+ * `./tttool explain Dateiname.gme`
 
    Dieser Befehl gibt die GME-Datei als Hex-Code aus, wobei bekannte Abschnitte
    erläutert sind.
 
- * `tttool export Dateiname.gme`
+ * `./tttool export Dateiname.gme`
 
    erstellt die Datei `Dateiname.yaml`, die den (von `tttool` verstandenen)
    Inhalt der Datei in menschenlesbarer und editierbarer Form enthält. Dies
@@ -77,21 +94,21 @@ Einrückungen, also Leerzeichen am Anfang der Zeile, wichtig sind.
 
 [YAML]: http://de.wikipedia.org/wiki/YAML
 
-Als Ausgangspunkt kann eine YAML-Datei dienen, die man mit `tttool export` aus
+Als Ausgangspunkt kann eine YAML-Datei dienen, die man mit `./tttool export` aus
 einer existierenden GME-Datei bekommt, oder die knapp gehaltene Beispieldatei
 [`example.yaml`], die auch in der ZIP-Datei enthalten ist. 
 
 [`example.yaml`]: https://github.com/entropia/tip-toi-reveng/blob/master/example.yaml
 
-Die Umwandlung der YAML-Datei in eine GME-Datei geschiet mit dem Befehl
+Die Umwandlung der YAML-Datei in eine GME-Datei geschieht mit dem Befehl
 
-    tttool assemble mein_produkt.yaml
+    $ ./tttool assemble mein_produkt.yaml
 
-Wenn es keine Fehler gab liegt danach eine `mein_produkt.gme` im Verzeichnis, die man auf den Stift kopieren kann. Diese Schritte muss man natürlich nach jeder Änderung an der YAML-Datei oder den Audio-Dateien neu durchführen.
+Wenn es keine Fehler gab dann verrichtet `tttool` schweigend seinen Dienst und danach liegt eine Datei namens `mein_produkt.gme` im aktuellen Verzeichnis, die man auf den Stift kopieren kann. Diese Schritte muss man natürlich nach jeder Änderung an der YAML-Datei oder den Audio-Dateien erneut durchführen.
 
 ### Eine einfache GME-Datei
 
-In der Datei legt man zuerst ein paar allgemeine Einstellungen fest. Die einzig zwingend notwendige ist die `product-id`. Hier wird der Codes des *Einschaltknopfes* festgelegt, den jedes Tiptoi-Produkt hat. Will man ein vorhandenes Tiptoi-Produkt neu besprechen, muss man natürlich den Einschaltcode dieses Produktes nehmen. Erstellt man etwas komplett neues sollte man hier eine Nummer nehmen, die keinem offiziellen Produkt entspricht. Zur Zeit bietet sich da die 42 an.
+In der Datei legt man zuerst ein paar allgemeine Einstellungen fest. Die einzig zwingend notwendige ist die `product-id`. Hier wird der Code des *Einschaltknopfes* festgelegt, den jedes Tiptoi-Produkt hat. Will man ein vorhandenes Tiptoi-Produkt neu besprechen, muss man natürlich den Einschaltcode dieses Produktes nehmen. Erstellt man etwas komplett neues sollte man hier eine Nummer nehmen, die keinem offiziellen Produkt entspricht. Zur Zeit bietet sich da die 42 an.
 
 Damit man mitbekommt, dass der Stift das eigene Produkt auch erkannt hat, kann man im Feld `welcome` einen oder, durch Kommas getrennt, mehrere Dateinamen von Audio-Dateien angeben. Diese Dateien sollten im gleichen Verzeichnis wie die YAML-Datei liegen, und im OGG- oder MP3-Format sein. In der YAML-Datei lässt man die Dateiendung allerdings weg. 
 
@@ -130,7 +147,7 @@ spielt `wir_spielen.ogg` nur dann ab, wenn das Register `$modus` auf 1 gesetzt i
   - $modus==2? P(wir_hoeren_zu)
 ~~~
 
-Neben der Abfage `$register == zahl?` gibt es noch die üblichen Vergleichsoperatoren `!=`, `>`, `<`, `>=` und `<=`.
+Neben der Abfage `$register == zahl?` gibt es noch die üblichen Vergleichsoperatoren `!=`, `>`, `<`, `>=` und `<=`. In einer Zeilen müssen immer erst *alle* Abfragen kommen, bevor weitere Befehle folgen dürfen.
 
 Um ein Register zu setzen schreibt man etwa `$modus := 2`. Ein Code, der zwischen drei Modi durchschaltet, sähe also wie folgt aus:
 
@@ -154,16 +171,113 @@ Richtig aufwendige Programmierung geht mit dem Jump-Befehl, mit dem der Stift zu
 
 Hier wird sowohl bei 8066 als auch bei 8067 die Datei `hallo.ogg` ausgegeben.
 
-
 Es gibt sicher noch mehr Befehle, aber es sind noch nicht alle entschlüsselt.
+
+### Namen statt Codes
+
+Wenn man kein vorhandenes Tiptoi-Produkt neu besprechen will, sind die konkreten Codes für die Skripte nicht so wichtig. Dann bietet es sich an, den Skripten hilfreiche Namen zu geben, etwa statt
+
+~~~
+product-id: 42
+welcome: hallo
+scripts:
+  8066:
+  - P(erstes_feld)
+  8067:
+  - P(zweites_feld)
+~~~
+
+schreibt man 
+
+~~~
+product-id: 42
+welcome: hallo
+scripts:
+  gruene_box:
+  - P(erstes_feld)
+  rote_box:
+  - P(zweites_feld)
+~~~
+
+Wenn man `./tttool assemble` auf diese Datei loslässt, so vergibt `./tttool` selbst die Codes für die Skripte. Die Zuordnung wird gespeichert (Datei `...codes.yaml`), so dass man die Datei später noch problemlos erweitern kann.
+
+### Text-To-Speech
+
+*Dies wird zur Zeit nur in der Linux-Version des `tttool` unterstützt.*
+
+Gerade während man sein Tiptoi-Produkt noch entwickelt, oder für schnelle Experimente, ist es eher hinderlich wenn man jede Audio-Ausgabe erst noch aufnehmen muss. Daher kann `tttool` auch selbst Ansagen erstellen. Dazu gibt man zu jedem Sample den zu sprechenden Text in einer eigenen Sektion `speak` an:
+
+~~~
+product-id: 42
+welcome: hallo
+scripts:
+  gruene_box:
+  - P(erstes_feld)
+  rote_box:
+  - P(zweites_feld)
+speak:
+  hallo: "Hallo"
+  erstes_feld: "Dies ist das erste Feld."
+  zweites_feld: "Dies ist das zweite Feld."
+~~~
+
+Die Trennung macht es einfach, dies später durch eigene Aufnahmen zu ersetzen: Kommentieren Sie einfach die entsprechende Zeile in der `speak`-Sektion aus.
+
 
 ## Eigene Tiptoi-Produkte erstellen
 
-*TODO*
+Man kann auch seine eigenen Tiptoi-Produkte gestalten. Das geht im Grund in drei einfachen Schritten:
 
-### Die Crux mit den OID-Codes
+ 1. Mit `./tttool oid-code` erstellt man die Punktmuster.
+ 2. Diese bringt man in die richtige Form und legt sie ggf. über ein Motiv.
+ 3. Das Ergebns druckt man.
 
-*TODO*
+Allerdings klappt insbesondere der letzte Schritt nicht immer problemlos.
+
+### Codes erzeugen
+
+Um einen Code zu erzeugen, etwa für den Start-Knopf für unsere selbst erstellte GME-Datei mit Product-ID 42, führt man `./tttool oid-code 42` aus. Nach der Meldung
+
+    Writing oid-43.png.. (Code 43, raw code 273)
+
+findet man diese Datei im aktuellen Verzeichnis. Sie enhält das Muster zum Code 42, vielfach wiederholt. Sie soll eine Fläche von 10×10cm abdecken, was bei den empfohlenen 1200dpi eine Auflösung von 4800×4800 Pixeln ergibt.
+
+Ähnliche Codes braucht man für jedes Feld, etwa `8066` oder `8067` im obigen Beispielt. Statt diese alle einzeln zu erzeugen kann man das auch in einem Rutsch machen:
+
+    $ ./tttool oid-code example.yaml 
+    Writing oid-42-START.png.. (Code 42, raw code 272)
+    Writing oid-42-8066.png.. (Code 8066, raw code 3701)
+    Writing oid-42-8067.png.. (Code 8067, raw code 3702)
+
+Hat man seinen Skripten Namen gegeben, wie oben beschrieben, dann bekommt man auch schönere Dateinamen für die Muster:
+
+    $ ~/projekte/tip-toi-reveng/tttool oid-code foo.yaml 
+    Speaking "Hallo".
+    Writing oid-42-START.png.. (Code 42, raw code 272)
+    Writing oid-42-gruene_box.png.. (Code 4716, raw code 0)
+    Writing oid-42-rote_box.png.. (Code 4717, raw code 1)
+
+### Bilder erstellen
+
+Wichtig beim erstellen der Bilder ist die richtige Auflösung. Die gerade erstellten Muster liegen in 1200dpi vor. Dies muss so bleiben; sie dürfen nicht skaliert werden.
+
+Daher empfiehlt es sich mit einer leere Datei in der richtigen Auflösung zu beginnen – zum Beispiel 10000×7000 Pixel für für DIN-A5 – und dann die Grafiken und Texte zu importieren und auf die richtige Größe skalieren.
+
+Fügt man in eine solche Datei die erstellten Dateien mit den Punktmustern ein, so sollten sie tatsächlich eine Fläche von 10×10cm abdecken, sonst hat man etwas falsch gemacht. Es empfiehlt sich, für jedes Muster eine eigene Ebene zu verwenden, die man zuschneidet oder mit einer Ebenenmaske auf die richtige Form und Größe bringt. Diese Ebene darf man natürlich nicht skalieren!
+
+### Produkt drucken
+
+Ob der eigene Drucker die Codes gut abbilden kann ist ein wenig Glückssache. Mit manchen Druckern bekommt man auf Anhieb ein gut brauchbares Ergebnis, mit anderen gar nicht.
+
+Wenn es nicht gleich klappt, hier ein paar Tipps:
+
+ * Spielen Sie mit den Druckeinstellungen rum. Können Sie die Auflösung erhöhen -- oder auch verringern? Probieren Sie 1200dpi oder 600dpi, wenn möglich. Ebenso können Sie am kontrast drehen.
+ * Funktionieren Schwarz-Weiß-Bilder besser als Farbbilder -- oder andersherum?
+ * Vielleicht ist Ihr Motiv zu dunkel. Hellen Sie es ein wenig auf.
+ * Es kann helfen, wenn die Fläche hinter den Codes nicht zu viel Struktur hat. Färben Sie sie ggf. einfarbig ein.
+ * Manche Drucker bringen die Codes nur dann brauchbar zu Papier, wenn nichts anderes gedruckt wird. Drucken Sie in dem Fall erst das Motiv und dann, aufs gleiche Blatt, die Codes. Das geht schnell indem Sie die jeweiligen Ebenen sichtbar bzw. unsichtbar machen.
+
+Auch wenn Ihr Drucker nur die Codes ohne Motiv drucken kann, können Sie viele schöne Sachen bastlen. Schneiden Sie einfach die Codes aus und bekleben Sie Spielsachen, Möbel, Bücher, etc!
 
 ## Community
 
