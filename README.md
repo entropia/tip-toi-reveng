@@ -102,7 +102,7 @@ Otherwise, installation from source is not difficult either:
     `cabal`, and you should run the two commands
 
         cabal update
-        cabal install --dependencies-only
+        cabal install --only-dependencies
 
  3. Now you can build the program using
 
