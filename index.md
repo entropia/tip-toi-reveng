@@ -18,14 +18,17 @@ eigene Produkte erstellen.
 
 Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
 
- * [Selbstgemachte Tier-Figuren], ein 4-minütiges Youtube-Video von Pronwan
+ * Pronwan veröffentlich einige Videos:
+   * [Selbstgemachte Tier-Figuren] (4 Minuten)
+   * [Monkey Island 3] als Tiptoi-Spiel (8 Minuten)
  * Joachim Breitner, der Hauptentwicker des `tttool` berichtet auf seinem [Blog] von seinen Basteleien:
    * Der [neu besprochene Weltatlas]
    * [Weihnachtsgeschenke-Verteilung]
    * Ein [Taschenrechner]
 
 
-[Selbstgemachte Tier-Figuren]: https://www.youtube.com/watch?v=Yic57Y9VORA&app=desktop
+[Selbstgemachte Tier-Figuren]: https://www.youtube.com/watch?v=Yic57Y9VORA
+[Monkey Island 3]: https://www.youtube.com/watch?v=UieoGOHULVw
 [Blog]: https://www.joachim-breitner.de/blog/
 [neu besprochene Weltatlas]: https://www.joachim-breitner.de/blog/641-Personalisierte_Tip-Toi-Datei_als_Geschenk
 [Weihnachtsgeschenke-Verteilung]: https://www.joachim-breitner.de/blog/666-Geschenke_mit_dem_Tiptoi-Stift_verteilen
