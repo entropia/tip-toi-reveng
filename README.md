@@ -15,9 +15,7 @@ you to dissect these files.
 The tool can also be used to generate completely new files from scratch; see
 below for details.
 
-If you want to learn more, here are some relevant links:
- * Discussion about Tip-Toi: http://www.quadrierer.de/geekythinking/blog/?itemid=368 (German)
- * Discussion about Tip-Toi and the related TING pen, including discussion on how to print your own books: http://www.mikrocontroller.net/topic/214479 (German)
+If you want to learn more please have a look into our wiki (https://github.com/entropia/tip-toi-reveng/wiki).
 
 The tttool tool
 ---------------
