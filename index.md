@@ -25,6 +25,7 @@ Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
    * Der [neu besprochene Weltatlas]
    * [Weihnachtsgeschenke-Verteilung]
    * Ein [Taschenrechner]
+ * Eine [Outdoor-Schatzsuche](http://mycvs.org/post/110330262976/interactive-treasure-hunt-with-tip-toi-the)
 
 
 [Selbstgemachte Tier-Figuren]: https://www.youtube.com/watch?v=Yic57Y9VORA
