@@ -393,6 +393,12 @@ haben.
 
 [tiptoi-Mailingliste]: https://lists.nomeata.de/mailman/listinfo/tiptoi
 
+Wer tiefergehende Informationen zum Tiptoi-Stift sucht sollte auch mal ins
+[Wiki der Github-Seite] schauen. Dort sind viele technische Details zum Stift
+zusammengetragen worden.
+
+[Wiki der Github-Seite]: https://github.com/entropia/tip-toi-reveng/wiki
+
 Fehler im `tttool` oder Verbesserungsvorschläge dürfen gerne über den
 [Github-Bugtracker] gemeldet werden.
 
