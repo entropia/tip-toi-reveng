@@ -194,5 +194,5 @@ Other resources in this repository
  * `matlab/` contains scripts to analyse gme files in Matlab
  * `wip/` (work in progess) contains notes about the parts of the gme files that are not
    fully understood yet.
-
+ * `perl-tools` contains a perl based script, to generate a PDF with all OID codes from a yaml-file as well some functions to generate PNG-files, inject pHYs-chunks with resolution hints into GD generated PNG files as result from some testing
 
