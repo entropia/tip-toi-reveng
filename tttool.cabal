@@ -36,6 +36,7 @@ executable tttool
     GMERun,
     GMEWriter,
     Lint,
+    Language,
     OidCode,
     OneLineParser,
     PrettyPrint,
