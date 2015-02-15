@@ -12,6 +12,8 @@ import Data.Hashable
 import Text.Printf
 import Control.Exception
 import System.IO.Error
+import System.Environment
+import System.Info (os)
 
 import Language
 
@@ -42,21 +44,44 @@ espeak lang tmp txt =
             De -> "de"
             Fr -> "fr"
 
+espeak_contrib :: Language -> FilePath -> String -> (String, [String])
+espeak_contrib lang tmp txt =
+ ("./contrib/espeak", ["-v", l, "-w", tmp, "-s", "120", txt])
+  where
+    l = case lang of 
+            En -> "en"
+            De -> "de"
+            Fr -> "fr"
+
+
 engines :: Language -> FilePath -> String -> [(String, [String])]
 engines l ft txt =
     [ pico l ft txt
     , espeak l ft txt
+    , espeak_contrib l ft txt
     ]
 
-createWav [] = do
-    putStrLn "No suitable text-to-speech-engine found."
-    putStrLn "Do you have libttspico-utils or espeak installed?"
-    exitFailure
-createWav ((c,args):es) = do
+oggenc :: FilePath -> FilePath -> (String, [String])
+oggenc from to = ("oggenc", ["-Q", "-o", to, from])
+
+oggenc_contrib :: FilePath -> FilePath -> (String, [String])
+oggenc_contrib from to = ("contrib/oggenc", ["-Q", "-o", to, from])
+
+encoders :: FilePath -> FilePath -> [(String, [String])]
+encoders from to =
+    [ oggenc from to
+    , oggenc_contrib from to
+    ] 
+
+tryPrograms [] e = e
+tryPrograms ((c,args):es) e = do
     -- Missing programs cause exceptions on Windows, but error 127 on Linux.
     -- Try to handle both here.
     r <- tryJust (guard . isDoesNotExistError) $ do
-        ph <- runProcess  c args Nothing Nothing Nothing Nothing Nothing
+        env <- getEnvironment
+        let env' | os == "mingw32" = ("ESPEAK_DATA_PATH", "contrib") : env
+                 | otherwise       = env
+        ph <- runProcess  c args Nothing (Just env') Nothing Nothing Nothing
         ret <- waitForProcess ph
         if ret == ExitSuccess then return True
         else if ret == ExitFailure 127 then return False
@@ -65,7 +90,7 @@ createWav ((c,args):es) = do
             exitFailure
     case r of
        Right True -> return ()
-       _ -> createWav es 
+       _ -> tryPrograms es e
 
 textToSpeech :: Language -> String -> IO ()
 textToSpeech lang txt = do
@@ -78,12 +103,13 @@ textToSpeech lang txt = do
     (tmp,h) <- openTempFile (takeDirectory fn) (takeBaseName fn <.> "wav")
     hClose h
 
-    createWav $ engines lang tmp txt
+    tryPrograms (engines lang tmp txt) $ do
+        putStrLn "No suitable text-to-speech-engine found."
+        putStrLn "Do you have libttspico-utils or espeak installed?"
 
-    (ret, _, err) <- readProcessWithExitCode "oggenc" ["-o", fn, tmp] ""
-    unless (ret == ExitSuccess) $ do
-        putStrLn "Failed to execute \"oggenc\":"
-        putStrLn err
+    tryPrograms (encoders tmp fn) $ do
+        putStrLn "Could not find \"oggenc\"."
+        putStrLn "Do you have vorbis-tools installed?"
 
     removeFile tmp
     return ()
