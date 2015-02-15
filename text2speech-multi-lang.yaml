@@ -1,0 +1,29 @@
+# This is an example source file for a TipToi file, showing the text-to-speech
+# feature
+
+# You write your yaml file as usual. Note that you can specify a default
+# language
+product-id: 900
+welcome: hello
+language: en
+scripts:
+  8066:
+  - $mode==1? P(hello)
+  - $mode==2? P(bonjour)
+  - $mode==3? P(hallo)
+  8067:
+  - $mode==1? P(good_bye)
+  - $mode==2? P(aurevoir)
+  - $mode==3? P(tschuess)
+
+# In order to use different languages in the speak section, put them in a list
+# (by using -) and add a language field to each of them.
+speak:
+ - hello:    "Hello!"
+   good_bye: "Good bye!"
+ - language: de
+   hallo:    "Hallo!"
+   tschuess: "Tschüss!"
+ - language: fr
+   bonjour:  "Bon jour!"
+   aurevoir: "Aur revoir!"

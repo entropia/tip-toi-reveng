@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards, DeriveGeneric, CPP #-}
+{-# LANGUAGE RecordWildCards, DeriveGeneric, CPP, TupleSections #-}
 
 module TipToiYaml
     ( tt2ttYaml, ttYaml2tt
@@ -22,6 +22,7 @@ import Control.Monad
 import System.Directory
 import qualified Data.Map as M
 import qualified Data.Set as S
+import qualified Data.Vector as V
 import Control.Monad.Writer.Strict
 #if MIN_VERSION_time(1,5,0)
 import Data.Time.Format (defaultTimeLocale)
@@ -38,10 +39,12 @@ import qualified Text.Parsec.Token as P
 import Text.Parsec.Language (emptyDef)
 import GHC.Generics
 import qualified Data.Foldable as F
+import qualified Data.Traversable as T
 import Control.Arrow
 import Control.Applicative ((<*>), (<*))
 
 import TextToSpeech
+import Language
 import Types
 import Constants
 import KnownCodes
@@ -59,7 +62,8 @@ data TipToiYAML = TipToiYAML
     , ttyWelcome :: Maybe String
     , ttyProduct_Id :: Word32
     , ttyScriptCodes :: Maybe CodeMap
-    , ttySpeak :: Maybe (M.Map String String)
+    , ttySpeak :: Maybe SpeakSpecs
+    , ttyLanguage :: Maybe Language
     }
     deriving Generic
 
@@ -68,6 +72,41 @@ data TipToiCodesYAML = TipToiCodesYAML
     }
     deriving Generic
 
+data SpeakSpec = SpeakSpec
+    { ssLanguage :: Maybe Language
+    , ssSpeak    :: M.Map String String
+    }
+
+instance FromJSON SpeakSpec where
+    parseJSON v = do
+        m <- parseJSON v
+        l <- T.traverse parseJSON  $ M.lookup "language" m
+        m' <- T.traverse parseJSON $ M.delete "language" m 
+        return $ SpeakSpec l m'
+
+instance ToJSON SpeakSpec where
+    toJSON (SpeakSpec (Just l) m) = toJSON $ M.insert "language" (ppLang l) m 
+    toJSON (SpeakSpec Nothing m)  = toJSON $ m
+
+toSpeakMap :: Language -> Maybe SpeakSpecs -> M.Map String (Language, String)
+toSpeakMap l Nothing = M.empty
+toSpeakMap l (Just (SpeakSpecs specs)) = M.unionsWith e $ map go specs
+  where
+    go (SpeakSpec ml m) = M.map ((l',)) m
+      where l' = fromMaybe l ml
+    e = error "Conflicting definitions in section \"speak\""
+          
+
+newtype SpeakSpecs = SpeakSpecs [SpeakSpec] 
+
+instance FromJSON SpeakSpecs where
+    parseJSON (Array a) = SpeakSpecs <$> mapM parseJSON  (V.toList a)
+    parseJSON v = SpeakSpecs . (:[]) <$> parseJSON v
+
+instance ToJSON SpeakSpecs where
+    toJSON (SpeakSpecs [x]) = toJSON x
+    toJSON (SpeakSpecs l)   = Array $ V.fromList $ map toJSON $ l
+    
 options = defaultOptions { fieldLabelModifier = map fix . map toLower . drop 3 }
        where fix '_' = '-'
              fix c   = c
@@ -94,6 +133,7 @@ tt2ttYaml path (TipToiFile {..}) = TipToiYAML
     , ttyMedia_Path = Just path
     , ttyScriptCodes = Nothing
     , ttySpeak = Nothing
+    , ttyLanguage = Nothing
     }
 
 
@@ -211,13 +251,15 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
             , Line _ cs as _ <- ls
             , r <- concatMap F.toList cs ++ concatMap F.toList as ]
 
+    let ttySpeakMap = toSpeakMap (fromMaybe defaultLanguage ttyLanguage) ttySpeak
+    
     -- Generate text-to-spech files
-    forM (maybe [] M.elems ttySpeak) $ \txt -> do
-        textToSpeech (ttsFileName txt) txt
+    forM (M.elems ttySpeakMap) $ \(lang, txt) ->
+        textToSpeech lang txt
 
-    files <- forM filenames' $ \fn -> case ttySpeak >>= M.lookup fn of
-        Just txt -> do
-            B.readFile (ttsFileName txt)
+    files <- forM filenames' $ \fn -> case M.lookup fn ttySpeakMap of
+        Just (lang, txt) -> do
+            B.readFile (ttsFileName lang txt)
         Nothing -> do
             let paths = [ combine dir relpath
                     | ext <- map snd fileMagics
@@ -469,6 +511,7 @@ debugGame productID = do
             , let chars = [oid `div` 10^p `mod` 10| p <-[4,3,2,1,0]]
             , let line = ppLine t $ Line 0 [] [Play n | n <- [0..5]] ([10] ++ chars)
             ]
+        , ttyLanguage = Nothing
         }
   where
     t= M.fromList $

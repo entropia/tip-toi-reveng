@@ -11,15 +11,21 @@ import Control.Monad
 import Data.Hashable
 import Text.Printf
 
-ttsFileName txt = "tts-cache" </> "tts-" ++ map go (shorten txt) <.> "ogg"
+import Language
+
+ttsFileName lang txt = "tts-cache" </> "tts-" ++ map go (shorten txt) ++ "-" ++ ppLang lang <.>  "ogg"
   where go '/'         = '_'
         go c | c < ' ' = '_'
         go c           = c
         shorten x | length x > 20 = printf "%s-%016X" (take 20 x) (hash x)
         shorten x                 = x
 
-textToSpeech :: FilePath -> String -> IO ()
-textToSpeech fn txt = do
+langToPico2WaveParam En = "en-GB"
+langToPico2WaveParam De = "de-DE"
+langToPico2WaveParam Fr = "fr-FR"
+
+textToSpeech :: Language -> String -> IO ()
+textToSpeech lang txt = do
     ex <- doesFileExist fn
     if ex then return () else do
 
@@ -29,7 +35,7 @@ textToSpeech fn txt = do
     (tmp,h) <- openTempFile (takeDirectory fn) (takeBaseName fn <.> "wav")
     hClose h
 
-    (ret, _, err) <- readProcessWithExitCode "pico2wave" ["--wave", tmp, "--lang", "en-GB", txt] ""
+    (ret, _, err) <- readProcessWithExitCode "pico2wave" ["--wave", tmp, "--lang", langToPico2WaveParam lang, txt] ""
     unless (ret == ExitSuccess) $ do
         putStrLn "Failed to execute \"pico2wave\":"
         putStrLn err
@@ -43,3 +49,5 @@ textToSpeech fn txt = do
 
     removeFile tmp
     return ()
+  where
+    fn = ttsFileName lang txt

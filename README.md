@@ -151,7 +151,7 @@ things you did if you succeded.
 Text to speech
 --------------
 
-If you have libttspico-utils and vorbis-tools installed, you can have tttool
+If you have `libttspico-utils` and `vorbis-tools installed`, you can have tttool
 generate audio files from text for you, which makes developing your yaml file
 much easier. See [text2speech.yaml](text2speech.yaml) for more information.
 
