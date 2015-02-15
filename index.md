@@ -269,9 +269,6 @@ noch problemlos erweitern kann.
 
 ### Text-To-Speech
 
-*Dies ist ein recht neues Feature und wird zur Zeit nur in der
- Linux-Version des `tttool` unterstützt.*
-
 Gerade während man sein Tiptoi-Produkt noch entwickelt, oder für
 schnelle Experimente, ist es eher hinderlich, wenn man jede
 Audio-Ausgabe erst noch aufnehmen muss. Daher kann `tttool` auch
