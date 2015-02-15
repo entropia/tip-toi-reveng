@@ -10,19 +10,62 @@ import System.Exit
 import Control.Monad
 import Data.Hashable
 import Text.Printf
+import Control.Exception
+import System.IO.Error
 
 import Language
 
-ttsFileName lang txt = "tts-cache" </> "tts-" ++ map go (shorten txt) ++ "-" ++ ppLang lang <.>  "ogg"
+ttsFileName lang txt =
+    "tts-cache" </> "tts-" ++ map go (shorten txt) ++ "-" ++ ppLang lang <.>  "ogg"
   where go '/'         = '_'
         go c | c < ' ' = '_'
         go c           = c
         shorten x | length x > 20 = printf "%s-%016X" (take 20 x) (hash x)
         shorten x                 = x
 
-langToPico2WaveParam En = "en-GB"
-langToPico2WaveParam De = "de-DE"
-langToPico2WaveParam Fr = "fr-FR"
+
+pico :: Language -> FilePath -> String -> (String, [String])
+pico lang tmp txt =
+   ("pico2wave", ["--wave", tmp, "--lang", l, txt])
+  where
+    l = case lang of 
+            En -> "en-GB"
+            De -> "de-DE"
+            Fr -> "fr-FR"
+
+espeak :: Language -> FilePath -> String -> (String, [String])
+espeak lang tmp txt =
+ ("espeak", ["-v", l, "-w", tmp, "-s", "120", txt])
+  where
+    l = case lang of 
+            En -> "en"
+            De -> "de"
+            Fr -> "fr"
+
+engines :: Language -> FilePath -> String -> [(String, [String])]
+engines l ft txt =
+    [ pico l ft txt
+    , espeak l ft txt
+    ]
+
+createWav [] = do
+    putStrLn "No suitable text-to-speech-engine found."
+    putStrLn "Do you have libttspico-utils or espeak installed?"
+    exitFailure
+createWav ((c,args):es) = do
+    -- Missing programs cause exceptions on Windows, but error 127 on Linux.
+    -- Try to handle both here.
+    r <- tryJust (guard . isDoesNotExistError) $ do
+        ph <- runProcess  c args Nothing Nothing Nothing Nothing Nothing
+        ret <- waitForProcess ph
+        if ret == ExitSuccess then return True
+        else if ret == ExitFailure 127 then return False
+        else do
+            putStrLn $ "Failed to execute \"" ++ c ++ "\" (" ++ show ret ++ ")"
+            exitFailure
+    case r of
+       Right True -> return ()
+       _ -> createWav es 
 
 textToSpeech :: Language -> String -> IO ()
 textToSpeech lang txt = do
@@ -35,17 +78,12 @@ textToSpeech lang txt = do
     (tmp,h) <- openTempFile (takeDirectory fn) (takeBaseName fn <.> "wav")
     hClose h
 
-    (ret, _, err) <- readProcessWithExitCode "pico2wave" ["--wave", tmp, "--lang", langToPico2WaveParam lang, txt] ""
-    unless (ret == ExitSuccess) $ do
-        putStrLn "Failed to execute \"pico2wave\":"
-        putStrLn err
-        putStrLn "Do you have libttspico-utils installed?"
+    createWav $ engines lang tmp txt
 
     (ret, _, err) <- readProcessWithExitCode "oggenc" ["-o", fn, tmp] ""
     unless (ret == ExitSuccess) $ do
         putStrLn "Failed to execute \"oggenc\":"
         putStrLn err
-        putStrLn "Do you have vorbis-tools installed?"
 
     removeFile tmp
     return ()
