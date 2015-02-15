@@ -1,6 +1,6 @@
 # Changelog for tttool
 
-## 1.1 (unreleased)
+## 1.1 (2015-02-15)
 
  * The yaml files support a `language` field, specifying the default language
    for the text-to-speech feature.
