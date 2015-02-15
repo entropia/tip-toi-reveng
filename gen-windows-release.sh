@@ -11,6 +11,7 @@ rm -f $zipfile
 zip $zipfile \
 	tttool.exe \
 	README.md \
+	Changelog.md \
 	oid-decoder.html \
 	example \
 	example.yaml \
