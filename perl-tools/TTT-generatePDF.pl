@@ -58,6 +58,7 @@ if ((exists $$opt{'yamlcode'}) && -f $$opt{'pdf'}) {
     my($filename, $directories, $suffix) = fileparse($$opt{'yaml'}, ('.yaml','.YAML','.Yaml'));
     $$opt{'yamlcode'} =$directories . $filename . '.codes.yaml';
     if (! -f $$opt{'yamlcode'}) {
+        $$opt{'yamlcode'} =$directories . $filename.'.yaml';
     	print "Can not find additional code file: $$opt{'yamlcode'}\n";
     }	
 }	
@@ -153,7 +154,7 @@ while (0 < scalar @OIDkeys) {
     $text->font( $font{'TimesBold'}, 14 / pt );
     $text->fillcolor('black');
     $text->translate( (111+(186*($i % 3)))/pt, (711-(int($i / 3)*60))/pt );
-    $text->text_center($OID);
+#    $text->text_center($OID);
 
     if (0 == scalar @OIDkeys) {
     	last;
