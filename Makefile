@@ -1,5 +1,7 @@
-tttool: tttool.hs
-	ghc -O -with-rtsopts=-K100M  tttool.hs
+tttool: src/*.hs
+	# cabal update
+	cabal install --only-dependencies
+	cabal install --bindir=.
 
 all: tttool libtiptoi gameanalyse makegraphic
 

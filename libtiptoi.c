@@ -186,6 +186,10 @@ GME_AUDIO_FILE_TABLE *createAudioTable(GME_FILE *gme, char *filepath,int useNumb
 		if (useNumbers){
 			sprintf(audioFileName,"%s/%04d.ogg", filepath, i);
 		}else{
+			if (fplist == NULL) {
+				fprintf(stderr,"Could not open file %s\n", filepath);
+				exit(1);
+			}
 			fscanf(fplist, "%s", audioFileName);
 		}
 		aft[i].offset = nextOffset;
@@ -209,10 +213,18 @@ void addAudioFiles(GME_FILE *gme, GME_AUDIO_FILE_TABLE *aft, uint8_t *data, char
 		if (useNumbers){
 			sprintf(audioFileName,"%s/%04d.ogg", filepath, i);
 		}else{
+			if (fplist == NULL) {
+				fprintf(stderr,"Could not open file %s\n", filepath);
+				exit(1);
+			}
 			fscanf(fplist, "%s", audioFileName);
 		}
 		
 		fp = fopen(audioFileName, "rb");
+		if (fp == NULL) {
+			fprintf(stderr,"Could not open file %s\n", audioFileName);
+			return;
+		}
 		fread(cpos, 1, aft[i].lenght, fp);
 		fclose(fp);
 		for (j = 0; j < aft[i].lenght; j++){
@@ -259,7 +271,7 @@ GME_AUDIO_SCRIPT *readFilelist(char *filelist, uint32_t firstOffset){
 	fseek(fp, 0, SEEK_SET);
 
 	if ((gas = malloc(sizeof(GME_AUDIO_SCRIPT))) == NULL || (gas->data = malloc(filesize+1)) == NULL){
-		fprintf(stderr, "Could not allocate memory\n", filelist);
+		fprintf(stderr, "Could not allocate memory: %d\n", filesize+1);
 		exit(1);
 	}
 	gas->fileCount = 0;
@@ -316,6 +328,8 @@ GME_AUDIO_SCRIPT *readFilelist(char *filelist, uint32_t firstOffset){
 			}
 		}
 	}
+	
+	return gas;
 }
 
 //Replace audio files with files from given list
@@ -348,13 +362,17 @@ void replaceAudio(char *inputfile, char *outputfile, char *filepath, int useNumb
 	*((uint32_t*)dataPos) = calculateChecksum(data, dataPos-data);
 
 	fp = fopen(outputfile, "wb");
+	if (fp == NULL) {
+		fprintf(stderr,"Could not open file %s for writing\n", outputfile);
+		exit(1);
+	}
 	fwrite(data, 1, dataLength, fp);
 	fclose(fp);
 }
 
 //Exports all audio files and creates a filelist.txt with every filename
 //for use by replace functionality
-int exportAudioFiles(char *inputfile, char *path, int filelistOnly){
+void exportAudioFiles(char *inputfile, char *path, int filelistOnly){
 	GME_FILE *gme = readFile(inputfile);
 	char filename[1024];
 	uint8_t *file;
@@ -368,7 +386,7 @@ int exportAudioFiles(char *inputfile, char *path, int filelistOnly){
 	sprintf(filename, "%sfilelist.txt", path);
 	if ((fplist = fopen(filename, "wb")) == NULL){
 		fprintf(stderr, "Could not open outputfile '%s'", filename);
-		exit(0);
+		exit(1);
 	}
 	for (i = 0; i < gme->audioFileTableEntries; i++){
 		duplicate = 0;
@@ -452,7 +470,7 @@ void printInformation(char *inputfile, FILE *out){
 	uint32_t jumpTableOffset;
 	uint32_t *gjt;
 	uint16_t elements;
-	fprintf(out,"Filesize: %d\n", gme->filesize);
+	fprintf(out,"Filesize: %ld\n", gme->filesize);
 	fprintf(out,"File checksum: 0x%0X\n", gme->checksum);
 	fprintf(out,"Calc checksum: 0x%0X\n", calculateChecksum(gme->data, gme->filesize - 4));
 	fprintf(out,"XOR value: 0x%0X\n", gme->xor);
