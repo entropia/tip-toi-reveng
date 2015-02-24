@@ -36,6 +36,7 @@ my ($opt, $usage) = describe_options(
   [ 'pdf|p=s',   "pdf file for output, default same path/basename like yamlfile" ],
   [ 'yamlcode=s', "hidden"],
   [ 'Pageheader|P=s', "Header for each PDF page, default is name of the yaml file"],
+  [ 'notext|n', "no Text in oid-codes"],
   [],
   [ 'verbose|v', "verbose", { hidden => 1}      ],
   [ 'help|h',    "print usage message and exit" ],
@@ -58,6 +59,7 @@ if ((exists $$opt{'yamlcode'}) && -f $$opt{'pdf'}) {
     my($filename, $directories, $suffix) = fileparse($$opt{'yaml'}, ('.yaml','.YAML','.Yaml'));
     $$opt{'yamlcode'} =$directories . $filename . '.codes.yaml';
     if (! -f $$opt{'yamlcode'}) {
+        $$opt{'yamlcode'} =$directories . $filename.'.yaml';
     	print "Can not find additional code file: $$opt{'yamlcode'}\n";
     }	
 }	
@@ -153,8 +155,9 @@ while (0 < scalar @OIDkeys) {
     $text->font( $font{'TimesBold'}, 14 / pt );
     $text->fillcolor('black');
     $text->translate( (111+(186*($i % 3)))/pt, (711-(int($i / 3)*60))/pt );
-    $text->text_center($OID);
-
+    if (! exists $$opt{'notext'}){
+     $text->text_center($OID);
+    }
     if (0 == scalar @OIDkeys) {
     	last;
     }	
