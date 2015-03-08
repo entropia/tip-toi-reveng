@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-wine cabal install --bindir=.
+wine cabal install --distdir=dist-win --bindir=.
 (cd Audio/digits/; ./build.sh)
 
 rev=$(git describe --tags)

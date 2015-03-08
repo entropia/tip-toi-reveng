@@ -1,5 +1,10 @@
 # Changelog for tttool
 
+## 1.2 (2013-03-08)
+
+ * The `language` fields takes arbitrary strings, which will hopefully be
+   understood by the text-to-speak engine.
+
 ## 1.1 (2015-02-15)
 
  * The yaml files support a `language` field, specifying the default language

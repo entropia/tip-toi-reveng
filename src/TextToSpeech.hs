@@ -31,27 +31,24 @@ pico lang tmp txt =
    ("pico2wave", ["--wave", tmp, "--lang", l, txt])
   where
     l = case lang of 
-            En -> "en-GB"
-            De -> "de-DE"
-            Fr -> "fr-FR"
+            Language "en" -> "en-GB"
+            Language "de" -> "de-DE"
+            Language "fr" -> "fr-FR"
+            Language s    -> s
 
 espeak :: Language -> FilePath -> String -> (String, [String])
 espeak lang tmp txt =
  ("espeak", ["-v", l, "-w", tmp, "-s", "120", txt])
   where
     l = case lang of 
-            En -> "en"
-            De -> "de"
-            Fr -> "fr"
+            Language s    -> s
 
 espeak_contrib :: Language -> FilePath -> String -> (String, [String])
 espeak_contrib lang tmp txt =
  ("./contrib/espeak", ["-v", l, "-w", tmp, "-s", "120", txt])
   where
     l = case lang of 
-            En -> "en"
-            De -> "de"
-            Fr -> "fr"
+            Language s    -> s
 
 
 engines :: Language -> FilePath -> String -> [(String, [String])]
