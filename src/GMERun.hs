@@ -1,15 +1,19 @@
+{-# LANGUAGE FlexibleContexts #-}
 module GMERun (playTipToi) where
 
 import Text.Printf
 import Data.Bits
 import Data.List
 import qualified Data.Map as M
+import Control.Monad.State
 
 import Types
 import PrettyPrint
 import Utils
 
 type PlayState r = M.Map r Word16
+
+type GMEM r = StateT (PlayState r) IO
 
 formatState :: PlayState ResReg -> String
 formatState s = spaces $
@@ -21,18 +25,20 @@ playTipToi :: Transscript -> TipToiFile -> IO ()
 playTipToi t tt = do
     let initialState = M.fromList $ zip [0..] (ttInitialRegs tt)
     printf "Initial state (not showing zero registers): %s\n" (formatState initialState)
-    forEachNumber initialState $ \i s -> do
+    flip evalStateT initialState $ forEachNumber $ \i -> do
         case lookup (fromIntegral i) (ttScripts tt) of
-            Nothing -> printf "OID %d not in main table\n" i >> return s
-            Just Nothing -> printf "OID %d deactivated\n" i >> return s
+            Nothing -> lift $ printf "OID %d not in main table\n" i
+            Just Nothing -> lift $ printf "OID %d deactivated\n" i
             Just (Just lines) -> do
-                case find (enabledLine s) lines of
-                    Nothing -> printf "None of these lines matched!\n" >> mapM_ (putStrLn . ppLine t) lines >> return s
+                code <- gets $ \s -> find (enabledLine s) lines
+                case code of
+                    Nothing -> lift $ do
+                        printf "None of these lines matched!\n"
+                        mapM_ (putStrLn . ppLine t) lines
                     Just l -> do
-                        printf "Executing:  %s\n" (ppLine t l)
-                        let s' = applyLine l s
-                        printf "State now: %s\n" (formatState s')
-                        return s'
+                        lift $ printf "Executing:  %s\n" (ppLine t l)
+                        applyLine l
+                        get >>= lift . printf "State now: %s\n" . formatState
 
 enabledLine :: Ord r => PlayState r -> Line r -> Bool
 enabledLine s (Line _ cond _ _) = all (condTrue s) cond
@@ -51,13 +57,24 @@ value :: Ord r => PlayState r -> TVal r -> Word16
 value m (Reg r) = M.findWithDefault 0 r m
 value m (Const n) = n
 
-applyLine :: Ord r => Line r -> PlayState r -> PlayState r
-applyLine (Line _ _ act _) s = foldl' go s act
+getVal :: (Ord r, MonadState (PlayState r) m) => TVal r -> m Word16
+getVal v = gets $ \s ->  value s v
+
+modReg :: (Ord r, MonadState (PlayState r) m) => r -> (Word16 -> Word16) -> m ()
+modReg r f = do
+    x <- getVal (Reg r)
+    modify $ M.insert r (f x)
+
+applyLine :: (Ord r, MonadState (PlayState r) m) => Line r -> m ()
+applyLine (Line _ _ act _) = mapM_ go act
   where
-    go s (Neg r) = M.insert r (neg (s `value` Reg r)) s
-    go s (ArithOp o r n) = M.insert r (applyOp o (s `value` Reg r) (s `value` n)) s
-    go s (Jump n)  = error "Playing scripts with the J command is not yet implemented. Please file a bug."
-    go s _         = s
+    go (Neg r) = modReg r neg
+    go (ArithOp o r n) = do
+        arg <- getVal n
+        let (*) = applyOp o
+        modReg r (* arg)
+    go (Jump n) = error "Playing scripts with the J command is not yet implemented. Please file a bug."
+    go _        = return ()
 
     neg 0 = 1
     neg _ = 0
@@ -74,15 +91,11 @@ applyLine (Line _ _ act _) s = foldl' go s act
 
 
 
-forEachNumber :: s -> (Int -> s -> IO s) -> IO ()
-forEachNumber state action = go state
-  where
-    go s = do
-        putStrLn "Next OID touched? "
-        str <- getLine
-        case readMaybe str of
-            Just i -> action i s >>= go
-            Nothing -> do
-                putStrLn "Not a number, please try again"
-                go s
+forEachNumber :: (Int -> StateT s IO ()) -> StateT s IO ()
+forEachNumber action = forever $ do
+    lift $ putStrLn "Next OID touched? "
+    str <- lift $ getLine
+    case readMaybe str of
+        Just i ->  action i
+        Nothing -> lift $ putStrLn "Not a number, please try again"
 
