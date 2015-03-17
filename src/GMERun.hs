@@ -25,20 +25,26 @@ playTipToi :: Transscript -> TipToiFile -> IO ()
 playTipToi t tt = do
     let initialState = M.fromList $ zip [0..] (ttInitialRegs tt)
     printf "Initial state (not showing zero registers): %s\n" (formatState initialState)
-    flip evalStateT initialState $ forEachNumber $ \i -> do
+    flip evalStateT initialState $ forEachNumber $ untilNothing $ \i -> do
         case lookup (fromIntegral i) (ttScripts tt) of
-            Nothing -> lift $ printf "OID %d not in main table\n" i
-            Just Nothing -> lift $ printf "OID %d deactivated\n" i
+            Nothing -> do
+                lift $ printf "OID %d not in main table\n" i
+                return Nothing
+            Just Nothing -> do
+                lift $ printf "OID %d deactivated\n" i
+                return Nothing
             Just (Just lines) -> do
                 code <- gets $ \s -> find (enabledLine s) lines
                 case code of
                     Nothing -> lift $ do
                         printf "None of these lines matched!\n"
                         mapM_ (putStrLn . ppLine t) lines
+                        return Nothing
                     Just l -> do
                         lift $ printf "Executing:  %s\n" (ppLine t l)
-                        applyLine l
+                        next <- applyLine l
                         get >>= lift . printf "State now: %s\n" . formatState
+                        return next
 
 enabledLine :: Ord r => PlayState r -> Line r -> Bool
 enabledLine s (Line _ cond _ _) = all (condTrue s) cond
@@ -65,16 +71,23 @@ modReg r f = do
     x <- getVal (Reg r)
     modify $ M.insert r (f x)
 
-applyLine :: (Ord r, MonadState (PlayState r) m) => Line r -> m ()
-applyLine (Line _ _ act _) = mapM_ go act
+applyLine :: (Ord r, MonadState (PlayState r) m) => Line r -> m (Maybe Word16)
+applyLine (Line _ _ acts _) = go acts
   where
-    go (Neg r) = modReg r neg
-    go (ArithOp o r n) = do
-        arg <- getVal n
+    go (Neg r : acts) = do
+        modReg r neg
+        go acts
+    go (ArithOp o r v : acts) = do
+        arg <- getVal v
         let (*) = applyOp o
         modReg r (* arg)
-    go (Jump n) = error "Playing scripts with the J command is not yet implemented. Please file a bug."
-    go _        = return ()
+        go acts
+    go (Jump v: _ ) = do
+        n <- getVal v
+        return (Just n)
+    go (_: acts) = do
+        go acts
+    go [] = return Nothing
 
     neg 0 = 1
     neg _ = 0
@@ -90,8 +103,13 @@ applyLine (Line _ _ act _) = mapM_ go act
     applyOp Set = \_ v -> v
 
 
+untilNothing :: Monad m => (a -> m (Maybe a)) -> a -> m ()
+untilNothing f i = do
+    r <- f i
+    case r of Just i' -> untilNothing f i'
+              Nothing -> return ()
 
-forEachNumber :: (Int -> StateT s IO ()) -> StateT s IO ()
+forEachNumber :: (Word16 -> StateT s IO ()) -> StateT s IO ()
 forEachNumber action = forever $ do
     lift $ putStrLn "Next OID touched? "
     str <- lift $ getLine
