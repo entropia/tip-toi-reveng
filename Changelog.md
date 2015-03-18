@@ -1,6 +1,10 @@
 # Changelog for tttool
 
-## 1.2 (2013-03-08)
+## 1.3 (2015-03-18)
+
+ * The `tttoo play` command now supports jump commands.
+
+## 1.2 (2015-03-08)
 
  * The `language` fields takes arbitrary strings, which will hopefully be
    understood by the text-to-speak engine.
