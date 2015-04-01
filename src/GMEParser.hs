@@ -263,7 +263,10 @@ getXor = do
     present <- getBS 4
     -- Brute force, but that's ok here
     case [ n | n <- [0..0xFF]
-             , cypher n present `elem` map fst fileMagics ] of
+             , let c = cypher n present
+             , (magic,_) <- fileMagics
+             , magic `B.isPrefixOf` c
+             ] of
         [] -> fail "Could not find magic hash"
         (x:_) -> return x
 
