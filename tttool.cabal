@@ -66,6 +66,9 @@ executable tttool
     vector      == 0.10.*,
     yaml        == 0.8.*
 
+  if impl(ghc < 7.5)
+    build-depends: ghc-prim
+
   if flag(old-locale)
     build-depends: time == 1.4.*, old-locale
   else
