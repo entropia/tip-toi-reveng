@@ -1,6 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
 
-module OidCode (genRawPNG, DPI(..)) where
+module OidCode (genRawPNG, genRawSVG, DPI(..)) where
 
 import Data.Word
 import Data.Bits
@@ -11,6 +11,15 @@ import Codec.Picture
 import Codec.Picture.Types
 import Control.Monad.ST
 import Control.Applicative
+
+import qualified Text.Blaze.Svg as S
+import qualified Text.Blaze.Svg11 as S
+import qualified Text.Blaze.Svg11.Attributes as A
+import Text.Blaze.Svg11 ((!))
+import Text.Blaze.Svg.Renderer.Utf8
+import qualified Data.ByteString.Lazy as B (writeFile)
+import Control.Arrow
+
 
 -- Image generation
 
@@ -27,9 +36,7 @@ checksum dec = c3
     (&) = (.&.)
 
 
-{-
-oidSVG :: Int -> S.Svg
-oidSVG code | code >= 4^8 = error $ printf "Code %d too large to draw" code
+oidSVG :: Word16 -> S.Svg
 oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
                            ! A.width (S.toValue "1mm")
                            ! A.height (S.toValue "1mm")
@@ -54,12 +61,12 @@ oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
 
     -- pixel = S.rect ! A.width (S.toValue "2") ! A.height (S.toValue "2") ! pos (7,7)
     pixel (x,y) = S.path ! A.d path
-      where path = mkPath $ do
-            S.m (x+5) (y+5)
-            S.hr 2
-            S.vr 2
-            S.hr (-2)
-            S.z
+      where path = S.mkPath $ do
+                S.m (x+5) (y+5)
+                S.hr 2
+                S.vr 2
+                S.hr (-2)
+                S.z
 
     plain = pixel
     value 0 = at (2,2)   plain
@@ -73,17 +80,8 @@ oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
     -- Drawing combinators
     at (x, y) f = f . ((+x) *** (+y))
 
-genSVGs :: String -> IO ()
-genSVGs code_str = do
-    codes <- parseRange code_str
-    forM_ codes $ \c -> do
-        let filename = printf "oid%d.svg" c
-        printf "Writing %s...\n" filename
-        genSVG c filename
-
-genSVG :: Int -> FilePath -> IO ()
-genSVG code filename = B.writeFile filename (renderSvg (oidSVG code))
--}
+genRawSVG :: Word16 -> FilePath -> IO ()
+genRawSVG code filename = B.writeFile filename (renderSvg (oidSVG code))
 
 data DPI = D1200 | D600
 
