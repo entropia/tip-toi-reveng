@@ -268,42 +268,42 @@ assemble inf out = do
     writeTipToi out tt
 
 
-genPNGs :: DPI -> String -> IO ()
-genPNGs dpi arg = do
+genSVGs :: DPI -> String -> IO ()
+genSVGs dpi arg = do
     ex <- doesFileExist arg
-    if ex then genPNGsForFile dpi arg
-          else genPNGsForCodes dpi arg
+    if ex then genSVGsForFile dpi arg
+          else genSVGsForCodes dpi arg
 
-genPNGsForFile :: DPI -> FilePath -> IO ()
-genPNGsForFile dpi inf = do
+genSVGsForFile :: DPI -> FilePath -> IO ()
+genSVGsForFile dpi inf = do
     (tty, codeMap) <- readTipToiYaml inf
     (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
     let codes = ("START", fromIntegral (ttProductId tt)) : M.toList totalMap
     forM_  codes $ \(s,c) -> do
-        genPNG dpi c $ printf "oid-%d-%s.png" (ttProductId tt) s
+        genSVG dpi c $ printf "oid-%d-%s.svg" (ttProductId tt) s
 
-genPNGsForCodes :: DPI -> String -> IO ()
-genPNGsForCodes dpi code_str = do
+genSVGsForCodes :: DPI -> String -> IO ()
+genSVGsForCodes dpi code_str = do
     codes <- parseRange code_str
     forM_ codes $ \c -> do
-        genPNG dpi c $ printf "oid-%d.png" c
+        genSVG dpi c $ printf "oid-%d.svg" c
 
-genPNG :: DPI -> Word16 -> String -> IO ()
-genPNG dpi c filename =
+genSVG :: DPI -> Word16 -> String -> IO ()
+genSVG dpi c filename =
     case code2RawCode c of
         Nothing -> printf "Skipping %s, code %d not known.\n" filename c
         Just r -> do
             printf "Writing %s.. (Code %d, raw code %d)\n" filename c r
-            genRawPNG dpi r filename
+            genRawSVG {- dpi -} r filename
 
 
-genPNGsForRawCodes :: DPI -> String -> IO ()
-genPNGsForRawCodes dpi code_str = do
+genSVGsForRawCodes :: DPI -> String -> IO ()
+genSVGsForRawCodes dpi code_str = do
     codes <- parseRange code_str
     forM_ codes $ \r -> do
-        let filename = printf "oid-raw-%d.png" r
+        let filename = printf "oid-raw-%d.svg" r
         printf "Writing %s... (raw code %d)\n" filename r
-        genRawPNG dpi r filename
+        genRawSVG {- dpi -} r filename
 
 
 -- The main function
@@ -357,21 +357,21 @@ main' t ("rewrite": inf : out: [])  =              rewrite inf out
 main' t ("export": inf : out: [] )  =              export inf out
 main' t ("assemble": inf : out: []) =              assemble inf out
 main' t ("oid-code": "-d" : "600" : codes@(_:_))
-                                    =              genPNGs D600 (unwords codes)
+                                    =              genSVGs D600 (unwords codes)
 main' t ("oid-code": "-d" : "1200" : codes@(_:_))
-                                    =              genPNGs D1200 (unwords codes)
+                                    =              genSVGs D1200 (unwords codes)
 main' t ("oid-code": "-d" : _)      = do
     putStrLn $ "The parameter to -d has to be 600 or 1200"
     exitFailure
-main' t ("oid-code": codes@(_:_))   =              genPNGs D1200 (unwords codes)
+main' t ("oid-code": codes@(_:_))   =              genSVGs D1200 (unwords codes)
 main' t ("raw-oid-code": "-d" : "600" : codes@(_:_))
-                                    =              genPNGsForRawCodes D600 (unwords codes)
+                                    =              genSVGsForRawCodes D600 (unwords codes)
 main' t ("raw-oid-code": "-d" : "1200" : codes@(_:_))
-                                    =              genPNGsForRawCodes D1200 (unwords codes)
+                                    =              genSVGsForRawCodes D1200 (unwords codes)
 main' t ("raw-oid-code": "-d" : _)  = do
     putStrLn $ "The parameter to -d has to be 600 or 1200"
     exitFailure
-main' t ("raw-oid-code": codes@(_:_)) =            genPNGsForRawCodes D1200 (unwords codes)
+main' t ("raw-oid-code": codes@(_:_)) =            genSVGsForRawCodes D1200 (unwords codes)
 main' _ _ = do
     prg <- getProgName
     putStrLn $ "Usage: " ++ prg ++ " [options] command"
@@ -416,18 +416,18 @@ main' _ _ = do
     putStrLn $ "    assemble <infile.yaml> <outfile.gme>"
     putStrLn $ "       creates a gme file from the given source"
     putStrLn $ "    oid-code [-d DPI] <codes>"
-    putStrLn $ "       creates a PNG file for each given code"
+    putStrLn $ "       creates a SVG file for each given code"
     putStrLn $ "       scale this to 10cm×10cm"
     putStrLn $ "       By default, it creates a 1200 dpi image. With -d 600, you"
     putStrLn $ "       obtain a 600 dpi image."
     putStrLn $ "       <codes> can be a range, e.g. 1,3,1000-1085."
-    putStrLn $ "       Uses oid-<code>.png as the file name."
+    putStrLn $ "       Uses oid-<code>.svg as the file name."
     putStrLn $ "    oid-code [-d DPI] <infile.yaml>"
     putStrLn $ "       Like above, but creates one file for each code in the yaml file."
-    putStrLn $ "       Uses oid-<product-id>-<scriptname or code>.png as the file name."
+    putStrLn $ "       Uses oid-<product-id>-<scriptname or code>.svg as the file name."
     putStrLn $ "    raw-oid-code [-d DPI] <raw codes>"
-    putStrLn $ "       creates a PNG file with the given \"raw code\". Usually not needed."
-    putStrLn $ "       Uses oid-raw-<code>.png as the file name."
+    putStrLn $ "       creates a SVG file with the given \"raw code\". Usually not needed."
+    putStrLn $ "       Uses oid-raw-<code>.svg as the file name."
     exitFailure
 
 main = getArgs >>= (main' M.empty)
