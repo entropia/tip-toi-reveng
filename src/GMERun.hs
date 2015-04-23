@@ -11,6 +11,7 @@ import System.Console.Haskeline
 import System.Directory
 import System.FilePath
 import Data.Foldable (for_)
+import Data.Char
 
 import Types
 import PrettyPrint
@@ -32,10 +33,14 @@ playTipToi :: Transscript -> TipToiFile -> IO ()
 playTipToi t tt = do
     let initialState = M.fromList $ zip [0..] (ttInitialRegs tt)
     printf "Initial state (not showing zero registers): %s\n" (formatState initialState)
+
     dir <- getAppUserDataDirectory "tttool"
     createDirectoryIfMissing True dir
     let history_file = dir </> "play_history"
-    let haskeline_settings = defaultSettings { historyFile = Just history_file }
+    let completion = completeWord Nothing " " $ \p -> return
+            [simpleCompletion (show n) | (n, Just _) <- ttScripts tt, p `isPrefixOf` show n ]
+    let haskeline_settings = completion `setComplete` defaultSettings { historyFile = Just history_file }
+
     flip evalStateT initialState $
         flip runReaderT (t,tt) $
         runInputT haskeline_settings $
@@ -143,8 +148,9 @@ nextNumber action = go
     go = do
         mstr <- getInputLine "Next OID touched? "
         for_ mstr $ \str -> do
-                case readMaybe str of
-                    Just i ->  lift $ action i
-                    Nothing -> liftIO $ putStrLn "Not a number, please try again"
-                go
+            let str' = dropWhile isSpace $ reverse $ dropWhile isSpace $ reverse $ str
+            case readMaybe str' of
+                Just i ->  lift $ action i
+                Nothing -> liftIO $ putStrLn "Not a number, please try again"
+            go
 
