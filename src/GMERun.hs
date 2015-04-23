@@ -10,6 +10,7 @@ import Control.Monad.Reader
 import System.Console.Haskeline
 import System.Directory
 import System.FilePath
+import System.Random
 import Data.Foldable (for_)
 import Data.Char
 
@@ -117,6 +118,10 @@ applyLine (Line _ _ acts playlist) = go acts
         execOID n
     go (Play n: acts) = do
         playTTAudio (playlist !! fromIntegral n)
+        go acts
+    go (Random a b: acts) = do
+        pick <- liftIO $ randomRIO (b,a)
+        playTTAudio (playlist !! fromIntegral pick)
         go acts
     go (_: acts) = do
         go acts
