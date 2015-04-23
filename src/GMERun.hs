@@ -8,6 +8,8 @@ import qualified Data.Map as M
 import Control.Monad.State.Strict
 import Control.Monad.Reader
 import System.Console.Haskeline
+import System.Directory
+import System.FilePath
 import Data.Foldable (for_)
 
 import Types
@@ -30,7 +32,10 @@ playTipToi :: Transscript -> TipToiFile -> IO ()
 playTipToi t tt = do
     let initialState = M.fromList $ zip [0..] (ttInitialRegs tt)
     printf "Initial state (not showing zero registers): %s\n" (formatState initialState)
-    let haskeline_settings = defaultSettings
+    dir <- getAppUserDataDirectory "tttool"
+    createDirectoryIfMissing True dir
+    let history_file = dir </> "play_history"
+    let haskeline_settings = defaultSettings { historyFile = Just history_file }
     flip evalStateT initialState $
         flip runReaderT (t,tt) $
         runInputT haskeline_settings $
