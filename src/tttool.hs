@@ -133,7 +133,15 @@ lint file = do
 
 play :: Transscript -> FilePath -> IO ()
 play t file = do
-    (tt,_) <- parseTipToiFile <$> B.readFile file
+    tt <-
+        if ".yaml" `isSuffixOf` file
+        then do
+            (tty, codeMap) <- readTipToiYaml file
+            (tt, _) <- ttYaml2tt (takeDirectory file) tty codeMap
+            return tt
+        else do
+            (tt,_) <- parseTipToiFile <$> B.readFile file
+            return tt
     playTipToi t tt
 
 segments :: FilePath -> IO ()
@@ -407,7 +415,7 @@ main' _ _ = do
     putStrLn $ "       lists all unknown parts of the file."
     putStrLn $ "    explain <file.gme>..."
     putStrLn $ "       lists all parts of the file, with description and hexdump."
-    putStrLn $ "    play <file.gme>"
+    putStrLn $ "    play <file.gme or file.yaml>"
     putStrLn $ "       interactively play: Enter OIDs, and see what happens."
     putStrLn $ "    rewrite <infile.gme> <outfile.gme>"
     putStrLn $ "       parses the file and serializes it again (for debugging)."

@@ -56,7 +56,7 @@ supports various subcommands:
            lists all unknown parts of the file.
         explain <file.gme>...
            lists all parts of the file, with description and hexdump.
-        play <file.gme>
+        play <file.gme or file.yaml>
            interactively play: Enter OIDs, and see what happens.
         rewrite <infile.gme> <outfile.gme>
            parses the file and serializes it again (for debugging).
