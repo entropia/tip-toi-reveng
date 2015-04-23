@@ -13,7 +13,7 @@ import qualified Data.ByteString.Lazy as BL
 
 playSound :: BL.ByteString -> IO ()
 playSound content = do
-    tryPrograms content ["sox", "./sox/sox"] $ do
+    tryPrograms content ["sox", "contrib/sox/sox"] $ do
         putStrLn "Could not play audio file."
         putStrLn "Do you have \"sox\" installed?"
 
