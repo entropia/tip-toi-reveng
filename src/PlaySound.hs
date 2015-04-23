@@ -29,7 +29,7 @@ tryPrograms content (sox:soxes) e = do
         else if ret == ExitFailure 127 then return False
         else do
             putStrLn $ "Failed to execute \"" ++ sox ++ "\" (" ++ show ret ++ "):"
-            B.putStrLn err
+            B.putStr err
             exitFailure
     case r of
        Right True -> return ()
