@@ -1,19 +1,22 @@
 {-# LANGUAGE FlexibleContexts #-}
-module GMERun (playTipToi) where
+module GMERun (playTipToi, execOID) where
 
 import Text.Printf
 import Data.Bits
 import Data.List
 import qualified Data.Map as M
 import Control.Monad.State
+import Control.Monad.Reader
 
 import Types
 import PrettyPrint
 import Utils
+import PlaySound
 
 type PlayState r = M.Map r Word16
 
-type GMEM r = StateT (PlayState r) IO
+type GMEM r =
+    ReaderT (Transscript, TipToiFile) (StateT (PlayState r) IO)
 
 formatState :: PlayState ResReg -> String
 formatState s = spaces $
@@ -25,26 +28,30 @@ playTipToi :: Transscript -> TipToiFile -> IO ()
 playTipToi t tt = do
     let initialState = M.fromList $ zip [0..] (ttInitialRegs tt)
     printf "Initial state (not showing zero registers): %s\n" (formatState initialState)
-    flip evalStateT initialState $ forEachNumber $ untilNothing $ \i -> do
-        case lookup (fromIntegral i) (ttScripts tt) of
-            Nothing -> do
-                lift $ printf "OID %d not in main table\n" i
-                return Nothing
-            Just Nothing -> do
-                lift $ printf "OID %d deactivated\n" i
-                return Nothing
-            Just (Just lines) -> do
-                code <- gets $ \s -> find (enabledLine s) lines
-                case code of
-                    Nothing -> lift $ do
-                        printf "None of these lines matched!\n"
-                        mapM_ (putStrLn . ppLine t) lines
-                        return Nothing
-                    Just l -> do
-                        lift $ printf "Executing:  %s\n" (ppLine t l)
-                        next <- applyLine l
-                        get >>= lift . printf "State now: %s\n" . formatState
-                        return next
+    flip evalStateT initialState $ flip runReaderT (t,tt) $ forEachNumber $ \i -> do
+        execOID i
+        s <- get
+        liftIO $ printf "State now: %s\n" $ formatState s
+
+
+execOID :: Word16 -> GMEM Word16 ()
+execOID i = do
+    (t,tt) <- ask
+    case lookup (fromIntegral i) (ttScripts tt) of
+        Nothing -> do
+            liftIO $ printf "OID %d not in main table\n" i
+        Just Nothing -> do
+            liftIO $ printf "OID %d deactivated\n" i
+        Just (Just lines) -> do
+            code <- gets $ \s -> find (enabledLine s) lines
+            case code of
+                Nothing -> liftIO $ do
+                    printf "None of these lines matched!\n"
+                    mapM_ (putStrLn . ppLine t) lines
+
+                Just l -> do
+                    liftIO $ printf "Executing:  %s\n" (ppLine t l)
+                    applyLine l
 
 enabledLine :: Ord r => PlayState r -> Line r -> Bool
 enabledLine s (Line _ cond _ _) = all (condTrue s) cond
@@ -71,8 +78,15 @@ modReg r f = do
     x <- getVal (Reg r)
     modify $ M.insert r (f x)
 
-applyLine :: (Ord r, MonadState (PlayState r) m) => Line r -> m (Maybe Word16)
-applyLine (Line _ _ acts _) = go acts
+playTTAudio :: Word16 -> GMEM r ()
+playTTAudio i = do
+    (_,tt) <- ask
+    liftIO $ printf "Playing audio sample %d\n" i
+    let bs = ttAudioFiles tt !! fromIntegral i
+    liftIO $ playSound bs
+
+applyLine :: Line Word16 -> GMEM Word16 ()
+applyLine (Line _ _ acts playlist) = go acts
   where
     go (Neg r : acts) = do
         modReg r neg
@@ -84,10 +98,13 @@ applyLine (Line _ _ acts _) = go acts
         go acts
     go (Jump v: _ ) = do
         n <- getVal v
-        return (Just n)
+        execOID n
+    go (Play n: acts) = do
+        playTTAudio (playlist !! fromIntegral n)
+        go acts
     go (_: acts) = do
         go acts
-    go [] = return Nothing
+    go [] = return ()
 
     neg 0 = 1
     neg _ = 0
@@ -109,11 +126,11 @@ untilNothing f i = do
     case r of Just i' -> untilNothing f i'
               Nothing -> return ()
 
-forEachNumber :: (Word16 -> StateT s IO ()) -> StateT s IO ()
+forEachNumber :: (MonadIO m) =>  (Word16 -> m ()) -> m ()
 forEachNumber action = forever $ do
-    lift $ putStrLn "Next OID touched? "
-    str <- lift $ getLine
+    liftIO $ putStrLn "Next OID touched? "
+    str <- liftIO $ getLine
     case readMaybe str of
         Just i ->  action i
-        Nothing -> lift $ putStrLn "Not a number, please try again"
+        Nothing -> liftIO $ putStrLn "Not a number, please try again"
 
