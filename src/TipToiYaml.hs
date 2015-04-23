@@ -280,7 +280,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
 
     return $ (TipToiFile
         { ttProductId = ttyProduct_Id
-        , ttRawXor = 0x00000039 -- from Bauernhof
+        , ttRawXor = knownRawXOR
         , ttComment = BC.pack (fromMaybe "created with tip-toi-reveng" ttyComment)
         , ttDate = BC.pack date
         , ttWelcome = welcome
@@ -288,7 +288,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
         , ttScripts = scripts'
         , ttGames = []
         , ttAudioFiles = files
-        , ttAudioXor = 0xAD
+        , ttAudioXor = knownXOR
         , ttAudioFilesDoubles = False
         , ttChecksum = 0x00
         , ttChecksumCalc = 0x00
