@@ -5,8 +5,10 @@ import Text.Printf
 import Data.Bits
 import Data.List
 import qualified Data.Map as M
-import Control.Monad.State
+import Control.Monad.State.Strict
 import Control.Monad.Reader
+import System.Console.Haskeline
+import Data.Foldable (for_)
 
 import Types
 import PrettyPrint
@@ -28,10 +30,14 @@ playTipToi :: Transscript -> TipToiFile -> IO ()
 playTipToi t tt = do
     let initialState = M.fromList $ zip [0..] (ttInitialRegs tt)
     printf "Initial state (not showing zero registers): %s\n" (formatState initialState)
-    flip evalStateT initialState $ flip runReaderT (t,tt) $ forEachNumber $ \i -> do
-        execOID i
-        s <- get
-        liftIO $ printf "State now: %s\n" $ formatState s
+    let haskeline_settings = defaultSettings
+    flip evalStateT initialState $
+        flip runReaderT (t,tt) $
+        runInputT haskeline_settings $
+        nextNumber $ \i -> do
+                execOID i
+                s <- get
+                liftIO $ printf "State now: %s\n" $ formatState s
 
 
 execOID :: Word16 -> GMEM Word16 ()
@@ -126,11 +132,14 @@ untilNothing f i = do
     case r of Just i' -> untilNothing f i'
               Nothing -> return ()
 
-forEachNumber :: (MonadIO m) =>  (Word16 -> m ()) -> m ()
-forEachNumber action = forever $ do
-    liftIO $ putStrLn "Next OID touched? "
-    str <- liftIO $ getLine
-    case readMaybe str of
-        Just i ->  action i
-        Nothing -> liftIO $ putStrLn "Not a number, please try again"
+nextNumber :: (MonadIO m, MonadException m) =>  (Word16 -> m ()) -> InputT m ()
+nextNumber action = go
+  where
+    go = do
+        mstr <- getInputLine "Next OID touched? "
+        for_ mstr $ \str -> do
+                case readMaybe str of
+                    Just i ->  lift $ action i
+                    Nothing -> liftIO $ putStrLn "Not a number, please try again"
+                go
 
