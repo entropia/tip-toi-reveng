@@ -1,6 +1,4 @@
-{-# LANGUAGE NondecreasingIndentation #-}
-
-module PlaySound (withSoundPlayer) where
+module PlaySound (withSound, playSound) where
 
 import Control.Monad
 import System.IO
@@ -13,8 +11,8 @@ import Foreign.ForeignPtr
 import Graphics.UI.SDL as SDL
 import Graphics.UI.SDL.Mixer as Mix
 
-withSoundPlayer :: ((B.ByteString -> IO ()) -> IO a ) -> IO a
-withSoundPlayer body = bracket_ init cleanup (body playSound)
+withSound :: IO a -> IO a
+withSound = bracket_ init cleanup
   where
     init = do
         SDL.init [SDL.InitAudio]
@@ -23,7 +21,12 @@ withSoundPlayer body = bracket_ init cleanup (body playSound)
         unless ok $
             putStrLn "Failed to open SDL audio device"
 
-    playSound content = do
+    cleanup = do
+        Mix.closeAudio
+        SDL.quit
+
+playSound :: B.ByteString -> IO ()
+playSound content = do
         dir <- getTemporaryDirectory
         (tmp, h) <- openTempFile dir "sdl-input"
         B.hPutStr h content
@@ -38,11 +41,6 @@ withSoundPlayer body = bracket_ init cleanup (body playSound)
         --Mix.freeMusic mus
         finalizeForeignPtr mus
         removeFile tmp
-
-    cleanup = do
-        Mix.closeAudio
-        SDL.quit
-
 
 wait :: IO ()
 wait = do

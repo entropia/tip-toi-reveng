@@ -18,12 +18,11 @@ import Types
 import PrettyPrint
 import Utils
 import PlaySound
-import qualified Data.ByteString.Lazy as B
 
 type PlayState r = M.Map r Word16
 
 type GMEM r =
-    ReaderT (B.ByteString -> IO (), Transscript, TipToiFile) (StateT (PlayState r) IO)
+    ReaderT (Transscript, TipToiFile) (StateT (PlayState r) IO)
 
 formatState :: PlayState ResReg -> String
 formatState s = spaces $
@@ -43,19 +42,19 @@ playTipToi t tt = do
             [simpleCompletion (show n) | (n, Just _) <- ttScripts tt, p `isPrefixOf` show n ]
     let haskeline_settings = completion `setComplete` defaultSettings { historyFile = Just history_file }
 
-    withSoundPlayer $ \playSound ->
+    withSound $
         flip evalStateT initialState $
-            flip runReaderT (playSound,t,tt) $
-            runInputT haskeline_settings $
-            nextNumber $ \i -> do
-                    execOID i
-                    s <- get
-                    liftIO $ printf "State now: %s\n" $ formatState s
+        flip runReaderT (t,tt) $
+        runInputT haskeline_settings $
+        nextNumber $ \i -> do
+            execOID i
+            s <- get
+            liftIO $ printf "State now: %s\n" $ formatState s
 
 
 execOID :: Word16 -> GMEM Word16 ()
 execOID i = do
-    (_,t,tt) <- ask
+    (t,tt) <- ask
     case lookup (fromIntegral i) (ttScripts tt) of
         Nothing -> do
             liftIO $ printf "OID %d not in main table\n" i
@@ -99,7 +98,7 @@ modReg r f = do
 
 playTTAudio :: Word16 -> GMEM r ()
 playTTAudio i = do
-    (playSound,_,tt) <- ask
+    (_,tt) <- ask
     liftIO $ printf "Playing audio sample %d\n" i
     let bs = ttAudioFiles tt !! fromIntegral i
     liftIO $ playSound bs
