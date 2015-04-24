@@ -9,7 +9,7 @@ zipfile=tttool-win32-$rev.zip
 rm -f $zipfile
 
 # Oggenc
-OGGENC=oggenc2.87-1.3.4-generic.zip
+OGGENC=oggenc2.87-1.3.5-generic.zip
 
 mkdir -p contrib
 test -e contrib/$OGGENC ||
@@ -17,15 +17,16 @@ test -e contrib/$OGGENC ||
 unzip -d contrib contrib/$OGGENC oggenc2.exe
 mv contrib/oggenc2.exe contrib/oggenc.exe
 
-# sox
-SOXVERSION=14.4.2
-SOXFILE=sox-$SOXVERSION-win32.zip
+#SDL
+SDL=SDL-1.2.15-win32.zip
+SDLMIXER=SDL_mixer-1.2.12-win32.zip
 
-test -e contrib/$SOXFILE ||
-	wget http://sourceforge.net/projects/sox/files/sox/$SOXVERSION/$SOXFILE/download -O contrib/$SOXFILE
-rm -rf contrib/sox contrib/sox-$SOXVERSION
-unzip -d contrib contrib/$SOXFILE
-mv contrib/sox-$SOXVERSION contrib/sox
+test -e contrib/$SDL ||
+    wget http://libsdl.org/release/$SDL -O contrib/$SDL
+unzip -o -d contrib contrib/$SDL
+test -e contrib/$SDLMIXER ||
+    wget https://www.libsdl.org/projects/SDL_mixer/release/$SDLMIXER -O contrib/$SDLMIXER
+unzip -o -d contrib contrib/$SDLMIXER
 
 # install espeak first in wine
 cp ~/.wine/drive_c/Programme/eSpeak/command_line/espeak.exe contrib/
@@ -48,5 +49,7 @@ zip --recurse-paths $zipfile \
         contrib/oggenc.exe \
         contrib/espeak.exe \
         contrib/espeak-data \
-	contrib/sox/*
+        contrib/LICENSE* \
+        contrib/README-SDL.txt
+( cd contrib; zip ../$zipfile *.dll )
 echo Created $zipfile
