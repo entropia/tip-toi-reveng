@@ -68,7 +68,10 @@ executable tttool
     process-extras >= 0.2   &&   < 0.4,
     random      == 1.0.*,
     vector      == 0.10.*,
-    yaml        == 0.8.*
+    yaml        == 0.8.*,
+
+    SDL         == 0.6.*,
+    SDL-mixer   == 0.6.*
 
   if impl(ghc < 7.5)
     build-depends: ghc-prim
