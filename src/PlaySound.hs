@@ -2,35 +2,47 @@
 
 module PlaySound (playSound) where
 
-import System.Process.ByteString
+import System.Process
 import System.Exit
 import Control.Monad
 import Control.Exception
 import System.IO.Error
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy as BL
+import System.IO
+import System.Directory
+import qualified Data.ByteString.Lazy as B
 
 
-playSound :: BL.ByteString -> IO ()
+players :: String -> [(FilePath, [String])]
+players fn =
+    [ ("sox",                ["-q", fn, "-d"])
+    , ("./contrib/playmus",  [fn])
+    ]
+
+playSound :: B.ByteString -> IO ()
 playSound content = do
-    tryPrograms content ["sox", "contrib/sox/sox"] $ do
+    dir <- getTemporaryDirectory
+    (tmp, h) <- openTempFile dir "tttool-audio.tmp"
+    B.hPutStr h content
+    hClose h
+
+    tryPrograms (players  tmp) $ do
         putStrLn "Could not play audio file."
         putStrLn "Do you have \"sox\" installed?"
 
-soxArgs = ["-q", "-", "-d"]
+    removeFile tmp
 
-tryPrograms content [] e = e
-tryPrograms content (sox:soxes) e = do
+tryPrograms [] e = e
+tryPrograms ((c,args):es) e = do
     -- Missing programs cause exceptions on Windows, but error 127 on Linux.
     -- Try to handle both here.
     r <- tryJust (guard . isDoesNotExistError) $ do
-        (ret,out,err) <- readProcessWithExitCode sox soxArgs (BL.toStrict content)
+        ph <- runProcess  c args Nothing Nothing Nothing Nothing Nothing
+        ret <- waitForProcess ph
         if ret == ExitSuccess then return True
         else if ret == ExitFailure 127 then return False
         else do
-            putStrLn $ "Failed to execute \"" ++ sox ++ "\" (" ++ show ret ++ "):"
-            B.putStr err
+            putStrLn $ "Failed to execute \"" ++ c ++ "\" (" ++ show ret ++ ")"
             exitFailure
     case r of
        Right True -> return ()
-       _ -> tryPrograms content soxes e
+       _ -> tryPrograms es e

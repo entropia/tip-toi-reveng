@@ -28,6 +28,8 @@ test -e contrib/$SDLMIXER ||
     wget https://www.libsdl.org/projects/SDL_mixer/release/$SDLMIXER -O contrib/$SDLMIXER
 unzip -o -d contrib contrib/$SDLMIXER
 
+cp -v playmus/playmus.exe contrib/playmus.exe
+
 # install espeak first in wine
 cp ~/.wine/drive_c/Programme/eSpeak/command_line/espeak.exe contrib/
 cp -r ~/.wine/drive_c/Programme/eSpeak/espeak-data/ contrib/
@@ -50,6 +52,7 @@ zip --recurse-paths $zipfile \
         contrib/espeak.exe \
         contrib/espeak-data \
         contrib/LICENSE* \
-        contrib/README-SDL.txt
-( cd contrib; zip ../$zipfile *.dll )
+        contrib/README-SDL.txt \
+	contrib/*.dll \
+	contrib/playmus.exe
 echo Created $zipfile
