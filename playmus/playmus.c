@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
 		
 		/* Play and then exit */
 		printf("Playing %s\n", argv[i]);
-		Mix_FadeInMusic(music,looping,2000);
+		Mix_PlayMusic(music,looping);
 		while ( !next_track && (Mix_PlayingMusic() || Mix_PausedMusic()) ) {
 			if(interactive)
 				Menu();
@@ -227,7 +227,6 @@ int main(int argc, char *argv[])
 		music = NULL;
 
 		/* If the user presses Ctrl-C more than once, exit. */
-		SDL_Delay(500);
 		if ( next_track > 1 ) break;
 		
 		i++;
