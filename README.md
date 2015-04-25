@@ -96,22 +96,17 @@ Otherwise, installation from source is not difficult either:
     for details for your system. Users of Debian or Ubuntu simply run `apt-get
     install haskell-platform`.
 
- 2. Install the `SDL` and `SDL_mixer` developer libraries. On Debian and
-    Ubuntu, this is:
-
-        apt-get install libsdl1.2-dev libsdl-mixer1.2-dev
-
- 3. Install the dependencies. The Haskell platform comes with a tool called
+ 2. Install the dependencies. The Haskell platform comes with a tool called
     `cabal`, and you should run the two commands
 
         cabal update
         cabal install --only-dependencies
 
- 4. Now you can build the program using
+ 3. Now you can build the program using
 
         cabal install --bindir=.
 
- 5. At this point, `tttool` should be ready to go. If you run
+ 4. At this point, `tttool` should be ready to go. If you run
 
         ./tttool
 
