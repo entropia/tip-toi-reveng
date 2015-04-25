@@ -9,13 +9,15 @@ import Control.Exception
 import System.IO.Error
 import System.IO
 import System.Directory
+import System.FilePath
 import qualified Data.ByteString.Lazy as B
+import System.Environment.Executable
 
 
-players :: String -> [(FilePath, [String])]
-players fn =
-    [ ("sox",                ["-q", fn, "-d"])
-    , ("./contrib/playmus",  [fn])
+players :: FilePath -> FilePath -> [(FilePath, [String])]
+players myDir fn =
+    [ ("sox",                              ["-q", fn, "-d"])
+    , (myDir </> "contrib" </> "playmus",  [fn])
     ]
 
 playSound :: B.ByteString -> IO ()
@@ -25,7 +27,9 @@ playSound content = do
     B.hPutStr h content
     hClose h
 
-    tryPrograms (players  tmp) $ do
+    (myDir,_) <- splitExecutablePath
+
+    tryPrograms (players myDir tmp) $ do
         putStrLn "Could not play audio file."
         putStrLn "Do you have \"sox\" installed?"
 
