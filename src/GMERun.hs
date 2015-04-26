@@ -42,13 +42,12 @@ playTipToi t tt = do
             [simpleCompletion (show n) | (n, Just _) <- ttScripts tt, p `isPrefixOf` show n ]
     let haskeline_settings = completion `setComplete` defaultSettings { historyFile = Just history_file }
 
-    flip evalStateT initialState $
-        flip runReaderT (t,tt) $
-        runInputT haskeline_settings $
-        nextNumber $ \i -> do
-                execOID i
-                s <- get
-                liftIO $ printf "State now: %s\n" $ formatState s
+    flip evalStateT initialState $ flip runReaderT (t,tt) $ do
+        mapM_ playTTAudio $ concat $ ttWelcome tt
+        runInputT haskeline_settings $ nextNumber $ \i -> do
+            execOID i
+            s <- get
+            liftIO $ printf "State now: %s\n" $ formatState s
 
 
 execOID :: Word16 -> GMEM Word16 ()
