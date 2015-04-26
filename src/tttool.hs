@@ -19,6 +19,7 @@ import System.Directory
 import Numeric (readHex)
 import qualified Data.Map as M
 import Data.Foldable (for_)
+import Data.Version
 
 import Types
 import Constants
@@ -32,6 +33,8 @@ import OidCode
 import Utils
 import TipToiYaml
 import Lint
+
+import Paths_tttool
 
 
 -- Main commands
@@ -375,6 +378,8 @@ main' t ("raw-oid-code": "-d" : _)  = do
 main' t ("raw-oid-code": codes@(_:_)) =            genPNGsForRawCodes D1200 (unwords codes)
 main' _ _ = do
     prg <- getProgName
+    putStrLn $ "This is the Tiptoi toolkit, version " ++ showVersion version
+    putStrLn $ ""
     putStrLn $ "Usage: " ++ prg ++ " [options] command"
     putStrLn $ ""
     putStrLn $ "Options:"
