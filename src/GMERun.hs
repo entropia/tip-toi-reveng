@@ -155,6 +155,7 @@ nextNumber action = go
             let str' = dropWhile isSpace $ reverse $ dropWhile isSpace $ reverse $ str
             case readMaybe str' of
                 Just i ->  lift $ action i
-                Nothing -> liftIO $ putStrLn "Not a number, please try again"
+                Nothing | all isSpace str' -> return ()
+                        | otherwise  -> liftIO $ putStrLn "Not a number, please try again."
             go
 
