@@ -20,13 +20,6 @@ import Numeric (readHex)
 import qualified Data.Map as M
 import Data.Foldable (for_)
 
-{-
-import Text.Blaze.Svg11 ((!), mkPath, rotate, l, m)
-import qualified Text.Blaze.Svg11 as S
-import qualified Text.Blaze.Svg11.Attributes as A
-import Text.Blaze.Svg.Renderer.Utf8 (renderSvg)
--}
-
 import Types
 import Constants
 import KnownCodes
