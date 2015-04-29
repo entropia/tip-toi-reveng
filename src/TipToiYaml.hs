@@ -52,8 +52,6 @@ import PrettyPrint
 import OneLineParser
 import Utils
 
-type CodeMap = M.Map String Word16
-
 data TipToiYAML = TipToiYAML
     { ttyScripts :: M.Map String [String]
     , ttyComment :: Maybe String

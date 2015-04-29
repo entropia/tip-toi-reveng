@@ -22,7 +22,7 @@ import PlaySound
 type PlayState r = M.Map r Word16
 
 type GMEM r =
-    ReaderT (Transscript, TipToiFile) (StateT (PlayState r) IO)
+    ReaderT (CodeMap, Transscript, TipToiFile) (StateT (PlayState r) IO)
 
 formatState :: PlayState ResReg -> String
 formatState s = spaces $
@@ -30,29 +30,28 @@ formatState s = spaces $
     filter (\(k,v) -> k == 0 || v /= 0) $
     M.toAscList s
 
-playTipToi :: Transscript -> TipToiFile -> IO ()
-playTipToi t tt = do
+playTipToi :: CodeMap -> Transscript -> TipToiFile -> IO ()
+playTipToi cm t tt = do
     let initialState = M.fromList $ zip [0..] (ttInitialRegs tt)
     printf "Initial state (not showing zero registers): %s\n" (formatState initialState)
 
     dir <- getAppUserDataDirectory "tttool"
     createDirectoryIfMissing True dir
     let history_file = dir </> "play_history"
-    let completion = completeWord Nothing " " $ \p -> return
-            [simpleCompletion (show n) | (n, Just _) <- ttScripts tt, p `isPrefixOf` show n ]
+    let completion = completeFromList $
+            M.keys cm ++ [show n | (n, Just _) <- ttScripts tt, n `notElem` M.elems cm]
     let haskeline_settings = completion `setComplete` defaultSettings { historyFile = Just history_file }
 
-    flip evalStateT initialState $ flip runReaderT (t,tt) $ do
+    flip evalStateT initialState $ flip runReaderT (cm,t,tt) $ do
         mapM_ playTTAudio $ concat $ ttWelcome tt
-        runInputT haskeline_settings $ nextNumber $ \i -> do
+        runInputT haskeline_settings $ nextOID $ \i -> do
             execOID i
             s <- get
             liftIO $ printf "State now: %s\n" $ formatState s
 
-
 execOID :: Word16 -> GMEM Word16 ()
 execOID i = do
-    (t,tt) <- ask
+    (cm,t,tt) <- ask
     case lookup (fromIntegral i) (ttScripts tt) of
         Nothing -> do
             liftIO $ printf "OID %d not in main table\n" i
@@ -96,7 +95,7 @@ modReg r f = do
 
 playTTAudio :: Word16 -> GMEM r ()
 playTTAudio i = do
-    (_,tt) <- ask
+    (_,_,tt) <- ask
     liftIO $ printf "Playing audio sample %d\n" i
     let bs = ttAudioFiles tt !! fromIntegral i
     liftIO $ playSound bs
@@ -146,16 +145,21 @@ untilNothing f i = do
     case r of Just i' -> untilNothing f i'
               Nothing -> return ()
 
-nextNumber :: (MonadIO m, MonadException m) =>  (Word16 -> m ()) -> InputT m ()
-nextNumber action = go
+nextOID :: (Word16 -> GMEM r ()) -> InputT (GMEM r) ()
+nextOID action = go
   where
     go = do
+        (cm,t,tt) <- lift ask
         mstr <- getInputLine "Next OID touched? "
         for_ mstr $ \str -> do
             let str' = dropWhile isSpace $ reverse $ dropWhile isSpace $ reverse $ str
-            case readMaybe str' of
-                Just i ->  lift $ action i
-                Nothing | all isSpace str' -> return ()
-                        | otherwise  -> liftIO $ putStrLn "Not a number, please try again."
+            case () of () | Just i <- readMaybe str'   -> lift $ action i
+                          | str' == ""                 -> return ()
+                          | Just i <- M.lookup str' cm -> lift $ action i
+                          | otherwise -> liftIO $ putStrLn "Please enter a number (OID) or name of a script."
             go
+
+completeFromList :: Monad m => [[Char]] -> CompletionFunc m
+completeFromList xs = completeWord Nothing " " $ \p -> return
+            [simpleCompletion x | x <- xs, p `isPrefixOf` x ]
 

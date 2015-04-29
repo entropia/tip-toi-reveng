@@ -129,16 +129,16 @@ lint file = do
 
 play :: Transscript -> FilePath -> IO ()
 play t file = do
-    tt <-
+    (cm,tt) <-
         if ".yaml" `isSuffixOf` file
         then do
-            (tty, codeMap) <- readTipToiYaml file
-            (tt, _) <- ttYaml2tt (takeDirectory file) tty codeMap
-            return tt
+            (tty, extraCodeMap) <- readTipToiYaml file
+            (tt, codeMap) <- ttYaml2tt (takeDirectory file) tty extraCodeMap
+            return (codeMap, tt)
         else do
             (tt,_) <- parseTipToiFile <$> B.readFile file
-            return tt
-    playTipToi t tt
+            return (M.empty, tt)
+    playTipToi cm t tt
 
 segments :: FilePath -> IO ()
 segments file = do

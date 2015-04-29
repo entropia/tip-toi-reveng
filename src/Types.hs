@@ -104,4 +104,6 @@ data SubGame
     deriving Show
 
 type Transscript = M.Map Word16 String
+type CodeMap = M.Map String Word16
+
 
