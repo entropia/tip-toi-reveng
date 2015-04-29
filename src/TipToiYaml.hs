@@ -212,9 +212,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
                                  extCodeMap
                                  (fromMaybe M.empty ttyScriptCodes)
 
-    (scriptMap, totalMap) <- case scriptCodes (M.keys ttyScripts) codeMap of
-        Left e -> fail e
-        Right f -> return f
+    (scriptMap, totalMap) <- either fail return $ scriptCodes (M.keys ttyScripts) codeMap
 
     let m = M.mapKeys scriptMap ttyScripts
         first = fst (M.findMin m)
