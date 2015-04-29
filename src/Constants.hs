@@ -28,3 +28,6 @@ fileMagics =
     , (BC.pack "OggS", "ogg")
     , (BC.pack "fLaC", "flac")
     , (BC.pack "ID3",  "mp3")]
+
+maxCommentLength :: Int
+maxCommentLength = 49

@@ -17,6 +17,7 @@ import Text.Printf
 import Data.Char
 import Data.Either
 import Data.Functor
+import Data.Version
 import Data.Maybe
 import Control.Monad
 import System.Directory
@@ -51,6 +52,8 @@ import KnownCodes
 import PrettyPrint
 import OneLineParser
 import Utils
+
+import Paths_tttool
 
 data TipToiYAML = TipToiYAML
     { ttyScripts :: M.Map String [String]
@@ -274,10 +277,18 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
                     mapM_ putStrLn ex
                     exitFailure
 
+    comment <- case ttyComment of
+        Nothing -> return $ BC.pack $ "created with tttool version " ++ showVersion version
+        Just c | length c > maxCommentLength -> do
+                    printf "Comment is %d characters too long; the maximum is %d."
+                           (length c - maxCommentLength) maxCommentLength
+                    exitFailure
+               | otherwise -> return $ BC.pack c
+
     return $ (TipToiFile
         { ttProductId = ttyProduct_Id
         , ttRawXor = knownRawXOR
-        , ttComment = BC.pack (fromMaybe "created with tip-toi-reveng" ttyComment)
+        , ttComment = comment
         , ttDate = BC.pack date
         , ttWelcome = welcome
         , ttInitialRegs = [fromMaybe 0 (M.lookup r initRegs) | r <- [0..maxReg]]
