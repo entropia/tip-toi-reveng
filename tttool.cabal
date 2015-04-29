@@ -13,7 +13,7 @@ license:             MIT
 license-file:        LICENSE
 author:              Joachim Breitner
 maintainer:          mail@joachim-breitner.de
-copyright:           2013-2014 Joachim Breitner
+copyright:           2013-2015 Joachim Breitner
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
