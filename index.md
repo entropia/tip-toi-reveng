@@ -27,6 +27,7 @@ Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
    * Ein [Taschenrechner]
  * Eine [Outdoor-Schatzsuche](http://mycvs.org/post/110330262976/interactive-treasure-hunt-with-tip-toi-the)
  * In der [c't 8/2015](http://www.heise.de/ct/ausgabe/2015-8-Eigene-Buecher-und-Spiele-fuer-den-Tiptoi-vertonen-2578001.html) wird beschrieben, wie man einen Vokabltrainer basteln kann.
+ * [Rallye - Das verlorene Schaf](https://lists.nomeata.de/archive/tiptoi/2015/000774.html) von Micha Reischuck
 
 
 [Selbstgemachte Tier-Figuren]: https://www.youtube.com/watch?v=Yic57Y9VORA
