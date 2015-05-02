@@ -19,13 +19,7 @@ import System.Directory
 import Numeric (readHex)
 import qualified Data.Map as M
 import Data.Foldable (for_)
-
-{-
-import Text.Blaze.Svg11 ((!), mkPath, rotate, l, m)
-import qualified Text.Blaze.Svg11 as S
-import qualified Text.Blaze.Svg11.Attributes as A
-import Text.Blaze.Svg.Renderer.Utf8 (renderSvg)
--}
+import Data.Version
 
 import Types
 import Constants
@@ -39,6 +33,8 @@ import OidCode
 import Utils
 import TipToiYaml
 import Lint
+
+import Paths_tttool
 
 
 -- Main commands
@@ -133,8 +129,16 @@ lint file = do
 
 play :: Transscript -> FilePath -> IO ()
 play t file = do
-    (tt,_) <- parseTipToiFile <$> B.readFile file
-    playTipToi t tt
+    (cm,tt) <-
+        if ".yaml" `isSuffixOf` file
+        then do
+            (tty, extraCodeMap) <- readTipToiYaml file
+            (tt, codeMap) <- ttYaml2tt (takeDirectory file) tty extraCodeMap
+            return (codeMap, tt)
+        else do
+            (tt,_) <- parseTipToiFile <$> B.readFile file
+            return (M.empty, tt)
+    playTipToi cm t tt
 
 segments :: FilePath -> IO ()
 segments file = do
@@ -374,6 +378,8 @@ main' t ("raw-oid-code": "-d" : _)  = do
 main' t ("raw-oid-code": codes@(_:_)) =            genPNGsForRawCodes D1200 (unwords codes)
 main' _ _ = do
     prg <- getProgName
+    putStrLn $ "This is the Tiptoi toolkit, version " ++ showVersion version
+    putStrLn $ ""
     putStrLn $ "Usage: " ++ prg ++ " [options] command"
     putStrLn $ ""
     putStrLn $ "Options:"
@@ -407,7 +413,7 @@ main' _ _ = do
     putStrLn $ "       lists all unknown parts of the file."
     putStrLn $ "    explain <file.gme>..."
     putStrLn $ "       lists all parts of the file, with description and hexdump."
-    putStrLn $ "    play <file.gme>"
+    putStrLn $ "    play <file.gme or file.yaml>"
     putStrLn $ "       interactively play: Enter OIDs, and see what happens."
     putStrLn $ "    rewrite <infile.gme> <outfile.gme>"
     putStrLn $ "       parses the file and serializes it again (for debugging)."

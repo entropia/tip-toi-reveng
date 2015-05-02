@@ -15,9 +15,7 @@ you to dissect these files.
 The tool can also be used to generate completely new files from scratch; see
 below for details.
 
-If you want to learn more, here are some relevant links:
- * Discussion about Tip-Toi: http://www.quadrierer.de/geekythinking/blog/?itemid=368 (German)
- * Discussion about Tip-Toi and the related TING pen, including discussion on how to print your own books: http://www.mikrocontroller.net/topic/214479 (German)
+If you want to learn more please have a look into our wiki (https://github.com/entropia/tip-toi-reveng/wiki).
 
 The tttool tool
 ---------------
@@ -58,7 +56,7 @@ supports various subcommands:
            lists all unknown parts of the file.
         explain <file.gme>...
            lists all parts of the file, with description and hexdump.
-        play <file.gme>
+        play <file.gme or file.yaml>
            interactively play: Enter OIDs, and see what happens.
         rewrite <infile.gme> <outfile.gme>
            parses the file and serializes it again (for debugging).
@@ -102,7 +100,7 @@ Otherwise, installation from source is not difficult either:
     `cabal`, and you should run the two commands
 
         cabal update
-        cabal install --dependencies-only
+        cabal install --only-dependencies
 
  3. Now you can build the program using
 
@@ -153,7 +151,7 @@ things you did if you succeded.
 Text to speech
 --------------
 
-If you have libttspico-utils and vorbis-tools installed, you can have tttool
+If you have `libttspico-utils` and `vorbis-tools installed`, you can have tttool
 generate audio files from text for you, which makes developing your yaml file
 much easier. See [text2speech.yaml](text2speech.yaml) for more information.
 
@@ -194,5 +192,5 @@ Other resources in this repository
  * `matlab/` contains scripts to analyse gme files in Matlab
  * `wip/` (work in progess) contains notes about the parts of the gme files that are not
    fully understood yet.
-
+ * `perl-tools` contains a perl based script, to generate a PDF with all OID codes from a yaml-file as well some functions to generate PNG-files, inject pHYs-chunks with resolution hints into GD generated PNG files as result from some testing
 

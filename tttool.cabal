@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                tttool
-version:             1.0
+version:             1.4.0.1
 synopsis:            Working with files for the Tiptoi® pen
 description:         The Ravensburger Tiptoi® pen is programmed via special
                      files. Their file format has been reverse engineered; this
@@ -13,7 +13,7 @@ license:             MIT
 license-file:        LICENSE
 author:              Joachim Breitner
 maintainer:          mail@joachim-breitner.de
-copyright:           2013-2014 Joachim Breitner
+copyright:           2013-2015 Joachim Breitner
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
@@ -25,6 +25,8 @@ flag old-locale
    If true then depend on time < 1.5 together with old-locale.
  default: False
 
+Flag bytestring_has_builder
+  default: True
 
 executable tttool
   main-is:             tttool.hs
@@ -36,8 +38,10 @@ executable tttool
     GMERun,
     GMEWriter,
     Lint,
+    Language,
     OidCode,
     OneLineParser,
+    PlaySound,
     PrettyPrint,
     RangeParser,
     TipToiYaml,
@@ -45,32 +49,44 @@ executable tttool
     KnownCodes,
     Types,
     Utils
-        
+
   build-depends:
     base        == 4.5.*   ||  == 4.6.*  ||  == 4.7.* ||  == 4.8.*,
     binary      == 0.5.*   ||  == 0.7.*,
-    bytestring  == 0.10.*,
     containers  == 0.4.*   ||  == 0.5.*,
     directory   == 1.2.*,
-    filepath    == 1.3.*,
+    executable-path == 0.0.*,
+    filepath    == 1.3.*   ||  == 1.4.*,
     template-haskell >= 2.7 && < 2.11,
-    ghc-prim,
 
     JuicyPixels == 3.1.*   ||  == 3.2.*,
     aeson       == 0.7.*   ||  == 0.8.*,
-    bytestring-builder >= 0.10.4.1.1,
     hashable    == 1.2.*,
+    haskeline   == 0.7.*,
     mtl         == 2.1.*   ||  == 2.2.*,
-    text        == 0.11.*  ||  == 1.2.*,
     parsec      == 3.1.*,
     process     == 1.1.*   ||  == 1.2.*,
+    process-extras >= 0.2   &&   < 0.4,
+    random      >= 1.0      &&   < 1.2,
     vector      == 0.10.*,
     yaml        == 0.8.*
+
+  if impl(ghc < 7.5)
+    build-depends: ghc-prim
 
   if flag(old-locale)
     build-depends: time == 1.4.*, old-locale
   else
     build-depends: time == 1.5.*
+
+  if flag(bytestring_has_builder)
+    build-depends:
+      bytestring >= 0.10.4 && < 0.11
+  else
+    build-depends:
+      bytestring >= 0.10 && < 0.10.4,
+      bytestring-builder >= 0.10.4.1.1
+
 
   hs-source-dirs:      src
   default-language:    Haskell2010

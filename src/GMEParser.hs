@@ -238,10 +238,12 @@ getBinaries = do
         binary <- getSegAt offset (BC.unpack desc) (getBS length)
         return (desc, binary)
 
-getAudios :: SGet ([B.ByteString], Bool, Word8)
-getAudios = do
+getAudios :: Word32 -> SGet ([B.ByteString], Bool, Word8)
+getAudios rawXor = do
     until <- lookAhead getWord32
-    x <- lookAhead $ jumpTo until >> getXor
+    x <- case () of
+          () | rawXor == knownRawXOR -> return knownXOR
+             | otherwise             -> lookAhead $ jumpTo until >> getXor
     offset <- bytesRead
     let n_entries = fromIntegral ((until - offset) `div` 8)
     at_doubled <- lookAhead $ do
@@ -263,7 +265,10 @@ getXor = do
     present <- getBS 4
     -- Brute force, but that's ok here
     case [ n | n <- [0..0xFF]
-             , cypher n present `elem` map fst fileMagics ] of
+             , let c = cypher n present
+             , (magic,_) <- fileMagics
+             , magic `B.isPrefixOf` c
+             ] of
         [] -> fail "Could not find magic hash"
         (x:_) -> return x
 
@@ -356,13 +361,14 @@ getSpecials = (,) <$> getWord16 <*> getWord16
 getTipToiFile :: SGet TipToiFile
 getTipToiFile = getSegAt 0x00 "Header" $ do
     ttScripts <- indirection "Scripts" getScripts
-    (ttAudioFiles, ttAudioFilesDoubles, ttAudioXor) <- indirection "Media" getAudios
+    ttRawXor <- getAt 0x001C getWord32
+    (ttAudioFiles, ttAudioFilesDoubles, ttAudioXor) <- indirection "Media" (getAudios ttRawXor)
     _ <- getWord32 -- Usually 0x0000238b
     _ <- indirection "Additional script" getScript
     ttGames <- indirection "Games" $ indirections getWord32 "" getGame
     ttProductId <- getWord32
     ttInitialRegs <- indirection "Initial registers" getInitialRegs
-    ttRawXor <- getWord32
+    _ <- getWord32 -- raw Xor
     (ttComment, ttDate) <- do
         l <- getWord8
         c <- getBS (fromIntegral l)

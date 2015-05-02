@@ -1,15 +1,28 @@
-module GMERun (playTipToi) where
+{-# LANGUAGE FlexibleContexts #-}
+module GMERun (playTipToi, execOID) where
 
 import Text.Printf
 import Data.Bits
 import Data.List
 import qualified Data.Map as M
+import Control.Monad.State.Strict
+import Control.Monad.Reader
+import System.Console.Haskeline
+import System.Directory
+import System.FilePath
+import System.Random
+import Data.Foldable (for_)
+import Data.Char
 
 import Types
 import PrettyPrint
 import Utils
+import PlaySound
 
 type PlayState r = M.Map r Word16
+
+type GMEM r =
+    ReaderT (CodeMap, Transscript, TipToiFile) (StateT (PlayState r) IO)
 
 formatState :: PlayState ResReg -> String
 formatState s = spaces $
@@ -17,22 +30,43 @@ formatState s = spaces $
     filter (\(k,v) -> k == 0 || v /= 0) $
     M.toAscList s
 
-playTipToi :: Transscript -> TipToiFile -> IO ()
-playTipToi t tt = do
+playTipToi :: CodeMap -> Transscript -> TipToiFile -> IO ()
+playTipToi cm t tt = do
     let initialState = M.fromList $ zip [0..] (ttInitialRegs tt)
     printf "Initial state (not showing zero registers): %s\n" (formatState initialState)
-    forEachNumber initialState $ \i s -> do
-        case lookup (fromIntegral i) (ttScripts tt) of
-            Nothing -> printf "OID %d not in main table\n" i >> return s
-            Just Nothing -> printf "OID %d deactivated\n" i >> return s
-            Just (Just lines) -> do
-                case find (enabledLine s) lines of
-                    Nothing -> printf "None of these lines matched!\n" >> mapM_ (putStrLn . ppLine t) lines >> return s
-                    Just l -> do
-                        printf "Executing:  %s\n" (ppLine t l)
-                        let s' = applyLine l s
-                        printf "State now: %s\n" (formatState s')
-                        return s'
+
+    dir <- getAppUserDataDirectory "tttool"
+    createDirectoryIfMissing True dir
+    let history_file = dir </> "play_history"
+    let completion = completeFromList $
+            M.keys cm ++ [show n | (n, Just _) <- ttScripts tt, n `notElem` M.elems cm]
+    let haskeline_settings = completion `setComplete` defaultSettings { historyFile = Just history_file }
+
+    flip evalStateT initialState $ flip runReaderT (cm,t,tt) $ do
+        mapM_ playTTAudio $ concat $ ttWelcome tt
+        runInputT haskeline_settings $ nextOID $ \i -> do
+            execOID i
+            s <- get
+            liftIO $ printf "State now: %s\n" $ formatState s
+
+execOID :: Word16 -> GMEM Word16 ()
+execOID i = do
+    (cm,t,tt) <- ask
+    case lookup (fromIntegral i) (ttScripts tt) of
+        Nothing -> do
+            liftIO $ printf "OID %d not in main table\n" i
+        Just Nothing -> do
+            liftIO $ printf "OID %d deactivated\n" i
+        Just (Just lines) -> do
+            code <- gets $ \s -> find (enabledLine s) lines
+            case code of
+                Nothing -> liftIO $ do
+                    printf "None of these lines matched!\n"
+                    mapM_ (putStrLn . ppLine t) lines
+
+                Just l -> do
+                    liftIO $ printf "Executing:  %s\n" (ppLine t l)
+                    applyLine l
 
 enabledLine :: Ord r => PlayState r -> Line r -> Bool
 enabledLine s (Line _ cond _ _) = all (condTrue s) cond
@@ -51,13 +85,45 @@ value :: Ord r => PlayState r -> TVal r -> Word16
 value m (Reg r) = M.findWithDefault 0 r m
 value m (Const n) = n
 
-applyLine :: Ord r => Line r -> PlayState r -> PlayState r
-applyLine (Line _ _ act _) s = foldl' go s act
+getVal :: (Ord r, MonadState (PlayState r) m) => TVal r -> m Word16
+getVal v = gets $ \s ->  value s v
+
+modReg :: (Ord r, MonadState (PlayState r) m) => r -> (Word16 -> Word16) -> m ()
+modReg r f = do
+    x <- getVal (Reg r)
+    modify $ M.insert r (f x)
+
+playTTAudio :: Word16 -> GMEM r ()
+playTTAudio i = do
+    (_,_,tt) <- ask
+    liftIO $ printf "Playing audio sample %d\n" i
+    let bs = ttAudioFiles tt !! fromIntegral i
+    liftIO $ playSound bs
+
+applyLine :: Line Word16 -> GMEM Word16 ()
+applyLine (Line _ _ acts playlist) = go acts
   where
-    go s (Neg r) = M.insert r (neg (s `value` Reg r)) s
-    go s (ArithOp o r n) = M.insert r (applyOp o (s `value` Reg r) (s `value` n)) s
-    go s (Jump n)  = error "Playing scripts with the J command is not yet implemented. Please file a bug."
-    go s _         = s
+    go (Neg r : acts) = do
+        modReg r neg
+        go acts
+    go (ArithOp o r v : acts) = do
+        arg <- getVal v
+        let (*) = applyOp o
+        modReg r (* arg)
+        go acts
+    go (Jump v: _ ) = do
+        n <- getVal v
+        execOID n
+    go (Play n: acts) = do
+        playTTAudio (playlist !! fromIntegral n)
+        go acts
+    go (Random a b: acts) = do
+        pick <- liftIO $ randomRIO (b,a)
+        playTTAudio (playlist !! fromIntegral pick)
+        go acts
+    go (_: acts) = do
+        go acts
+    go [] = return ()
 
     neg 0 = 1
     neg _ = 0
@@ -73,16 +139,27 @@ applyLine (Line _ _ act _) s = foldl' go s act
     applyOp Set = \_ v -> v
 
 
+untilNothing :: Monad m => (a -> m (Maybe a)) -> a -> m ()
+untilNothing f i = do
+    r <- f i
+    case r of Just i' -> untilNothing f i'
+              Nothing -> return ()
 
-forEachNumber :: s -> (Int -> s -> IO s) -> IO ()
-forEachNumber state action = go state
+nextOID :: (Word16 -> GMEM r ()) -> InputT (GMEM r) ()
+nextOID action = go
   where
-    go s = do
-        putStrLn "Next OID touched? "
-        str <- getLine
-        case readMaybe str of
-            Just i -> action i s >>= go
-            Nothing -> do
-                putStrLn "Not a number, please try again"
-                go s
+    go = do
+        (cm,t,tt) <- lift ask
+        mstr <- getInputLine "Next OID touched? "
+        for_ mstr $ \str -> do
+            let str' = dropWhile isSpace $ reverse $ dropWhile isSpace $ reverse $ str
+            case () of () | Just i <- readMaybe str'   -> lift $ action i
+                          | str' == ""                 -> return ()
+                          | Just i <- M.lookup str' cm -> lift $ action i
+                          | otherwise -> liftIO $ putStrLn "Please enter a number (OID) or name of a script."
+            go
+
+completeFromList :: Monad m => [[Char]] -> CompletionFunc m
+completeFromList xs = completeWord Nothing " " $ \p -> return
+            [simpleCompletion x | x <- xs, p `isPrefixOf` x ]
 

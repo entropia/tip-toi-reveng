@@ -16,6 +16,11 @@ arithOpCode XOr  = [0xF7, 0xFF]
 -- Neg is unary, hence a Command
 arithOpCode Set  = [0xF9, 0xFF]
 
+knownRawXOR :: Word32
+knownRawXOR = 0x00000039 -- from Bauernhof
+
+knownXOR :: Word8
+knownXOR = 0xAD
 
 fileMagics :: [(BC.ByteString, String)]
 fileMagics =
@@ -23,3 +28,6 @@ fileMagics =
     , (BC.pack "OggS", "ogg")
     , (BC.pack "fLaC", "flac")
     , (BC.pack "ID3",  "mp3")]
+
+maxCommentLength :: Int
+maxCommentLength = 49

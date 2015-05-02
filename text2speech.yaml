@@ -1,9 +1,10 @@
 # This is an example source file for a TipToi file, showing the text-to-speech
 # feature
 
-# You write your yaml file as usual:
+# You write your yaml file as usual, and include a language field.
 product-id: 42
 welcome: hello
+language: en
 scripts:
   8066:
   - $mode==1? P(mode_one)
@@ -23,3 +24,6 @@ speak:
   
 # You can mix synthesized and normal files; if there is no entry in the speak
 # section, tttool will look for an ogg file as normal.
+
+# See text2speech-multi-lang.yaml for how to mix several languages in the text
+# to speech mode.
