@@ -93,20 +93,25 @@ the github project.
 Otherwise, installation from source is not difficult either:
 
  1. First install the *Haskell platform*, see http://www.haskell.org/platform/
-    for details for your system. Users of Debian or Ubuntu simply run `apt-get
-    install haskell-platform`.
+    for details for your system. Users of Debian or Ubuntu simply run
 
- 2. Install the dependencies. The Haskell platform comes with a tool called
-    `cabal`, and you should run the two commands
+        apt-get install haskell-platform
+
+ 2. Install the development packages for ncurses, i.e.
+
+        apt-get install libncurses5-dev
+
+ 3. Install the Haskell dependencies. The Haskell platform comes with a tool
+    called `cabal`, and you should run the two commands
 
         cabal update
         cabal install --only-dependencies
 
- 3. Now you can build the program using
+ 4. Now you can build the program using
 
         cabal install --bindir=.
 
- 4. At this point, `tttool` should be ready to go. If you run
+ 5. At this point, `tttool` should be ready to go. If you run
 
         ./tttool
 
