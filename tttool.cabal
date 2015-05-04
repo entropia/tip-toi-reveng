@@ -66,7 +66,6 @@ executable tttool
     mtl         == 2.1.*   ||  == 2.2.*,
     parsec      == 3.1.*,
     process     == 1.1.*   ||  == 1.2.*,
-    process-extras >= 0.2   &&   < 0.4,
     random      >= 1.0      &&   < 1.2,
     vector      == 0.10.*,
     yaml        == 0.8.*
