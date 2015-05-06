@@ -448,7 +448,8 @@ encodeFileCommented fn c v = do
 
 readTipToiYaml :: FilePath -> IO (TipToiYAML, CodeMap)
 readTipToiYaml inf = do
-    etty <- decodeFileEither inf
+    content <- SBC.readFile inf
+    let etty = decodeEither' content
     tty <- case etty of
         Left e -> print e >> exitFailure
         Right tty -> return tty
