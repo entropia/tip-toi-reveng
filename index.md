@@ -29,6 +29,7 @@ Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
  * In der [c't 8/2015](http://www.heise.de/ct/ausgabe/2015-8-Eigene-Buecher-und-Spiele-fuer-den-Tiptoi-vertonen-2578001.html) wird beschrieben, wie man einen Vokabltrainer basteln kann.
  * [Rallye - Das verlorene Schaf](https://lists.nomeata.de/archive/tiptoi/2015/000774.html) von Micha Reischuck
  * [Ein personalisiertes Zoo-Puzzle](http://keiplan.blogspot.no/2015/05/tiptoi-zoo-puzzle.html) von Andy
+ * [Ein Sequencer](http://www.raketenwerfer.de/post/120870754563/tttool-step-sequencer) von Peter Schneider.
 
 
 [Selbstgemachte Tier-Figuren]: https://www.youtube.com/watch?v=Yic57Y9VORA
