@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                tttool
-version:             1.4.0.2
+version:             1.4.0.3
 synopsis:            Working with files for the Tiptoi® pen
 description:         The Ravensburger Tiptoi® pen is programmed via special
                      files. Their file format has been reverse engineered; this
@@ -67,7 +67,7 @@ executable tttool
     parsec      == 3.1.*,
     process     == 1.1.*   ||  == 1.2.*,
     random      >= 1.0      &&   < 1.2,
-    vector      == 0.10.*,
+    vector      >= 0.10     &&   < 0.12,
     yaml        == 0.8.*
 
   if impl(ghc < 7.5)
