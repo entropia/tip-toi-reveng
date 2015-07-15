@@ -43,6 +43,7 @@ Sonstiges zur Einstimmug:
 
  * Der Podcast Modellansatz [interviewte Joachim Breitner](http://modellansatz.de/papierrechner) zu dem Projekt (80 Minuten).
  * Auf der GPN'15 in Karlsruhe gab es einen [Vortrag zum Projekt](https://entropia.de/GPN15:Der_Tiptoi-Stift), der auch [aufgezeichnet](https://media.ccc.de/browse/conferences/gpn/gpn15/gpn15-6687-der_tiptoi-stift.html#video) wurde (63 Minuten).
+ * Micha Reischuck zeigt einem [Screencast](https://youtu.be/QtdlwmKgg70) wie man mit GIMP die OID-Codes über Bilder legt.
 
 ## Installation (Windows)
 
