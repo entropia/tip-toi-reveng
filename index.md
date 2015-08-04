@@ -27,7 +27,9 @@ Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
    * Ein [Taschenrechner]
  * Eine [Outdoor-Schatzsuche](http://mycvs.org/post/110330262976/interactive-treasure-hunt-with-tip-toi-the)
  * In der [c't 8/2015](http://www.heise.de/ct/ausgabe/2015-8-Eigene-Buecher-und-Spiele-fuer-den-Tiptoi-vertonen-2578001.html) wird beschrieben, wie man einen Vokabltrainer basteln kann.
- * [Rallye - Das verlorene Schaf](https://lists.nomeata.de/archive/tiptoi/2015/000774.html) von Micha Reischuck
+ * Micha Reischuck bastelt Ralleys mit dem Tiptoi-Stift:
+   * [Das verlorene Schaf](https://lists.nomeata.de/archive/tiptoi/2015/000774.html)
+   * [Piratenralley](https://github.com/michote/Piraten-Geburtstag)
  * [Ein personalisiertes Zoo-Puzzle](http://keiplan.blogspot.no/2015/05/tiptoi-zoo-puzzle.html) von Andy
  * [Ein Sequencer](http://www.raketenwerfer.de/post/120870754563/tttool-step-sequencer) von Peter Schneider
 
