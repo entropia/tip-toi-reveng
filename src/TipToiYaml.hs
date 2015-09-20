@@ -107,7 +107,7 @@ instance FromJSON SpeakSpecs where
 instance ToJSON SpeakSpecs where
     toJSON (SpeakSpecs [x]) = toJSON x
     toJSON (SpeakSpecs l)   = Array $ V.fromList $ map toJSON $ l
-    
+
 options = defaultOptions { fieldLabelModifier = map fix . map toLower . drop 3 }
        where fix '_' = '-'
              fix c   = c
@@ -115,11 +115,17 @@ options = defaultOptions { fieldLabelModifier = map fix . map toLower . drop 3 }
 instance FromJSON TipToiYAML where
      parseJSON = genericParseJSON $ options
 instance ToJSON TipToiYAML where
-     toJSON = genericToJSON $ options
+     toJSON = genericToJSON options
+#if MIN_VERSION_aeson(0,10,0)
+    toEncoding = genericToEncoding options
+#endif
 instance FromJSON TipToiCodesYAML where
      parseJSON = genericParseJSON $ options
 instance ToJSON TipToiCodesYAML where
-     toJSON = genericToJSON $ options
+     toJSON = genericToJSON options
+#if MIN_VERSION_aeson(0,10,0)
+    toEncoding = genericToEncoding options
+#endif
 
 
 tt2ttYaml :: String -> TipToiFile -> TipToiYAML
