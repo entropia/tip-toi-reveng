@@ -113,16 +113,16 @@ options = defaultOptions { fieldLabelModifier = map fix . map toLower . drop 3 }
              fix c   = c
 
 instance FromJSON TipToiYAML where
-     parseJSON = genericParseJSON $ options
+    parseJSON = genericParseJSON $ options
 instance ToJSON TipToiYAML where
-     toJSON = genericToJSON options
+    toJSON = genericToJSON options
 #if MIN_VERSION_aeson(0,10,0)
     toEncoding = genericToEncoding options
 #endif
 instance FromJSON TipToiCodesYAML where
-     parseJSON = genericParseJSON $ options
+    parseJSON = genericParseJSON $ options
 instance ToJSON TipToiCodesYAML where
-     toJSON = genericToJSON options
+    toJSON = genericToJSON options
 #if MIN_VERSION_aeson(0,10,0)
     toEncoding = genericToEncoding options
 #endif
