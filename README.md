@@ -68,7 +68,8 @@ supports various subcommands:
            creates a PNG file for each given code
            scale this to 10cm×10cm
            By default, it creates a 1200 dpi image. With -d 600, you
-           obtain a 600 dpi image.
+           obtain a 600 dpi image. With -d 600d resp. 1200d you can double the
+           size of the pixel.
            <codes> can be a range, e.g. 1,3,1000-1085.
            Uses oid-<code>.png as the file name.
         oid-code [-d DPI] <infile.yaml>

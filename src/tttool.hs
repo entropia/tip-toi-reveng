@@ -272,42 +272,42 @@ assemble inf out = do
     writeTipToi out tt
 
 
-genPNGs :: DPI -> String -> IO ()
-genPNGs dpi arg = do
+genPNGs :: DPI -> PixelSize -> String -> IO ()
+genPNGs dpi ps arg = do
     ex <- doesFileExist arg
-    if ex then genPNGsForFile dpi arg
-          else genPNGsForCodes dpi arg
+    if ex then genPNGsForFile dpi ps arg
+          else genPNGsForCodes dpi ps arg
 
-genPNGsForFile :: DPI -> FilePath -> IO ()
-genPNGsForFile dpi inf = do
+genPNGsForFile :: DPI -> PixelSize -> FilePath -> IO ()
+genPNGsForFile dpi ps inf = do
     (tty, codeMap) <- readTipToiYaml inf
     (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
     let codes = ("START", fromIntegral (ttProductId tt)) : M.toList totalMap
     forM_  codes $ \(s,c) -> do
-        genPNG dpi c $ printf "oid-%d-%s.png" (ttProductId tt) s
+        genPNG dpi ps c $ printf "oid-%d-%s.png" (ttProductId tt) s
 
-genPNGsForCodes :: DPI -> String -> IO ()
-genPNGsForCodes dpi code_str = do
+genPNGsForCodes :: DPI -> PixelSize -> String -> IO ()
+genPNGsForCodes dpi ps code_str = do
     codes <- parseRange code_str
     forM_ codes $ \c -> do
-        genPNG dpi c $ printf "oid-%d.png" c
+        genPNG dpi ps c $ printf "oid-%d.png" c
 
-genPNG :: DPI -> Word16 -> String -> IO ()
-genPNG dpi c filename =
+genPNG :: DPI -> PixelSize -> Word16 -> String -> IO ()
+genPNG dpi ps c filename =
     case code2RawCode c of
         Nothing -> printf "Skipping %s, code %d not known.\n" filename c
         Just r -> do
             printf "Writing %s.. (Code %d, raw code %d)\n" filename c r
-            genRawPNG dpi r filename
+            genRawPNG dpi ps r filename
 
 
-genPNGsForRawCodes :: DPI -> String -> IO ()
-genPNGsForRawCodes dpi code_str = do
+genPNGsForRawCodes :: DPI -> PixelSize -> String -> IO ()
+genPNGsForRawCodes dpi ps code_str = do
     codes <- parseRange code_str
     forM_ codes $ \r -> do
         let filename = printf "oid-raw-%d.png" r
         printf "Writing %s... (raw code %d)\n" filename r
-        genRawPNG dpi r filename
+        genRawPNG dpi ps r filename
 
 
 -- The main function
@@ -361,21 +361,29 @@ main' t ("rewrite": inf : out: [])  =              rewrite inf out
 main' t ("export": inf : out: [] )  =              export inf out
 main' t ("assemble": inf : out: []) =              assemble inf out
 main' t ("oid-code": "-d" : "600" : codes@(_:_))
-                                    =              genPNGs D600 (unwords codes)
+                                    =              genPNGs D600 SinglePixel (unwords codes)
 main' t ("oid-code": "-d" : "1200" : codes@(_:_))
-                                    =              genPNGs D1200 (unwords codes)
+                                    =              genPNGs D1200 SinglePixel (unwords codes)
+main' t ("oid-code": "-d" : "600d" : codes@(_:_))
+                                    =              genPNGs D600 DoublePixel (unwords codes)
+main' t ("oid-code": "-d" : "1200d" : codes@(_:_))
+                                    =              genPNGs D1200 DoublePixel (unwords codes)
 main' t ("oid-code": "-d" : _)      = do
-    putStrLn $ "The parameter to -d has to be 600 or 1200"
+    putStrLn $ "The parameter to -d has to be 600, 1200, 600d or 1200d"
     exitFailure
-main' t ("oid-code": codes@(_:_))   =              genPNGs D1200 (unwords codes)
+main' t ("oid-code": codes@(_:_))   =              genPNGs D1200 SinglePixel (unwords codes)
 main' t ("raw-oid-code": "-d" : "600" : codes@(_:_))
-                                    =              genPNGsForRawCodes D600 (unwords codes)
+                                    =              genPNGsForRawCodes D600 SinglePixel (unwords codes)
 main' t ("raw-oid-code": "-d" : "1200" : codes@(_:_))
-                                    =              genPNGsForRawCodes D1200 (unwords codes)
+                                    =              genPNGsForRawCodes D1200 SinglePixel (unwords codes)
+main' t ("raw-oid-code": "-d" : "600d" : codes@(_:_))
+                                    =              genPNGsForRawCodes D600 DoublePixel (unwords codes)
+main' t ("raw-oid-code": "-d" : "1200d" : codes@(_:_))
+                                    =              genPNGsForRawCodes D1200 DoublePixel (unwords codes)
 main' t ("raw-oid-code": "-d" : _)  = do
-    putStrLn $ "The parameter to -d has to be 600 or 1200"
+    putStrLn $ "The parameter to -d has to be 600, 1200, 600d or 1200d"
     exitFailure
-main' t ("raw-oid-code": codes@(_:_)) =            genPNGsForRawCodes D1200 (unwords codes)
+main' t ("raw-oid-code": codes@(_:_)) =            genPNGsForRawCodes D1200 SinglePixel (unwords codes)
 main' _ _ = do
     prg <- getProgName
     putStrLn $ "This is the Tiptoi toolkit, version " ++ showVersion version

@@ -1,6 +1,6 @@
-{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE BangPatterns, TupleSections #-}
 
-module OidCode (genRawPNG, DPI(..)) where
+module OidCode (genRawPNG, DPI(..), PixelSize(..)) where
 
 import Data.Word
 import Data.Bits
@@ -86,9 +86,10 @@ genSVG code filename = B.writeFile filename (renderSvg (oidSVG code))
 -}
 
 data DPI = D1200 | D600
+data PixelSize = SinglePixel | DoublePixel
 
 imageFromBlackPixels :: Int -> Int -> [(Int, Int)] -> Image PixelYA8
-imageFromBlackPixels width height pixels = runST $ do 
+imageFromBlackPixels width height pixels = runST $ do
     i <- createMutableImage width height background
     forM_ pixels $ \(x,y) -> do
         writePixel i x y black
@@ -97,8 +98,8 @@ imageFromBlackPixels width height pixels = runST $ do
     black =      PixelYA8 minBound maxBound
     background = PixelYA8 maxBound minBound
 
-oidImage :: DPI -> Word16 -> Image PixelYA8
-oidImage dpi code =
+oidImage :: DPI -> PixelSize -> Word16 -> Image PixelYA8
+oidImage dpi ps code =
     imageFromBlackPixels
         (width *4*dotsPerPoint)
         (height*4*dotsPerPoint)
@@ -119,8 +120,51 @@ oidImage dpi code =
         [ (p, plain) | p <- [(0,0), (1,0), (2,0), (3,0), (0,1), (0,3) ] ] ++
         [ ((0,2), special) ]
 
-    plain | D1200 <- dpi = [ (5,5), (5,6), (6,5), (6,6) ]
-          | D600 <- dpi  = [ (3,3) ]
+    plain | D1200 <- dpi, SinglePixel <- ps = coordsOfDots
+                [ "           "
+                , "           "
+                , "           "
+                , "           "
+                , "           "
+                , "    **     "
+                , "    **     "
+                , "           "
+                , "           "
+                , "           "
+                , "           "
+                , "           "
+                ]
+          | D1200 <- dpi, DoublePixel <- ps = coordsOfDots
+                [ "           "
+                , "           "
+                , "           "
+                , "           "
+                , "   ****    "
+                , "   ****    "
+                , "   ****    "
+                , "   ****    "
+                , "           "
+                , "           "
+                , "           "
+                , "           "
+                ]
+          | D600 <- dpi, SinglePixel <- ps  = coordsOfDots
+                [ "      "
+                , "      "
+                , "  *   "
+                , "      "
+                , "      "
+                , "      "
+                ]
+          | D600 <- dpi, DoublePixel <- ps  = coordsOfDots
+                [ "      "
+                , "      "
+                , "  **  "
+                , "  **  "
+                , "      "
+                , "      "
+                ]
+
 
     s  | D1200 <- dpi = 2
        | D600  <- dpi = 1
@@ -134,6 +178,14 @@ oidImage dpi code =
 
     position ((n,m), p) = at (n*dotsPerPoint, m*dotsPerPoint) p
 
+    coordsOfDots :: [String] -> [(Int, Int)]
+    coordsOfDots rows =
+        [ (x,y)
+        | (row, y) <- zip rows [0..]
+        , (c, x)   <- zip row  [0..]
+        , c == '*'
+        ]
+
     -- Drawing combinators
 
     at (x, y) = map (\(x', y') -> (x + x', y + y'))
@@ -142,6 +194,6 @@ oidImage dpi code =
 
 
 
-genRawPNG :: DPI -> Word16 -> FilePath -> IO ()
-genRawPNG dpi code filename = writePng filename (oidImage dpi code)
+genRawPNG :: DPI -> PixelSize -> Word16 -> FilePath -> IO ()
+genRawPNG dpi ps code filename = writePng filename (oidImage dpi ps code)
 
