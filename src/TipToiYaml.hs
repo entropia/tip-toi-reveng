@@ -150,9 +150,15 @@ mergeOnlyEqual s c1 c2 = error $
     printf "The .yaml file specifies code %d for script \"%s\",\
            \but the .codes.yamls file specifies %d. Please fix this!" c2 s c1
 
-scriptCodes :: [String] -> CodeMap -> Either String (String -> Word16, CodeMap)
-scriptCodes [] codeMap = Right (error "scriptCodes []", codeMap)
-scriptCodes codes codeMap
+toWord16 :: Word32 -> Word16
+toWord16 x = fromIntegral x
+
+toWord32 :: Word16 -> Word32
+toWord32 x = fromIntegral x
+
+scriptCodes :: [String] -> CodeMap -> Word32 -> Either String (String -> Word16, CodeMap)
+scriptCodes [] codeMap productId = Right (error "scriptCodes []", codeMap)
+scriptCodes codes codeMap productId
     | null strs || null nums = Right (lookupCode, totalMap)
     | otherwise = Left "Cannot mix numbers and names in scripts."
   where
@@ -164,11 +170,37 @@ scriptCodes codes codeMap
             Nothing -> Left s 
             Just n -> Right (n::Word16)
 
+-- The following logic (for objectCodes) tries to use different object codes 
+-- for different projects, as far as possible. This makes the detection of not 
+-- having activated a book/product more robust.
+
+-- We could theoretically set: 
+--    objectCodeOffsetMax = lastObjectCode - firstObjectCode.
+-- This would assign perfectly usable object codes, and would minimize the 
+-- probability of object code collisions between products, but sometimes 
+-- object codes would wrap around from 16383 to 1000 even for small projects 
+-- which may be undesirable. We arbitrarily do not use the last 199 possible 
+-- offsets to avoid a wrap around in object codes for projects with <= 200 
+-- object codes. This does not impose any limit on the number of object codes 
+-- per project. Every project can always use all 15384 object codes.
+    objectCodeOffsetMax = lastObjectCode - firstObjectCode - 199
+
+-- Distribute the used object codes for different projects across the whole 
+-- range of usable object codes. We do this by multiplying the productId with 
+-- the golden ratio to achive a maximum distance between different projects, 
+-- indepedent of the total number of different projects.
+-- 9385 = (16383-1000-199+1)*((sqrt(5)-1)/2)
+    objectCodeOffset = toWord16(rem (productId * 9385) (toWord32(objectCodeOffsetMax) + 1))
+
+-- objectCodes always contains _all_ possible object codes [firstObjectCode..lastObjectCode], 
+-- starting at firstObjectCode+objectCodeOffset and then wrapping around.
+    objectCodes = [firstObjectCode + objectCodeOffset .. lastObjectCode] ++ [firstObjectCode .. firstObjectCode + objectCodeOffset - 1]
+
     newAssignments =
         M.fromList $
         zip newStrs $
         filter (`S.notMember` usedCodes) $
-        [firstObjectCode .. lastObjectCode]
+        objectCodes
 
     totalMap = M.fromList
         [ (str, fromJust $
@@ -219,7 +251,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
                                  extCodeMap
                                  (fromMaybe M.empty ttyScriptCodes)
 
-    (scriptMap, totalMap) <- either fail return $ scriptCodes (M.keys ttyScripts) codeMap
+    (scriptMap, totalMap) <- either fail return $ scriptCodes (M.keys ttyScripts) codeMap ttyProduct_Id
 
     let m = M.mapKeys scriptMap ttyScripts
         first = fst (M.findMin m)
