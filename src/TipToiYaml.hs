@@ -179,18 +179,18 @@ scriptCodes codes codeMap productId
 -- This would assign perfectly usable object codes, and would minimize the 
 -- probability of object code collisions between products, but sometimes 
 -- object codes would wrap around from 16383 to 1000 even for small projects 
--- which may be undesirable. We arbitrarily do not use the last 199 possible 
--- offsets to avoid a wrap around in object codes for projects with <= 200 
+-- which may be undesirable. We arbitrarily do not use the last 999 possible
+-- offsets to avoid a wrap around in object codes for projects with <= 1000
 -- object codes. This does not impose any limit on the number of object codes 
 -- per project. Every project can always use all 15384 object codes.
-    objectCodeOffsetMax = lastObjectCode - firstObjectCode - 199
+    objectCodeOffsetMax = lastObjectCode - firstObjectCode - 999
 
 -- Distribute the used object codes for different projects across the whole 
 -- range of usable object codes. We do this by multiplying the productId with 
 -- the golden ratio to achive a maximum distance between different projects, 
 -- indepedent of the total number of different projects.
--- 9385 = (16383-1000-199+1)*((sqrt(5)-1)/2)
-    objectCodeOffset = toWord16(rem (productId * 9385) (toWord32(objectCodeOffsetMax) + 1))
+-- 8890 = (16383-1000-999+1)*((sqrt(5)-1)/2)
+    objectCodeOffset = toWord16(rem (productId * 8890) (toWord32(objectCodeOffsetMax) + 1))
 
 -- objectCodes always contains _all_ possible object codes [firstObjectCode..lastObjectCode], 
 -- starting at firstObjectCode+objectCodeOffset and then wrapping around.
