@@ -11,7 +11,7 @@ code2RawCode :: Word16 -> Maybe Word16
 code2RawCode code = knownRawCodes V.!? fromIntegral code
 
 firstObjectCode :: Word16
-firstObjectCode = 4716 
+firstObjectCode = 1000
 
 lastObjectCode :: Word16
 lastObjectCode = fromIntegral $ V.length knownRawCodes - 1
