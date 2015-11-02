@@ -93,26 +93,32 @@ the github project.
 
 Otherwise, installation from source is not difficult either:
 
- 1. First install the *Haskell platform*, see http://www.haskell.org/platform/
+ 1. If you have not done so yet, fetch the source code and change to the
+    directory containing the code:
+
+        git clone https://github.com/entropia/tip-toi-reveng.git tttool
+        cd tttool
+
+ 2. Install the *Haskell platform*, see http://www.haskell.org/platform/
     for details for your system. Users of Debian or Ubuntu simply run
 
         apt-get install haskell-platform
 
- 2. Install the development packages for ncurses, i.e.
+ 3. Install the development packages for ncurses, i.e.
 
         apt-get install libncurses5-dev
 
- 3. Install the Haskell dependencies. The Haskell platform comes with a tool
+ 4. Install the Haskell dependencies. The Haskell platform comes with a tool
     called `cabal`, and you should run the two commands
 
         cabal update
         cabal install --only-dependencies
 
- 4. Now you can build the program using
+ 5. Now you can build the program using
 
         cabal install --bindir=.
 
- 5. At this point, `tttool` should be ready to go. If you run
+ 6. At this point, `tttool` should be ready to go. If you run
 
         ./tttool
 
