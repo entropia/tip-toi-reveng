@@ -1,5 +1,18 @@
 # Changelog for tttool
 
+## 1.5.1 (2015-11-11)
+
+ * Do not assign object IDs >= 15000, as these are not recognized.
+
+## 1.5 (2015-10-28)
+
+ * New commands FB00 (alternative play range command), FFE0 (alternative
+   play random sample) and FFE1 (alternative play all samples)
+ * New pixel formats -d 1200d and -d 600d,w hich double the size of the
+   dots.
+ * Assign object IDs dependent on project IDs, to avoid overlap.
+ * Fix missing support in tttool play for > and <=
+
 ## 1.4 (2015-04-29)
 
  * The `tttool play` command is greatly enhanced:
