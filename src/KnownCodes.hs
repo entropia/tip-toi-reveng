@@ -14,7 +14,10 @@ firstObjectCode :: Word16
 firstObjectCode = 1000
 
 lastObjectCode :: Word16
-lastObjectCode = fromIntegral $ V.length knownRawCodes - 1
+-- Empirically, the pen does not recognize OIDs >= 15000:
+lastObjectCode = 14999
+-- Last object code accoring to the known raw codes:
+-- lastObjectCode = fromIntegral $ V.length knownRawCodes - 1
 
 knownRawCodes :: V.Vector Word16
 knownRawCodes =
