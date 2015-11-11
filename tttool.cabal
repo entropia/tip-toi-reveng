@@ -1,5 +1,5 @@
 name:                tttool
-version:             1.4.0.5
+version:             1.5.0.1
 synopsis:            Working with files for the Tiptoi® pen
 description:         The Ravensburger Tiptoi® pen is programmed via special
                      files. Their file format has been reverse engineered; this
@@ -62,7 +62,7 @@ executable tttool
     haskeline   == 0.7.*,
     mtl         == 2.1.*   ||  == 2.2.*,
     parsec      == 3.1.*,
-    process     >= 1.1      &&   < 1.4,
+    process     >= 1.1      &&   < 1.5,
     random      >= 1.0      &&   < 1.2,
     vector      >= 0.10     &&   < 0.12,
     yaml        == 0.8.*

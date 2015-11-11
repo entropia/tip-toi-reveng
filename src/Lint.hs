@@ -29,9 +29,7 @@ lintTipToi tt segments = do
     unless (null overlapping_segments) $ do
         printf "Overlapping segments: %d\n"
             (length overlapping_segments)
-        forM_ overlapping_segments $ \((o1,l1,d1),(o2,l2,d2)) ->
-            printf "   Offset %08X Size %d (%s) overlaps Offset %08X Size %d (%s) by %d\n"
-            o1 l1 (ppDesc d1) o2 l2 (ppDesc d2) (o1 + l1 - o2)
+        mapM_ (uncurry report) overlapping_segments
   where
     hyp1 :: Line ResReg -> Bool
     hyp1 (Line _ _ as mi) = all ok as
@@ -43,6 +41,12 @@ lintTipToi tt segments = do
     hyp2 :: Word16 -> Line ResReg -> Bool
     hyp2 n (Line _ _ _ mi) = all (<= n) mi
 
-
-
-
+    report :: Segment -> Segment -> IO ()
+    report (o1,l1,d1) (o2,l2,d2)
+        | l1 == l2 && o1 == o2
+        = printf "   Offset %08X Size %d referenced by %s and %s\n"
+            o1 l1 (ppDesc d1) (ppDesc d2)
+        | otherwise
+        = printf "   Offset %08X Size %d (%s) overlaps Offset %08X Size %d (%s) by %d\n"
+            o1 l1 (ppDesc d1) o2 l2 (ppDesc d2) overlap
+      where overlap = o1 + l1 - o2

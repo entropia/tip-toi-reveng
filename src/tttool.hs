@@ -156,8 +156,8 @@ explain file = do
             printSegment (o,l,["-- unknown --"])
             printExtract bytes o l
             putStrLn ""
-        Right s@(o,l,_) -> do
-            printSegment s
+        Right ss@((o,l,_):_) -> do
+            mapM_ printSegment ss
             printExtract bytes o l
             putStrLn ""
 
@@ -202,15 +202,16 @@ findPosition pos' file = do
     pos = fromIntegral pos'
 
 
-addHoles :: [Segment] -> [Either (Offset, Word32) Segment]
-addHoles = go
-   where go [] = []
-         go [s] = [Right s]
-         go (s@(o1,l1,d2):r@((o2,_,_):_))
-            | o1 + l1 == o2 -- no hole
-            = Right s : go r
-            | otherwise -- a hole
-            = Right s : Left (o1+l1, o2 - (o1 + l1)) : go r
+-- returns a list of segments in case of overlap
+addHoles :: [Segment] -> [Either (Offset, Word32) [Segment]]
+addHoles = go 0
+   where go at [] = []
+         go at ss@((o,l,d):_)
+            | at /= o -- a hole
+            = Left (at, o-at) : go o ss
+            | otherwise -- no hole
+            = let (this, others) = span (\(o',l',_) -> o == o' && l == l') ss
+              in Right this : go (o + l) others
 
 unknown_segments :: FilePath -> IO ()
 unknown_segments file = do
