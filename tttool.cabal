@@ -48,7 +48,7 @@ executable tttool
     Utils
 
   build-depends:
-    base        == 4.5.*   ||  == 4.6.*  ||  == 4.7.* ||  == 4.8.*,
+    base        >= 4.5 &&  < 4.10,
     binary      == 0.5.*   ||  == 0.7.*,
     containers  == 0.4.*   ||  == 0.5.*,
     directory   == 1.2.*,
