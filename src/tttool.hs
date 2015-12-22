@@ -162,6 +162,7 @@ explain file = do
             putStrLn ""
 
 printExtract :: B.ByteString -> Offset -> Word32 -> IO ()
+printExtract b o 0 = return ()
 printExtract b o l = do
     let o1 = o .&. 0xFFFFFFF0
     lim_forM_ [o1, o1+0x10 .. (o + l-1)] $ \s -> do
