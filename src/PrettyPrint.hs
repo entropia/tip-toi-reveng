@@ -144,7 +144,7 @@ ppGame t (Game6 u1 u2 plls sg1s sg2s u3 pll2s pl) =
     (length pll2s)  (indent 4 (map (ppPlayListList t) pll2s))
     (show pl)
 ppGame t (Game7 u1 c u2 plls sgs u3 pll2s pll) =
-    printf (unlines ["  type: 6", "  u1:   %d", "  u2:   %s",
+    printf (unlines ["  type: 7", "  u1:   %d", "  u2:   %s",
                      "  playlistlists: (%d)", "%s",
                      "  subgames: (%d)", "%s",
                      "  u3: %s",
@@ -157,7 +157,7 @@ ppGame t (Game7 u1 c u2 plls sgs u3 pll2s pll) =
     (length pll2s)  (indent 4 (map (ppPlayListList t) pll2s))
     (ppPlayListList t pll)
 ppGame t (Game8 u1 c u2 plls sgs u3 pll2s oidl gidl pll1 pll2) =
-    printf (unlines ["  type: 6", "  u1:   %d", "  u2:   %s",
+    printf (unlines ["  type: 8", "  u1:   %d", "  u2:   %s",
                      "  playlistlists: (%d)", "%s",
                      "  subgames: (%d)", "%s",
                      "  u3: %s",
