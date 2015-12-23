@@ -32,7 +32,7 @@ exportLine (Line _ cs as xs) = spaces $
     map ppConditional cs ++ map (ppCommand True M.empty xs) as
 
 -- Group consecutive runs of numbers, if they do not have a description
-groupRuns :: (Eq a, Enum a) => (a -> Maybe b) -> [a] -> [Either b [a]]
+groupRuns :: (Eq a, Bounded a, Enum a) => (a -> Maybe b) -> [a] -> [Either b [a]]
 groupRuns l = go
   where
     go []  = []
@@ -41,8 +41,10 @@ groupRuns l = go
     go (x:xs) = case l x of
         Just l -> Left l : go xs
         Nothing -> case go xs of
-            Right (y:ys):r' | succ x == y -> Right (x:y:ys) : r'
-            r                             -> Right [x] : r
+            Right (y:ys):r'
+              | x /= maxBound
+              , succ x == y    -> Right (x:y:ys) : r'
+            r                  -> Right [x] : r
 
 ppPlayList :: Transscript -> PlayList -> String
 ppPlayList t xs = "[" ++ commas (map go (groupRuns (flip M.lookup t) xs)) ++ "]"
