@@ -253,7 +253,7 @@ ppGame t Game253 =
                      ])
 
 ppSubGames :: Transscript -> [SubGame] -> String
-ppSubGames t = concatMap (uncurry (ppSubGame t)) . zip [1..]
+ppSubGames t = concatMap (uncurry (ppSubGame t)) . zip [0..]
 
 ppSubGame :: Transscript -> Int -> SubGame -> String
 ppSubGame t n (SubGame u oids1 oids2 oids3 plls) = printf (unlines

@@ -288,7 +288,7 @@ getPlayList :: SGet PlayList
 getPlayList = getArray getWord16 getWord16
 
 getGameIdList :: SGet [GameId]
-getGameIdList = getArray getWord16 getWord16
+getGameIdList = getArray getWord16 (subtract 1 <$> getWord16)
 
 getGameIdListList :: SGet [[GameId]]
 getGameIdListList = indirections getWord16 "" getGameIdList
