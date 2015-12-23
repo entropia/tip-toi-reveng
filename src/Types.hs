@@ -85,17 +85,157 @@ data TipToiFile = TipToiFile
 type PlayListList = [PlayList]
 type GameId = Word16
 
-data Game
-    = Game6 Word16 B.ByteString [PlayListList] [SubGame] [SubGame] B.ByteString [PlayListList] PlayList
-    | Game7 Word16 Word16 B.ByteString [PlayListList] [SubGame] B.ByteString [PlayListList] PlayListList
-    | Game8 Word16 Word16 B.ByteString [PlayListList] [SubGame] B.ByteString [PlayListList] [OID] [GameId] PlayListList PlayListList
+data Game =
+    CommonGame
+        { gGameType                 :: Word16
+        , gRounds                   :: Word16
+        , gUnknownC                 :: Word16
+        , gEarlyRounds              :: Word16
+        , gRepeatLastMedia          :: Word16
+        , gUnknownX                 :: Word16
+        , gUnknownW                 :: Word16
+        , gUnknownV                 :: Word16
+        , gStartPlayList            :: PlayListList
+        , gRoundEndPlayList         :: PlayListList
+        , gFinishPlayList           :: PlayListList
+        , gRoundStartPlayList       :: PlayListList
+        , gLaterRoundStartPlayList  :: PlayListList
+        , gSubgames                 :: [SubGame]
+        , gTargetScores             :: [Word16]
+        , gFinishPlayLists          :: [PlayListList]
+        }
+    | Game6
+        { gRounds                   :: Word16
+        , gBonusRounds              :: Word16
+        , gBonusTarget              :: Word16
+        , gUnknownI                 :: Word16
+        , gEarlyRounds              :: Word16
+        , gUnknownQ                 :: Word16
+        , gRepeatLastMedia          :: Word16
+        , gUnknownX                 :: Word16
+        , gUnknownW                 :: Word16
+        , gUnknownV                 :: Word16
+        , gStartPlayList            :: PlayListList
+        , gRoundEndPlayList         :: PlayListList
+        , gFinishPlayList           :: PlayListList
+        , gRoundStartPlayList       :: PlayListList
+        , gLaterRoundStartPlayList  :: PlayListList
+        , gRoundStartPlayList2      :: PlayListList
+        , gLaterRoundStartPlayList2 :: PlayListList
+        , gSubgames                 :: [SubGame]
+        , gSecondarySubgames        :: [SubGame]
+        , gTargetScores             :: [Word16]
+        , gBonusTargetScores        :: [Word16]
+        , gFinishPlayLists          :: [PlayListList]
+        , gBonusFinishPlayLists     :: [PlayListList]
+        , gBonusSubgames            :: [SubGame]
+        }
+    | Game7
+        { gRounds                   :: Word16
+        , gUnknownC                 :: Word16
+        , gEarlyRounds              :: Word16
+        , gRepeatLastMedia          :: Word16
+        , gUnknownX                 :: Word16
+        , gUnknownW                 :: Word16
+        , gUnknownV                 :: Word16
+        , gStartPlayList            :: PlayListList
+        , gRoundEndPlayList         :: PlayListList
+        , gFinishPlayList           :: PlayListList
+        , gRoundStartPlayList       :: PlayListList
+        , gLaterRoundStartPlayList  :: PlayListList
+        , gSubgames                 :: [SubGame]
+        , gTargetScores             :: [Word16]
+        , gFinishPlayLists          :: [PlayListList]
+        , gSubgameGroups            :: [[SubGame]]
+        }
+    | Game8
+        { gRounds                   :: Word16
+        , gUnknownC                 :: Word16
+        , gEarlyRounds              :: Word16
+        , gRepeatLastMedia          :: Word16
+        , gUnknownX                 :: Word16
+        , gUnknownW                 :: Word16
+        , gUnknownV                 :: Word16
+        , gStartPlayList            :: PlayListList
+        , gRoundEndPlayList         :: PlayListList
+        , gFinishPlayList           :: PlayListList
+        , gRoundStartPlayList       :: PlayListList
+        , gLaterRoundStartPlayList  :: PlayListList
+        , gSubgames                 :: [SubGame]
+        , gTargetScores             :: [Word16]
+        , gFinishPlayLists          :: [PlayListList]
+        , gGameSelectOIDs           :: [Word16]
+        , gGameSelect               :: [Word16]
+        , gGameSelectErrors1        :: PlayListList
+        , gGameSelectErrors2        :: PlayListList
+        }
     | Game9
+        { gRounds                   :: Word16
+        , gUnknownC                 :: Word16
+        , gEarlyRounds              :: Word16
+        , gRepeatLastMedia          :: Word16
+        , gUnknownX                 :: Word16
+        , gUnknownW                 :: Word16
+        , gUnknownV                 :: Word16
+        , gStartPlayList            :: PlayListList
+        , gRoundEndPlayList         :: PlayListList
+        , gFinishPlayList           :: PlayListList
+        , gRoundStartPlayList       :: PlayListList
+        , gLaterRoundStartPlayList  :: PlayListList
+        , gSubgames                 :: [SubGame]
+        , gTargetScores             :: [Word16]
+        , gFinishPlayLists          :: [PlayListList]
+        , gExtraPlayLists           :: [PlayListList]
+        }
     | Game10
+        { gRounds                   :: Word16
+        , gUnknownC                 :: Word16
+        , gEarlyRounds              :: Word16
+        , gRepeatLastMedia          :: Word16
+        , gUnknownX                 :: Word16
+        , gUnknownW                 :: Word16
+        , gUnknownV                 :: Word16
+        , gStartPlayList            :: PlayListList
+        , gRoundEndPlayList         :: PlayListList
+        , gFinishPlayList           :: PlayListList
+        , gRoundStartPlayList       :: PlayListList
+        , gLaterRoundStartPlayList  :: PlayListList
+        , gSubgames                 :: [SubGame]
+        , gTargetScores             :: [Word16]
+        , gFinishPlayLists          :: [PlayListList]
+        , gExtraPlayLists           :: [PlayListList]
+        }
     | Game16
+        { gRounds                   :: Word16
+        , gUnknownC                 :: Word16
+        , gEarlyRounds              :: Word16
+        , gRepeatLastMedia          :: Word16
+        , gUnknownX                 :: Word16
+        , gUnknownW                 :: Word16
+        , gUnknownV                 :: Word16
+        , gStartPlayList            :: PlayListList
+        , gRoundEndPlayList         :: PlayListList
+        , gFinishPlayList           :: PlayListList
+        , gRoundStartPlayList       :: PlayListList
+        , gLaterRoundStartPlayList  :: PlayListList
+        , gSubgames                 :: [SubGame]
+        , gTargetScores             :: [Word16]
+        , gExtraOIDs                :: [Word16]
+        , gExtraPlayLists           :: [PlayListList]
+        }
     | Game253
-    | UnknownGame Word16 Word16 Word16 B.ByteString [PlayListList] [SubGame] B.ByteString [PlayListList]
     deriving Show
 
+
+gameType :: Game -> Word16
+gameType (CommonGame {gGameType = gGameType }) = gGameType
+gameType Game6 {} = 6
+gameType Game7 {} = 7
+gameType Game8 {} = 8
+gameType Game9 {} = 9
+gameType Game10 {} = 10
+gameType Game16 {} = 16
+gameType Game253 {} = 253
 
 type OID = Word16
 

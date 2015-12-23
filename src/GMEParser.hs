@@ -17,6 +17,7 @@ import Control.Monad.Reader
 import Control.Monad.RWS.Strict
 import Control.Exception
 import Control.Arrow
+import Debug.Trace
 
 import Types
 import Constants
@@ -286,11 +287,11 @@ calcChecksum = do
 getPlayList :: SGet PlayList
 getPlayList = getArray getWord16 getWord16
 
+getGameIdList :: SGet [GameId]
+getGameIdList = getArray getWord16 getWord16
+
 getOidList :: SGet [OID]
 getOidList = getArray getWord16 getWord16
-
-getGidList :: SGet [OID]
-getGidList = getArray getWord16 getWord16
 
 getPlayListList :: SGet PlayListList
 getPlayListList = indirections getWord16 "" getPlayList
@@ -304,52 +305,72 @@ getSubGame = do
     plls <- indirections (return 9) "playlistlist " getPlayListList
     return (SubGame u oid1s oid2s oid3s plls)
 
+
 getGame :: SGet Game
 getGame = do
-    t <- getWord16
-    case t of
-      6 -> do
-        b <- getWord16
-        u1 <- getWord16
-        c <- getWord16
-        u2 <- getBS 18
-        plls <- indirections (return 7) "playlistlistA-" getPlayListList
-        sg1s <- indirections (return b) "subgameA-" getSubGame
-        sg2s <- indirections (return c) "subgameB-" getSubGame
-        u3 <- getBS 20
-        pll2s <- indirections (return 10) "playlistlistB-" getPlayListList
-        pl <- indirection "playlist" getPlayList
+    gGameType <- getWord16
+    getRealGame gGameType
 
-        return (Game6 u1 u2 plls sg1s sg2s u3 pll2s pl)
-      7 -> do
-        (u1,c,u2,plls, sgs, u3, pll2s) <- common
-        pll <- indirection "playlistlist" getPlayListList
-        return (Game7 u1 c u2 plls sgs u3 pll2s pll)
-      8 -> do
-        (u1,c,u2,plls, sgs, u3, pll2s) <- common
-        oidl <- indirection "oidlist" getOidList
-        gidl <- indirection "gidlist" getGidList
-        pll1 <- indirection "playlistlist1" getPlayListList
-        pll2 <- indirection "playlistlist2" getPlayListList
-        return (Game8 u1 c u2 plls sgs u3 pll2s oidl gidl pll1 pll2)
+getRealGame :: Word16 -> SGet Game
+getRealGame 253 = return Game253
+getRealGame gGameType = do
+    gSubgameCount             <- getWord16
+    gRounds                   <- getWord16
+    gUnknownC                 <- getIf (/=6) getWord16
+    gBonusSubgameCount        <- getIf (==6) getWord16
+    gBonusRounds              <- getIf (==6) getWord16
+    gBonusTarget              <- getIf (==6) getWord16
+    gUnknownI                 <- getIf (==6) getWord16
+    gEarlyRounds              <- getWord16
+    gUnknownQ                 <- getIf (==6) getWord16
+    gRepeatLastMedia          <- getWord16
+    gUnknownX                 <- getWord16
+    gUnknownW                 <- getWord16
+    gUnknownV                 <- getWord16
+    gStartPlayList            <- indirection "startplaylist" getPlayListList
+    gRoundEndPlayList         <- indirection "roundendplaylist" getPlayListList
+    gFinishPlayList           <- indirection "finishplaylist" getPlayListList
+    gRoundStartPlayList       <- indirection "roudstartplaylist" getPlayListList
+    gLaterRoundStartPlayList  <- indirection "laterroundstartplaylist" getPlayListList
+    gRoundStartPlayList2      <- getIf (==6) $ indirection "roundendplaylist2" getPlayListList
+    gLaterRoundStartPlayList2 <- getIf (==6) $ indirection "laterroundstartplaylist2" getPlayListList
+    gSubgames                 <- indirections (return gSubgameCount) "subgame-" getSubGame
+    gSecondarySubgames        <- getIf (== 6) $ indirections (return gBonusSubgameCount) "bonus-subgame-" getSubGame
+    gTargetScores             <- if gGameType == 6 then replicateM 2 getWord16
+                                                   else replicateM 10 getWord16
+    gBonusTargetScores        <- getIf (== 6) $ replicateM 8 getWord16
+    gFinishPlayLists          <- if gGameType == 6 then indirections (return 2) "finishplaylist" getPlayListList
+                                                   else indirections (return 10) "finishplaylist" getPlayListList
+    gBonusFinishPlayLists     <- getIf (== 6) $ indirections (return 8) "bonus finishplaylist" getPlayListList
+    -- TODO
+    getIf (== 6) getWord32
+    getIf (== 7) getWord32
+    gBonusSubgames            <- return []
+    gSubgameGroups            <- return []
+    gGameSelectOIDs           <- getIf (==8) $ indirection "gameSelectOids" getOidList
+    gGameSelect               <- getIf (==8) $ indirection "gameSelect" getGameIdList
+    gGameSelectErrors1        <- getIf (==8) $ indirection "gameSelectErrors1" getPlayListList
+    gGameSelectErrors2        <- getIf (==8) $ indirection "gameSelectErrors2" getPlayListList
+    gExtraOIDs                <- getIf (==16) $ indirection "extra oids" getOidList
+    gExtraPlayLists           <- case gGameType of
+        9 ->  indirections (return 75) "playlist-" getPlayListList
+        10 -> indirections (return 1) "playlist-" getPlayListList
+        16 -> indirections (return 3) "playlist-" getPlayListList
+        _ -> return $ error $ "error in gExtraPlayLists"
 
-      253 -> do
-        return Game253
-
-      _ -> do
-        (u1,c,u2,plls, sgs, u3, pll2s) <- common
-        return (UnknownGame t u1 c u2 plls sgs u3 pll2s)
- where
-    common = do -- the common header of a non-type-6-game
-        b <- getWord16
-        u1 <- getWord16
-        c <- getWord16
-        u2 <- getBS 10
-        plls <- indirections (return 5) "playlistlistA-" getPlayListList
-        sgs <- indirections (return b) "subgame-" getSubGame
-        u3 <- getBS 20
-        pll2s <- indirections (return 10) "playlistlistB-" getPlayListList
-        return (u1, c, u2, plls, sgs, u3, pll2s)
+    case gGameType of
+      6 -> return $ Game6 {..}
+      7 -> return $ Game7 {..}
+      8 -> return $ Game8 {..}
+      9 -> return $ Game9 {..}
+      10 -> return $ Game10 {..}
+      16 -> return $ Game16 {..}
+      253 -> return Game253
+      _ -> return $ CommonGame {..}
+  where
+    getIf :: (Word16 -> Bool) -> SGet a -> SGet a
+    getIf p a | p gGameType = a
+              | otherwise   = return (error "getIf used wrongly")
 
 
 getInitialRegs :: SGet [Word16]
