@@ -1,5 +1,10 @@
 # Changelog for tttool
 
+## 1.5.2 (UNRELEASED)
+
+ * Fix various crashes in corner cases, mostly involving games. Thanks to
+   @ToniMahagoni for reporting these!
+
 ## 1.5.1 (2015-11-11)
 
  * Do not assign object IDs >= 15000, as these are not recognized.
