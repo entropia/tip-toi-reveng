@@ -133,12 +133,12 @@ ppCommonGame :: Transscript -> Game -> String
 ppCommonGame t g =
     printf (unlines ["  type: %d",
                      "  rounds: %d",
-                     "  unkown (c): %d",
+                     "  unknown (c): %d",
                      "  early rounds: %d",
                      "  repeat last media OID: %d",
-                     "  unkown (x): %d",
-                     "  unkown (w): %d",
-                     "  unkown (v): %d",
+                     "  unknown (x): %d",
+                     "  unknown (w): %d",
+                     "  unknown (v): %d",
                      "  start play list:               %s",
                      "  round end play list:           %s",
                      "  finish play list:              %s",
@@ -172,13 +172,13 @@ ppGame t (Game6 {..}) =
                      "  rounds: %d",
                      "  bonus rounds: %d",
                      "  rounds target: %d",
-                     "  unkown (i): %d",
+                     "  unknown (i): %d",
                      "  early rounds: %d",
-                     "  unkown (q): %d",
+                     "  unknown (q): %d",
                      "  repeat last media OID: %d",
-                     "  unkown (x): %d",
-                     "  unkown (w): %d",
-                     "  unkown (v): %d",
+                     "  unknown (x): %d",
+                     "  unknown (w): %d",
+                     "  unknown (v): %d",
                      "  start play list:               %s",
                      "  round end play list:           %s",
                      "  finish play list:              %s",
@@ -192,7 +192,7 @@ ppGame t (Game6 {..}) =
                      "  bonus target scores: (%d) %s",
                      "  finish play lists: (%d)", "%s",
                      "  bonus finish play lists: (%d)", "%s",
-                     "  bonus subgame ids: TODO"
+                     "  bonus subgame ids: %s"
                      ])
     gRounds
     gBonusRounds
@@ -215,14 +215,14 @@ ppGame t (Game6 {..}) =
     (length gBonusTargetScores)  (show gBonusTargetScores)
     (length gFinishPlayLists)    (indent 4 (map (ppPlayListList t) gFinishPlayLists))
     (length gBonusFinishPlayLists)    (indent 4 (map (ppPlayListList t) gBonusFinishPlayLists))
+    (show gBonusSubgameIds)
 
-ppGame t g@(Game7 {..}) = do
-    ppCommonGame t g
-    printf (unlines [ "  subgame groups TODO"
+ppGame t g@(Game7 {..}) = (ppCommonGame t g ++) $
+    printf (unlines [ "  subgame groups: %s"
                      ])
+        (show gSubgameGroups)
 
-ppGame t g@(Game8 {..}) = do
-    ppCommonGame t g
+ppGame t g@(Game8 {..}) = (ppCommonGame t g ++) $
     printf (unlines ["  game select OIDs:     %s",
                      "  game select games:    %s",
                      "  game select errors 1: %s",
@@ -233,20 +233,17 @@ ppGame t g@(Game8 {..}) = do
         (ppPlayListList t gGameSelectErrors1)
         (ppPlayListList t gGameSelectErrors2)
 
-ppGame t g@(Game9 {..}) = do
-    ppCommonGame t g
+ppGame t g@(Game9 {..}) = (ppCommonGame t g ++) $
     printf (unlines ["  extra play lists (%d):","%s"
                      ])
         (length gExtraPlayLists)    (indent 4 (map (ppPlayListList t) gExtraPlayLists))
 
-ppGame t g@(Game10 {..}) = do
-    ppCommonGame t g
+ppGame t g@(Game10 {..}) = (ppCommonGame t g ++) $
     printf (unlines ["  extra play lists (%d):","%s"
                      ])
         (length gExtraPlayLists)    (indent 4 (map (ppPlayListList t) gExtraPlayLists))
 
-ppGame t g@(Game16 {..}) = do
-    ppCommonGame t g
+ppGame t g@(Game16 {..}) = (ppCommonGame t g ++) $
     printf (unlines ["  extra play lists (%d):","%s"
                      ])
         (length gExtraPlayLists)    (indent 4 (map (ppPlayListList t) gExtraPlayLists))

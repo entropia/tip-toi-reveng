@@ -123,12 +123,12 @@ data Game =
         , gRoundStartPlayList2      :: PlayListList
         , gLaterRoundStartPlayList2 :: PlayListList
         , gSubgames                 :: [SubGame]
-        , gSecondarySubgames        :: [SubGame]
+        , gBonusSubgames            :: [SubGame]
         , gTargetScores             :: [Word16]
         , gBonusTargetScores        :: [Word16]
         , gFinishPlayLists          :: [PlayListList]
         , gBonusFinishPlayLists     :: [PlayListList]
-        , gBonusSubgames            :: [SubGame]
+        , gBonusSubgameIds          :: [Word16]
         }
     | Game7
         { gRounds                   :: Word16
@@ -146,7 +146,7 @@ data Game =
         , gSubgames                 :: [SubGame]
         , gTargetScores             :: [Word16]
         , gFinishPlayLists          :: [PlayListList]
-        , gSubgameGroups            :: [[SubGame]]
+        , gSubgameGroups            :: [[GameId]]
         }
     | Game8
         { gRounds                   :: Word16

@@ -290,6 +290,9 @@ getPlayList = getArray getWord16 getWord16
 getGameIdList :: SGet [GameId]
 getGameIdList = getArray getWord16 getWord16
 
+getGameIdListList :: SGet [[GameId]]
+getGameIdListList = indirections getWord16 "" getGameIdList
+
 getOidList :: SGet [OID]
 getOidList = getArray getWord16 getWord16
 
@@ -335,18 +338,15 @@ getRealGame gGameType = do
     gRoundStartPlayList2      <- getIf (==6) $ indirection "roundendplaylist2" getPlayListList
     gLaterRoundStartPlayList2 <- getIf (==6) $ indirection "laterroundstartplaylist2" getPlayListList
     gSubgames                 <- indirections (return gSubgameCount) "subgame-" getSubGame
-    gSecondarySubgames        <- getIf (== 6) $ indirections (return gBonusSubgameCount) "bonus-subgame-" getSubGame
+    gBonusSubgames            <- getIf (==6) $ indirections (return gBonusSubgameCount) "bonus-subgame-" getSubGame
     gTargetScores             <- if gGameType == 6 then replicateM 2 getWord16
                                                    else replicateM 10 getWord16
-    gBonusTargetScores        <- getIf (== 6) $ replicateM 8 getWord16
+    gBonusTargetScores        <- getIf (==6) $ replicateM 8 getWord16
     gFinishPlayLists          <- if gGameType == 6 then indirections (return 2) "finishplaylist" getPlayListList
                                                    else indirections (return 10) "finishplaylist" getPlayListList
-    gBonusFinishPlayLists     <- getIf (== 6) $ indirections (return 8) "bonus finishplaylist" getPlayListList
-    -- TODO
-    getIf (== 6) getWord32
-    getIf (== 7) getWord32
-    gBonusSubgames            <- return []
-    gSubgameGroups            <- return []
+    gBonusFinishPlayLists     <- getIf (==6) $ indirections (return 8) "bonus finishplaylist" getPlayListList
+    gBonusSubgameIds          <- getIf (==6) $ indirection "subgameidlist" getGameIdList
+    gSubgameGroups            <- getIf (==7) $ indirection "subgamegroups" getGameIdListList
     gGameSelectOIDs           <- getIf (==8) $ indirection "gameSelectOids" getOidList
     gGameSelect               <- getIf (==8) $ indirection "gameSelect" getGameIdList
     gGameSelectErrors1        <- getIf (==8) $ indirection "gameSelectErrors1" getPlayListList
