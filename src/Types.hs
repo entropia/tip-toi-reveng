@@ -123,7 +123,6 @@ data Game =
         , gRoundStartPlayList2      :: PlayListList
         , gLaterRoundStartPlayList2 :: PlayListList
         , gSubgames                 :: [SubGame]
-        , gBonusSubgames            :: [SubGame]
         , gTargetScores             :: [Word16]
         , gBonusTargetScores        :: [Word16]
         , gFinishPlayLists          :: [PlayListList]

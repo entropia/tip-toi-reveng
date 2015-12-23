@@ -337,8 +337,9 @@ getRealGame gGameType = do
     gLaterRoundStartPlayList  <- indirection "laterroundstartplaylist" getPlayListList
     gRoundStartPlayList2      <- getIf (==6) $ indirection "roundendplaylist2" getPlayListList
     gLaterRoundStartPlayList2 <- getIf (==6) $ indirection "laterroundstartplaylist2" getPlayListList
-    gSubgames                 <- indirections (return gSubgameCount) "subgame-" getSubGame
-    gBonusSubgames            <- getIf (==6) $ indirections (return gBonusSubgameCount) "bonus-subgame-" getSubGame
+    let subgameCount | gGameType == 6 = gSubgameCount + gBonusSubgameCount
+                     | otherwise      = gSubgameCount
+    gSubgames                 <- indirections (return subgameCount) "subgame-" getSubGame
     gTargetScores             <- if gGameType == 6 then replicateM 2 getWord16
                                                    else replicateM 10 getWord16
     gBonusTargetScores        <- getIf (==6) $ replicateM 8 getWord16
