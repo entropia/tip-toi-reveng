@@ -219,6 +219,7 @@ data Game =
         , gLaterRoundStartPlayList  :: PlayListList
         , gSubgames                 :: [SubGame]
         , gTargetScores             :: [Word16]
+        , gFinishPlayLists          :: [PlayListList]
         , gExtraOIDs                :: [Word16]
         , gExtraPlayLists           :: [PlayListList]
         }

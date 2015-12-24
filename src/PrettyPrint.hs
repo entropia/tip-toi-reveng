@@ -234,17 +234,19 @@ ppGame t g@(Game8 {..}) = (ppCommonGame t g ++) $
 ppGame t g@(Game9 {..}) = (ppCommonGame t g ++) $
     printf (unlines ["  extra play lists (%d):","%s"
                      ])
-        (length gExtraPlayLists)    (indent 4 (map (ppPlayListList t) gExtraPlayLists))
+        (length gExtraPlayLists)  (indent 4 (map (ppPlayListList t) gExtraPlayLists))
 
 ppGame t g@(Game10 {..}) = (ppCommonGame t g ++) $
     printf (unlines ["  extra play lists (%d):","%s"
                      ])
-        (length gExtraPlayLists)    (indent 4 (map (ppPlayListList t) gExtraPlayLists))
+        (length gExtraPlayLists)  (indent 4 (map (ppPlayListList t) gExtraPlayLists))
 
 ppGame t g@(Game16 {..}) = (ppCommonGame t g ++) $
-    printf (unlines ["  extra play lists (%d):","%s"
+    printf (unlines ["  extra OIDs (%d): %s",
+                     "  extra play lists (%d):","%s"
                      ])
-        (length gExtraPlayLists)    (indent 4 (map (ppPlayListList t) gExtraPlayLists))
+        (length gExtraOIDs)       (show gExtraOIDs)
+        (length gExtraPlayLists)  (indent 4 (map (ppPlayListList t) gExtraPlayLists))
 
 ppGame t Game253 =
     printf (unlines ["  type: 253"
