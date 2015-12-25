@@ -4,6 +4,7 @@ import Text.Read
 import System.FilePath
 import Numeric
 import Data.List (intercalate)
+import Options.Applicative.Help.Chunk
 
 import Types
 import RangeParser
@@ -316,8 +317,14 @@ oidCodeCmd =
     command "oid-code" $
     info (helper <*> parser) $
     progDesc "creates PNG files for each given code(s)" <>
-    footer "Uses oid-<code>.png as the file name."
+    footerDoc foot
   where
+    foot = unChunk $ vsepChunks
+        [ paragraph "Uses oid-<code>.png as the file name."
+        , paragraph $ "Note that it used to work to call \"tttool oid-code foo.yaml\". " ++
+                      "Please use \"tttool oid-codes\" for that now."
+        ]
+
     parser =(\raw range c -> genPNGsForCodes raw c range) <$> rawCodeSwitchParser <*> codeRangeParser
 
     codeRangeParser :: Parser [Word16]
