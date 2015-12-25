@@ -20,69 +20,37 @@ If you want to learn more please have a look into our wiki (https://github.com/e
 The tttool tool
 ---------------
 
-Use the tool `tttool.hs` to investigate the gme files and build new ones. It
+Use the tool `tttool` to investigate the gme files and build new ones. It
 supports various subcommands:
 
-    Usage: tttool [options] command
+    ./tttool info      -- Print general information about a GME file
+    ./tttool media     -- dumps all audio samples
+    ./tttool scripts   -- prints the decoded scripts for each OID
+    ./tttool script    -- prints the decoded scripts for a specific OID
+    ./tttool binaries  -- dumps all binaries
+    ./tttool games     -- prints the decoded games
+    ./tttool lint      -- checks for errors in the file or in this program
+    ./tttool segments  -- lists all known parts of the file, with description.
+    ./tttool segment   -- prints the decoded scripts for a specific OID
+    ./tttool holes     -- lists all unknown parts of the file.
+    ./tttool explain   -- print a hexdump of a GME file with descriptions
+    ./tttool play      -- interactively play a GME file
+    ./tttool rewrite   -- parses the file and reads it again (for debugging)
+    ./tttool export    -- dumps the file in the human-readable yaml format
+    ./tttool assemble  -- creates a gme file from the given source
+    ./tttool oid-table -- creates a PDF file with all codes in the yaml file
+    ./tttool oid-codes -- creates PNG files for every OID in the yaml file.
+    ./tttool oid-code  -- creates PNG files for each given code(s)
 
-    Options:
-        -t <transcriptfile>
-           in the screen output, replaces media file indices by a transscript
+Run
 
-    Commands:
-        info <file.gme>...
-           general information
-        media [-d dir] <file.gme>...
-           dumps all audio samples to the given directory (default: media/)
-        scripts <file.gme>...
-           prints the decoded scripts for each OID
-        script <file.gme> <n>
-           prints the decoded scripts for the given OID
-        raw-scripts <file.gme>...
-           prints the scripts for each OID, in their raw form
-        raw-script <file.gme> <n>
-           prints the scripts for the given OID, in their raw form
-        binaries [-d dir] <file.gme>...
-           dumps all binaries to the given directory (default: binaries/)
-        games <file.gme>...
-           prints the decoded games
-        lint <file.gme>
-           checks for errors in the file or in this program
-        segments <file.gme>...
-           lists all known parts of the file, with description.
-        segment <file.gme> <pos>
-           which segment contains the given position.
-        holes <file.gme>...
-           lists all unknown parts of the file.
-        explain <file.gme>...
-           lists all parts of the file, with description and hexdump.
-        play <file.gme or file.yaml>
-           interactively play: Enter OIDs, and see what happens.
-        rewrite <infile.gme> <outfile.gme>
-           parses the file and serializes it again (for debugging).
-        export <infile.gme> [<outfile.yaml>]
-           dumps the file in the human-readable yaml format
-        assemble <infile.yaml> <outfile.gme>
-           creates a gme file from the given source
-        oid-table <infile.yaml> [<outfile.pdf>]
-           creates a PDF file with all codes in the yaml file
-        oid-code [-d DPI] <codes>
-           creates a PNG file for each given code
-           scale this to 10cm×10cm
-           By default, it creates a 1200 dpi image. With -d 600, you
-           obtain a 600 dpi image. With -d 600d resp. 1200d you can double the
-           size of the pixel.
-           <codes> can be a range, e.g. 1,3,1000-1085.
-           Uses oid-<code>.png as the file name.
-        oid-code [-d DPI] <infile.yaml>
-           Like above, but creates one file for each code in the yaml file.
-           Uses oid-<product-id>-<scriptname or code>.png as the file name.
-        raw-oid-code [-d DPI] <raw codes>
-           creates a PNG file with the given "raw code". Usually not needed.
-           Uses oid-raw-<code>.png as the file name.
+    ./tttool --help
 
-A transscript is simply a `;`-separated table of OIDs and some text, see for example [`transcript/WWW_Bauernhof.csv`](transcript/WWW_Bauernhof.csv).
+to learn about global options (e.g. DPI settings), and
 
+    ./tttool command --help
+
+for the options of the individual command.
 
 Installation
 ------------

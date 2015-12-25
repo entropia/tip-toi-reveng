@@ -10,8 +10,8 @@ import qualified Text.Parsec as P
 import Types
 import OneLineParser
 
-parseRange :: String -> IO [Word16]
-parseRange = parseOneLine rangeParser "command line"
+parseRange :: String -> Either String [Word16]
+parseRange = parseOneLinePure rangeParser "command line"
 
 rangeParser :: Parser [Word16]
 rangeParser = concat <$> oneRangeParser `sepBy1` many1 (P.char ' ' <|> P.char ',')

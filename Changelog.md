@@ -1,9 +1,18 @@
 # Changelog for tttool
 
-## 1.5.2 (UNRELEASED)
+## 1.6 (UNRELEASED)
 
  * Fix various crashes in corner cases, mostly involving games. Thanks to
    @ToniMahagoni for reporting these!
+ * New command `tttool oid-table` that prints all OIDs of a given YAML file as
+   a nice and handy table in a PDF file
+ * Completely re-done option parsing, so there now proper support for short and
+   long options, arbitrary order of options, better error messages and
+   per-command `--help` output.
+
+   **Incompatibility:** Some commands are now called differently. In
+   particular, to generate PNG files with all codes from a YAML file, use
+   `./tttool oid-codes`, not `./tttool oid-code`.
 
 ## 1.5.1 (2015-11-11)
 

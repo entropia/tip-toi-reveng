@@ -107,3 +107,11 @@ type Transscript = M.Map Word16 String
 type CodeMap = M.Map String Word16
 
 
+-- Command options
+
+data Conf = Conf
+    { cTransscriptFile :: Maybe FilePath
+    , cDPI :: Int
+    , cPixelSize :: Int
+    }
+

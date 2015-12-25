@@ -26,7 +26,7 @@ oidTable title entries = pdfByteString docInfo a4rect $ do
             Nothing -> return (d, Nothing)
             Just c -> do
                 image <- createPDFRawImage' imageSizePixels imageSizePixels False $
-                    genRawPixels imageSizePixels imageSizePixels D1200 SinglePixel $
+                    genRawPixels imageSizePixels imageSizePixels 1200 1 $
                     c
                 return (d, Just image)
 

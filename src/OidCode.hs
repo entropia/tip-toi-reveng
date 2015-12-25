@@ -88,8 +88,8 @@ genSVG :: Int -> FilePath -> IO ()
 genSVG code filename = B.writeFile filename (renderSvg (oidSVG code))
 -}
 
-data DPI = D1200 | D600
-data PixelSize = SinglePixel | DoublePixel
+type DPI = Int
+type PixelSize = Int
 
 imageFromBlackPixels :: Int -> Int -> [(Int, Int)] -> Image PixelYA8
 imageFromBlackPixels width height pixels = runST $ do
@@ -105,8 +105,8 @@ oidImage :: Int -> Int -> DPI -> PixelSize -> Word16 -> Image PixelYA8
 oidImage w h dpi ps code =
     imageFromBlackPixels w h (tile f)
   where
-    !dotsPerPoint | D1200 <- dpi = 12
-                  |  D600 <- dpi =  6
+    !dotsPerPoint | 1200 <- dpi = 12
+                  |  600 <- dpi =  6
 
 
     quart 8 = checksum code
@@ -118,7 +118,7 @@ oidImage w h dpi ps code =
         [ (p, plain) | p <- [(0,0), (1,0), (2,0), (3,0), (0,1), (0,3) ] ] ++
         [ ((0,2), special) ]
 
-    plain | D1200 <- dpi, SinglePixel <- ps = coordsOfDots
+    plain | 1200 <- dpi, 1 <- ps = coordsOfDots
                 [ "           "
                 , "           "
                 , "           "
@@ -132,7 +132,7 @@ oidImage w h dpi ps code =
                 , "           "
                 , "           "
                 ]
-          | D1200 <- dpi, DoublePixel <- ps = coordsOfDots
+          | 1200 <- dpi, 2 <- ps = coordsOfDots
                 [ "           "
                 , "           "
                 , "           "
@@ -146,7 +146,7 @@ oidImage w h dpi ps code =
                 , "           "
                 , "           "
                 ]
-          | D600 <- dpi, SinglePixel <- ps  = coordsOfDots
+          | 600 <- dpi, 1 <- ps  = coordsOfDots
                 [ "      "
                 , "      "
                 , "  *   "
@@ -154,7 +154,7 @@ oidImage w h dpi ps code =
                 , "      "
                 , "      "
                 ]
-          | D600 <- dpi, DoublePixel <- ps  = coordsOfDots
+          | 600 <- dpi, 2 <- ps  = coordsOfDots
                 [ "      "
                 , "      "
                 , "  **  "
@@ -164,10 +164,10 @@ oidImage w h dpi ps code =
                 ]
 
 
-    s  | D1200 <- dpi = 2
-       | D600  <- dpi = 1
-    ss | D1200 <- dpi = 3
-       | D600  <- dpi = 2
+    s  | 1200 <- dpi = 2
+       | 600  <- dpi = 1
+    ss | 1200 <- dpi = 3
+       | 600  <- dpi = 2
     value 0 = at ( s, s) plain
     value 1 = at (-s, s) plain
     value 2 = at (-s,-s) plain
@@ -208,5 +208,5 @@ genRawPNG dpi ps code filename = writePng filename (oidImage w h dpi ps code)
   where
     w = 100*dotsPerPoint*4
     h = 100*dotsPerPoint*4
-    !dotsPerPoint | D1200 <- dpi = 12
-                  |  D600 <- dpi =  6
+    !dotsPerPoint | 1200 <- dpi = 12
+                  |  600 <- dpi =  6
