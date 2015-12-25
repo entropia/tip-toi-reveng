@@ -1,6 +1,5 @@
 import Options.Applicative
 
-import Text.Read
 import System.FilePath
 import Numeric
 import Data.List (intercalate)
@@ -11,6 +10,7 @@ import Types
 import RangeParser
 import Commands
 import Paths_tttool
+import Utils
 
 -- Parameter parsing
 
