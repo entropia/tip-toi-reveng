@@ -44,24 +44,37 @@ optionParser =
         ]
 
     cmd = subparser $ mconcat
-        [ infoCmd
-        , mediaCmd
+        [ cmdSep "GME creation commands:"
+        , assembleCmd
+        , cmdSep ""
+
+        , cmdSep "OID code creation commands:"
+        , oidTableCmd
+        , oidCodesCmd
+        , oidCodeCmd
+        , cmdSep ""
+
+        , cmdSep "GME analysis commands:"
+        , infoCmd
+        , exportCmd
         , scriptsCmd
         , scriptCmd
-        , binariesCmd
         , gamesCmd
         , lintCmd
         , segmentsCmd
         , segmentCmd
-        , holesCmd
         , explainCmd
-        , playCmd
+        , holesCmd
         , rewriteCmd
-        , exportCmd
-        , assembleCmd
-        , oidTableCmd
-        , oidCodesCmd
-        , oidCodeCmd
+        , cmdSep ""
+
+        , cmdSep "GME extraction commands:"
+        , mediaCmd
+        , binariesCmd
+        , cmdSep ""
+
+        , cmdSep "Simulation commands:"
+        , playCmd
         ]
 
 only :: (Eq a, Show a) => [a] -> ReadM a -> ReadM a
@@ -70,6 +83,9 @@ only valid r = do
     if x `elem` valid then return x
                       else readerError msg
   where msg = "Sorry, supported values are only: " ++ intercalate ", " (map show valid)
+
+cmdSep :: String -> Mod CommandFields a
+cmdSep s = command s $ info empty mempty
 
 
 -- Common option Parsers
@@ -236,6 +252,7 @@ playCmd =
   where
     parser = flip play <$> gmeFileParser
 
+
 rewriteCmd :: Mod CommandFields (Conf -> IO ())
 rewriteCmd =
     command "rewrite" $
@@ -266,7 +283,7 @@ exportCmd =
 
     outFileParser :: Parser (Maybe FilePath)
     outFileParser = optional $ strArgument $ mconcat
-        [ metavar "[OUT]"
+        [ metavar "OUT"
         , help "YAML file to write"
         ]
 
@@ -280,7 +297,7 @@ assembleCmd =
 
     outFileParser :: Parser (Maybe FilePath)
     outFileParser = optional $ strArgument $ mconcat
-        [ metavar "[OUT]"
+        [ metavar "OUT"
         , help "GME file to write"
         ]
 
@@ -294,7 +311,7 @@ oidTableCmd =
 
     outFileParser :: Parser (Maybe FilePath)
     outFileParser = optional $ strArgument $ mconcat
-        [ metavar "[OUT]"
+        [ metavar "OUT"
         , help "PDF file to write"
         ]
 
