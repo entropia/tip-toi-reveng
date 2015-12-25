@@ -37,6 +37,7 @@ executable tttool
     Lint,
     Language,
     OidCode,
+    OidTable,
     OneLineParser,
     PlaySound,
     PrettyPrint,
@@ -65,7 +66,9 @@ executable tttool
     process     >= 1.1      &&   < 1.5,
     random      >= 1.0      &&   < 1.2,
     vector      >= 0.10     &&   < 0.12,
-    yaml        == 0.8.*
+    yaml        == 0.8.*,
+    HPDF        == 1.4.*,
+    split       == 0.2.*
 
   if impl(ghc < 7.5)
     build-depends: ghc-prim

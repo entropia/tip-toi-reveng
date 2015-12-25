@@ -30,6 +30,7 @@ import GMERun
 import PrettyPrint
 import RangeParser
 import OidCode
+import OidTable
 import Utils
 import TipToiYaml
 import Lint
@@ -273,6 +274,13 @@ assemble inf out = do
     writeTipToiCodeYaml inf tty codeMap totalMap
     writeTipToi out tt
 
+genOidTable :: FilePath -> FilePath -> IO ()
+genOidTable inf out = do
+    (tty, codeMap) <- readTipToiYaml inf
+    (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
+    let codes = ("START", fromIntegral (ttProductId tt)) : M.toList totalMap
+    pdfFile <- oidTable inf codes
+    B.writeFile out pdfFile
 
 genPNGs :: DPI -> PixelSize -> String -> IO ()
 genPNGs dpi ps arg = do
@@ -338,6 +346,7 @@ main' t ("-t":transscript:args) =
 
 main' t ("export": inf : [] )       = main' t ("export":inf: dropExtension inf <.> "yaml":[])
 main' t ("assemble": inf : [] )     = main' t ("assemble":inf: dropExtension inf <.> "gme":[])
+main' t ("oid-table": inf : [] )    = main' t ("oid-table":inf: dropExtension inf <.> "pdf":[])
 
 main' t ("info": files)             = withEachFile (dumpInfo t) files
 main' t ("media": "-d": dir: files) = withEachFile (dumpAudioTo dir) files
@@ -362,6 +371,7 @@ main' t ("play": file : [])         =              play t file
 main' t ("rewrite": inf : out: [])  =              rewrite inf out
 main' t ("export": inf : out: [] )  =              export inf out
 main' t ("assemble": inf : out: []) =              assemble inf out
+main' t ("oid-table": inf : out: []) =             genOidTable inf out
 main' t ("oid-code": "-d" : "600" : codes@(_:_))
                                     =              genPNGs D600 SinglePixel (unwords codes)
 main' t ("oid-code": "-d" : "1200" : codes@(_:_))
@@ -431,6 +441,8 @@ main' _ _ = do
     putStrLn $ "       dumps the file in the human-readable yaml format"
     putStrLn $ "    assemble <infile.yaml> <outfile.gme>"
     putStrLn $ "       creates a gme file from the given source"
+    putStrLn $ "    oid-table <infile.yaml> [<outfile.pdf>]"
+    putStrLn $ "       creates a PDF file with all codes in the yaml file"
     putStrLn $ "    oid-code [-d DPI] <codes>"
     putStrLn $ "       creates a PNG file for each given code"
     putStrLn $ "       scale this to 10cm×10cm"

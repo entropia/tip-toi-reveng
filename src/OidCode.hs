@@ -1,6 +1,6 @@
 {-# LANGUAGE BangPatterns, TupleSections #-}
 
-module OidCode (genRawPNG, DPI(..), PixelSize(..)) where
+module OidCode (genRawPixels, genRawPNG, DPI(..), PixelSize(..)) where
 
 import Data.Word
 import Data.Bits
@@ -11,6 +11,9 @@ import Codec.Picture
 import Codec.Picture.Types
 import Control.Monad.ST
 import Control.Applicative
+import qualified Data.Vector.Unboxed as VU
+import qualified Data.Vector.Storable as VS
+
 
 -- Image generation
 
@@ -98,15 +101,10 @@ imageFromBlackPixels width height pixels = runST $ do
     black =      PixelYA8 minBound maxBound
     background = PixelYA8 maxBound minBound
 
-oidImage :: DPI -> PixelSize -> Word16 -> Image PixelYA8
-oidImage dpi ps code =
-    imageFromBlackPixels
-        (width *4*dotsPerPoint)
-        (height*4*dotsPerPoint)
-        (tile f)
+oidImage :: Int -> Int -> DPI -> PixelSize -> Word16 -> Image PixelYA8
+oidImage w h dpi ps code =
+    imageFromBlackPixels w h (tile f)
   where
-    width = 100 -- in mm
-    height = 100 -- in mm
     !dotsPerPoint | D1200 <- dpi = 12
                   |  D600 <- dpi =  6
 
@@ -191,9 +189,24 @@ oidImage dpi ps code =
     at (x, y) = map (\(x', y') -> (x + x', y + y'))
     tile f = concat [ at (x*4*dotsPerPoint, y*4*dotsPerPoint) f
                     | x <- [0..width-1], y <- [0..height-1]]
+    width  = w `div` (4*dotsPerPoint)
+    height = h `div` (4*dotsPerPoint)
 
+
+-- Width and height in pixels
+genRawPixels :: Int -> Int -> DPI -> PixelSize -> Word16 -> VU.Vector Word32
+genRawPixels w h dpi ps code =
+    -- All very shaky here, but it seems to work
+    VS.convert $
+    VS.unsafeCast $
+    imageData $
+    (promoteImage $ oidImage w h dpi ps code :: Image PixelRGBA8)
 
 
 genRawPNG :: DPI -> PixelSize -> Word16 -> FilePath -> IO ()
-genRawPNG dpi ps code filename = writePng filename (oidImage dpi ps code)
-
+genRawPNG dpi ps code filename = writePng filename (oidImage w h dpi ps code)
+  where
+    w = 100*dotsPerPoint*4
+    h = 100*dotsPerPoint*4
+    !dotsPerPoint | D1200 <- dpi = 12
+                  |  D600 <- dpi =  6

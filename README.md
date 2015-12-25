@@ -64,6 +64,8 @@ supports various subcommands:
            dumps the file in the human-readable yaml format
         assemble <infile.yaml> <outfile.gme>
            creates a gme file from the given source
+        oid-table <infile.yaml> [<outfile.pdf>]
+           creates a PDF file with all codes in the yaml file
         oid-code [-d DPI] <codes>
            creates a PNG file for each given code
            scale this to 10cm×10cm
