@@ -294,7 +294,7 @@ assembleCmd =
     info (helper <*> parser) $
     progDesc "creates a gme file from the given source"
   where
-    parser = const <$> (twoFiles "gme" export <$> yamlFileParser <*> outFileParser)
+    parser = const <$> (twoFiles "gme" assemble <$> yamlFileParser <*> outFileParser)
 
     outFileParser :: Parser (Maybe FilePath)
     outFileParser = optional $ strArgument $ mconcat
