@@ -308,7 +308,7 @@ oidTableCmd =
     info (helper <*> parser) $
     progDesc "creates a PDF file with all codes in the yaml file"
   where
-    parser = const <$> (twoFiles "pdf" export <$> yamlFileParser <*> outFileParser)
+    parser = const <$> (twoFiles "pdf" genOidTable <$> yamlFileParser <*> outFileParser)
 
     outFileParser :: Parser (Maybe FilePath)
     outFileParser = optional $ strArgument $ mconcat
@@ -324,11 +324,6 @@ oidCodesCmd =
     footer "Uses oid-<product-id>-<scriptname or code>.png as the file name."
   where
     parser = flip genPNGsForFile <$> yamlFileParser
-
-main :: IO ()
-main = do
-    act <- execParser optionParser
-    act
 
 oidCodeCmd :: Mod CommandFields (Conf -> IO ())
 oidCodeCmd =
@@ -356,3 +351,8 @@ oidCodeCmd =
         [ long "raw"
         , help "take the given codes as \"raw codes\" (rarely needed)"
         ]
+
+main :: IO ()
+main = do
+    act <- execParser optionParser
+    act
