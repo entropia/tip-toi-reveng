@@ -294,9 +294,14 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
     forM (M.elems ttySpeakMap) $ \(lang, txt) ->
         textToSpeech lang txt
 
-    files <- forM filenames' $ \fn -> case M.lookup fn ttySpeakMap of
+    -- Check which files do not exist
+
+
+    -- Not very nice, better to use something like Control.Applicative.Error if
+    -- it were in base, and not fixed to String.
+    files_with_errors <- forM filenames' $ \fn -> case M.lookup fn ttySpeakMap of
         Just (lang, txt) -> do
-            B.readFile (ttsFileName lang txt)
+            Right <$> B.readFile (ttsFileName lang txt)
         Nothing -> do
             let paths = [ combine dir relpath
                     | ext <- map snd fileMagics
@@ -306,14 +311,18 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
             ex <- filterM doesFileExist paths
             case ex of
                 [] -> do
-                    putStrLn "Could not find any of these files:"
-                    mapM_ putStrLn paths
-                    exitFailure
-                [f] -> B.readFile f
+                    return $ Left $ unlines $
+                      "Could not find any of these files:" :
+                      paths
+                [f] -> Right <$> B.readFile f
                 _  -> do
-                    putStrLn "Multiple matching files found:"
-                    mapM_ putStrLn ex
-                    exitFailure
+                    return $ Left $ unlines $
+                      "Multiple matching files found:" :
+                      paths
+
+    files <- case partitionEithers files_with_errors of
+        ([],files)  -> return files
+        (errors, _) -> putStr (unlines errors) >> exitFailure
 
     comment <- case ttyComment of
         Nothing -> return $ BC.pack $ "created with tttool version " ++ showVersion version
