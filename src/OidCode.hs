@@ -5,15 +5,19 @@ module OidCode (genRawPixels, genRawPNG, DPI(..), PixelSize(..)) where
 import Data.Word
 import Data.Bits
 import Data.Functor
+import qualified Data.ByteString.Lazy as B
 import Control.Monad
 import Control.Monad.Writer.Strict
 import Codec.Picture
 import Codec.Picture.Types
+import Codec.Picture.Metadata
 import Control.Monad.ST
 import Control.Applicative
 import qualified Data.Vector.Unboxed as VU
 import qualified Data.Vector.Storable as VS
 
+import Data.Version (showVersion)
+import Paths_tttool
 
 -- Image generation
 
@@ -204,9 +208,18 @@ genRawPixels w h dpi ps code =
 
 
 genRawPNG :: DPI -> PixelSize -> Word16 -> FilePath -> IO ()
-genRawPNG dpi ps code filename = writePng filename (oidImage w h dpi ps code)
+genRawPNG dpi ps code filename =
+    B.writeFile filename $
+    encodePngWithMetadata metadata $
+    oidImage w h dpi ps code
   where
     w = 100*dotsPerPoint*4
     h = 100*dotsPerPoint*4
     !dotsPerPoint | 1200 <- dpi = 12
                   |  600 <- dpi =  6
+    metadata = mconcat
+        [ singleton DpiX (fromIntegral dpi)
+        , singleton DpiY (fromIntegral dpi)
+        , singleton Title $ "Tiptoi OID Code " ++ show code
+        , singleton Software $ "tttool " ++ showVersion version
+        ]

@@ -15,6 +15,9 @@
    `./tttool oid-codes`, not `./tttool oid-code`.
  * `./tttool assemble` will print all errors due to missing audio files, not
    just the first.
+ * The png files written by `./tttool oid-code` and `./tttool oid-codes` store
+   their DPI value, so that importing them into DTP programs is likely to yield
+   the desired result.
 
 ## 1.5.1 (2015-11-11)
 
