@@ -13,6 +13,8 @@
    **Incompatibility:** Some commands are now called differently. In
    particular, to generate PNG files with all codes from a YAML file, use
    `./tttool oid-codes`, not `./tttool oid-code`.
+ * `./tttool assemble` will print all errors due to missing audio files, not
+   just the first.
 
 ## 1.5.1 (2015-11-11)
 
