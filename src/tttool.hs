@@ -9,7 +9,6 @@ import Data.Monoid
 import Types
 import RangeParser
 import Commands
-import Paths_tttool
 import Utils
 
 -- Parameter parsing
@@ -17,7 +16,7 @@ import Utils
 optionParser :: ParserInfo (IO ())
 optionParser =
     info (helper <*> (conf <**> cmd)) $
-    progDesc "tttool -- The swiss army knife for the Tiptoi hacker"
+    progDesc $ "tttool-" ++ tttoolVersion ++ " -- The swiss army knife for the Tiptoi hacker"
   where
     conf = pure Conf <*> transscript <*> dpi <*> pixelSize
 

@@ -16,8 +16,7 @@ import Control.Applicative
 import qualified Data.Vector.Unboxed as VU
 import qualified Data.Vector.Storable as VS
 
-import Data.Version (showVersion)
-import Paths_tttool
+import Utils
 
 -- Image generation
 
@@ -221,5 +220,5 @@ genRawPNG dpi ps code filename =
         [ singleton DpiX (fromIntegral dpi)
         , singleton DpiY (fromIntegral dpi)
         , singleton Title $ "Tiptoi OID Code " ++ show code
-        , singleton Software $ "tttool " ++ showVersion version
+        , singleton Software $ "tttool " ++ tttoolVersion
         ]

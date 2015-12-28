@@ -8,11 +8,10 @@ import Control.Monad hiding (forM_)
 import Data.Foldable (forM_)
 import Data.List.Split
 import Text.Printf
-import Data.Version (showVersion)
 
 import OidCode
 import KnownCodes
-import Paths_tttool
+import Utils
 
 
 -- IO technically unnecessary: https://github.com/alpheccar/HPDF/issues/7
@@ -43,7 +42,7 @@ oidTable title entries = pdfByteString docInfo a4rect $ do
 
             displayFormattedText footerRect NormalParagraph footerFont $ do
                 setJustification LeftJustification
-                paragraph $ txt $ "Created by tttool-" ++ showVersion version
+                paragraph $ txt $ "Created by tttool-" ++ tttoolVersion
 
             displayFormattedText footerRect NormalParagraph footerFont $ do
                 setJustification RightJustification

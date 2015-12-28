@@ -2,6 +2,12 @@ module Utils where
 
 import Control.Monad
 
+import Paths_tttool
+import Data.Version
+
+tttoolVersion :: String
+tttoolVersion = showVersion version
+
 -- Utilities
 
 readMaybe :: (Read a) => String -> Maybe a

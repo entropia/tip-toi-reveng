@@ -17,7 +17,6 @@ import Text.Printf
 import Data.Char
 import Data.Either
 import Data.Functor
-import Data.Version
 import Data.Maybe
 import Control.Monad
 import System.Directory
@@ -52,8 +51,6 @@ import KnownCodes
 import PrettyPrint
 import OneLineParser
 import Utils
-
-import Paths_tttool
 
 data TipToiYAML = TipToiYAML
     { ttyScripts :: M.Map String [String]
@@ -325,7 +322,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
         (errors, _) -> putStr (unlines errors) >> exitFailure
 
     comment <- case ttyComment of
-        Nothing -> return $ BC.pack $ "created with tttool version " ++ showVersion version
+        Nothing -> return $ BC.pack $ "created with tttool version " ++ tttoolVersion
         Just c | length c > maxCommentLength -> do
                     printf "Comment is %d characters too long; the maximum is %d."
                            (length c - maxCommentLength) maxCommentLength
