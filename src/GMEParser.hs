@@ -333,7 +333,7 @@ getRealGame gGameType = do
     gStartPlayList            <- indirection "startplaylist" getPlayListList
     gRoundEndPlayList         <- indirection "roundendplaylist" getPlayListList
     gFinishPlayList           <- indirection "finishplaylist" getPlayListList
-    gRoundStartPlayList       <- indirection "roudstartplaylist" getPlayListList
+    gRoundStartPlayList       <- indirection "roundstartplaylist" getPlayListList
     gLaterRoundStartPlayList  <- indirection "laterroundstartplaylist" getPlayListList
     gRoundStartPlayList2      <- getIf (==6) $ indirection "roundendplaylist2" getPlayListList
     gLaterRoundStartPlayList2 <- getIf (==6) $ indirection "laterroundstartplaylist2" getPlayListList
