@@ -380,7 +380,7 @@ getTipToiFile = getSegAt 0x00 "Header" $ do
 
     jumpTo 0x0090
     ttBinaries1 <- fromMaybe [] <$> maybeIndirection "Binaries 1" getBinaries
-    ttSpecialOIDs <- maybeIndirection "specials symbols" getSpecials
+    ttSpecialOIDs <- maybeIndirection "special symbols" getSpecials
     ttBinaries2 <- fromMaybe [] <$> maybeIndirection "Binaries 1" getBinaries
 
     jumpTo 0x00A0
