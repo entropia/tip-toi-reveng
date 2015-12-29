@@ -132,12 +132,12 @@ quote s = printf "'%s'" s
 ppGame :: Transscript -> Game -> String
 ppGame t (Game6 u1 u2 plls sg1s sg2s u3 pll2s pl) =
     printf (unlines ["  type: 6", "  u1:   %d", "  u2:   %s",
-                     "  playlistlists: (%d)", "%s",
+                     "  playlist 1: (%d)", "%s",
                      "  subgames1: (%d)", "%s",
                      "  subgames2: (%d)", "%s",
                      "  u3: %s",
-                     "  playlistlists: (%d)","%s",
-                     "  playlist: %s"])
+                     "  playlist 2: (%d)","%s",
+                     "  playlist 3: %s"])
     u1 (prettyHex u2)
     (length plls)   (indent 4 (map (ppPlayListList t) plls))
     (length sg1s)   (ppSubGames t sg1s)
@@ -147,11 +147,11 @@ ppGame t (Game6 u1 u2 plls sg1s sg2s u3 pll2s pl) =
     (show pl)
 ppGame t (Game7 u1 c u2 plls sgs u3 pll2s pll) =
     printf (unlines ["  type: 7", "  u1:   %d", "  u2:   %s",
-                     "  playlistlists: (%d)", "%s",
+                     "  playlist 1: (%d)", "%s",
                      "  subgames: (%d)", "%s",
                      "  u3: %s",
-                     "  playlistlists: (%d)","%s",
-                     "  playlistlist: %s"])
+                     "  playlist 2: (%d)","%s",
+                     "  playlist 3: %s"])
     u1 (prettyHex u2)
     (length plls)   (indent 4 (map (ppPlayListList t) plls))
     (length sgs)    (ppSubGames t sgs)
@@ -160,14 +160,14 @@ ppGame t (Game7 u1 c u2 plls sgs u3 pll2s pll) =
     (ppPlayListList t pll)
 ppGame t (Game8 u1 c u2 plls sgs u3 pll2s oidl gidl pll1 pll2) =
     printf (unlines ["  type: 8", "  u1:   %d", "  u2:   %s",
-                     "  playlistlists: (%d)", "%s",
+                     "  playlist 1: (%d)", "%s",
                      "  subgames: (%d)", "%s",
                      "  u3: %s",
-                     "  playlistlists: (%d)","%s",
+                     "  playlist 2: (%d)","%s",
                      "  oids: %s",
                      "  gids: %s",
-                     "  playlistlist: %s",
-                     "  playlistlist: %s"
+                     "  playlist 3: %s",
+                     "  playlist 4: %s"
                      ])
     u1 (prettyHex u2)
     (length plls)   (indent 4 (map (ppPlayListList t) plls))
@@ -181,10 +181,10 @@ ppGame t (UnknownGame typ u1 c u2 plls sgs u3 pll2s) =
                      "  u1:   %d",
                      "  c:    %d",
                      "  u2:   %s",
-                     "  playlistlists: (%d)", "%s",
+                     "  playlist 1: (%d)", "%s",
                      "  subgames: (%d)", "%s",
                      "  u3: %s",
-                     "  playlistlists: (%d)","%s"])
+                     "  playlist 2: (%d)","%s"])
     typ u1 c (prettyHex u2)
     (length plls)   (indent 4 (map (ppPlayListList t) plls))
     (length sgs)    (ppSubGames t sgs)
@@ -205,7 +205,7 @@ ppSubGame t n (SubGame u oids1 oids2 oids3 plls) = printf (unlines
     , "      oids1: %s"
     , "      oids2: %s"
     , "      oids3: %s"
-    , "      playlistlists: (%d)" , "%s"
+    , "      playlist: (%d)" , "%s"
     ])
     n
     (prettyHex u)
