@@ -75,6 +75,8 @@ executable tttool
   if impl(ghc < 7.5)
     build-depends: ghc-prim
 
+  ghc-options: -fcontext-stack=42
+
   if flag(old-locale)
     build-depends: time == 1.4.*, old-locale
   else

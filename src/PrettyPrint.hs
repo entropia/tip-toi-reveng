@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE TypeSynonymInstances, RecordWildCards #-}
 module PrettyPrint where
 
 import qualified Data.ByteString.Lazy as B
@@ -129,74 +129,131 @@ spaces = intercalate " "
 commas = intercalate ","
 quote s = printf "'%s'" s
 
-ppGame :: Transscript -> Game -> String
-ppGame t (Game6 u1 u2 plls sg1s sg2s u3 pll2s pl) =
-    printf (unlines ["  type: 6", "  u1:   %d", "  u2:   %s",
-                     "  playlist 1: (%d)", "%s",
-                     "  subgames1: (%d)", "%s",
-                     "  subgames2: (%d)", "%s",
-                     "  u3: %s",
-                     "  playlist 2: (%d)","%s",
-                     "  playlist 3: %s"])
-    u1 (prettyHex u2)
-    (length plls)   (indent 4 (map (ppPlayListList t) plls))
-    (length sg1s)   (ppSubGames t sg1s)
-    (length sg2s)   (ppSubGames t sg2s)
-    (prettyHex u3)
-    (length pll2s)  (indent 4 (map (ppPlayListList t) pll2s))
-    (show pl)
-ppGame t (Game7 u1 c u2 plls sgs u3 pll2s pll) =
-    printf (unlines ["  type: 7", "  u1:   %d", "  u2:   %s",
-                     "  playlist 1: (%d)", "%s",
-                     "  subgames: (%d)", "%s",
-                     "  u3: %s",
-                     "  playlist 2: (%d)","%s",
-                     "  playlist 3: %s"])
-    u1 (prettyHex u2)
-    (length plls)   (indent 4 (map (ppPlayListList t) plls))
-    (length sgs)    (ppSubGames t sgs)
-    (prettyHex u3)
-    (length pll2s)  (indent 4 (map (ppPlayListList t) pll2s))
-    (ppPlayListList t pll)
-ppGame t (Game8 u1 c u2 plls sgs u3 pll2s oidl gidl pll1 pll2) =
-    printf (unlines ["  type: 8", "  u1:   %d", "  u2:   %s",
-                     "  playlist 1: (%d)", "%s",
-                     "  subgames: (%d)", "%s",
-                     "  u3: %s",
-                     "  playlist 2: (%d)","%s",
-                     "  oids: %s",
-                     "  gids: %s",
-                     "  playlist 3: %s",
-                     "  playlist 4: %s"
-                     ])
-    u1 (prettyHex u2)
-    (length plls)   (indent 4 (map (ppPlayListList t) plls))
-    (length sgs)    (ppSubGames t sgs)
-    (prettyHex u3)
-    (length pll2s)  (indent 4 (map (ppPlayListList t) pll2s))
-    (ppOidList oidl) (show gidl)
-    (ppPlayListList t pll1) (ppPlayListList t pll2)
-ppGame t (UnknownGame typ u1 c u2 plls sgs u3 pll2s) =
+ppCommonGame :: Transscript -> Game -> String
+ppCommonGame t g =
     printf (unlines ["  type: %d",
-                     "  u1:   %d",
-                     "  c:    %d",
-                     "  u2:   %s",
-                     "  playlist 1: (%d)", "%s",
+                     "  rounds: %d",
+                     "  unknown (c): %d",
+                     "  early rounds: %d",
+                     "  repeat last media OID: %d",
+                     "  unknown (x): %d",
+                     "  unknown (w): %d",
+                     "  unknown (v): %d",
+                     "  start play list:               %s",
+                     "  round end play list:           %s",
+                     "  finish play list:              %s",
+                     "  round start play list:         %s",
+                     "  later round start play list:   %s",
                      "  subgames: (%d)", "%s",
-                     "  u3: %s",
-                     "  playlist 2: (%d)","%s"])
-    typ u1 c (prettyHex u2)
-    (length plls)   (indent 4 (map (ppPlayListList t) plls))
-    (length sgs)    (ppSubGames t sgs)
-    (prettyHex u3)
-    (length pll2s)  (indent 4 (map (ppPlayListList t) pll2s))
+                     "  target scores: (%d) %s",
+                     "  finish play lists: (%d)", "%s"
+                     ])
+    (gameType g)
+    (gRounds g)
+    (gUnknownC g)
+    (gEarlyRounds g)
+    (gRepeatLastMedia g)
+    (gUnknownX g) (gUnknownW g) (gUnknownV g)
+    (ppPlayListList t (gStartPlayList g))
+    (ppPlayListList t (gRoundEndPlayList g))
+    (ppPlayListList t (gFinishPlayList g))
+    (ppPlayListList t (gRoundStartPlayList g))
+    (ppPlayListList t (gLaterRoundStartPlayList g))
+    (length (gSubgames g))       (ppSubGames t (gSubgames g))
+    (length (gTargetScores g))   (show (gTargetScores g))
+    (length (gFinishPlayLists g))(indent 4 (map (ppPlayListList t) (gFinishPlayLists g)))
+
+ppGame :: Transscript -> Game -> String
+ppGame t g@(CommonGame {..}) =
+    ppCommonGame t g
+
+ppGame t (Game6 {..}) =
+    printf (unlines ["  type: 6",
+                     "  rounds: %d",
+                     "  bonus rounds: %d",
+                     "  rounds target: %d",
+                     "  unknown (i): %d",
+                     "  early rounds: %d",
+                     "  unknown (q): %d",
+                     "  repeat last media OID: %d",
+                     "  unknown (x): %d",
+                     "  unknown (w): %d",
+                     "  unknown (v): %d",
+                     "  start play list:               %s",
+                     "  round end play list:           %s",
+                     "  finish play list:              %s",
+                     "  round start play list:         %s",
+                     "  later round start play list:   %s",
+                     "  round start play list 2:       %s",
+                     "  later round start play list 2: %s",
+                     "  subgames: (%d)", "%s",
+                     "  target scores: (%d) %s",
+                     "  bonus target scores: (%d) %s",
+                     "  finish play lists: (%d)", "%s",
+                     "  bonus finish play lists: (%d)", "%s",
+                     "  bonus subgame ids: %s"
+                     ])
+    gRounds
+    gBonusRounds
+    gBonusTarget
+    gUnknownI
+    gEarlyRounds
+    gUnknownQ
+    gRepeatLastMedia
+    gUnknownX gUnknownW gUnknownV
+    (ppPlayListList t gStartPlayList)
+    (ppPlayListList t gRoundEndPlayList)
+    (ppPlayListList t gFinishPlayList)
+    (ppPlayListList t gRoundStartPlayList)
+    (ppPlayListList t gLaterRoundStartPlayList)
+    (ppPlayListList t gRoundStartPlayList2)
+    (ppPlayListList t gLaterRoundStartPlayList2)
+    (length gSubgames)           (ppSubGames t gSubgames)
+    (length gTargetScores)       (show gTargetScores)
+    (length gBonusTargetScores)  (show gBonusTargetScores)
+    (length gFinishPlayLists)    (indent 4 (map (ppPlayListList t) gFinishPlayLists))
+    (length gBonusFinishPlayLists)    (indent 4 (map (ppPlayListList t) gBonusFinishPlayLists))
+    (show gBonusSubgameIds)
+
+ppGame t g@(Game7 {..}) = (ppCommonGame t g ++) $
+    printf (unlines [ "  subgame groups: %s"
+                     ])
+        (show gSubgameGroups)
+
+ppGame t g@(Game8 {..}) = (ppCommonGame t g ++) $
+    printf (unlines ["  game select OIDs:     %s",
+                     "  game select games:    %s",
+                     "  game select errors 1: %s",
+                     "  game select errors 2: %s"
+                     ])
+        (show gGameSelectOIDs)
+        (show gGameSelect)
+        (ppPlayListList t gGameSelectErrors1)
+        (ppPlayListList t gGameSelectErrors2)
+
+ppGame t g@(Game9 {..}) = (ppCommonGame t g ++) $
+    printf (unlines ["  extra play lists (%d):","%s"
+                     ])
+        (length gExtraPlayLists)  (indent 4 (map (ppPlayListList t) gExtraPlayLists))
+
+ppGame t g@(Game10 {..}) = (ppCommonGame t g ++) $
+    printf (unlines ["  extra play lists (%d):","%s"
+                     ])
+        (length gExtraPlayLists)  (indent 4 (map (ppPlayListList t) gExtraPlayLists))
+
+ppGame t g@(Game16 {..}) = (ppCommonGame t g ++) $
+    printf (unlines ["  extra OIDs (%d): %s",
+                     "  extra play lists (%d):","%s"
+                     ])
+        (length gExtraOIDs)       (show gExtraOIDs)
+        (length gExtraPlayLists)  (indent 4 (map (ppPlayListList t) gExtraPlayLists))
+
 ppGame t Game253 =
     printf (unlines ["  type: 253"
                      ])
-ppGame t _ = "TODO"
 
 ppSubGames :: Transscript -> [SubGame] -> String
-ppSubGames t = concatMap (uncurry (ppSubGame t)) . zip [1..]
+ppSubGames t = concatMap (uncurry (ppSubGame t)) . zip [0..]
 
 ppSubGame :: Transscript -> Int -> SubGame -> String
 ppSubGame t n (SubGame u oids1 oids2 oids3 plls) = printf (unlines
@@ -212,6 +269,7 @@ ppSubGame t n (SubGame u oids1 oids2 oids3 plls) = printf (unlines
     (ppOidList oids1) (ppOidList oids2) (ppOidList oids3)
     (length plls)  (indent 8 (map (ppPlayListList t) plls))
 
+indent :: Int -> [String] -> String
 indent n = intercalate "\n" . map (replicate n ' ' ++)
 
 checkLine :: Int -> Line ResReg -> [String]
