@@ -33,64 +33,6 @@ checksum dec = c3
     (&) = (.&.)
 
 
-{-
-oidSVG :: Int -> S.Svg
-oidSVG code | code >= 4^8 = error $ printf "Code %d too large to draw" code
-oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
-                           ! A.width (S.toValue "1mm")
-                           ! A.height (S.toValue "1mm")
-                           ! A.viewbox (S.toValue "0 0 48 48") $ do
-    S.defs pattern
-    S.rect ! A.width (S.toValue "48") ! A.height (S.toValue "48")
-           ! A.fill (S.toValue $ "url(#"++patid++")")
-  where
-    quart 8 = checksum code
-    quart n = (code `div` 4^n) `mod` 4
-    patid = "pat-" ++ show code
-
-    pattern = S.pattern ! A.width (S.toValue "48")
-                        ! A.height (S.toValue "48")
-                        ! A.id_ (S.toValue patid)
-                        ! A.patternunits (S.toValue "userSpaceOnUse") $ S.g (f (0,0))
-    f = mconcat $ map position $
-        zip (flip (,) <$> [3,2,1] <*> [3,2,1])
-            [ value (quart n) | n <- [0..8] ] ++
-        [ (p, plain) | p <- [(0,0), (1,0), (2,0), (3,0), (0,1), (0,3) ] ] ++
-        [ ((0,2), special) ]
-
-    -- pixel = S.rect ! A.width (S.toValue "2") ! A.height (S.toValue "2") ! pos (7,7)
-    pixel (x,y) = S.path ! A.d path
-      where path = mkPath $ do
-            S.m (x+5) (y+5)
-            S.hr 2
-            S.vr 2
-            S.hr (-2)
-            S.z
-
-    plain = pixel
-    value 0 = at (2,2)   plain
-    value 1 = at (-2,2)  plain
-    value 2 = at (-2,-2) plain
-    value 3 = at (2,-2)  plain
-    special = at (3,0)   plain
-
-    position ((n,m), p) = at (n*12, m*12) p
-
-    -- Drawing combinators
-    at (x, y) f = f . ((+x) *** (+y))
-
-genSVGs :: String -> IO ()
-genSVGs code_str = do
-    codes <- parseRange code_str
-    forM_ codes $ \c -> do
-        let filename = printf "oid%d.svg" c
-        printf "Writing %s...\n" filename
-        genSVG c filename
-
-genSVG :: Int -> FilePath -> IO ()
-genSVG code filename = B.writeFile filename (renderSvg (oidSVG code))
--}
-
 type DPI = Int
 type PixelSize = Int
 
