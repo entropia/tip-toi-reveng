@@ -9,7 +9,6 @@ import Data.Foldable (forM_)
 import Data.List.Split
 import Text.Printf
 import Control.Arrow ((***))
-import Debug.Trace
 
 import OidCode
 import KnownCodes
@@ -136,8 +135,8 @@ calcPositions
     -> [Point]
 calcPositions tw th ew eh pw ph = [ x :+ (th - y) | y <- ys , x <- xs]
   where
-    xs = takeWhile (<= tw - ew) [0,ew+pw..]
-    ys = takeWhile (<= th - eh) [0,eh+ph..]
+    xs = [0,ew+pw..tw-ew]
+    ys = [0,eh+ph..th-eh]
 
 -- Conversation factor
 cm :: Double
