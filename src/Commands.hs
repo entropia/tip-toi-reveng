@@ -277,7 +277,7 @@ genOidTable conf inf out = do
     (tty, codeMap) <- readTipToiYaml inf
     (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
     let codes = ("START", fromIntegral (ttProductId tt)) : M.toList totalMap
-    pdfFile <- oidTable conf inf codes
+    let pdfFile = oidTable conf inf codes
     B.writeFile out pdfFile
 
 genPNGsForFile :: Conf -> FilePath -> IO ()

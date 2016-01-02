@@ -19,7 +19,7 @@ import Types
 
 -- IO technically unnecessary: https://github.com/alpheccar/HPDF/issues/7
 
-oidTable :: Conf -> String -> [(String, Word16)] -> IO LB.ByteString
+oidTable :: Conf -> String -> [(String, Word16)] -> LB.ByteString
 oidTable conf title entries | entriesPerPage < 1 = error "OID codes too large to fit on a single page"
                             | otherwise = pdfByteString docInfo a4rect $ do
     -- Replace codes by images
@@ -27,7 +27,7 @@ oidTable conf title entries | entriesPerPage < 1 = error "OID codes too large to
         case code2RawCode rc of
             Nothing -> return (d, Nothing)
             Just c -> do
-                image <- createPDFRawImage' imageWidthPx imageHeightPx False $
+                image <- createPDFRawImageFromARGB imageWidthPx imageHeightPx False $
                     genRawPixels imageWidthPx imageHeightPx (cDPI conf) (cPixelSize conf) $
                     c
                 return (d, Just image)
@@ -138,11 +138,6 @@ calcPositions tw th ew eh pw ph = [ x :+ (th - y) | y <- ys , x <- xs]
   where
     xs = takeWhile (<= tw - ew) [0,ew+pw..]
     ys = takeWhile (<= th - eh) [0,eh+ph..]
-
-
--- More sensible types (see https://github.com/alpheccar/HPDF/issues/8)
-createPDFRawImage' :: Int -> Int -> Bool -> V.Vector Word32 -> PDF (PDFReference RawImage)
-createPDFRawImage' w h i v = createPDFRawImage (fromIntegral w) (fromIntegral h) i v
 
 -- Conversation factor
 cm :: Double
