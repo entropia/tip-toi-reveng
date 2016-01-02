@@ -1,7 +1,7 @@
 module Utils where
 
-import Control.Monad
-import Data.Traversable
+import Control.Monad (forM, forM_)
+import Data.Traversable (for)
 
 import Paths_tttool
 import Data.Version
@@ -11,7 +11,7 @@ tttoolVersion = showVersion version
 
 -- Utilities
 
-readMaybe :: (Read a) => String -> Maybe a
+readMaybe :: Read a => String -> Maybe a
 readMaybe s = case reads s of
               [(x, "")] -> Just x
               _ -> Nothing
