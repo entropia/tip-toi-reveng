@@ -40,6 +40,7 @@ import Text.Parsec.Language (emptyDef)
 import GHC.Generics
 import qualified Data.Foldable as F
 import qualified Data.Traversable as T
+import Data.Traversable (for, traverse)
 import Control.Arrow
 import Control.Applicative ((<*>), (<*))
 
@@ -214,7 +215,9 @@ scriptCodes codes codeMap productId
         Nothing -> error $ printf "Cannot jump to unknown script \"%s\"." s
         Just c -> c
 
-resolveRegs :: (M.Map Register Word16, [(t0, Maybe [Line Register])]) -> (M.Map ResReg Word16, [(t0, Maybe [Line ResReg])])
+resolveRegs ::
+    (M.Map Register Word16, [(a, Maybe [Line Register])]) ->
+    (M.Map ResReg Word16, [(a, Maybe [Line ResReg])])
 resolveRegs x = everywhere x
   where
     -- Could use generics somehow
@@ -232,11 +235,32 @@ resolveRegs x = everywhere x
 
 resolveJumps :: (String -> Word16) -> [(a, Maybe [Line b])] -> [(a, Maybe [Line b])]
 resolveJumps m = everywhere
-    where 
+  where
     everywhere = map (second (fmap (map resolveLine)))
     resolveLine (Line o cond cmds acts) = (Line o cond (map resolve cmds) acts)
     resolve (NamedJump n) = Jump (Const (m n))
     resolve c = c
+
+newtype WithFileNames a = WithFileNames
+    { runWithFileNames :: ((String -> Word16) -> a, [String] -> [String])
+    }
+
+instance Functor WithFileNames where
+    fmap f (WithFileNames (r,fns)) = WithFileNames (f . r, fns)
+
+instance Applicative WithFileNames where
+    pure x = WithFileNames (const x, id)
+    WithFileNames (r1,fns1) <*> WithFileNames (r2,fns2)
+        = WithFileNames (\m -> r1 m (r2 m),fns1 . fns2)
+
+recordFilename :: String -> WithFileNames Word16
+recordFilename fn = WithFileNames (($ fn), (fn :))
+
+resolveFileNames :: WithFileNames a -> (a, [String])
+resolveFileNames (WithFileNames (r,fns)) = (r filename_lookup, filenames)
+  where
+    filenames = S.toList $ S.fromList $ fns []
+    filename_lookup = (M.fromList (zip filenames [0..]) M.!)
 
 
 ttYaml2tt :: FilePath -> TipToiYAML -> CodeMap -> IO (TipToiFile, CodeMap)
@@ -256,25 +280,24 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
 
     welcome_names <- parseOneLine parseWelcome "welcome" (fromMaybe "" ttyWelcome)
 
-    (prescripts, filenames) <- liftM unzip $ forM [first .. last] $ \oid -> do
-       case M.lookup oid m of
-        Nothing -> return (\_ -> (oid, Nothing), [])
-        Just raw_lines -> do
-            (lines, filenames) <- liftM unzip $ forMn raw_lines $ \i raw_line -> do
-                let d = printf "Line %d of OID %d" i oid
-                (l,s) <- parseOneLine parseLine d raw_line
-                return (\f -> l (map f s), s)
-            return (\f -> (oid, Just (map ($ f) lines)), concat filenames)
-
-    let filenames' = S.toList $ S.fromList $ welcome_names ++ concat filenames
-    let filename_lookup = (M.fromList (zip filenames' [0..]) M.!)
-
-    let welcome = [map filename_lookup welcome_names]
+    let ((prescripts, welcome), filenames) = resolveFileNames $
+            (,) <$>
+            for [first ..last] (\oid ->
+                (oid ,) <$>
+                for (M.lookup oid m) (\raw_lines ->
+                    forAn raw_lines (\i raw_line ->
+                        let d = printf "Line %d of OID %d" i oid
+                            (l,s) = either error id $ parseOneLinePure parseLine d raw_line
+                        in l <$> traverse recordFilename s
+                    )
+                )
+            ) <*>
+            traverse recordFilename welcome_names
 
     preInitRegs <- M.fromList <$> parseOneLine parseInitRegs "init" (fromMaybe "" ttyInit)
 
     -- resolve registers
-    let (initRegs, scripts) = resolveRegs (preInitRegs, map ($ filename_lookup) prescripts)
+    let (initRegs, scripts) = resolveRegs (preInitRegs, prescripts)
 
     -- resolve named jumps
     let scripts' = resolveJumps scriptMap scripts
@@ -286,7 +309,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
             , r <- concatMap F.toList cs ++ concatMap F.toList as ]
 
     let ttySpeakMap = toSpeakMap (fromMaybe defaultLanguage ttyLanguage) ttySpeak
-    
+
     -- Generate text-to-spech files
     forM (M.elems ttySpeakMap) $ \(lang, txt) ->
         textToSpeech lang txt
@@ -296,7 +319,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
 
     -- Not very nice, better to use something like Control.Applicative.Error if
     -- it were in base, and not fixed to String.
-    files_with_errors <- forM filenames' $ \fn -> case M.lookup fn ttySpeakMap of
+    files_with_errors <- forM filenames $ \fn -> case M.lookup fn ttySpeakMap of
         Just (lang, txt) -> do
             Right <$> B.readFile (ttsFileName lang txt)
         Nothing -> do
@@ -334,7 +357,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
         , ttRawXor = knownRawXOR
         , ttComment = comment
         , ttDate = BC.pack date
-        , ttWelcome = welcome
+        , ttWelcome = [welcome]
         , ttInitialRegs = [fromMaybe 0 (M.lookup r initRegs) | r <- [0..maxReg]]
         , ttScripts = scripts'
         , ttGames = []
