@@ -65,16 +65,13 @@ singeOidImage dpi ps code = ((width, height), pixels)
     quart n = (code `div` 4^n) `mod` 4
 
 
-    dot = [(x,y) | x <- [1..ps'], y <- [1..ps']]
+    dot = [(x,y) | x <- [1..ps], y <- [1..ps]]
 
     centeredDot | xshift < 0 || yshift < 0 = error "Dots too large. Try a smaller pixel size"
                 | otherwise = at (xshift, yshift) dot
-      where xshift = (spacePerPoint - ps') `div` 2 - 1
-            yshift = (spacePerPoint - ps') `div` 2 - 1
+      where xshift = (spacePerPoint - ps) `div` 2 - 1
+            yshift = (spacePerPoint - ps) `div` 2 - 1
 
-
-    -- real pixel size
-    ps' = (dpi `div2` 600) * ps
     -- | how many pixels to shift dots horizontally
     s  = dpi `div2` 600
     -- | how many pixels to shift the special dot horizontally

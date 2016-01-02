@@ -42,9 +42,9 @@ optionParser =
     pixelSize = option auto $ mconcat
         [ long "pixel-size"
         , metavar "N"
-        , value 1
+        , value 2
         , showDefault
-        , help "Use this many pixels per dot in when creating OID codes."
+        , help "Use this many pixels (squared) per dot in when creating OID codes."
         ]
 
     codeDim = option parseCodeDim $ mconcat
