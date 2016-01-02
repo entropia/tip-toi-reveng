@@ -1,4 +1,4 @@
-{-# LANGUAGE BangPatterns, TupleSections #-}
+{-# LANGUAGE BangPatterns, TupleSections, FlexibleContexts #-}
 
 module OidCode (genRawPixels, genRawPNG, DPI(..), PixelSize(..)) where
 
@@ -13,8 +13,7 @@ import Codec.Picture.Types
 import Codec.Picture.Metadata
 import Control.Monad.ST
 import Control.Applicative
-import qualified Data.Vector.Unboxed as VU
-import qualified Data.Vector.Storable as VS
+import Data.Vector.Storable.ByteString
 
 import Utils
 
@@ -36,15 +35,15 @@ checksum dec = c3
 type DPI = Int
 type PixelSize = Int
 
-imageFromBlackPixels :: Int -> Int -> [(Int, Int)] -> Image PixelYA8
+imageFromBlackPixels :: ColorConvertible PixelYA8 p => Int -> Int -> [(Int, Int)] -> Image p
 imageFromBlackPixels width height pixels = runST $ do
     i <- createMutableImage width height background
     forM_ pixels $ \(x,y) -> do
         writePixel i x y black
     freezeImage i
   where
-    black =      PixelYA8 minBound maxBound
-    background = PixelYA8 maxBound minBound
+    black =      promotePixel $ PixelYA8 minBound maxBound
+    background = promotePixel $ PixelYA8 maxBound minBound
 
 -- | Renders a single OID Image, returns its dimensions and the black pixels therein
 singeOidImage :: DPI -> PixelSize -> Word16 -> ((Int, Int), [(Int, Int)])
@@ -91,7 +90,7 @@ singeOidImage dpi ps code = ((width, height), pixels)
     -- integer division rounded up
     x `div2` y = ((x-1) `div` y) + 1
 
-oidImage :: Int -> Int -> DPI -> PixelSize -> Word16 -> Image PixelYA8
+oidImage :: ColorConvertible PixelYA8 p => Int -> Int -> DPI -> PixelSize -> Word16 -> Image p
 oidImage w h dpi ps code =
     imageFromBlackPixels w h tiledPixels
   where
@@ -105,20 +104,20 @@ oidImage w h dpi ps code =
         ]
 
 -- Width and height in pixels
-genRawPixels :: Int -> Int -> DPI -> PixelSize -> Word16 -> VU.Vector Word32
+genRawPixels :: Int -> Int -> DPI -> PixelSize -> Word16 -> B.ByteString
 genRawPixels w h dpi ps code =
     -- All very shaky here, but it seems to work
-    VS.convert $
-    VS.unsafeCast $
+    B.fromStrict $
+    vectorToByteString $
     imageData $
-    (promoteImage $ oidImage w h dpi ps code :: Image PixelRGBA8)
+    (oidImage w h dpi ps code :: Image PixelRGB8)
 
 
 genRawPNG :: Int -> Int -> DPI -> PixelSize -> Word16 -> FilePath -> IO ()
 genRawPNG w h dpi ps code filename =
     B.writeFile filename $
     encodePngWithMetadata metadata $
-    oidImage w h dpi ps code
+    (oidImage w h dpi ps code :: Image PixelYA8)
   where
     metadata = mconcat
         [ singleton DpiX (fromIntegral dpi)

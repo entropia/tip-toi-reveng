@@ -20,13 +20,13 @@ import Types
 
 oidTable :: Conf -> String -> [(String, Word16)] -> LB.ByteString
 oidTable conf title entries | entriesPerPage < 1 = error "OID codes too large to fit on a single page"
-                            | otherwise = pdfByteString docInfo a4rect $ do
+                            | otherwise = pdfByteString docInfo a4rect $ {-# SCC "bar" #-} do
     -- Replace codes by images
     entries' <- forM entries $ \(d,rc) ->
         case code2RawCode rc of
             Nothing -> return (d, Nothing)
             Just c -> do
-                image <- createPDFRawImageFromARGB imageWidthPx imageHeightPx False $
+                image <- createPDFRawImageFromByteString imageWidthPx imageHeightPx False NoFilter $
                     genRawPixels imageWidthPx imageHeightPx (cDPI conf) (cPixelSize conf) $
                     c
                 return (d, Just image)
