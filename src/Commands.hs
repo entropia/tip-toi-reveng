@@ -272,12 +272,12 @@ assemble inf out = do
     writeTipToiCodeYaml inf tty codeMap totalMap
     writeTipToi out tt
 
-genOidTable :: FilePath -> FilePath -> IO ()
-genOidTable inf out = do
+genOidTable :: Conf -> FilePath -> FilePath -> IO ()
+genOidTable conf inf out = do
     (tty, codeMap) <- readTipToiYaml inf
     (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
     let codes = ("START", fromIntegral (ttProductId tt)) : M.toList totalMap
-    pdfFile <- oidTable inf codes
+    pdfFile <- oidTable conf inf codes
     B.writeFile out pdfFile
 
 genPNGsForFile :: Conf -> FilePath -> IO ()
@@ -307,7 +307,18 @@ genPNGsForCodes True conf codes =
         genRawPNG' conf r filename
 
 genRawPNG' :: Conf -> Word16 -> FilePath -> IO ()
-genRawPNG' conf = genRawPNG (cDPI conf) (cPixelSize conf)
+genRawPNG' conf =
+    genRawPNG w h (cDPI conf) (cPixelSize conf)
+  where
+    (w,h) = cCodeDimPixels conf
+
+cCodeDimPixels :: Conf -> (Int, Int)
+cCodeDimPixels conf = (w',h')
+  where
+    (w,h) = cCodeDim conf
+    -- (Roughly) 25mm per inch
+    w' = (w * cDPI conf) `div` 25
+    h' = (h * cDPI conf) `div` 25
 
 readTransscriptFile :: Maybe FilePath -> IO Transscript
 readTransscriptFile Nothing = return M.empty

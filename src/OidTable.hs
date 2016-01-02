@@ -8,24 +8,27 @@ import Control.Monad hiding (forM_)
 import Data.Foldable (forM_)
 import Data.List.Split
 import Text.Printf
+import Control.Arrow ((***))
+import Debug.Trace
 
 import OidCode
 import KnownCodes
 import Utils
+import Types
 
 
 -- IO technically unnecessary: https://github.com/alpheccar/HPDF/issues/7
 
-oidTable :: String -> [(String, Word16)] -> IO LB.ByteString
-oidTable title entries = pdfByteString docInfo a4rect $ do
-
-    -- Replace codes by imagesj
+oidTable :: Conf -> String -> [(String, Word16)] -> IO LB.ByteString
+oidTable conf title entries | entriesPerPage < 1 = error "OID codes too large to fit on a single page"
+                            | otherwise = pdfByteString docInfo a4rect $ do
+    -- Replace codes by images
     entries' <- forM entries $ \(d,rc) ->
         case code2RawCode rc of
             Nothing -> return (d, Nothing)
             Just c -> do
-                image <- createPDFRawImage' imageSizePixels imageSizePixels False $
-                    genRawPixels imageSizePixels imageSizePixels 1200 1 $
+                image <- createPDFRawImage' imageWidthPx imageHeightPx False $
+                    genRawPixels imageWidthPx imageHeightPx (cDPI conf) (cPixelSize conf) $
                     c
                 return (d, Just image)
 
@@ -52,26 +55,76 @@ oidTable title entries = pdfByteString docInfo a4rect $ do
                 withNewContext $ do
                     applyMatrix $ translate  p
                     forM_ mbi $ \i -> withNewContext $ do
-                        applyMatrix $ translate  (0 :+ (-imageSize))
+                        applyMatrix $ translate  (0 :+ (-imageHeight))
                         applyMatrix $ scale (1/px) (1/px)
                         drawXObject i
                     withNewContext $ do
-                        applyMatrix $ translate  (0 :+ (-imageSize - 0.2*cm))
-                        let fontRect = Rectangle (0 :+ (-1*cm)) (imageSize :+ 0)
+                        applyMatrix $ translate  (0 :+ (-imageHeight - subtitleSep))
+                        let fontRect = Rectangle (0 :+ (-subtitleHeight)) (imageWidth :+ 0)
                         addShape fontRect
-                        -- setAsClipPath
-                        displayFormattedText fontRect
-                                NormalParagraph bodyFont $ do
+                        setAsClipPath
+                        displayFormattedText fontRect NormalParagraph bodyFont $ do
                             paragraph $ txt e
   where
-    docInfo = standardDocInfo { author=toPDFString "tttool", compressed = True}
+    docInfo = standardDocInfo
+        { author=toPDFString $ "tttool-" ++ tttoolVersion
+        , compressed = True
+        }
 
-    positions = map (+(2*cm :+ 2*cm)) $
-        calcPositions
-            (a4w - 4*cm) (a4h - 6*cm)
-            (imageSize)  (imageSize + 1*cm)
-            (0.4*cm)     (0.4*cm)
+    -- Configure-dependent dimensions (all in pt)
+    (imageWidth,imageHeight) = (*mm) *** (*mm) $ fromIntegral *** fromIntegral $cCodeDim conf
+
+    -- Static dimensions (all in pt)
+
+    -- Page paddings
+    padTop, padLeft, padBot, padRight :: Double
+    padTop   = 1*cm
+    padBot   = 1*cm
+    padLeft  = 2*cm
+    padRight = 2*cm
+
+    titleHeight  = 1*cm
+    titleSep     = 1*cm
+    footerHeight = 1*cm
+    footerSep    = 1*cm
+
+    imageSepH = 0.4*cm
+    imageSepV = 0.4*cm
+
+    subtitleHeight = 1*cm
+    subtitleSep    = 0.2*cm
+
+    -- Derived dimensions (all in pt)
+    titleRect = Rectangle
+        (padLeft          :+ (a4h - padTop - titleHeight))
+        ((a4w - padRight) :+ (a4h - padTop))
+    titleFont = Font (PDFFont Helvetica 16) black black
+
+    footerRect = Rectangle
+        (padLeft          :+ padBot)
+        ((a4w - padRight) :+ (padBot + footerHeight))
+    footerFont = Font (PDFFont Helvetica 10) black black
+
+    bodyFont = Font (PDFFont Helvetica 12) black black
+
+    bodyWidth  = a4w - padLeft - padRight
+    bodyHeight = a4h - padTop - titleHeight - titleSep - footerSep - footerHeight - padBot
+
+    positions = map (+(padLeft :+ (padBot + footerHeight + footerSep))) $
+        calcPositions bodyWidth  bodyHeight
+                      imageWidth (imageHeight + subtitleSep + subtitleHeight)
+                      imageSepH  imageSepV
     entriesPerPage = length positions
+
+
+    -- Derived dimensions (all in pixels)
+    imageWidthPx = floor (imageWidth * px)
+    imageHeightPx = floor (imageHeight * px)
+
+    -- config-dependent conversion factors
+    px :: Double
+    px = fromIntegral (cDPI conf) / 72
+
 
 calcPositions
     :: Double -- ^ total width
@@ -87,20 +140,6 @@ calcPositions tw th ew eh pw ph = [ x :+ (th - y) | y <- ys , x <- xs]
     ys = takeWhile (<= th - eh) [0,eh+ph..]
 
 
--- in pt
-imageSize = 3*cm
-imageSizePixels = floor (imageSize * px)
-
-bodyContainer :: Container ps  s
-bodyContainer = mkContainer (2*cm) (a4h - 4*cm) (a4w - 4*cm) (a4h - 6*cm) 0
-bodyFont = Font (PDFFont Helvetica 12) black black
-
-titleRect = Rectangle (2*cm :+ (a4h - 3*cm)) ((a4w - 2*cm) :+ (a4h - 2*cm))
-titleFont = Font (PDFFont Helvetica 16) black black
-
-footerRect = Rectangle (2*cm :+ 1*cm) ((a4w - 2*cm) :+ 2*cm)
-footerFont = Font (PDFFont Helvetica 10) black black
-
 -- More sensible types (see https://github.com/alpheccar/HPDF/issues/8)
 createPDFRawImage' :: Int -> Int -> Bool -> V.Vector Word32 -> PDF (PDFReference RawImage)
 createPDFRawImage' w h i v = createPDFRawImage (fromIntegral w) (fromIntegral h) i v
@@ -109,8 +148,8 @@ createPDFRawImage' w h i v = createPDFRawImage (fromIntegral w) (fromIntegral h)
 cm :: Double
 cm = 28.3465
 
-px :: Double
-px = 1200/72
+mm :: Double
+mm = 2.83465
 
 -- A4 dimensions
 a4w, a4h :: Double

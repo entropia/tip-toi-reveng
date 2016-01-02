@@ -7,7 +7,6 @@ import Data.Bits
 import Data.Functor
 import qualified Data.ByteString.Lazy as B
 import Control.Monad
-import Control.Monad.Writer.Strict
 import Codec.Picture
 import Codec.Picture.Types
 import Codec.Picture.Metadata
@@ -46,97 +45,66 @@ imageFromBlackPixels width height pixels = runST $ do
     black =      PixelYA8 minBound maxBound
     background = PixelYA8 maxBound minBound
 
-oidImage :: Int -> Int -> DPI -> PixelSize -> Word16 -> Image PixelYA8
-oidImage w h dpi ps code =
-    imageFromBlackPixels w h (tile f)
+-- | Renders a single OID Image, returns its dimensions and the black pixels therein
+singeOidImage :: DPI -> PixelSize -> Word16 -> ((Int, Int), [(Int, Int)])
+singeOidImage dpi ps code = ((width, height), pixels)
   where
-    !dotsPerPoint | 1200 <- dpi = 12
-                  |  600 <- dpi =  6
+    spacePerPoint = dpi `div2` 100
+    width  = 4*spacePerPoint
+    height = 4*spacePerPoint
+
+    pixels = mconcat $ map position $
+        zip (flip (,) <$> [3,2,1] <*> [3,2,1])
+            [ value (quart n) | n <- [0..8] ] ++
+        [ (p, centeredDot) | p <- [(0,0), (1,0), (2,0), (3,0), (0,1), (0,3) ] ] ++
+        [ ((0,2), special) ]
 
 
     quart 8 = checksum code
     quart n = (code `div` 4^n) `mod` 4
 
-    f = mconcat $ map position $
-        zip (flip (,) <$> [3,2,1] <*> [3,2,1])
-            [ value (quart n) | n <- [0..8] ] ++
-        [ (p, plain) | p <- [(0,0), (1,0), (2,0), (3,0), (0,1), (0,3) ] ] ++
-        [ ((0,2), special) ]
 
-    plain | 1200 <- dpi, 1 <- ps = coordsOfDots
-                [ "           "
-                , "           "
-                , "           "
-                , "           "
-                , "           "
-                , "    **     "
-                , "    **     "
-                , "           "
-                , "           "
-                , "           "
-                , "           "
-                , "           "
-                ]
-          | 1200 <- dpi, 2 <- ps = coordsOfDots
-                [ "           "
-                , "           "
-                , "           "
-                , "           "
-                , "   ****    "
-                , "   ****    "
-                , "   ****    "
-                , "   ****    "
-                , "           "
-                , "           "
-                , "           "
-                , "           "
-                ]
-          | 600 <- dpi, 1 <- ps  = coordsOfDots
-                [ "      "
-                , "      "
-                , "  *   "
-                , "      "
-                , "      "
-                , "      "
-                ]
-          | 600 <- dpi, 2 <- ps  = coordsOfDots
-                [ "      "
-                , "      "
-                , "  **  "
-                , "  **  "
-                , "      "
-                , "      "
-                ]
+    dot = [(x,y) | x <- [1..ps'], y <- [1..ps']]
+
+    centeredDot | xshift < 0 || yshift < 0 = error "Dots too large. Try a smaller pixel size"
+                | otherwise = at (xshift, yshift) dot
+      where xshift = (spacePerPoint - ps') `div` 2 - 1
+            yshift = (spacePerPoint - ps') `div` 2 - 1
 
 
-    s  | 1200 <- dpi = 2
-       | 600  <- dpi = 1
-    ss | 1200 <- dpi = 3
-       | 600  <- dpi = 2
-    value 0 = at ( s, s) plain
-    value 1 = at (-s, s) plain
-    value 2 = at (-s,-s) plain
-    value 3 = at ( s,-s) plain
-    special = at (ss,0)  plain
+    -- real pixel size
+    ps' = (dpi `div2` 600) * ps
+    -- | how many pixels to shift dots horizontally
+    s  = dpi `div2` 600
+    -- | how many pixels to shift the special dot horizontally
+    ss = dpi `div2` 400
 
-    position ((n,m), p) = at (n*dotsPerPoint, m*dotsPerPoint) p
+    value 0 = at ( s, s) centeredDot
+    value 1 = at (-s, s) centeredDot
+    value 2 = at (-s,-s) centeredDot
+    value 3 = at ( s,-s) centeredDot
+    special = at (ss,0)  centeredDot
 
-    coordsOfDots :: [String] -> [(Int, Int)]
-    coordsOfDots rows =
-        [ (x,y)
-        | (row, y) <- zip rows [0..]
-        , (c, x)   <- zip row  [0..]
-        , c == '*'
-        ]
+    position ((n,m), p) = at (n*spacePerPoint, m*spacePerPoint) p
 
     -- Drawing combinators
-
     at (x, y) = map (\(x', y') -> (x + x', y + y'))
-    tile f = concat [ at (x*4*dotsPerPoint, y*4*dotsPerPoint) f
-                    | x <- [0..width-1], y <- [0..height-1]]
-    width  = w `div` (4*dotsPerPoint)
-    height = h `div` (4*dotsPerPoint)
 
+    -- integer division rounded up
+    x `div2` y = ((x-1) `div` y) + 1
+
+oidImage :: Int -> Int -> DPI -> PixelSize -> Word16 -> Image PixelYA8
+oidImage w h dpi ps code =
+    imageFromBlackPixels w h tiledPixels
+  where
+    ((cw,ch), pixels) = singeOidImage dpi ps code
+
+    tiledPixels =
+        [ (x',y')
+        | (x,y) <- pixels
+        , x' <- [x,x + cw..w-1]
+        , y' <- [y,y + ch..h-1]
+        ]
 
 -- Width and height in pixels
 genRawPixels :: Int -> Int -> DPI -> PixelSize -> Word16 -> VU.Vector Word32
@@ -148,16 +116,12 @@ genRawPixels w h dpi ps code =
     (promoteImage $ oidImage w h dpi ps code :: Image PixelRGBA8)
 
 
-genRawPNG :: DPI -> PixelSize -> Word16 -> FilePath -> IO ()
-genRawPNG dpi ps code filename =
+genRawPNG :: Int -> Int -> DPI -> PixelSize -> Word16 -> FilePath -> IO ()
+genRawPNG w h dpi ps code filename =
     B.writeFile filename $
     encodePngWithMetadata metadata $
     oidImage w h dpi ps code
   where
-    w = 100*dotsPerPoint*4
-    h = 100*dotsPerPoint*4
-    !dotsPerPoint | 1200 <- dpi = 12
-                  |  600 <- dpi =  6
     metadata = mconcat
         [ singleton DpiX (fromIntegral dpi)
         , singleton DpiY (fromIntegral dpi)

@@ -18,7 +18,11 @@ optionParser =
     info (helper <*> (conf <**> cmd)) $
     progDesc $ "tttool-" ++ tttoolVersion ++ " -- The swiss army knife for the Tiptoi hacker"
   where
-    conf = pure Conf <*> transscript <*> dpi <*> pixelSize
+    conf = pure Conf
+        <*> transscript
+        <*> codeDim
+        <*> dpi
+        <*> pixelSize
 
     transscript = optional $ strOption $ mconcat
         [ long "transscript"
@@ -27,21 +31,41 @@ optionParser =
         , help "Mapping from media file indices to plaintext. This should be a ';'-separated file, with OID codes in the first column and plain text in the second"
         ]
 
-    dpi = option (only [1200,600] auto) $ mconcat
+    dpi = option auto $ mconcat
         [ long "dpi"
         , metavar "DPI"
         , value 1200
         , showDefault
-        , help "Use this resolution in dpi when creating OID-Codes"
+        , help "Use this resolution in dpi when creating OID codes"
         ]
 
-    pixelSize = option (only [1,2] auto) $ mconcat
+    pixelSize = option auto $ mconcat
         [ long "pixel-size"
         , metavar "N"
         , value 1
         , showDefault
-        , help "Use this many pixels per dot in when creating OID-Codes."
+        , help "Use this many pixels per dot in when creating OID codes."
         ]
+
+    codeDim = option parseCodeDim $ mconcat
+        [ long "code-dim"
+        , metavar "W[xH]"
+        , value (30,30)
+        , showDefaultWith showCodeDim
+        , help "Generate OID codes of this size, in millimeters"
+        ]
+
+    showCodeDim (x,y) | x == y    = show x
+                      | otherwise = show x ++ "x" ++ show y
+
+    parseCodeDim :: ReadM (Int, Int)
+    parseCodeDim = eitherReader go
+      where
+        go input = case reads input of
+            [(x,"")] -> return (x,x)
+            [(x,'x':rest)] -> case reads rest of
+                [(y,[])] -> return (x,y)
+                _        -> Left $ "Cannot parse dimensions " ++ input
 
     cmd = subparser $ mconcat
         [ cmdSep "GME creation commands:"
@@ -307,7 +331,7 @@ oidTableCmd =
     info (helper <*> parser) $
     progDesc "creates a PDF file with all codes in the yaml file"
   where
-    parser = const <$> (twoFiles "pdf" genOidTable <$> yamlFileParser <*> outFileParser)
+    parser = (\a b conf -> twoFiles "pdf" (genOidTable conf) a b) <$> yamlFileParser <*> outFileParser
 
     outFileParser :: Parser (Maybe FilePath)
     outFileParser = optional $ strArgument $ mconcat
@@ -320,8 +344,14 @@ oidCodesCmd =
     command "oid-codes" $
     info (helper <*> parser) $
     progDesc "creates PNG files for every OID in the yaml file." <>
-    footer "Uses oid-<product-id>-<scriptname or code>.png as the file name."
+    footerDoc foot
   where
+    foot = unChunk $ vsepChunks
+        [ paragraph "Uses oid-<code>.png as the file name."
+        , paragraph "Use the global options to configure size, resolution and blackness of the code (see ./tttool --help)."
+        , paragraph $ "Note that it used to work to call \"tttool oid-code foo.yaml\". " ++
+                      "Please use \"tttool oid-codes\" for that now."
+        ]
     parser = flip genPNGsForFile <$> yamlFileParser
 
 oidCodeCmd :: Mod CommandFields (Conf -> IO ())
@@ -333,6 +363,7 @@ oidCodeCmd =
   where
     foot = unChunk $ vsepChunks
         [ paragraph "Uses oid-<code>.png as the file name."
+        , paragraph "Use the global options to configure size, resolution and blackness of the code (see ./tttool --help)."
         , paragraph $ "Note that it used to work to call \"tttool oid-code foo.yaml\". " ++
                       "Please use \"tttool oid-codes\" for that now."
         ]

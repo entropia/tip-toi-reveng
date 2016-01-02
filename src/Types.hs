@@ -251,7 +251,9 @@ type CodeMap = M.Map String Word16
 
 data Conf = Conf
     { cTransscriptFile :: Maybe FilePath
+    , cCodeDim :: (Int, Int)
     , cDPI :: Int
     , cPixelSize :: Int
     }
+    deriving Show
 
