@@ -6,6 +6,7 @@ import Data.Word
 import Data.Bits
 import Data.Functor
 import qualified Data.ByteString.Lazy as B
+import Data.Monoid
 import Control.Monad
 import Codec.Picture
 import Codec.Picture.Types
