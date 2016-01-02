@@ -42,7 +42,7 @@ import qualified Data.Foldable as F
 import qualified Data.Traversable as T
 import Data.Traversable (for, traverse)
 import Control.Arrow
-import Control.Applicative ((<*>), (<*))
+import Control.Applicative (Applicative(..), (<*>), (<*))
 
 import TextToSpeech
 import Language
