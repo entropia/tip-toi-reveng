@@ -71,7 +71,8 @@ executable tttool
     HPDF        >= 1.4.10   && < 1.5,
     split       == 0.2.*,
     optparse-applicative == 0.11.*,
-    spool       == 0.1.*
+    spool       == 0.1.*,
+    zlib        >= 0.5      && < 0.7
 
   if impl(ghc < 7.5)
     build-depends: ghc-prim

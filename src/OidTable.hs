@@ -2,13 +2,13 @@ module OidTable where
 
 import Data.Word
 import qualified Data.ByteString.Lazy as LB
-import qualified Data.Vector.Unboxed as V
 import Graphics.PDF
 import Control.Monad hiding (forM_)
 import Data.Foldable (forM_)
 import Data.List.Split
 import Text.Printf
 import Control.Arrow ((***))
+import Codec.Compression.Zlib
 
 import OidCode
 import KnownCodes
@@ -20,13 +20,14 @@ import Types
 
 oidTable :: Conf -> String -> [(String, Word16)] -> LB.ByteString
 oidTable conf title entries | entriesPerPage < 1 = error "OID codes too large to fit on a single page"
-                            | otherwise = pdfByteString docInfo a4rect $ {-# SCC "bar" #-} do
+                            | otherwise = pdfByteString docInfo a4rect $ do
     -- Replace codes by images
     entries' <- forM entries $ \(d,rc) ->
         case code2RawCode rc of
             Nothing -> return (d, Nothing)
             Just c -> do
-                image <- createPDFRawImageFromByteString imageWidthPx imageHeightPx False NoFilter $
+                image <- createPDFRawImageFromByteString imageWidthPx imageHeightPx False FlateDecode $
+                    compressWith defaultCompressParams { compressLevel = defaultCompression } $
                     genRawPixels imageWidthPx imageHeightPx (cDPI conf) (cPixelSize conf) $
                     c
                 return (d, Just image)
@@ -67,7 +68,7 @@ oidTable conf title entries | entriesPerPage < 1 = error "OID codes too large to
   where
     docInfo = standardDocInfo
         { author=toPDFString $ "tttool-" ++ tttoolVersion
-        , compressed = True
+        , compressed = False
         }
 
     -- Configure-dependent dimensions (all in pt)
