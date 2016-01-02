@@ -1,5 +1,6 @@
 module Utils where
 
+import Control.Applicative
 import Control.Monad (forM, forM_)
 import Data.Traversable (for)
 
