@@ -84,28 +84,28 @@ oidTable conf title entries | entriesPerPage < 1 = error "OID codes too large to
     padRight = 2*cm
 
     titleHeight  = 1*cm
-    titleSep     = 1*cm
-    footerHeight = 1*cm
-    footerSep    = 1*cm
+    titleSep     = 0.5*cm
+    footerHeight = 0.5*cm
+    footerSep    = 0.5*cm
 
     imageSepH = 0.4*cm
-    imageSepV = 0.4*cm
+    imageSepV = 0.2*cm
 
-    subtitleHeight = 1*cm
+    subtitleHeight = 0.4*cm
     subtitleSep    = 0.2*cm
 
     -- Derived dimensions (all in pt)
     titleRect = Rectangle
         (padLeft          :+ (a4h - padTop - titleHeight))
         ((a4w - padRight) :+ (a4h - padTop))
-    titleFont = Font (PDFFont Helvetica 16) black black
+    titleFont = Font (PDFFont Helvetica 12) black black
 
     footerRect = Rectangle
         (padLeft          :+ padBot)
         ((a4w - padRight) :+ (padBot + footerHeight))
-    footerFont = Font (PDFFont Helvetica 10) black black
+    footerFont = Font (PDFFont Helvetica 8) black black
 
-    bodyFont = Font (PDFFont Helvetica 12) black black
+    bodyFont = Font (PDFFont Helvetica 8) black black
 
     bodyWidth  = a4w - padLeft - padRight
     bodyHeight = a4h - padTop - titleHeight - titleSep - footerSep - footerHeight - padBot
