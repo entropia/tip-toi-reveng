@@ -15,8 +15,10 @@ import Utils
 
 optionParser :: ParserInfo (IO ())
 optionParser =
-    info (helper <*> (conf <**> cmd)) $
-    progDesc $ "tttool-" ++ tttoolVersion ++ " -- The swiss army knife for the Tiptoi hacker"
+    info (helper <*> (conf <**> cmd)) $ mconcat
+    [ progDesc $ "tttool-" ++ tttoolVersion ++ " -- The swiss army knife for the Tiptoi hacker"
+    , fullDesc
+    ]
   where
     conf = pure Conf
         <*> transscript
@@ -67,7 +69,7 @@ optionParser =
                 [(y,[])] -> return (x,y)
                 _        -> Left $ "Cannot parse dimensions " ++ input
 
-    cmd = subparser $ mconcat
+    cmd = hsubparser $ mconcat
         [ cmdSep "GME creation commands:"
         , assembleCmd
         , cmdSep ""
@@ -137,7 +139,7 @@ rawSwitchParser = switch $ mconcat
 infoCmd :: Mod CommandFields (Conf -> IO ())
 infoCmd =
     command "info" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "Print general information about a GME file"
   where
     parser = flip dumpInfo <$> gmeFileParser
@@ -146,7 +148,7 @@ infoCmd =
 mediaCmd :: Mod CommandFields (Conf -> IO ())
 mediaCmd =
     command "media" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "dumps all audio samples"
   where
     parser = const <$> (dumpAudioTo <$> mediaDirParser <*> gmeFileParser)
@@ -164,7 +166,7 @@ mediaCmd =
 scriptsCmd :: Mod CommandFields (Conf -> IO ())
 scriptsCmd =
     command "scripts" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "prints the decoded scripts for each OID"
   where
     parser = (\r f c -> dumpScripts c r Nothing f)
@@ -175,7 +177,7 @@ scriptsCmd =
 scriptCmd :: Mod CommandFields (Conf -> IO ())
 scriptCmd =
     command "script" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "prints the decoded scripts for a specific OID"
   where
     parser = (\r f n c -> dumpScripts c r (Just n) f)
@@ -191,7 +193,7 @@ scriptCmd =
 binariesCmd :: Mod CommandFields (Conf -> IO ())
 binariesCmd =
     command "binaries" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "dumps all binaries"
   where
     parser = const <$> (dumpBinariesTo <$> binariesDirParser <*> gmeFileParser)
@@ -209,7 +211,7 @@ binariesCmd =
 gamesCmd :: Mod CommandFields (Conf -> IO ())
 gamesCmd =
     command "games" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "prints the decoded games"
   where
     parser = flip dumpGames <$> gmeFileParser
@@ -217,7 +219,7 @@ gamesCmd =
 lintCmd :: Mod CommandFields (Conf -> IO ())
 lintCmd =
     command "lint" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "checks for errors in the file or in this program"
   where
     parser = const <$> (lint <$> gmeFileParser)
@@ -225,7 +227,7 @@ lintCmd =
 segmentsCmd :: Mod CommandFields (Conf -> IO ())
 segmentsCmd =
     command "segments" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "lists all known parts of the file, with description."
   where
     parser = const <$> (segments <$> gmeFileParser)
@@ -234,7 +236,7 @@ segmentsCmd =
 segmentCmd :: Mod CommandFields (Conf -> IO ())
 segmentCmd =
     command "segment" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "prints the decoded scripts for a specific OID"
   where
     parser = (\f n c -> findPosition n f)
@@ -255,7 +257,7 @@ segmentCmd =
 holesCmd :: Mod CommandFields (Conf -> IO ())
 holesCmd =
     command "holes" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "lists all unknown parts of the file."
   where
     parser = const <$> (unknown_segments <$> gmeFileParser)
@@ -263,7 +265,7 @@ holesCmd =
 explainCmd :: Mod CommandFields (Conf -> IO ())
 explainCmd =
     command "explain" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "print a hexdump of a GME file with descriptions"
   where
     parser = const <$> (explain <$> gmeFileParser)
@@ -271,7 +273,7 @@ explainCmd =
 playCmd :: Mod CommandFields (Conf -> IO ())
 playCmd =
     command "play" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "interactively play a GME file"
   where
     parser = flip play <$> gmeFileParser
@@ -280,7 +282,7 @@ playCmd =
 rewriteCmd :: Mod CommandFields (Conf -> IO ())
 rewriteCmd =
     command "rewrite" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "parses the file and reads it again (for debugging)"
   where
     parser = const <$> (rewrite <$> gmeFileParser <*> outFileParser)
@@ -300,7 +302,7 @@ twoFiles suffix go inFile Nothing = go inFile outFile
 exportCmd :: Mod CommandFields (Conf -> IO ())
 exportCmd =
     command "export" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "dumps the file in the human-readable yaml format"
   where
     parser = const <$> (twoFiles "yaml" export <$> gmeFileParser <*> outFileParser)
@@ -314,7 +316,7 @@ exportCmd =
 assembleCmd :: Mod CommandFields (Conf -> IO ())
 assembleCmd =
     command "assemble" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "creates a gme file from the given source"
   where
     parser = const <$> (twoFiles "gme" assemble <$> yamlFileParser <*> outFileParser)
@@ -328,7 +330,7 @@ assembleCmd =
 oidTableCmd :: Mod CommandFields (Conf -> IO ())
 oidTableCmd =
     command "oid-table" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "creates a PDF file with all codes in the yaml file"
   where
     parser = (\a b conf -> twoFiles "pdf" (genOidTable conf) a b) <$> yamlFileParser <*> outFileParser
@@ -342,7 +344,7 @@ oidTableCmd =
 oidCodesCmd :: Mod CommandFields (Conf -> IO ())
 oidCodesCmd =
     command "oid-codes" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "creates PNG files for every OID in the yaml file." <>
     footerDoc foot
   where
@@ -357,7 +359,7 @@ oidCodesCmd =
 oidCodeCmd :: Mod CommandFields (Conf -> IO ())
 oidCodeCmd =
     command "oid-code" $
-    info (helper <*> parser) $
+    info parser $
     progDesc "creates PNG files for each given code(s)" <>
     footerDoc foot
   where
@@ -384,5 +386,5 @@ oidCodeCmd =
 
 main :: IO ()
 main = do
-    act <- execParser optionParser
+    act <- customExecParser (prefs showHelpOnError) optionParser
     act
