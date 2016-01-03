@@ -17,9 +17,14 @@ optionParser :: ParserInfo (IO ())
 optionParser =
     info (helper <*> (conf <**> cmd)) $ mconcat
     [ progDesc $ "tttool-" ++ tttoolVersion ++ " -- The swiss army knife for the Tiptoi hacker"
+    , footerDoc foot
     , fullDesc
     ]
   where
+    foot = unChunk $ vsepChunks
+        [ paragraph "Please run \"tttool COMMAND --help\" for information on the particular command."
+        ]
+
     conf = pure Conf
         <*> transscript
         <*> codeDim
