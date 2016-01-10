@@ -20,7 +20,7 @@ Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
 
  * Pronwan veröffentlich einige Videos:
    * [Selbstgemachte Tier-Figuren] (4 Minuten)
-   * [Monkey Island 3] als Tiptoi-Spiel (8 Minuten)
+   * [Monkey Island 3] als Tiptoi-Spiel (8 Minuten), sowie eine [Erklärung der Programmierung] (24 Minuten) dieses Abendteuers
  * Joachim Breitner, der Hauptentwicker des `tttool` berichtet auf seinem [Blog] von seinen Basteleien:
    * Der [neu besprochene Weltatlas]
    * [Weihnachtsgeschenke-Verteilung]
@@ -37,6 +37,7 @@ Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
 
 [Selbstgemachte Tier-Figuren]: https://www.youtube.com/watch?v=Yic57Y9VORA
 [Monkey Island 3]: https://www.youtube.com/watch?v=UieoGOHULVw
+[Erklärung der Programmierung]: https://www.youtube.com/watch?v=xlUr1eZKhWw
 [Blog]: https://www.joachim-breitner.de/blog/
 [neu besprochene Weltatlas]: https://www.joachim-breitner.de/blog/641-Personalisierte_Tip-Toi-Datei_als_Geschenk
 [Weihnachtsgeschenke-Verteilung]: https://www.joachim-breitner.de/blog/666-Geschenke_mit_dem_Tiptoi-Stift_verteilen
@@ -47,6 +48,7 @@ Sonstiges zur Einstimmug:
  * Der Podcast Modellansatz [interviewte Joachim Breitner](http://modellansatz.de/papierrechner) zu dem Projekt (80 Minuten).
  * Auf der GPN'15 in Karlsruhe gab es einen [Vortrag zum Projekt](https://entropia.de/GPN15:Der_Tiptoi-Stift), der auch [aufgezeichnet](https://media.ccc.de/browse/conferences/gpn/gpn15/gpn15-6687-der_tiptoi-stift.html#video) wurde (63 Minuten).
  * Micha Reischuck zeigt einem [Screencast](https://youtu.be/QtdlwmKgg70) wie man mit GIMP die OID-Codes über Bilder legt.
+ * Andreas Grimme hat mit [ttaudio](https://github.com/sidiandi/ttaudio#readme) eine Windows-GUI erstellt, falls man einfach nur ein paar Audio-Dateien auf den Stift laden will.
 
 ## Installation (Windows)
 
