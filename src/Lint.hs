@@ -1,4 +1,4 @@
-module Lint (lintTipToi) where
+module Lint (lintTipToi, warnTipToi) where
 
 import Text.Printf
 import Data.Maybe
@@ -50,3 +50,13 @@ lintTipToi tt segments = do
         = printf "   Offset %08X Size %d (%s) overlaps Offset %08X Size %d (%s) by %d\n"
             o1 l1 (ppDesc d1) o2 l2 (ppDesc d2) overlap
       where overlap = o1 + l1 - o2
+
+warnTipToi :: TipToiFile -> IO ()
+warnTipToi tt = do
+    sequence_
+      [ printf "[Script %d line %d] Warning: More than 8 commands per line may cause problems\n"
+            c n
+      | (c, Just lines) <- ttScripts tt
+      , (n,Line _ _ cmds _) <- zip [(1::Int)..] lines
+      , length cmds > 8
+      ]

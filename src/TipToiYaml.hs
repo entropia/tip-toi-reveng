@@ -570,6 +570,7 @@ codeFileName fn = base <.> "codes" <.> ext
     base = dropExtension fn
     ext  = takeExtension fn
 
+-- | Unused
 debugGame :: ProductID -> IO TipToiYAML
 debugGame productID = do
     return $ TipToiYAML

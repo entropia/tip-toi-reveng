@@ -269,6 +269,7 @@ assemble :: FilePath -> FilePath -> IO ()
 assemble inf out = do
     (tty, codeMap) <- readTipToiYaml inf
     (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
+    warnTipToi tt
     writeTipToiCodeYaml inf tty codeMap totalMap
     writeTipToi out tt
 
