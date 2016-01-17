@@ -18,6 +18,10 @@
  * The png files written by `./tttool oid-code` and `./tttool oid-codes` store
    their DPI value, so that importing them into DTP programs is likely to yield
    the desired result.
+ * The “other” play commands (FFE0, FFE1, FB00) are implemented in the parser,
+   printer and serializer, with syntax `P*(..)`, `PA*(..)` and `PA(..)`. These
+   are not interesting to you unless you want to understand existing Tiptoi
+   products. 
 
 ## 1.5.1 (2015-11-11)
 

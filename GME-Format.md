@@ -104,10 +104,10 @@ Known commands are:
  * `FFF7` (written `$r^=m`): Bitwise xor to register `$r` the value of `m`
  * `FFF8` (written `Neg($r)`): Negate register `$r`.
  * `FFF9` (written `$r:=m`): Set register `$r` to `m` or value of `$m`
- * `FFE0` (written `P()`: play one random sample of the media list
- * `FFE1` (written `P()`: play all samples of the media list
+ * `FFE0` (written `P*`: play one random sample of the media list
+ * `FFE1` (written `PA*`: play all samples of the media list
  * `FFE8` (written `P(m)`): Play audio referenced by the `m`th entry in the indices list.
- * `FB00` (written `P(b-a)`): Play all samples from that inclusive range. `a` := lowbyte(`m`), `b` := highbyte(`m`)
+ * `FB00` (written `PA(b-a)`): Play all samples from that inclusive range. `a` := lowbyte(`m`), `b` := highbyte(`m`)
  * `FC00` (written `P(b-a)`): Play one random sample from that inclusive range. `a` := lowbyte(`m`), `b` := highbyte(`m`)
  * `FD00` (written `G(m)`): Begin game `m`.
  * `F8FF` (written `J(m)`): Jump to script `m`.

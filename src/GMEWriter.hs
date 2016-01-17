@@ -186,6 +186,14 @@ putCommand (Neg r) = do
     putWord16 r
     mapM_ putWord8 [0xF8, 0xFF]
     putTVal (Const 0)
+putCommand RandomVariant = do
+    putWord16 0
+    mapM_ putWord8 [0xE0, 0xFF]
+    putTVal (Const 0)
+putCommand PlayAllVariant = do
+    putWord16 0
+    mapM_ putWord8 [0xE1, 0xFF]
+    putTVal (Const 0)
 putCommand (Play n) = do
     putWord16 0
     mapM_ putWord8 [0xE8, 0xFF]
@@ -193,6 +201,10 @@ putCommand (Play n) = do
 putCommand (Random a b) = do
     putWord16 0
     mapM_ putWord8 [0x00, 0xFC]
+    putTVal (Const (lowhigh a b))
+putCommand (PlayAll a b) = do
+    putWord16 0
+    mapM_ putWord8 [0x00, 0xFB]
     putTVal (Const (lowhigh a b))
 putCommand (Game n) = do
     putWord16 0

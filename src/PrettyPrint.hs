@@ -105,12 +105,15 @@ ppArithOp XOr  = "^="
 ppArithOp Set  = ":="
 
 ppCommand :: Reg r => Bool -> Transscript -> PlayList -> Command r -> String
-ppCommand True t xs (Play n)     | not (validIndex xs (fromIntegral n)) = ""
-ppCommand True t xs (Random a b) | any (not . validIndex xs . fromIntegral) [b..a] = ""
+ppCommand True t xs p
+    | any (not . validIndex xs) (indices p) = ""
 
-ppCommand _ t xs (Play n)        = printf "P(%s)" (ppPlayIndex t xs (fromIntegral n))
-ppCommand _ t xs (Random a b)    = printf "P(%s)" $ commas $ map (ppPlayIndex t xs . fromIntegral ) [b..a]
-ppCommand _ t xs (Cancel)        = printf "C"
+ppCommand _ t xs (Play n)        = printf "P(%s)" $ ppPlayIndex t xs (fromIntegral n)
+ppCommand _ t xs (Random a b)    = printf "P(%s)" $ ppPlayRange t xs [b..a]
+ppCommand _ t xs (PlayAll a b)   = printf "PA(%s)" $ ppPlayRange t xs [b..a]
+ppCommand _ t xs PlayAllVariant  = printf "PA*(%s)" $ ppPlayAll t xs
+ppCommand _ t xs RandomVariant   = printf "P*(%s)" $ ppPlayAll t xs
+ppCommand _ t xs Cancel          = printf "C"
 ppCommand _ t xs (Jump v)        = printf "J(%s)" (ppTVal v)
 ppCommand _ t xs (NamedJump v)   = printf "J(%s)" v
 ppCommand _ t xs (Game b)        = printf "G(%d)" b
@@ -118,12 +121,24 @@ ppCommand _ t xs (ArithOp o r n) = ppReg r ++ ppArithOp o ++ ppTVal n
 ppCommand _ t xs (Neg r)       = printf "Neg(%s)" (ppReg r)
 ppCommand _ t xs (Unknown b r n) = printf "?(%s,%s) (%s)" (ppReg r) (ppTVal n) (prettyHex b)
 
+indices :: Command r -> [Int]
+indices (Play n)      = [fromIntegral n]
+indices (Random a b)  = map fromIntegral [b..a]
+indices (PlayAll a b) = map fromIntegral [b..a]
+indices _ = []
+
 validIndex :: PlayList -> Int -> Bool
 validIndex xs n = n >= 0 && n < length xs
 
 ppPlayIndex :: Transscript -> PlayList -> Int -> String
 ppPlayIndex t xs n | validIndex xs n = transcribe t (xs !! n)
                    | otherwise       = "invalid_index_" ++ show n
+
+ppPlayRange :: Transscript -> PlayList -> [Word8] -> String
+ppPlayRange t xs = commas . map (ppPlayIndex t xs . fromIntegral)
+
+ppPlayAll :: Transscript -> PlayList -> String
+ppPlayAll t = commas . map (transcribe t)
 
 spaces = intercalate " "
 commas = intercalate ","

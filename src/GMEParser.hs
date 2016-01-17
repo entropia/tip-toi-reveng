@@ -194,7 +194,15 @@ lineParser = begin
         ]
 
     actions =
-        [ (B.pack [0xE8,0xFF], \r -> do
+        [ (B.pack [0xE0,0xFF], \r -> do
+            unless (r == 0) $ fail "Non-zero register for RandomVariant command"
+            Const 0x0000 <- getTVal
+            return RandomVariant)
+        , (B.pack [0xE1,0xFF], \r -> do
+            unless (r == 0) $ fail "Non-zero register for PlayAllVariant command"
+            Const 0x0000 <- getTVal
+            return PlayAllVariant)
+        , (B.pack [0xE8,0xFF], \r -> do
             unless (r == 0) $ fail "Non-zero register for Play command"
             Const n <- getTVal
             return (Play n))
@@ -202,6 +210,10 @@ lineParser = begin
             unless (r == 0) $ fail "Non-zero register for Random command"
             Const n <- getTVal
             return (Random (lowbyte n) (highbyte n)))
+        , (B.pack [0x00,0xFB], \r -> do
+            unless (r == 0) $ fail "Non-zero register for PlayAll command"
+            Const n <- getTVal
+            return (PlayAll (lowbyte n) (highbyte n)))
         , (B.pack [0xFF,0xFA], \r -> do
             unless (r == 0) $ fail "Non-zero register for Cancel command"
             Const 0xFFFF <- getTVal

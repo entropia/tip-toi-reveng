@@ -97,6 +97,7 @@ executable tttool
   default-language:    Haskell2010
   ghc-options:
     -fwarn-unused-imports
+    -fwarn-incomplete-patterns
     -rtsopts
     -with-rtsopts=-K100M
 

@@ -479,13 +479,20 @@ parseCommands i =
          return (Unknown h r v : cmds, filenames)
 
     , descP "Play action" $
-      do char 'P'
+      do (withA, withStar) <- P.lexeme lexer $ do
+            char 'P'
+            withA <- optionBool (char 'A')
+            withStar <- optionBool (char '*')
+            return (withA, withStar)
          fns <- P.parens lexer $ P.commaSep1 lexer parseAudioRef
          let n = length fns
+         let c = case (withA, withStar, fns) of
+                (False, False, [fn]) -> Play (fromIntegral i)
+                (False, False, _)    -> Random (fromIntegral (i + n - 1)) (fromIntegral i)
+                (True,  False, _)    -> PlayAll (fromIntegral (i + n - 1)) (fromIntegral i)
+                (False, True,  _)    -> RandomVariant
+                (True,  True,  _)    -> PlayAllVariant
          (cmds, filenames) <- parseCommands (i+n)
-         let c = case fns of
-                [fn] -> Play (fromIntegral i)
-                _    -> Random (fromIntegral (i + n - 1)) (fromIntegral i)
          return (c : cmds, fns ++ filenames)
     , descP "Cancel" $
       do P.lexeme lexer $ char 'C'
@@ -507,6 +514,8 @@ parseCommands i =
     ]
 
 
+optionBool :: Stream s m t => ParsecT s u m a -> ParsecT s u m Bool
+optionBool p = option False (p $> True)
 
 
 encodeFileCommented :: ToJSON a => FilePath -> String -> a -> IO ()

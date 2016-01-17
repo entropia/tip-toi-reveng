@@ -45,6 +45,9 @@ data ArithOp
 data Command r
     = Play Word16
     | Random Word8 Word8
+    | PlayAll Word8 Word8
+    | PlayAllVariant
+    | RandomVariant
     | Cancel
     | Game Word16
     | ArithOp ArithOp r (TVal r)
