@@ -515,7 +515,7 @@ parseCommands i =
 
 
 optionBool :: Stream s m t => ParsecT s u m a -> ParsecT s u m Bool
-optionBool p = option False (p $> True)
+optionBool p = option False (const True <$> p)
 
 
 encodeFileCommented :: ToJSON a => FilePath -> String -> a -> IO ()
