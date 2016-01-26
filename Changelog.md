@@ -21,7 +21,10 @@
  * The “other” play commands (FFE0, FFE1, FB00) are implemented in the parser,
    printer and serializer, with syntax `P*(..)`, `PA*(..)` and `PA(..)`. These
    are not interesting to you unless you want to understand existing Tiptoi
-   products. 
+   products.
+ * Games are not exported by `tttool export` and assembled by `tttool
+   assemble`. This way, existing Tiptoi products can be modified without losing
+   them.
 
 ## 1.5.1 (2015-11-11)
 
