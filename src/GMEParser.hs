@@ -355,9 +355,10 @@ getRealGame gGameType = do
     gTargetScores             <- if gGameType == 6 then replicateM 2 getWord16
                                                    else replicateM 10 getWord16
     gBonusTargetScores        <- getIf (==6) $ replicateM 8 getWord16
-    gFinishPlayLists          <- if gGameType == 6 then indirections (return 2) "finishplaylist" getPlayListList
-                                                   else indirections (return 10) "finishplaylist" getPlayListList
-    gBonusFinishPlayLists     <- getIf (==6) $ indirections (return 8) "bonus finishplaylist" getPlayListList
+    let fplCount | gGameType == 6 = 2
+                 | otherwise      = 10
+    gFinishPlayLists          <- indirections (return fplCount) "finishplaylist-" getPlayListList
+    gBonusFinishPlayLists     <- getIf (==6) $ indirections (return 8) "bonus finishplaylist-" getPlayListList
     gBonusSubgameIds          <- getIf (==6) $ indirection "subgameidlist" getGameIdList
     gSubgameGroups            <- getIf (==7) $ indirection "subgamegroups" getGameIdListList
     gGameSelectOIDs           <- getIf (==8) $ indirection "gameSelectOids" getOidList

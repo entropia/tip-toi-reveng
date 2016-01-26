@@ -201,6 +201,7 @@ ppGame t (Game6 {..}) =
                      "  later round start play list:   %s",
                      "  round start play list 2:       %s",
                      "  later round start play list 2: %s",
+                     "  bonus subgame count: %d",
                      "  subgames: (%d)", "%s",
                      "  target scores: (%d) %s",
                      "  bonus target scores: (%d) %s",
@@ -223,6 +224,7 @@ ppGame t (Game6 {..}) =
     (ppPlayListList t gLaterRoundStartPlayList)
     (ppPlayListList t gRoundStartPlayList2)
     (ppPlayListList t gLaterRoundStartPlayList2)
+    gBonusSubgameCount
     (length gSubgames)           (ppSubGames t gSubgames)
     (length gTargetScores)       (show gTargetScores)
     (length gBonusTargetScores)  (show gBonusTargetScores)

@@ -109,6 +109,7 @@ data Game =
         }
     | Game6
         { gRounds                   :: Word16
+        , gBonusSubgameCount        :: Word16
         , gBonusRounds              :: Word16
         , gBonusTarget              :: Word16
         , gUnknownI                 :: Word16
@@ -242,9 +243,15 @@ gameType Game253 {} = 253
 
 type OID = Word16
 
-data SubGame
-    = SubGame B.ByteString [OID] [OID] [OID] [PlayListList]
+data SubGame = SubGame
+    { sgUnknown :: B.ByteString
+    , sgOids1 :: [OID]
+    , sgOids2 :: [OID]
+    , sgOids3 :: [OID]
+    , sgPlaylist :: [PlayListList]
+    }
     deriving Show
+
 
 type Transscript = M.Map Word16 String
 type CodeMap = M.Map String Word16

@@ -133,6 +133,7 @@ data GameYaml = CommonGameYaml
         }
     | Game6Yaml
         { gyRounds                   :: Word16
+        , gyBonusSubgameCount        :: Word16
         , gyBonusRounds              :: Word16
         , gyBonusTarget              :: Word16
         , gyUnknownI                 :: Word16
@@ -336,6 +337,7 @@ game2gameYaml CommonGame {..} = CommonGameYaml
         }
 game2gameYaml Game6 {..} = Game6Yaml
         { gyRounds                   = gRounds
+        , gyBonusSubgameCount        = gBonusSubgameCount
         , gyBonusRounds              = gBonusRounds
         , gyBonusTarget              = gBonusTarget
         , gyUnknownI                 = gUnknownI
@@ -454,6 +456,163 @@ game2gameYaml Game16 {..} = Game16Yaml
         , gyExtraPlayLists           = map playListList2Yaml gExtraPlayLists
         }
 game2gameYaml Game253 = Game253Yaml
+
+playListListFromYaml :: PlayListListYaml -> WithFileNames PlayListList
+playListListFromYaml =
+    fmap listify .
+    traverse recordFilename .
+    either error id .
+    parseOneLinePure parsePlayList "playlist"
+  where listify [] = []
+        listify x  = [x]
+
+oidListFromYaml :: OIDListYaml -> [OID]
+oidListFromYaml = map read . words
+
+subGameFromYaml :: SubGameYaml -> WithFileNames SubGame
+subGameFromYaml (SubGameYaml u o1 o2 o3 pl) = (\x -> SubGame
+    { sgUnknown = either error id $ parseOneLinePure parsePrettyHex "unknown" u
+    , sgOids1 = oidListFromYaml o1
+    , sgOids2 = oidListFromYaml o2
+    , sgOids3 = oidListFromYaml o3
+    , sgPlaylist = x
+    }) <$> traverse playListListFromYaml pl
+
+
+gameYaml2Game :: GameYaml -> WithFileNames Game
+gameYaml2Game CommonGameYaml {..} = pure CommonGame
+        <*> pure gyGameType
+        <*> pure gyRounds
+        <*> pure gyUnknownC
+        <*> pure gyEarlyRounds
+        <*> pure gyRepeatLastMedia
+        <*> pure gyUnknownX
+        <*> pure gyUnknownW
+        <*> pure gyUnknownV
+        <*> playListListFromYaml gyStartPlayList
+        <*> playListListFromYaml gyRoundEndPlayList
+        <*> playListListFromYaml gyFinishPlayList
+        <*> playListListFromYaml gyRoundStartPlayList
+        <*> playListListFromYaml gyLaterRoundStartPlayList
+        <*> traverse subGameFromYaml gySubgames
+        <*> pure gyTargetScores
+        <*> traverse playListListFromYaml gyFinishPlayLists
+gameYaml2Game Game6Yaml {..} = pure Game6
+        <*> pure gyRounds
+        <*> pure gyBonusSubgameCount
+        <*> pure gyBonusRounds
+        <*> pure gyBonusTarget
+        <*> pure gyUnknownI
+        <*> pure gyEarlyRounds
+        <*> pure gyUnknownQ
+        <*> pure gyRepeatLastMedia
+        <*> pure gyUnknownX
+        <*> pure gyUnknownW
+        <*> pure gyUnknownV
+        <*> playListListFromYaml gyStartPlayList
+        <*> playListListFromYaml gyRoundEndPlayList
+        <*> playListListFromYaml gyFinishPlayList
+        <*> playListListFromYaml gyRoundStartPlayList
+        <*> playListListFromYaml gyLaterRoundStartPlayList
+        <*> playListListFromYaml gyRoundStartPlayList2
+        <*> playListListFromYaml gyLaterRoundStartPlayList2
+        <*> traverse subGameFromYaml gySubgames
+        <*> pure gyTargetScores
+        <*> pure gyBonusTargetScores
+        <*> traverse playListListFromYaml gyFinishPlayLists
+        <*> traverse playListListFromYaml gyBonusFinishPlayLists
+        <*> pure gyBonusSubgameIds
+gameYaml2Game Game7Yaml {..} = pure Game7
+        <*> pure gyRounds
+        <*> pure gyUnknownC
+        <*> pure gyEarlyRounds
+        <*> pure gyRepeatLastMedia
+        <*> pure gyUnknownX
+        <*> pure gyUnknownW
+        <*> pure gyUnknownV
+        <*> playListListFromYaml gyStartPlayList
+        <*> playListListFromYaml gyRoundEndPlayList
+        <*> playListListFromYaml gyFinishPlayList
+        <*> playListListFromYaml gyRoundStartPlayList
+        <*> playListListFromYaml gyLaterRoundStartPlayList
+        <*> traverse subGameFromYaml gySubgames
+        <*> pure gyTargetScores
+        <*> traverse playListListFromYaml gyFinishPlayLists
+        <*> pure gySubgameGroups
+gameYaml2Game Game8Yaml {..} = pure Game8
+        <*> pure gyRounds
+        <*> pure gyUnknownC
+        <*> pure gyEarlyRounds
+        <*> pure gyRepeatLastMedia
+        <*> pure gyUnknownX
+        <*> pure gyUnknownW
+        <*> pure gyUnknownV
+        <*> playListListFromYaml gyStartPlayList
+        <*> playListListFromYaml gyRoundEndPlayList
+        <*> playListListFromYaml gyFinishPlayList
+        <*> playListListFromYaml gyRoundStartPlayList
+        <*> playListListFromYaml gyLaterRoundStartPlayList
+        <*> traverse subGameFromYaml gySubgames
+        <*> pure gyTargetScores
+        <*> traverse playListListFromYaml gyFinishPlayLists
+        <*> pure (oidListFromYaml gyGameSelectOIDs)
+        <*> pure gyGameSelect
+        <*> playListListFromYaml gyGameSelectErrors1
+        <*> playListListFromYaml gyGameSelectErrors2
+gameYaml2Game Game9Yaml {..} = pure Game9
+        <*> pure gyRounds
+        <*> pure gyUnknownC
+        <*> pure gyEarlyRounds
+        <*> pure gyRepeatLastMedia
+        <*> pure gyUnknownX
+        <*> pure gyUnknownW
+        <*> pure gyUnknownV
+        <*> playListListFromYaml gyStartPlayList
+        <*> playListListFromYaml gyRoundEndPlayList
+        <*> playListListFromYaml gyFinishPlayList
+        <*> playListListFromYaml gyRoundStartPlayList
+        <*> playListListFromYaml gyLaterRoundStartPlayList
+        <*> traverse subGameFromYaml gySubgames
+        <*> pure gyTargetScores
+        <*> traverse playListListFromYaml gyFinishPlayLists
+        <*> traverse playListListFromYaml gyExtraPlayLists
+gameYaml2Game Game10Yaml {..} = pure Game10
+        <*> pure gyRounds
+        <*> pure gyUnknownC
+        <*> pure gyEarlyRounds
+        <*> pure gyRepeatLastMedia
+        <*> pure gyUnknownX
+        <*> pure gyUnknownW
+        <*> pure gyUnknownV
+        <*> playListListFromYaml gyStartPlayList
+        <*> playListListFromYaml gyRoundEndPlayList
+        <*> playListListFromYaml gyFinishPlayList
+        <*> playListListFromYaml gyRoundStartPlayList
+        <*> playListListFromYaml gyLaterRoundStartPlayList
+        <*> traverse subGameFromYaml gySubgames
+        <*> pure gyTargetScores
+        <*> traverse playListListFromYaml gyFinishPlayLists
+        <*> traverse playListListFromYaml gyExtraPlayLists
+gameYaml2Game Game16Yaml {..} = pure Game16
+        <*> pure gyRounds
+        <*> pure gyUnknownC
+        <*> pure gyEarlyRounds
+        <*> pure gyRepeatLastMedia
+        <*> pure gyUnknownX
+        <*> pure gyUnknownW
+        <*> pure gyUnknownV
+        <*> playListListFromYaml gyStartPlayList
+        <*> playListListFromYaml gyRoundEndPlayList
+        <*> playListListFromYaml gyFinishPlayList
+        <*> playListListFromYaml gyRoundStartPlayList
+        <*> playListListFromYaml gyLaterRoundStartPlayList
+        <*> traverse subGameFromYaml gySubgames
+        <*> pure gyTargetScores
+        <*> traverse playListListFromYaml gyFinishPlayLists
+        <*> pure (oidListFromYaml gyExtraOIDs)
+        <*> traverse playListListFromYaml gyExtraPlayLists
+gameYaml2Game Game253Yaml = pure Game253
+
 
 mergeOnlyEqual :: String -> Word16 -> Word16 -> Word16
 mergeOnlyEqual _ c1 c2 | c1 == c2 = c1
@@ -591,10 +750,11 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
         first = fst (M.findMin m)
         last = fst (M.findMax m)
 
-    welcome_names <- parseOneLine parseWelcome "welcome" (fromMaybe "" ttyWelcome)
+    welcome_names <- parseOneLine parsePlayList "welcome" (fromMaybe "" ttyWelcome)
 
-    let ((prescripts, welcome), filenames) = resolveFileNames $
-            (,) <$>
+
+    let ((prescripts, welcome, games), filenames) = resolveFileNames $
+            (,,) <$>
             for [first ..last] (\oid ->
                 (oid ,) <$>
                 for (M.lookup oid m) (\raw_lines ->
@@ -605,7 +765,8 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
                     )
                 )
             ) <*>
-            traverse recordFilename welcome_names
+            traverse recordFilename welcome_names <*>
+            traverse gameYaml2Game ttyGames
 
     preInitRegs <- M.fromList <$> parseOneLine parseInitRegs "init" (fromMaybe "" ttyInit)
 
@@ -673,7 +834,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
         , ttWelcome = [welcome]
         , ttInitialRegs = [fromMaybe 0 (M.lookup r initRegs) | r <- [0..maxReg]]
         , ttScripts = scripts'
-        , ttGames = []
+        , ttGames = games
         , ttAudioFiles = files
         , ttAudioXor = knownXOR
         , ttAudioFilesDoubles = False
@@ -737,8 +898,8 @@ parseInitRegs = many $ do
     v <- parseWord16
     return (r,v)
 
-parseWelcome :: Parser [String]
-parseWelcome = P.commaSep lexer $ parseAudioRef
+parsePlayList :: Parser [String]
+parsePlayList = P.commaSep lexer $ parseAudioRef
 
 parseAudioRef :: Parser String
 parseAudioRef = P.lexeme lexer $ many1 (alphaNum <|> char '_')
