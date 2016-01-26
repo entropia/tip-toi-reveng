@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards, DeriveGeneric, CPP, TupleSections #-}
+{-# LANGUAGE RecordWildCards, DeriveGeneric, CPP, TupleSections, TemplateHaskell #-}
 
 module TipToiYaml
     ( tt2ttYaml, ttYaml2tt
@@ -32,6 +32,7 @@ import System.Locale (defaultTimeLocale)
 import Data.Time (getCurrentTime, formatTime)
 import Data.Yaml hiding ((.=), Parser)
 import Data.Aeson.Types hiding ((.=), Parser)
+import Data.Aeson.TH
 import Text.Parsec hiding (Line, lookAhead, spaces)
 import Text.Parsec.String
 import qualified Text.Parsec as P
@@ -52,6 +53,7 @@ import KnownCodes
 import PrettyPrint
 import OneLineParser
 import Utils
+import TipToiYamlAux
 
 data TipToiYAML = TipToiYAML
     { ttyScripts :: M.Map String [String]
@@ -63,6 +65,7 @@ data TipToiYAML = TipToiYAML
     , ttyScriptCodes :: Maybe CodeMap
     , ttySpeak :: Maybe SpeakSpecs
     , ttyLanguage :: Maybe Language
+    , ttyGames :: [GameYaml]
     }
     deriving Generic
 
@@ -80,11 +83,11 @@ instance FromJSON SpeakSpec where
     parseJSON v = do
         m <- parseJSON v
         l <- T.traverse parseJSON  $ M.lookup "language" m
-        m' <- T.traverse parseJSON $ M.delete "language" m 
+        m' <- T.traverse parseJSON $ M.delete "language" m
         return $ SpeakSpec l m'
 
 instance ToJSON SpeakSpec where
-    toJSON (SpeakSpec (Just l) m) = toJSON $ M.insert "language" (ppLang l) m 
+    toJSON (SpeakSpec (Just l) m) = toJSON $ M.insert "language" (ppLang l) m
     toJSON (SpeakSpec Nothing m)  = toJSON $ m
 
 toSpeakMap :: Language -> Maybe SpeakSpecs -> M.Map String (Language, String)
@@ -94,9 +97,9 @@ toSpeakMap l (Just (SpeakSpecs specs)) = M.unionsWith e $ map go specs
     go (SpeakSpec ml m) = M.map ((l',)) m
       where l' = fromMaybe l ml
     e = error "Conflicting definitions in section \"speak\""
-          
 
-newtype SpeakSpecs = SpeakSpecs [SpeakSpec] 
+
+newtype SpeakSpecs = SpeakSpecs [SpeakSpec]
 
 instance FromJSON SpeakSpecs where
     parseJSON (Array a) = SpeakSpecs <$> mapM parseJSON  (V.toList a)
@@ -106,23 +109,178 @@ instance ToJSON SpeakSpecs where
     toJSON (SpeakSpecs [x]) = toJSON x
     toJSON (SpeakSpecs l)   = Array $ V.fromList $ map toJSON $ l
 
-options = defaultOptions { fieldLabelModifier = map fix . map toLower . drop 3 }
+type PlayListListYaml = String
+
+type OIDListYaml = String
+
+data GameYaml = CommonGameYaml
+        { gyGameType                 :: Word16
+        , gyRounds                   :: Word16
+        , gyUnknownC                 :: Word16
+        , gyEarlyRounds              :: Word16
+        , gyRepeatLastMedia          :: Word16
+        , gyUnknownX                 :: Word16
+        , gyUnknownW                 :: Word16
+        , gyUnknownV                 :: Word16
+        , gyStartPlayList            :: PlayListListYaml
+        , gyRoundEndPlayList         :: PlayListListYaml
+        , gyFinishPlayList           :: PlayListListYaml
+        , gyRoundStartPlayList       :: PlayListListYaml
+        , gyLaterRoundStartPlayList  :: PlayListListYaml
+        , gySubgames                 :: [SubGameYaml]
+        , gyTargetScores             :: [Word16]
+        , gyFinishPlayLists          :: [PlayListListYaml]
+        }
+    | Game6Yaml
+        { gyRounds                   :: Word16
+        , gyBonusRounds              :: Word16
+        , gyBonusTarget              :: Word16
+        , gyUnknownI                 :: Word16
+        , gyEarlyRounds              :: Word16
+        , gyUnknownQ                 :: Word16
+        , gyRepeatLastMedia          :: Word16
+        , gyUnknownX                 :: Word16
+        , gyUnknownW                 :: Word16
+        , gyUnknownV                 :: Word16
+        , gyStartPlayList            :: PlayListListYaml
+        , gyRoundEndPlayList         :: PlayListListYaml
+        , gyFinishPlayList           :: PlayListListYaml
+        , gyRoundStartPlayList       :: PlayListListYaml
+        , gyLaterRoundStartPlayList  :: PlayListListYaml
+        , gyRoundStartPlayList2      :: PlayListListYaml
+        , gyLaterRoundStartPlayList2 :: PlayListListYaml
+        , gySubgames                 :: [SubGameYaml]
+        , gyTargetScores             :: [Word16]
+        , gyBonusTargetScores        :: [Word16]
+        , gyFinishPlayLists          :: [PlayListListYaml]
+        , gyBonusFinishPlayLists     :: [PlayListListYaml]
+        , gyBonusSubgameIds          :: [Word16]
+        }
+    | Game7Yaml
+        { gyRounds                   :: Word16
+        , gyUnknownC                 :: Word16
+        , gyEarlyRounds              :: Word16
+        , gyRepeatLastMedia          :: Word16
+        , gyUnknownX                 :: Word16
+        , gyUnknownW                 :: Word16
+        , gyUnknownV                 :: Word16
+        , gyStartPlayList            :: PlayListListYaml
+        , gyRoundEndPlayList         :: PlayListListYaml
+        , gyFinishPlayList           :: PlayListListYaml
+        , gyRoundStartPlayList       :: PlayListListYaml
+        , gyLaterRoundStartPlayList  :: PlayListListYaml
+        , gySubgames                 :: [SubGameYaml]
+        , gyTargetScores             :: [Word16]
+        , gyFinishPlayLists          :: [PlayListListYaml]
+        , gySubgameGroups            :: [[GameId]]
+        }
+    | Game8Yaml
+        { gyRounds                   :: Word16
+        , gyUnknownC                 :: Word16
+        , gyEarlyRounds              :: Word16
+        , gyRepeatLastMedia          :: Word16
+        , gyUnknownX                 :: Word16
+        , gyUnknownW                 :: Word16
+        , gyUnknownV                 :: Word16
+        , gyStartPlayList            :: PlayListListYaml
+        , gyRoundEndPlayList         :: PlayListListYaml
+        , gyFinishPlayList           :: PlayListListYaml
+        , gyRoundStartPlayList       :: PlayListListYaml
+        , gyLaterRoundStartPlayList  :: PlayListListYaml
+        , gySubgames                 :: [SubGameYaml]
+        , gyTargetScores             :: [Word16]
+        , gyFinishPlayLists          :: [PlayListListYaml]
+        , gyGameSelectOIDs           :: OIDListYaml
+        , gyGameSelect               :: [Word16]
+        , gyGameSelectErrors1        :: PlayListListYaml
+        , gyGameSelectErrors2        :: PlayListListYaml
+        }
+    | Game9Yaml
+        { gyRounds                   :: Word16
+        , gyUnknownC                 :: Word16
+        , gyEarlyRounds              :: Word16
+        , gyRepeatLastMedia          :: Word16
+        , gyUnknownX                 :: Word16
+        , gyUnknownW                 :: Word16
+        , gyUnknownV                 :: Word16
+        , gyStartPlayList            :: PlayListListYaml
+        , gyRoundEndPlayList         :: PlayListListYaml
+        , gyFinishPlayList           :: PlayListListYaml
+        , gyRoundStartPlayList       :: PlayListListYaml
+        , gyLaterRoundStartPlayList  :: PlayListListYaml
+        , gySubgames                 :: [SubGameYaml]
+        , gyTargetScores             :: [Word16]
+        , gyFinishPlayLists          :: [PlayListListYaml]
+        , gyExtraPlayLists           :: [PlayListListYaml]
+        }
+    | Game10Yaml
+        { gyRounds                   :: Word16
+        , gyUnknownC                 :: Word16
+        , gyEarlyRounds              :: Word16
+        , gyRepeatLastMedia          :: Word16
+        , gyUnknownX                 :: Word16
+        , gyUnknownW                 :: Word16
+        , gyUnknownV                 :: Word16
+        , gyStartPlayList            :: PlayListListYaml
+        , gyRoundEndPlayList         :: PlayListListYaml
+        , gyFinishPlayList           :: PlayListListYaml
+        , gyRoundStartPlayList       :: PlayListListYaml
+        , gyLaterRoundStartPlayList  :: PlayListListYaml
+        , gySubgames                 :: [SubGameYaml]
+        , gyTargetScores             :: [Word16]
+        , gyFinishPlayLists          :: [PlayListListYaml]
+        , gyExtraPlayLists           :: [PlayListListYaml]
+        }
+    | Game16Yaml
+        { gyRounds                   :: Word16
+        , gyUnknownC                 :: Word16
+        , gyEarlyRounds              :: Word16
+        , gyRepeatLastMedia          :: Word16
+        , gyUnknownX                 :: Word16
+        , gyUnknownW                 :: Word16
+        , gyUnknownV                 :: Word16
+        , gyStartPlayList            :: PlayListListYaml
+        , gyRoundEndPlayList         :: PlayListListYaml
+        , gyFinishPlayList           :: PlayListListYaml
+        , gyRoundStartPlayList       :: PlayListListYaml
+        , gyLaterRoundStartPlayList  :: PlayListListYaml
+        , gySubgames                 :: [SubGameYaml]
+        , gyTargetScores             :: [Word16]
+        , gyFinishPlayLists          :: [PlayListListYaml]
+        , gyExtraOIDs                :: OIDListYaml
+        , gyExtraPlayLists           :: [PlayListListYaml]
+        }
+    | Game253Yaml
+
+data SubGameYaml = SubGameYaml
+    { sgUnknown :: String
+    , sgOids1 :: OIDListYaml
+    , sgOids2 :: OIDListYaml
+    , sgOids3 :: OIDListYaml
+    , sgPlaylist :: [PlayListListYaml]
+    }
+
+
+$(deriveJSON gameYamlOptions ''GameYaml)
+$(deriveJSON gameYamlOptions ''SubGameYaml)
+
+tipToiYamlOptions = defaultOptions { fieldLabelModifier = map fix . map toLower . drop 3 }
        where fix '_' = '-'
              fix c   = c
 
 instance FromJSON TipToiYAML where
-    parseJSON = genericParseJSON $ options
+    parseJSON = genericParseJSON tipToiYamlOptions
 instance ToJSON TipToiYAML where
-    toJSON = genericToJSON options
+    toJSON = genericToJSON tipToiYamlOptions
 #if MIN_VERSION_aeson(0,10,0)
-    toEncoding = genericToEncoding options
+    toEncoding = genericToEncoding tipToiYamlOptions
 #endif
 instance FromJSON TipToiCodesYAML where
-    parseJSON = genericParseJSON $ options
+    parseJSON = genericParseJSON tipToiYamlOptions
 instance ToJSON TipToiCodesYAML where
-    toJSON = genericToJSON options
+    toJSON = genericToJSON tipToiYamlOptions
 #if MIN_VERSION_aeson(0,10,0)
-    toEncoding = genericToEncoding options
+    toEncoding = genericToEncoding tipToiYamlOptions
 #endif
 
 
@@ -131,7 +289,7 @@ tt2ttYaml path (TipToiFile {..}) = TipToiYAML
     { ttyProduct_Id = ttProductId
     , ttyInit = Just $ spaces $ [ ppCommand True M.empty [] (ArithOp Set (RegPos r) (Const n))
                                 | (r,n) <- zip [0..] ttInitialRegs , n /= 0]
-    , ttyWelcome = Just $ commas $ map show $ concat ttWelcome
+    , ttyWelcome = Just $ playListList2Yaml ttWelcome
     , ttyComment = Just $ BC.unpack ttComment
     , ttyScripts = M.fromList
         [ (show oid, map exportLine ls) | (oid, Just ls) <- ttScripts]
@@ -139,8 +297,163 @@ tt2ttYaml path (TipToiFile {..}) = TipToiYAML
     , ttyScriptCodes = Nothing
     , ttySpeak = Nothing
     , ttyLanguage = Nothing
+    , ttyGames = map game2gameYaml ttGames
     }
 
+playListList2Yaml :: PlayListList -> PlayListListYaml
+playListList2Yaml = commas . map show . concat
+
+oidList2Yaml :: [OID] -> OIDListYaml
+oidList2Yaml = unwords . map show
+
+subGame2Yaml :: SubGame -> SubGameYaml
+subGame2Yaml (SubGame u o1 o2 o3 pl) = SubGameYaml
+    { sgUnknown = prettyHex u
+    , sgOids1 = oidList2Yaml o1
+    , sgOids2 = oidList2Yaml o2
+    , sgOids3 = oidList2Yaml o3
+    , sgPlaylist = map playListList2Yaml pl
+    }
+
+game2gameYaml :: Game -> GameYaml
+game2gameYaml CommonGame {..} = CommonGameYaml
+        { gyGameType                 = gGameType
+        , gyRounds                   = gRounds
+        , gyUnknownC                 = gUnknownC
+        , gyEarlyRounds              = gEarlyRounds
+        , gyRepeatLastMedia          = gRepeatLastMedia
+        , gyUnknownX                 = gUnknownX
+        , gyUnknownW                 = gUnknownW
+        , gyUnknownV                 = gUnknownV
+        , gyStartPlayList            = playListList2Yaml gStartPlayList
+        , gyRoundEndPlayList         = playListList2Yaml gRoundEndPlayList
+        , gyFinishPlayList           = playListList2Yaml gFinishPlayList
+        , gyRoundStartPlayList       = playListList2Yaml gRoundStartPlayList
+        , gyLaterRoundStartPlayList  = playListList2Yaml gLaterRoundStartPlayList
+        , gySubgames                 = map subGame2Yaml gSubgames
+        , gyTargetScores             = gTargetScores
+        , gyFinishPlayLists          = map playListList2Yaml gFinishPlayLists
+        }
+game2gameYaml Game6 {..} = Game6Yaml
+        { gyRounds                   = gRounds
+        , gyBonusRounds              = gBonusRounds
+        , gyBonusTarget              = gBonusTarget
+        , gyUnknownI                 = gUnknownI
+        , gyEarlyRounds              = gEarlyRounds
+        , gyUnknownQ                 = gUnknownQ
+        , gyRepeatLastMedia          = gRepeatLastMedia
+        , gyUnknownX                 = gUnknownX
+        , gyUnknownW                 = gUnknownW
+        , gyUnknownV                 = gUnknownV
+        , gyStartPlayList            = playListList2Yaml gStartPlayList
+        , gyRoundEndPlayList         = playListList2Yaml gRoundEndPlayList
+        , gyFinishPlayList           = playListList2Yaml gFinishPlayList
+        , gyRoundStartPlayList       = playListList2Yaml gRoundStartPlayList
+        , gyLaterRoundStartPlayList  = playListList2Yaml gLaterRoundStartPlayList
+        , gyRoundStartPlayList2      = playListList2Yaml gRoundStartPlayList2
+        , gyLaterRoundStartPlayList2 = playListList2Yaml gLaterRoundStartPlayList2
+        , gySubgames                 = map subGame2Yaml gSubgames
+        , gyTargetScores             = gTargetScores
+        , gyBonusTargetScores        = gBonusTargetScores
+        , gyFinishPlayLists          = map playListList2Yaml gFinishPlayLists
+        , gyBonusFinishPlayLists     = map playListList2Yaml gBonusFinishPlayLists
+        , gyBonusSubgameIds          = gBonusSubgameIds
+        }
+game2gameYaml Game7 {..} = Game7Yaml
+        { gyRounds                   = gRounds
+        , gyUnknownC                 = gUnknownC
+        , gyEarlyRounds              = gEarlyRounds
+        , gyRepeatLastMedia          = gRepeatLastMedia
+        , gyUnknownX                 = gUnknownX
+        , gyUnknownW                 = gUnknownW
+        , gyUnknownV                 = gUnknownV
+        , gyStartPlayList            = playListList2Yaml gStartPlayList
+        , gyRoundEndPlayList         = playListList2Yaml gRoundEndPlayList
+        , gyFinishPlayList           = playListList2Yaml gFinishPlayList
+        , gyRoundStartPlayList       = playListList2Yaml gRoundStartPlayList
+        , gyLaterRoundStartPlayList  = playListList2Yaml gLaterRoundStartPlayList
+        , gySubgames                 = map subGame2Yaml gSubgames
+        , gyTargetScores             = gTargetScores
+        , gyFinishPlayLists          = map playListList2Yaml gFinishPlayLists
+        , gySubgameGroups            = gSubgameGroups
+        }
+game2gameYaml Game8 {..} = Game8Yaml
+        { gyRounds                   = gRounds
+        , gyUnknownC                 = gUnknownC
+        , gyEarlyRounds              = gEarlyRounds
+        , gyRepeatLastMedia          = gRepeatLastMedia
+        , gyUnknownX                 = gUnknownX
+        , gyUnknownW                 = gUnknownW
+        , gyUnknownV                 = gUnknownV
+        , gyStartPlayList            = playListList2Yaml gStartPlayList
+        , gyRoundEndPlayList         = playListList2Yaml gRoundEndPlayList
+        , gyFinishPlayList           = playListList2Yaml gFinishPlayList
+        , gyRoundStartPlayList       = playListList2Yaml gRoundStartPlayList
+        , gyLaterRoundStartPlayList  = playListList2Yaml gLaterRoundStartPlayList
+        , gySubgames                 = map subGame2Yaml gSubgames
+        , gyTargetScores             = gTargetScores
+        , gyFinishPlayLists          = map playListList2Yaml gFinishPlayLists
+        , gyGameSelectOIDs           = oidList2Yaml gGameSelectOIDs
+        , gyGameSelect               = gGameSelect
+        , gyGameSelectErrors1        = playListList2Yaml gGameSelectErrors1
+        , gyGameSelectErrors2        = playListList2Yaml gGameSelectErrors2
+        }
+game2gameYaml Game9 {..} = Game9Yaml
+        { gyRounds                   = gRounds
+        , gyUnknownC                 = gUnknownC
+        , gyEarlyRounds              = gEarlyRounds
+        , gyRepeatLastMedia          = gRepeatLastMedia
+        , gyUnknownX                 = gUnknownX
+        , gyUnknownW                 = gUnknownW
+        , gyUnknownV                 = gUnknownV
+        , gyStartPlayList            = playListList2Yaml gStartPlayList
+        , gyRoundEndPlayList         = playListList2Yaml gRoundEndPlayList
+        , gyFinishPlayList           = playListList2Yaml gFinishPlayList
+        , gyRoundStartPlayList       = playListList2Yaml gRoundStartPlayList
+        , gyLaterRoundStartPlayList  = playListList2Yaml gLaterRoundStartPlayList
+        , gySubgames                 = map subGame2Yaml gSubgames
+        , gyTargetScores             = gTargetScores
+        , gyFinishPlayLists          = map playListList2Yaml gFinishPlayLists
+        , gyExtraPlayLists           = map playListList2Yaml gExtraPlayLists
+        }
+game2gameYaml Game10 {..} = Game10Yaml
+        { gyRounds                   = gRounds
+        , gyUnknownC                 = gUnknownC
+        , gyEarlyRounds              = gEarlyRounds
+        , gyRepeatLastMedia          = gRepeatLastMedia
+        , gyUnknownX                 = gUnknownX
+        , gyUnknownW                 = gUnknownW
+        , gyUnknownV                 = gUnknownV
+        , gyStartPlayList            = playListList2Yaml gStartPlayList
+        , gyRoundEndPlayList         = playListList2Yaml gRoundEndPlayList
+        , gyFinishPlayList           = playListList2Yaml gFinishPlayList
+        , gyRoundStartPlayList       = playListList2Yaml gRoundStartPlayList
+        , gyLaterRoundStartPlayList  = playListList2Yaml gLaterRoundStartPlayList
+        , gySubgames                 = map subGame2Yaml gSubgames
+        , gyTargetScores             = gTargetScores
+        , gyFinishPlayLists          = map playListList2Yaml gFinishPlayLists
+        , gyExtraPlayLists           = map playListList2Yaml gExtraPlayLists
+        }
+game2gameYaml Game16 {..} = Game16Yaml
+        { gyRounds                   = gRounds
+        , gyUnknownC                 = gUnknownC
+        , gyEarlyRounds              = gEarlyRounds
+        , gyRepeatLastMedia          = gRepeatLastMedia
+        , gyUnknownX                 = gUnknownX
+        , gyUnknownW                 = gUnknownW
+        , gyUnknownV                 = gUnknownV
+        , gyStartPlayList            = playListList2Yaml gStartPlayList
+        , gyRoundEndPlayList         = playListList2Yaml gRoundEndPlayList
+        , gyFinishPlayList           = playListList2Yaml gFinishPlayList
+        , gyRoundStartPlayList       = playListList2Yaml gRoundStartPlayList
+        , gyLaterRoundStartPlayList  = playListList2Yaml gLaterRoundStartPlayList
+        , gySubgames                 = map subGame2Yaml gSubgames
+        , gyTargetScores             = gTargetScores
+        , gyFinishPlayLists          = map playListList2Yaml gFinishPlayLists
+        , gyExtraOIDs                = oidList2Yaml gExtraOIDs
+        , gyExtraPlayLists           = map playListList2Yaml gExtraPlayLists
+        }
+game2gameYaml Game253 = Game253Yaml
 
 mergeOnlyEqual :: String -> Word16 -> Word16 -> Word16
 mergeOnlyEqual _ c1 c2 | c1 == c2 = c1
@@ -165,32 +478,32 @@ scriptCodes codes codeMap productId
     usedCodes = S.fromList $ M.elems codeMap
 
     f s = case readMaybe s of
-            Nothing -> Left s 
+            Nothing -> Left s
             Just n -> Right (n::Word16)
 
--- The following logic (for objectCodes) tries to use different object codes 
--- for different projects, as far as possible. This makes the detection of not 
+-- The following logic (for objectCodes) tries to use different object codes
+-- for different projects, as far as possible. This makes the detection of not
 -- having activated a book/product more robust.
 
--- We could theoretically set: 
+-- We could theoretically set:
 --    objectCodeOffsetMax = lastObjectCode - firstObjectCode.
--- This would assign perfectly usable object codes, and would minimize the 
--- probability of object code collisions between products, but sometimes 
--- object codes would wrap around from 14999 to 1000 even for small projects 
+-- This would assign perfectly usable object codes, and would minimize the
+-- probability of object code collisions between products, but sometimes
+-- object codes would wrap around from 14999 to 1000 even for small projects
 -- which may be undesirable. We arbitrarily do not use the last 999 possible
 -- offsets to avoid a wrap around in object codes for projects with <= 1000
--- object codes. This does not impose any limit on the number of object codes 
+-- object codes. This does not impose any limit on the number of object codes
 -- per project. Every project can always use all 14000 object codes.
     objectCodeOffsetMax = lastObjectCode - firstObjectCode - 999
 
--- Distribute the used object codes for different projects across the whole 
--- range of usable object codes. We do this by multiplying the productId with 
--- the golden ratio to achive a maximum distance between different projects, 
+-- Distribute the used object codes for different projects across the whole
+-- range of usable object codes. We do this by multiplying the productId with
+-- the golden ratio to achive a maximum distance between different projects,
 -- independent of the total number of different projects.
 -- 8035 = (14999-1000-999+1)*((sqrt(5)-1)/2)
     objectCodeOffset = toWord16(rem (productId * 8035) (toWord32(objectCodeOffsetMax) + 1))
 
--- objectCodes always contains _all_ possible object codes [firstObjectCode..lastObjectCode], 
+-- objectCodes always contains _all_ possible object codes [firstObjectCode..lastObjectCode],
 -- starting at firstObjectCode+objectCodeOffset and then wrapping around.
     objectCodes = [firstObjectCode + objectCodeOffset .. lastObjectCode] ++ [firstObjectCode .. firstObjectCode + objectCodeOffset - 1]
 
@@ -597,6 +910,7 @@ debugGame productID = do
             , let line = ppLine t $ Line 0 [] [Play n | n <- [0..5]] ([10] ++ chars)
             ]
         , ttyLanguage = Nothing
+        , ttyGames = []
         }
   where
     t= M.fromList $
