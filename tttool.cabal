@@ -43,6 +43,7 @@ executable tttool
     PrettyPrint,
     RangeParser,
     TipToiYaml,
+    TipToiYamlAux,
     TextToSpeech,
     KnownCodes,
     Types,
