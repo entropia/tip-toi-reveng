@@ -65,7 +65,7 @@ data TipToiYAML = TipToiYAML
     , ttyScriptCodes :: Maybe CodeMap
     , ttySpeak :: Maybe SpeakSpecs
     , ttyLanguage :: Maybe Language
-    , ttyGames :: [GameYaml]
+    , ttyGames :: Maybe [GameYaml]
     }
     deriving Generic
 
@@ -298,8 +298,11 @@ tt2ttYaml path (TipToiFile {..}) = TipToiYAML
     , ttyScriptCodes = Nothing
     , ttySpeak = Nothing
     , ttyLanguage = Nothing
-    , ttyGames = map game2gameYaml ttGames
+    , ttyGames = list2Maybe $ map game2gameYaml ttGames
     }
+
+list2Maybe [] = Nothing
+list2Maybe xs = Just xs
 
 playListList2Yaml :: PlayListList -> PlayListListYaml
 playListList2Yaml = commas . map show . concat
@@ -766,7 +769,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
                 )
             ) <*>
             traverse recordFilename welcome_names <*>
-            traverse gameYaml2Game ttyGames
+            traverse gameYaml2Game (fromMaybe [] ttyGames)
 
     preInitRegs <- M.fromList <$> parseOneLine parseInitRegs "init" (fromMaybe "" ttyInit)
 
@@ -1071,7 +1074,7 @@ debugGame productID = do
             , let line = ppLine t $ Line 0 [] [Play n | n <- [0..5]] ([10] ++ chars)
             ]
         , ttyLanguage = Nothing
-        , ttyGames = []
+        , ttyGames = Nothing
         }
   where
     t= M.fromList $
