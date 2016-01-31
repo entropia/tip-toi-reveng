@@ -983,6 +983,12 @@ parseCommands i =
             ]
          (cmds, filenames) <- parseCommands i
          return (cmd : cmds, filenames)
+    , descP "Timer action" $
+      do P.lexeme lexer $ char 'T'
+         (r,v) <- P.parens lexer $
+            (,) <$> parseReg <* P.comma lexer <*> parseTVal
+         (cmds, filenames) <- parseCommands i
+         return (Timer r v : cmds, filenames)
     , descP "Start Game" $
       do P.lexeme lexer $ char 'G'
          n <- P.parens lexer $ parseWord16

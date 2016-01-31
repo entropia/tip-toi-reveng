@@ -25,6 +25,7 @@
  * Games are not exported by `tttool export` and assembled by `tttool
    assemble`. This way, existing Tiptoi products can be modified without losing
    them.
+ * Support for the “timer” action (FF00) with syntax `T($register,123)`.
 
 ## 1.5.1 (2015-11-11)
 

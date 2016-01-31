@@ -229,7 +229,10 @@ lineParser = begin
         , (B.pack [0xF8,0xFF], \r -> do
             _ <- getTVal
             return (Neg r))
-        ] ++ 
+        , (B.pack [0x00,0xFF], \r -> do
+            v <- getTVal
+            return (Timer r v))
+        ] ++
         [ (B.pack (arithOpCode o), \r -> do
             n <- getTVal
             return (ArithOp o r n))

@@ -55,6 +55,7 @@ data Command r
     | Unknown B.ByteString r (TVal r)
     | Jump (TVal r)
     | NamedJump String -- Only in YAML files, never read from GMEs
+    | Timer r (TVal r)
     deriving (Eq, Functor, Foldable)
 
 type PlayList = [Word16]

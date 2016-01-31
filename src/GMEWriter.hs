@@ -346,6 +346,10 @@ putCommand (Jump v) = do
     putWord16 0
     mapM_ putWord8 [0xFF, 0xF8]
     putTVal v
+putCommand (Timer r v) = do
+    putWord16 r
+    mapM_ putWord8 [0x00, 0xFF]
+    putTVal v
 putCommand (NamedJump s) = error "putCommand: Unresolved NamedJump"
 putCommand (Unknown b r v) = do
     putWord16 r

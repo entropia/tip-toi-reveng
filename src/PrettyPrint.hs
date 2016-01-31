@@ -115,6 +115,7 @@ ppCommand _ t xs PlayAllVariant  = printf "PA*(%s)" $ ppPlayAll t xs
 ppCommand _ t xs RandomVariant   = printf "P*(%s)" $ ppPlayAll t xs
 ppCommand _ t xs Cancel          = printf "C"
 ppCommand _ t xs (Jump v)        = printf "J(%s)" (ppTVal v)
+ppCommand _ t xs (Timer r v)     = printf "T(%s,%s)" (ppReg r) (ppTVal v)
 ppCommand _ t xs (NamedJump v)   = printf "J(%s)" v
 ppCommand _ t xs (Game b)        = printf "G(%d)" b
 ppCommand _ t xs (ArithOp o r n) = ppReg r ++ ppArithOp o ++ ppTVal n

@@ -112,8 +112,9 @@ Known commands are:
  * `FD00` (written `G(m)`): Begin game `m`.
  * `F8FF` (written `J(m)`): Jump to script `m`.
  * `FAFF` (written `C`): Cancel game mode.
+ * `FF00` (wrirren `T($r,m)`): Writes an internal counter to `$r` with values in the range 0..m.
 
-Currently unknown commands are `FE00` and `FF00` (in theory there can be more but these have been seen in the wild, at least).
+There are Currently unknown commands (e.g. `FE00`).
 
 The commands `P`, `G` , `J` and `C` seem to ignore their registers, `C` also its parameter (which always is `FFFF`).
 
