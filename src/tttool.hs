@@ -73,6 +73,7 @@ optionParser =
             [(x,'x':rest)] -> case reads rest of
                 [(y,[])] -> return (x,y)
                 _        -> Left $ "Cannot parse dimensions " ++ input
+            _        -> Left $ "Cannot parse dimensions " ++ input
 
     cmd = hsubparser $ mconcat
         [ cmdSep "GME creation commands:"
