@@ -2,7 +2,6 @@
 
 # These are the versions that we built against, at least once, on travis
 env:
- - CABALVER=1.16 GHCVER=7.4.2
  - CABALVER=1.18 GHCVER=7.6.3
  - CABALVER=1.18 GHCVER=7.8.3
  - CABALVER=1.22 GHCVER=7.10.1
