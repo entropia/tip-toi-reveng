@@ -1,11 +1,7 @@
 # Changelog for tttool
 
-## 1.6 (UNRELEASED)
+## 1.6 (2016-01-31)
 
- * Fix various crashes in corner cases, mostly involving games. Thanks to
-   @ToniMahagoni for reporting these!
- * New command `tttool oid-table` that prints all OIDs of a given YAML file as
-   a nice and handy table in a PDF file
  * Completely re-done option parsing, so there now proper support for short and
    long options, arbitrary order of options, better error messages and
    per-command `--help` output.
@@ -13,19 +9,25 @@
    **Incompatibility:** Some commands are now called differently. In
    particular, to generate PNG files with all codes from a YAML file, use
    `./tttool oid-codes`, not `./tttool oid-code`.
- * `./tttool assemble` will print all errors due to missing audio files, not
-   just the first.
+ * The size of the OID codes written by `./tttool oid-code` is configurable.
  * The png files written by `./tttool oid-code` and `./tttool oid-codes` store
    their DPI value, so that importing them into DTP programs is likely to yield
    the desired result.
+ * New command `tttool oid-table` that prints all OIDs of a given YAML file as
+   a nice and handy table in a PDF file
+ * The output of `./tttool games` is more detailed.
+ * Games are not exported by `tttool export` and assembled by `tttool
+   assemble`. This way, existing Tiptoi products can be modified without losing
+   them.
  * The “other” play commands (FFE0, FFE1, FB00) are implemented in the parser,
    printer and serializer, with syntax `P*(..)`, `PA*(..)` and `PA(..)`. These
    are not interesting to you unless you want to understand existing Tiptoi
    products.
- * Games are not exported by `tttool export` and assembled by `tttool
-   assemble`. This way, existing Tiptoi products can be modified without losing
-   them.
  * Support for the “timer” action (FF00) with syntax `T($register,123)`.
+ * `./tttool assemble` will print all errors due to missing audio files, not
+   just the first.
+ * Fix various crashes in corner cases, mostly involving games. Thanks to
+   @ToniMahagoni for reporting these!
 
 ## 1.5.1 (2015-11-11)
 
