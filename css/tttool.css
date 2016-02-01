@@ -1,0 +1,23 @@
+
+.gallery {
+	display:flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	margin-bottom: 1rem;
+}
+
+.gallery .box {
+	width: 320px;
+	text-align:center;
+	display:block;
+	margin: 0ex;
+	margin-bottom: 2rem;
+}
+
+.gallery .box img {
+	display: block;
+}
+
+.gallery .title {
+	font-weight: bold
+}

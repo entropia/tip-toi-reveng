@@ -14,34 +14,119 @@ eigene Produkte erstellen.
 > Tiptoi-Produkte verkauft, verletzt vermutlich eine Reihe von
 > Patenten und anderen Schutzrechten.
 
-## Was kann ich hier machen
+## Was kann ich hier machen?
 
 Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
 
- * Pronwan veröffentlich einige Videos:
-   * [Selbstgemachte Tier-Figuren] (4 Minuten)
-   * [Monkey Island 3] als Tiptoi-Spiel (8 Minuten), sowie eine [Erklärung der Programmierung] (24 Minuten) dieses Abendteuers
- * Joachim Breitner, der Hauptentwicker des `tttool` berichtet auf seinem [Blog] von seinen Basteleien:
-   * Der [neu besprochene Weltatlas]
-   * [Weihnachtsgeschenke-Verteilung]
-   * Ein [Taschenrechner]
- * Eine [Outdoor-Schatzsuche](http://mycvs.org/post/110330262976/interactive-treasure-hunt-with-tip-toi-the)
- * In der [c't 8/2015](http://www.heise.de/ct/ausgabe/2015-8-Eigene-Buecher-und-Spiele-fuer-den-Tiptoi-vertonen-2578001.html) wird beschrieben, wie man einen Vokabeltrainer basteln kann.
- * Micha Reischuck bastelt Ralleys mit dem Tiptoi-Stift:
-   * [Das verlorene Schaf](https://lists.nomeata.de/archive/tiptoi/2015/000774.html)
-   * [Piratenralley](https://github.com/michote/Piraten-Geburtstag)
- * [Ein personalisiertes Zoo-Puzzle](http://keiplan.blogspot.no/2015/05/tiptoi-zoo-puzzle.html) von Andy
- * [Ein Sequencer](http://www.raketenwerfer.de/post/120870754563/tttool-step-sequencer) von Peter Schneider
- * In der [Make: 6/2015](http://www.heise.de/make/inhalt/2015/6/108/) wird ein weiteres Tiptoi-Bastel-Projekt auf sieben Seiten ausführlich erklärt.
+<div class="gallery">
+<div class="box">
+<a href="https://www.youtube.com/watch?v=Yic57Y9VORA">
+<img src="http://img.youtube.com/vi/Yic57Y9VORA/mqdefault.jpg" width="320" height="180"/>
+</a>
+<div class="title">Selbstgemachte Tier-Figuren</div>
+<div class="subtitle">Video von Pronwan, 4 Minuten</div>
+</div>
+
+<div class="box">
+<a href="https://www.youtube.com/watch?v=UieoGOHULVw">
+<img src="http://img.youtube.com/vi/UieoGOHULVw/mqdefault.jpg" width="320" height="180"/>
+</a>
+<div class="title">Monkey Island 3 als Tip-Toi-Spiel</div>
+<div class="subtitle">Video von Pronwan, 8 Minuten</div>
+</div>
+
+<div class="box">
+<a href="https://www.youtube.com/watch?v=xlUr1eZKhWw">
+<img src="http://img.youtube.com/vi/xlUr1eZKhWw/mqdefault.jpg" width="320" height="180"/>
+</a>
+<div class="title">Erklärung zur Programmierung</div>
+<div class="subtitle">Video von Pronwan, 24 Minuten</div>
+</div>
 
 
-[Selbstgemachte Tier-Figuren]: https://www.youtube.com/watch?v=Yic57Y9VORA
-[Monkey Island 3]: https://www.youtube.com/watch?v=UieoGOHULVw
-[Erklärung der Programmierung]: https://www.youtube.com/watch?v=xlUr1eZKhWw
-[Blog]: https://www.joachim-breitner.de/blog/
-[neu besprochene Weltatlas]: https://www.joachim-breitner.de/blog/641-Personalisierte_Tip-Toi-Datei_als_Geschenk
-[Weihnachtsgeschenke-Verteilung]: https://www.joachim-breitner.de/blog/666-Geschenke_mit_dem_Tiptoi-Stift_verteilen
-[Taschenrechner]: https://www.joachim-breitner.de/blog/669-Ein_Tiptoi-Taschenrechner
+<div class="box">
+<a href="https://www.joachim-breitner.de/blog/641-Personalisierte_Tip-Toi-Datei_als_Geschenk">
+<img src="/img/weltatlas.png" width="320" height="180"/>
+</a>
+<div class="title">Der neu Besprochene Weltatlas</div>
+<div class="subtitle">Blog-Post von Joachim Breitner</div>
+</div>
+
+<div class="box">
+<a href="https://www.joachim-breitner.de/blog/666-Geschenke_mit_dem_Tiptoi-Stift_verteilen">
+<img src="/img/weihnachten.png" width="320" height="180"/>
+</a>
+<div class="title">Weihnachtsgeschenke verteilen</div>
+<div class="subtitle">Blog-Post von Joachim Breitner</div>
+</div>
+
+<div class="box">
+<a href="https://www.joachim-breitner.de/blog/669-Ein_Tiptoi-Taschenrechner">
+<img src="/img/taschenrechner.png" width="320" height="180"/>
+</a>
+<div class="title">Ein Taschenrechner</div>
+<div class="subtitle">Blog-Post von Joachim Breitner</div>
+</div>
+
+<div class="box">
+<a href="http://mycvs.org/post/110330262976/interactive-treasure-hunt-with-tip-toi-the">
+<img src="/img/schatzsuche.png" width="320" height="180"/>
+</a>
+<div class="title">Eine Outdoor-Schatzsuche</div>
+</div>
+
+<div class="box">
+<a href="http://www.heise.de/ct/ausgabe/2015-8-Eigene-Buecher-und-Spiele-fuer-den-Tiptoi-vertonen-2578001.html">
+<img src="/img/ct.png" width="320" height="180"/>
+</a>
+<div class="title">Ein Vokabeltrainer</div>
+<div class="subtitle">Artikel in der c't 8/2015</div>
+</div>
+
+
+<div class="box">
+<a href="https://lists.nomeata.de/archive/tiptoi/2015/000774.html">
+<img src="/img/schaf.png" width="320" height="180"/>
+</a>
+<div class="title">Das verlorene Schaf</div>
+<div class="subtitle">Ralley von Micha Reischuck</div>
+</div>
+
+
+<div class="box">
+<a href="https://github.com/michote/Piraten-Geburtstag">
+<img src="/img/piraten.png" width="320" height="180"/>
+</a>
+<div class="title">Piratenralley</div>
+<div class="subtitle">Ralley von Micha Reischuck</div>
+</div>
+
+<div class="box">
+<a href="http://keiplan.blogspot.no/2015/05/tiptoi-zoo-puzzle.html">
+<img src="/img/zoo.png" width="320" height="180"/>
+</a>
+<div class="title">Personalisiertes Zoo-Puzzle</div>
+<div class="subtitle">von Andy</div>
+</div>
+
+<div class="box">
+<a href="http://www.raketenwerfer.de/post/120870754563/tttool-step-sequencer">
+<img src="/img/sequencer.png" width="320" height="180"/>
+</a>
+<div class="title">Ein Sequencer</div>
+<div class="subtitle">von Peter Schneider</div>
+</div>
+
+<div class="box">
+<a href="http://www.heise.de/make/inhalt/2015/6/108/">
+<img src="/img/make.png" width="320" height="180"/>
+</a>
+<div class="title">Ein Kompass</div>
+<div class="subtitle">Ausführliche Anleitung in der Make 6/2015</div>
+</div>
+
+
+</div>
 
 Sonstiges zur Einstimmug:
 
