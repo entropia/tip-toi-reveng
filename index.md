@@ -475,5 +475,5 @@ Ansonsten wird der Tiptoi-Stift auch im [Mikrocontroller-Forum] besprochen.
 ## Sonstiges
 
 Diese Website wurde mit [Jekyll](http://jekyllrb.com/) und dem Theme
-[Solo](http://solo.chibi.io) erzeugt und wird von [Github
+[Solo](http://chibicode.github.io/solo/) erzeugt und wird von [Github
 Pages](https://pages.github.com/) gehostet.
