@@ -10,6 +10,7 @@ where
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
+import qualified Data.ByteString as SB
 import qualified Data.ByteString.Char8 as SBC
 import System.Exit
 import System.FilePath
@@ -798,7 +799,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
     -- it were in base, and not fixed to String.
     files_with_errors <- forM filenames $ \fn -> case M.lookup fn ttySpeakMap of
         Just (lang, txt) -> do
-            Right <$> B.readFile (ttsFileName lang txt)
+            Right <$> readFile' (ttsFileName lang txt)
         Nothing -> do
             let paths = [ combine dir relpath
                     | ext <- map snd fileMagics
@@ -811,7 +812,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
                     return $ Left $ unlines $
                       "Could not find any of these files:" :
                       paths
-                [f] -> Right <$> B.readFile f
+                [f] -> Right <$> readFile' f
                 _  -> do
                     return $ Left $ unlines $
                       "Multiple matching files found:" :
@@ -1004,6 +1005,10 @@ optionBool p = option False (const True <$> p)
 encodeFileCommented :: ToJSON a => FilePath -> String -> a -> IO ()
 encodeFileCommented fn c v = do
     SBC.writeFile fn $ SBC.pack c <> encode v
+
+readFile' :: String -> IO B.ByteString
+readFile' filename =
+    B.fromStrict <$> SB.readFile filename
 
 readTipToiYaml :: FilePath -> IO (TipToiYAML, CodeMap)
 readTipToiYaml inf = do
