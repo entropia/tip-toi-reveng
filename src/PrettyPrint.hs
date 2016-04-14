@@ -47,7 +47,7 @@ groupRuns l = go
             r                  -> Right [x] : r
 
 ppPlayList :: Transscript -> PlayList -> String
-ppPlayList t xs = "[" ++ commas (map go (groupRuns (flip M.lookup t) xs)) ++ "]"
+ppPlayList t xs = "[" ++ commas (map go (groupRuns (`M.lookup` t) xs)) ++ "]"
   where go (Left s) = quote s
         go (Right [])  = error "Empty list in groupRuns result"
         go (Right l)   | length l > 3 = show (head l) ++ ".." ++ show (last l)
@@ -111,8 +111,10 @@ ppCommand True t xs p
 ppCommand _ t xs (Play n)        = printf "P(%s)" $ ppPlayIndex t xs (fromIntegral n)
 ppCommand _ t xs (Random a b)    = printf "P(%s)" $ ppPlayRange t xs [b..a]
 ppCommand _ t xs (PlayAll a b)   = printf "PA(%s)" $ ppPlayRange t xs [b..a]
-ppCommand _ t xs PlayAllVariant  = printf "PA*(%s)" $ ppPlayAll t xs
-ppCommand _ t xs RandomVariant   = printf "P*(%s)" $ ppPlayAll t xs
+ppCommand _ t xs (PlayAllVariant (Const 0)) = printf "PA*(%s)"    (ppPlayAll t xs)
+ppCommand _ t xs (PlayAllVariant v)         = printf "PA*(%s)(%s)" (ppPlayAll t xs) (ppTVal v)
+ppCommand _ t xs (RandomVariant (Const 0))  = printf "P*(%s)"     (ppPlayAll t xs)
+ppCommand _ t xs (RandomVariant v)          = printf "P*(%s)(%s)"  (ppPlayAll t xs) (ppTVal v)
 ppCommand _ t xs Cancel          = printf "C"
 ppCommand _ t xs (Jump v)        = printf "J(%s)" (ppTVal v)
 ppCommand _ t xs (Timer r v)     = printf "T(%s,%s)" (ppReg r) (ppTVal v)

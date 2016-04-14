@@ -963,13 +963,14 @@ parseCommands i =
             withStar <- optionBool (char '*')
             return (withA, withStar)
          fns <- P.parens lexer $ P.commaSep1 lexer parseAudioRef
+         playAllUnknownArgument <- option (Const 0) $ P.parens lexer $ parseTVal
          let n = length fns
          let c = case (withA, withStar, fns) of
                 (False, False, [fn]) -> Play (fromIntegral i)
                 (False, False, _)    -> Random (fromIntegral (i + n - 1)) (fromIntegral i)
                 (True,  False, _)    -> PlayAll (fromIntegral (i + n - 1)) (fromIntegral i)
-                (False, True,  _)    -> RandomVariant
-                (True,  True,  _)    -> PlayAllVariant
+                (False, True,  _)    -> RandomVariant playAllUnknownArgument
+                (True,  True,  _)    -> PlayAllVariant playAllUnknownArgument
          (cmds, filenames) <- parseCommands (i+n)
          return (c : cmds, fns ++ filenames)
     , descP "Cancel" $

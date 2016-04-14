@@ -314,14 +314,14 @@ putCommand (Neg r) = do
     putWord16 r
     mapM_ putWord8 [0xF8, 0xFF]
     putTVal (Const 0)
-putCommand RandomVariant = do
+putCommand (RandomVariant v) = do
     putWord16 0
     mapM_ putWord8 [0xE0, 0xFF]
-    putTVal (Const 0)
-putCommand PlayAllVariant = do
+    putTVal v
+putCommand (PlayAllVariant v) = do
     putWord16 0
     mapM_ putWord8 [0xE1, 0xFF]
-    putTVal (Const 0)
+    putTVal v
 putCommand (Play n) = do
     putWord16 0
     mapM_ putWord8 [0xE8, 0xFF]
