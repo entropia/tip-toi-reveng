@@ -1,5 +1,12 @@
 # Changelog for tttool
 
+## 1.6.1 (2016-04-17)
+
+ * `./tttool assemble`: Do not fail with too many open files
+ * Handle “other” play commands (FFE0, FFE1) even if their argument is not 0,
+   with some crude syntax in the YAML format. The meaning of this argument is
+   not yet understood, volunteers are welcome!
+
 ## 1.6 (2016-01-31)
 
  * Completely re-done option parsing, so there now proper support for short and
