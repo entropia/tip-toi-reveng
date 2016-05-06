@@ -1,5 +1,10 @@
 # Changelog for tttool
 
+## 1.7 (UNRELEASED)
+
+ * `./tttool oid-table` sorts naturally now, so that the sequence is `foo1`
+   `foo2` `foo10`, and not `foo1` `foo10` `foo2`.
+
 ## 1.6.1 (2016-04-17)
 
  * `./tttool assemble`: Do not fail with too many open files

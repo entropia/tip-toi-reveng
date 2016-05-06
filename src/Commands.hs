@@ -13,11 +13,13 @@ import Data.List
 import Data.Either
 import Data.Functor
 import Data.Maybe
+import Data.Function
 import Data.Ord
 import Control.Monad
 import System.Directory
 import qualified Data.Map as M
 import Data.Foldable (for_)
+import qualified Algorithms.NaturalSort
 
 import Types
 import Constants
@@ -277,9 +279,11 @@ genOidTable :: Conf -> FilePath -> FilePath -> IO ()
 genOidTable conf inf out = do
     (tty, codeMap) <- readTipToiYaml inf
     (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
-    let codes = ("START", fromIntegral (ttProductId tt)) : M.toList totalMap
+    let codes = ("START", fromIntegral (ttProductId tt)) : sort (M.toList totalMap)
     let pdfFile = oidTable conf inf codes
     B.writeFile out pdfFile
+  where
+    sort = sortBy (Algorithms.NaturalSort.compare `on` fst)
 
 genPNGsForFile :: Conf -> FilePath -> IO ()
 genPNGsForFile conf inf = do
