@@ -67,6 +67,11 @@ gallery:
   link: http://www.heise.de/make/inhalt/2015/6/108/
   img: /img/make.png
 
+- title: Jakobs Tiptoi-Buch
+  subtitle: von Keke
+  link: http://keke.netz-zwerge.de/blog/archives/348-Meine-erste-TipToi-Erfahrung.html
+  img: /img/keke.jpg
+
 ---
 
 Diese Seite enthält Information zum `tttool`, einem Werkzeug zum
