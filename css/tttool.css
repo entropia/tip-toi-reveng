@@ -21,3 +21,10 @@
 .gallery .title {
 	font-weight: bold
 }
+
+.flexbox-fix {
+	height: 0px;
+	width: 320px;
+	border: none;
+
+}

@@ -98,6 +98,9 @@ Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
 <div class="subtitle">{{image.subtitle}}</div>
 </div>
 {% endfor %}
+<div class="flexbox-fix"></div>
+<div class="flexbox-fix"></div>
+<div class="flexbox-fix"></div>
 </div>
 
 Sonstiges zur Einstimmug:
