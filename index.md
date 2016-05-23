@@ -109,6 +109,7 @@ Sonstiges zur Einstimmug:
  * Auf der [GPN'15](https://entropia.de/GPN15) in Karlsruhe gab es einen [Vortrag zum Projekt](https://entropia.de/GPN15:Der_Tiptoi-Stift), der auch [aufgezeichnet](https://media.ccc.de/browse/conferences/gpn/gpn15/gpn15-6687-der_tiptoi-stift.html#video) wurde (63 Minuten).
  * Micha Reischuck zeigt einem [Screencast](https://youtu.be/QtdlwmKgg70) wie man mit GIMP die OID-Codes über Bilder legt.
  * Andreas Grimme hat mit [ttaudio](https://github.com/sidiandi/ttaudio#readme) eine Windows-GUI erstellt, falls man einfach nur ein paar Audio-Dateien auf den Stift laden will.
+ * [Gerald Backmeister](http://mamu.backmeister.name/programmierung-und-skripting/tiptoi-hacking-mit-tttool/) beschreibt, was man mit dem tttool machen kann, und wie man es unter Ubuntu installiert.
 
 ## Installation (Windows)
 
