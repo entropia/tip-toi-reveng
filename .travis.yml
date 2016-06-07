@@ -31,7 +31,7 @@ before_install:
  - if [ "$WINDOWS" = yes ]; then export W=wine; else export W=""; fi
  - test -z "$WINDOWS"  || bash ./.travis-setup-windows.sh
  - test -z "$CABALVER" || bash ./.travis-setup-linux.sh
- - test -z "$STACK" || sudo apt-get install g++ gcc libc6-dev libffi-dev libgmp-dev make xz-utils zlib1g-dev
+ - test -z "$STACK" || sudo apt-get install g++ gcc libc6-dev libffi-dev libgmp-dev make xz-utils zlib1g-dev libwww-perl
  - 'test -z "$STACK" || RESOLVER="$(HEAD -S https://www.stackage.org/$STACK|grep HEAD|tail -n1|cut -d/ -f4)"'
  - test -z "$STACK" || stack setup --resolver $RESOLVER
 
