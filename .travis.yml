@@ -30,7 +30,7 @@ before_install:
  - test -z "$STACK" || sudo add-apt-repository -y ppa:hvr/ghc
  - test -z "$STACK" || sudo apt-get update
  - test -z "$STACK" || sudo apt-get install cabal-install-1.24
- - test -z "$STACK" || export PATH=/opt/cabal/1.14/bin:$PATH
+ - test -z "$STACK" || export PATH=/opt/cabal/1.24/bin:$PATH
 
  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
  - export WINEPATH='C:\Program Files (x86)\GnuWin32\bin'
