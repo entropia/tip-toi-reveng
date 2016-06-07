@@ -37,7 +37,7 @@ before_install:
 
 
 install:
- - 'test -z "$STACK" || echo "resolver: $RESOLVER" > stack.yaml' # dummy value
+ - 'test -z "$STACK" || echo "resolver: $RESOLVER" > stack.yaml'
  - test -z "$STACK" || stack solver --update-config
  - test -z "$STACK" || stack build --only-dependencies
 
