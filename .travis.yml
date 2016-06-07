@@ -1,46 +1,59 @@
 # NB: don't set `language: haskell` here
 
-# These are the versions that we built against, at least once, on travis
+# The following enables several GHC versions to be tested; often it's enough to test only against the last release in a major GHC version. Feel free to omit lines listings versions you don't need/want testing for.
 env:
- - CABALVER=1.18 GHCVER=7.6.3
- - CABALVER=1.18 GHCVER=7.8.3
- - CABALVER=1.22 GHCVER=7.10.1
- - CABALVER=1.24 GHCVER=8.0.1
- - CABALVER=head GHCVER=head   # see section about GHC HEAD snapshots
+ - CABALVER=1.18 GHCVER=7.8.4
+ - CABALVER=1.22 GHCVER=7.10.2
+ - CABALVER=head GHCVER=head  # see section about GHC HEAD snapshots
+ - WINDOWS=yes
+ - STACK=lts-2
+ - STACK=lts-3
+ - STACK=lts-4
+ - STACK=lts-5
+ - STACK=lts-6
+ - STACK=nightly
 
 matrix:
   allow_failures:
-    - env: CABALVER=1.24 GHCVER=8.0.1
-    - env: CABALVER=head GHCVER=head
+   - env: CABALVER=head GHCVER=head
+   - env: STACK=nightly
 
 # Note: the distinction between `before_install` and `install` is not important.
 before_install:
- - travis_retry sudo add-apt-repository -y ppa:hvr/ghc
- - travis_retry sudo apt-get update
- - travis_retry sudo apt-get install cabal-install-$CABALVER ghc-$GHCVER # see note about happy/alex
+ - mkdir -p ~/.local/bin
+ - export PATH=~/.local/bin:$PATH
+ - test -z "$STACK" || { travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack' ; }
+
  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
+ - export WINEPATH='C:\Program Files (x86)\GnuWin32\bin'
+ - if [ "$WINDOWS" = yes ]; then export W=wine; else export W=""; fi
+ - test -z "$WINDOWS"  || bash ./.travis-setup-windows.sh
+ - test -z "$CABALVER" || bash ./.travis-setup-linux.sh
+ - test -z "$STACK" || sudo apt-get install g++ gcc libc6-dev libffi-dev libgmp-dev make xz-utils zlib1g-dev
+ - test -z "$STACK" || stack setup --resolver $STACK
+
 
 install:
- - cabal --version
- - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
- - travis_retry cabal update
- - cabal install --only-dependencies --enable-tests --enable-benchmarks
+ - test -z "$STACK" || stack init --resolver $STACK --force
+ - test -z "$STACK" || stack solver --update-config
+ - test -z "$STACK" || stack build --only-dependencies
 
-# Here starts the actual work to be performed for the package under test; any command which exits with a non-zero exit code causes the build to fail.
 script:
- - if [ -f configure.ac ]; then autoreconf -i; fi
- - cabal configure --enable-tests --enable-benchmarks -v2  # -v2 provides useful information for debugging
- - cabal build   # this builds all libraries and executables (including tests/benchmarks)
- - cabal test
- - cabal check
- - cabal sdist   # tests that a source-distribution can be generated
+ - test -z "$CABALVER" -a -z "$WINDOWS" || $W cabal configure --enable-tests --enable-benchmarks -v2
+ - test -z "$CABALVER" -a -z "$WINDOWS" || $W cabal build
+ - test -z "$CABALVER" -a -z "$WINDOWS" || $W cabal test
+ - test -z "$CABALVER" -a -z "$WINDOWS" || $W cabal check
+ - test -z "$CABALVER" -a -z "$WINDOWS" || $W cabal sdist
+ - test -z "$STACK" || stack build --test
 
 # The following scriptlet checks that the resulting source distribution can be built & installed
- - export SRC_TGZ=$(cabal info . | awk '{print $2 ".tar.gz";exit}') ;
+ - test -z "$CABALVER" -a -z "$WINDOWS" || {
+   export SRC_TGZ=$($W cabal info . | awk '{print $2 ".tar.gz";exit}') ;
    cd dist/;
    if [ -f "$SRC_TGZ" ]; then
-      cabal install --force-reinstalls "$SRC_TGZ";
+      $W cabal install --force-reinstalls "$SRC_TGZ";
    else
       echo "expected '$SRC_TGZ' not found";
       exit 1;
-   fi
+   fi;
+   }
