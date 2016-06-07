@@ -36,8 +36,8 @@ before_install:
 
 
 install:
- - test -z "$STACK" || stack init --resolver $STACK --force
- - test -z "$STACK" || stack solver --update-config
+ - test -z "$STACK" || echo "resolver: lts-1.0" > stack.yaml # dummy value
+ - test -z "$STACK" || stack solver --update-config --resolver "$STACK"
  - test -z "$STACK" || stack build --only-dependencies
 
 script:
