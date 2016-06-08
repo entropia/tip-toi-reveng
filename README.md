@@ -134,6 +134,10 @@ can generate a debug gme using the `debug.yaml` file, adjusting its
 debug.yaml` and loading the resulting `debug.gme` on your pen.  It will then
 read out the codes, as a sequence of english digits.
 
+If you want to convert existing audio files of almost any format, and you have
+`ffmpeg` installed, you can use 
+
+    ffmpeg -i input-audio-in-some.fmt -ar 22050 -ac 1 foo.ogg
 
 Text to speech
 --------------
