@@ -444,7 +444,7 @@ void parse_game(FILE * file, int id, uint32_t start, uint32_t end)
 	    }
 	}
 
-	printf("\n", type);
+	printf("\n");
 	index = 4;
 
 	printf("Typ%03d (%d)OID ", type, count);
@@ -465,7 +465,7 @@ void parse_game(FILE * file, int id, uint32_t start, uint32_t end)
 	    }
 	}
 
-	printf("\n", type);
+	printf("\n");
 	index = 4;
 
 	printf("Typ%03d (%d)GID ", type, count);
@@ -485,7 +485,7 @@ void parse_game(FILE * file, int id, uint32_t start, uint32_t end)
 		printf("0");
 	    }
 	}
-	printf("\n", type);
+	printf("\n");
 	return;
     }
 
@@ -659,7 +659,7 @@ void parse_game(FILE * file, int id, uint32_t start, uint32_t end)
 //          parse_playlistpointer(file, pointer, start, end);
 	    }
 	}
-	printf("\n", type);
+	printf("\n");
 
 	printf("Typ%02d PLY ", type);
 	for (i = 0; i < ps2; i++) {
@@ -677,7 +677,7 @@ void parse_game(FILE * file, int id, uint32_t start, uint32_t end)
 		printf("0");
 	    }
 	}
-	printf("\n", type);
+	printf("\n");
 
 	printf("Typ%02d OID ", type);
 	for (i = 0; i < ps2; i++) {
@@ -695,7 +695,7 @@ void parse_game(FILE * file, int id, uint32_t start, uint32_t end)
 		printf("0");
 	    }
 	}
-	printf("\n", type);
+	printf("\n");
 
 	printf("Typ%02d GID ", type);
 	for (i = 0; i < ps2; i++) {
@@ -713,7 +713,7 @@ void parse_game(FILE * file, int id, uint32_t start, uint32_t end)
 		printf("0");
 	    }
 	}
-	printf("\n", type);
+	printf("\n");
     }
 
     uint32_t firstsub;

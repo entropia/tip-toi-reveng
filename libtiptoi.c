@@ -137,14 +137,14 @@ GME_FILE *readFile(char *filename){
 	fclose(fp);
 
 	gme->audioFileTableOffset = GET_UINT32(GME_AUDIO_FILE_TABLE_OFFSET);
-	gme->audioFileTable = &gme->data[gme->audioFileTableOffset];
+	gme->audioFileTable = (GME_AUDIO_FILE_TABLE *)&gme->data[gme->audioFileTableOffset];
 	gme->audioFileTableEntries = (gme->audioFileTable[0].offset - GET_UINT32(GME_AUDIO_FILE_TABLE_OFFSET)) / 8;
 	gme->bookCode = GET_UINT32(GME_BOOK_CODE_OFFSET);
 	gme->xor = getXOR(gme);
 	gme->checksum = *(uint32_t*)&gme->data[gme->filesize - 4];
 
 	gme->mainTableOffset = GET_UINT32(GME_MAIN_FILE_TABLE_OFFSET);
-	gme->mainTable = &gme->data[gme->mainTableOffset];
+	gme->mainTable = (GME_MAIN_TABLE *)&gme->data[gme->mainTableOffset];
 	return gme;
 }
 
@@ -490,7 +490,7 @@ void printInformation(char *inputfile, FILE *out){
 			}
 			fprintf(out, "%02d: %d\n", i, jumpTableOffset);
 			elements = *(uint16_t*)&gme->data[gme->mainTable->codeTable[i - gme->mainTable->firstOIDCode]];
-			gjt = &gme->data[gme->mainTable->codeTable[i - gme->mainTable->firstOIDCode]+2];
+			gjt = (uint32_t *)&gme->data[gme->mainTable->codeTable[i - gme->mainTable->firstOIDCode]+2];
 			for (j = 0; j < elements-1; j++){
 				fprintf(out,"\t%02d: %d: ", j, gjt[j]);
 				hexDump(out,&gme->data[gjt[j]], &gme->data[gjt[j + 1]]);
