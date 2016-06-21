@@ -289,7 +289,7 @@ rewriteCmd :: Mod CommandFields (Conf -> IO ())
 rewriteCmd =
     command "rewrite" $
     info parser $
-    progDesc "parses the file and reads it again (for debugging)"
+    progDesc "parses the file and writes it again (for debugging)"
   where
     parser = const <$> (rewrite <$> gmeFileParser <*> outFileParser)
 
