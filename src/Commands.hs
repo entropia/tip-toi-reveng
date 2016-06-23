@@ -118,7 +118,7 @@ dumpInfo conf file = do
         (length ttBinaries3)
         (length ttBinaries4)
     for_ ttSpecialOIDs $ \(oid1, oid2) ->
-        printf "Speical OIDs: %d, %d\n" oid1 oid2
+        printf "Special OIDs: %d, %d\n" oid1 oid2
     printf "Checksum found 0x%08X, calculated 0x%08X\n" ttChecksum ttChecksumCalc
 
 lint :: FilePath -> IO ()

@@ -43,7 +43,7 @@ supports various subcommands:
     segment                  prints the decoded scripts for a specific OID
     explain                  print a hexdump of a GME file with descriptions
     holes                    lists all unknown parts of the file.
-    rewrite                  parses the file and reads it again (for debugging)
+    rewrite                  parses the file and writes it again (for debugging)
 
     GME extraction commands:
     media                    dumps all audio samples
