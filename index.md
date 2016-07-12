@@ -72,6 +72,11 @@ gallery:
   link: http://keke.netz-zwerge.de/blog/archives/348-Meine-erste-TipToi-Erfahrung.html
   img: /img/keke.jpg
 
+- title: Familienbuch
+  subtitle: von Achim
+  link: https://lists.nomeata.de/archive/tiptoi/2016/001349.html
+  img: /img/achim.jpg
+
 ---
 
 Diese Seite enthält Information zum `tttool`, einem Werkzeug zum
