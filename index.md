@@ -71,11 +71,14 @@ gallery:
   subtitle: von Keke
   link: http://keke.netz-zwerge.de/blog/archives/348-Meine-erste-TipToi-Erfahrung.html
   img: /img/keke.jpg
-
 - title: Familienbuch
   subtitle: von Achim
   link: https://lists.nomeata.de/archive/tiptoi/2016/001349.html
   img: /img/achim.jpg
+- title: Forscher-Geburtstag
+  subtitle: Ralley von Micha Reischuck
+  link: https://github.com/michote/tiptoi-forscher-geburtstag
+  img: /img/forscher.jpg
 
 ---
 
