@@ -398,8 +398,8 @@ aus. Nach der Meldung
     Writing oid-42.png.. (Code 42, raw code 272)
 
 findet man diese Datei im aktuellen Verzeichnis. Sie enhält das Muster
-zum Code 42, vielfach wiederholt. Sie soll eine Fläche von 10×10cm
-abdecken, was bei den empfohlenen 1200dpi eine Auflösung von 4800×4800
+zum Code 42, vielfach wiederholt. Sie soll eine Fläche von 3×3cm
+abdecken, was bei den empfohlenen 1200dpi eine Auflösung von 1440×1440
 Pixeln ergibt.
 
 Ähnliche Codes braucht man für jedes Feld, etwa `8066` oder `8067` im
