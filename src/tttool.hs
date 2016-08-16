@@ -5,7 +5,7 @@ import Numeric
 import Data.List (intercalate)
 import Options.Applicative.Help.Chunk
 import Data.Monoid
-import Data.Foldable
+import Data.Foldable (asum)
 
 import Types
 import RangeParser
