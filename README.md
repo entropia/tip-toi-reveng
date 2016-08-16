@@ -43,7 +43,7 @@ supports various subcommands:
     segment                  prints the decoded scripts for a specific OID
     explain                  print a hexdump of a GME file with descriptions
     holes                    lists all unknown parts of the file.
-    rewrite                  parses the file and reads it again (for debugging)
+    rewrite                  parses the file and writes it again (for debugging)
 
     GME extraction commands:
     media                    dumps all audio samples
@@ -174,7 +174,7 @@ Other resources in this repository
 ----------------------------------
 
  * [`oid-decoder.html`](http://htmlpreview.github.io/?https://github.com/entropia/tip-toi-reveng/blob/master/oid-decoder.html) allows you to manually decode an OID image.
- * `scripts/updates.sh` downloads all gme files from the Ravensburger server.
+ * `scripts/update.sh` downloads all gme files from the Ravensburger server (requires perl and the [XML::Simple](http://search.cpan.org/~grantm/XML-Simple/) module).
  * `gameanalyse.c` and `libtiptoi.c` is an alternative tool to investigate gme
    files. It can also [replace audio files in gme files](Audio/README.md);
    compile and run it for diagnostic output.
