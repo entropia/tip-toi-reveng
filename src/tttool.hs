@@ -81,12 +81,14 @@ optionParser =
         [ hsubparser $ mconcat
           [ commandGroup "GME creation commands:"
           , assembleCmd
+          , hidden
           ]
         , hsubparser $ mconcat
           [ commandGroup "OID code creation commands:"
           , oidTableCmd
           , oidCodesCmd
           , oidCodeCmd
+          , hidden
           ]
         , hsubparser $ mconcat
           [ commandGroup "GME analysis commands:"
@@ -101,11 +103,13 @@ optionParser =
           , explainCmd
           , holesCmd
           , rewriteCmd
+          , hidden
           ]
         , hsubparser $ mconcat
           [ commandGroup "GME extraction commands:"
           , mediaCmd
           , binariesCmd
+          , hidden
           ]
         , hsubparser $ mconcat
           [ commandGroup "Simulation commands:"
