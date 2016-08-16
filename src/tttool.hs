@@ -5,6 +5,7 @@ import Numeric
 import Data.List (intercalate)
 import Options.Applicative.Help.Chunk
 import Data.Monoid
+import Data.Foldable
 
 import Types
 import RangeParser
@@ -75,38 +76,41 @@ optionParser =
                 _        -> Left $ "Cannot parse dimensions " ++ input
             _        -> Left $ "Cannot parse dimensions " ++ input
 
-    cmd = hsubparser $ mconcat
-        [ cmdSep "GME creation commands:"
-        , assembleCmd
-        , cmdSep ""
-
-        , cmdSep "OID code creation commands:"
-        , oidTableCmd
-        , oidCodesCmd
-        , oidCodeCmd
-        , cmdSep ""
-
-        , cmdSep "GME analysis commands:"
-        , infoCmd
-        , exportCmd
-        , scriptsCmd
-        , scriptCmd
-        , gamesCmd
-        , lintCmd
-        , segmentsCmd
-        , segmentCmd
-        , explainCmd
-        , holesCmd
-        , rewriteCmd
-        , cmdSep ""
-
-        , cmdSep "GME extraction commands:"
-        , mediaCmd
-        , binariesCmd
-        , cmdSep ""
-
-        , cmdSep "Simulation commands:"
-        , playCmd
+    cmd :: Parser (Conf -> IO ())
+    cmd = asum
+        [ hsubparser $ mconcat
+          [ commandGroup "GME creation commands:"
+          , assembleCmd
+          ]
+        , hsubparser $ mconcat
+          [ commandGroup "OID code creation commands:"
+          , oidTableCmd
+          , oidCodesCmd
+          , oidCodeCmd
+          ]
+        , hsubparser $ mconcat
+          [ commandGroup "GME analysis commands:"
+          , infoCmd
+          , exportCmd
+          , scriptsCmd
+          , scriptCmd
+          , gamesCmd
+          , lintCmd
+          , segmentsCmd
+          , segmentCmd
+          , explainCmd
+          , holesCmd
+          , rewriteCmd
+          ]
+        , hsubparser $ mconcat
+          [ commandGroup "GME extraction commands:"
+          , mediaCmd
+          , binariesCmd
+          ]
+        , hsubparser $ mconcat
+          [ commandGroup "Simulation commands:"
+          , playCmd
+          ]
         ]
 
 only :: (Eq a, Show a) => [a] -> ReadM a -> ReadM a

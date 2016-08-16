@@ -71,7 +71,7 @@ executable tttool
     yaml        == 0.8.*,
     HPDF        >= 1.4.10   && < 1.5,
     split       == 0.2.*,
-    optparse-applicative == 0.12.*,
+    optparse-applicative == 0.13.*,
     spool       == 0.1.*,
     zlib        >= 0.5      && < 0.7,
     natural-sort >= 0.1     && < 0.2
