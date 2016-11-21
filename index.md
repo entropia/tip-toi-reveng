@@ -75,10 +75,16 @@ gallery:
   subtitle: von Achim
   link: https://lists.nomeata.de/archive/tiptoi/2016/001349.html
   img: /img/achim.jpg
+
 - title: Forscher-Geburtstag
   subtitle: Ralley von Micha Reischuck
   link: https://github.com/michote/tiptoi-forscher-geburtstag
   img: /img/forscher.jpg
+
+- title: Fotobuch
+  subtitle: von Andreas Zwinkau
+  link: http://beza1e1.tuxen.de/articles/tiptoi.html
+  img: /img/fotobuch.jpg
 
 ---
 
