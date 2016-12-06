@@ -65,11 +65,13 @@ data Line r = Line Offset [Conditional r] [Command r] PlayList
 
 type ProductID = Word32
 
+
 data TipToiFile = TipToiFile
     { ttProductId :: ProductID
     , ttRawXor :: Word32
     , ttComment :: B.ByteString
     , ttDate :: B.ByteString
+    , ttLang :: B.ByteString
     , ttInitialRegs :: [Word16]
     , ttWelcome :: [PlayList]
     , ttScripts :: [(Word16, Maybe [Line ResReg])]

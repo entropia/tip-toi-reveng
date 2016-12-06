@@ -103,6 +103,8 @@ putTipToiFile (TipToiFile {..}) = mdo
     putWord8 $ fromIntegral (B.length ttComment)
     putBS ttComment
     putBS ttDate
+    putBS ttLang
+    putWord8 0
     seek 0x0071 -- Just to be safe
     putWord32 ipllo
     seek 0x0200 -- Just to be safe

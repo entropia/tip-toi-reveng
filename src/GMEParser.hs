@@ -108,6 +108,9 @@ getWord32 = liftGet G.getWord32le
 getBS :: Word32 -> SGet B.ByteString
 getBS n   = liftGet $ G.getLazyByteString (fromIntegral n)
 
+getBSNul :: SGet B.ByteString
+getBSNul = liftGet G.getLazyByteStringNul
+
 bytesRead = SGet get
 
 getArray :: Integral a => SGet a -> SGet b -> SGet [b]
@@ -407,11 +410,10 @@ getTipToiFile = getSegAt 0x00 "Header" $ do
     ttProductId <- getWord32
     ttInitialRegs <- indirection "Initial registers" getInitialRegs
     _ <- getWord32 -- raw Xor
-    (ttComment, ttDate) <- do
-        l <- getWord8
-        c <- getBS (fromIntegral l)
-        d <- getBS 8
-        return (c,d)
+    commentLength <- getWord8
+    ttComment <- getBS (fromIntegral commentLength)
+    ttDate <- getBS 8
+    ttLang <- getBSNul
 
     jumpTo 0x0071
     ttWelcome <- indirection "initial play lists" $ getPlayListList

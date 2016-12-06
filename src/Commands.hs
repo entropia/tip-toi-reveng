@@ -104,6 +104,7 @@ dumpInfo conf file = do
     printf "Magic XOR value: 0x%02X\n" ttAudioXor
     printf "Comment: %s\n" (BC.unpack ttComment)
     printf "Date: %s\n" (BC.unpack ttDate)
+    printf "Language: %s\n" (BC.unpack ttLang)
     printf "Number of registers: %d\n" (length ttInitialRegs)
     printf "Initial registers: %s\n" (show ttInitialRegs)
     printf "Initial sounds: %s\n" (ppPlayListList t ttWelcome)

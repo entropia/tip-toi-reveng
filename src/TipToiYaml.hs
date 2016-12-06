@@ -57,16 +57,17 @@ import Utils
 import TipToiYamlAux
 
 data TipToiYAML = TipToiYAML
-    { ttyScripts :: M.Map String [String]
-    , ttyComment :: Maybe String
-    , ttyMedia_Path :: Maybe String
-    , ttyInit :: Maybe String
-    , ttyWelcome :: Maybe String
-    , ttyProduct_Id :: Word32
+    { ttyScripts     :: M.Map String [String]
+    , ttyComment     :: Maybe String
+    , ttyGME_Lang    :: Maybe String
+    , ttyMedia_Path  :: Maybe String
+    , ttyInit        :: Maybe String
+    , ttyWelcome     :: Maybe String
+    , ttyProduct_Id  :: Word32
     , ttyScriptCodes :: Maybe CodeMap
-    , ttySpeak :: Maybe SpeakSpecs
-    , ttyLanguage :: Maybe Language
-    , ttyGames :: Maybe [GameYaml]
+    , ttySpeak       :: Maybe SpeakSpecs
+    , ttyLanguage    :: Maybe Language
+    , ttyGames       :: Maybe [GameYaml]
     }
     deriving Generic
 
@@ -266,7 +267,10 @@ data SubGameYaml = SubGameYaml
 $(deriveJSON gameYamlOptions ''GameYaml)
 $(deriveJSON gameYamlOptions ''SubGameYaml)
 
-tipToiYamlOptions = defaultOptions { fieldLabelModifier = map fix . map toLower . drop 3 }
+tipToiYamlOptions = defaultOptions
+    { fieldLabelModifier = map fix . map toLower . drop 3
+    , omitNothingFields  = True
+    }
        where fix '_' = '-'
              fix c   = c
 
@@ -293,6 +297,7 @@ tt2ttYaml path (TipToiFile {..}) = TipToiYAML
                                 | (r,n) <- zip [0..] ttInitialRegs , n /= 0]
     , ttyWelcome = Just $ playListList2Yaml ttWelcome
     , ttyComment = Just $ BC.unpack ttComment
+    , ttyGME_Lang = if BC.null ttLang then Nothing else Just (BC.unpack ttLang)
     , ttyScripts = M.fromList
         [ (show oid, map exportLine ls) | (oid, Just ls) <- ttScripts]
     , ttyMedia_Path = Just path
@@ -835,6 +840,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
         , ttRawXor = knownRawXOR
         , ttComment = comment
         , ttDate = BC.pack date
+        , ttLang = maybe BC.empty BC.pack ttyGME_Lang
         , ttWelcome = [welcome]
         , ttInitialRegs = [fromMaybe 0 (M.lookup r initRegs) | r <- [0..maxReg]]
         , ttScripts = scripts'
@@ -1078,6 +1084,7 @@ debugGame productID = do
         , ttyScriptCodes = Nothing
         , ttySpeak = Nothing
         , ttyComment = Nothing
+        , ttyGME_Lang = Nothing
         , ttyWelcome = Just $ "blob"
         , ttyScripts = M.fromList [
             (show oid, [line])
