@@ -438,11 +438,13 @@ dann die eigenen Grafiken und Texte zu importieren und auf die
 richtige Größe skalieren.
 
 Fügt man in eine solche Datei die erstellten Dateien mit den
-Punktmustern ein, so sollten sie tatsächlich eine Fläche von 10×10cm
-abdecken, sonst hat man etwas falsch gemacht. Es empfiehlt sich, für
-jedes Muster eine eigene Ebene zu verwenden, die man zuschneidet oder
-mit einer Ebenenmaske auf die richtige Form und Größe bringt. Diese
-Ebene darf man natürlich nicht skalieren!
+Punktmustern ein, so sollten sie tatsächlich eine Fläche von 3×3cm
+abdecken, sonst hat man etwas falsch gemacht. Das Tool kann auch andere Größen
+erstellen, beispielsweiße `--code-dim 100x100` für 10×10cm.
+
+Es empfiehlt sich, für jedes Muster eine eigene Ebene zu verwenden, die man
+zuschneidet oder mit einer Ebenenmaske auf die richtige Form und Größe bringt.
+Diese Ebene darf man natürlich nicht skalieren!
 
 ### Produkt drucken
 
