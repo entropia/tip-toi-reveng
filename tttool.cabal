@@ -1,5 +1,5 @@
 name:                tttool
-version:             1.7
+version:             1.7.0.1
 synopsis:            Working with files for the Tiptoi® pen
 description:         The Ravensburger Tiptoi® pen is programmed via special
                      files. Their file format has been reverse engineered; this
@@ -54,7 +54,7 @@ executable tttool
     base        >= 4.5 && < 4.10,
     binary      >= 0.5 && < 0.9,
     containers  == 0.4.*   ||  == 0.5.*,
-    directory   == 1.2.*,
+    directory   >= 1.2 && < 1.4,
     executable-path == 0.0.*,
     filepath    == 1.3.*   ||  == 1.4.*,
     template-haskell >= 2.7 && < 2.12,
@@ -67,7 +67,7 @@ executable tttool
     parsec      == 3.1.*,
     process     >= 1.1      &&   < 1.5,
     random      >= 1.0      &&   < 1.2,
-    vector      >= 0.10     &&   < 0.12,
+    vector      >= 0.10     &&   < 0.13,
     yaml        == 0.8.*,
     HPDF        >= 1.4.10   && < 1.5,
     split       == 0.2.*,
@@ -84,7 +84,7 @@ executable tttool
   if flag(old-locale)
     build-depends: time == 1.4.*, old-locale
   else
-    build-depends: time >= 1.5 && < 1.7
+    build-depends: time >= 1.5 && < 1.8
 
   if flag(bytestring_has_builder)
     build-depends:
