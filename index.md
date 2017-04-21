@@ -86,6 +86,11 @@ gallery:
   link: http://beza1e1.tuxen.de/articles/tiptoi.html
   img: /img/fotobuch.jpg
 
+- title: Mon Premier Crayon
+  subtitle: französisches Buch von Laurent
+  link: https://www.dropbox.com/sh/47x9preiew174fh/AAAyEMqAA0Vy4VvSI5zA7788a?dl=0
+  img: /img/img/crayon.png
+
 ---
 
 Diese Seite enthält Information zum `tttool`, einem Werkzeug zum
