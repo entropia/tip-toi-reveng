@@ -51,12 +51,22 @@ espeak_contrib myDir lang tmp txt =
     l = case lang of
             Language s    -> s
 
+say :: Language -> FilePath -> String -> (String, [String])
+say lang tmp txt =
+   ("say", ["-o", tmp, "--data-format=LEF32@8000", "-v", l, txt])
+  where
+   l = case lang of
+           Language "en" -> "Alex"
+	   Language "de" -> "Anna"
+	   Language "fr" -> "Thomas"
+	   Language s    -> s
 
 engines :: FilePath -> Language -> FilePath -> String -> [(String, [String])]
 engines myDir l ft txt =
     [ pico l ft txt
     , espeak l ft txt
     , espeak_contrib myDir l ft txt
+    , say l ft txt
     ]
 
 oggenc :: FilePath -> FilePath -> (String, [String])
