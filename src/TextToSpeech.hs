@@ -59,7 +59,7 @@ say lang tmp txt =
            Language "en" -> "Alex"
            Language "de" -> "Anna"
            Language "fr" -> "Thomas"
-           Language s    -> error $ "No voice for language \"" ++ s "\" known."
+           Language s    -> error $ "No voice for language \"" ++ s ++ "\" known."
 
 engines :: FilePath -> Language -> FilePath -> String -> [(String, [String])]
 engines myDir l ft txt =
