@@ -59,7 +59,6 @@ say lang tmp txt =
            Language "en" -> "Alex"
            Language "de" -> "Anna"
            Language "fr" -> "Thomas"
-           Language s    -> s
 
 engines :: FilePath -> Language -> FilePath -> String -> [(String, [String])]
 engines myDir l ft txt =
