@@ -57,9 +57,9 @@ say lang tmp txt =
   where
    l = case lang of
            Language "en" -> "Alex"
-	   Language "de" -> "Anna"
-	   Language "fr" -> "Thomas"
-	   Language s    -> s
+           Language "de" -> "Anna"
+           Language "fr" -> "Thomas"
+           Language s    -> s
 
 engines :: FilePath -> Language -> FilePath -> String -> [(String, [String])]
 engines myDir l ft txt =
