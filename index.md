@@ -400,7 +400,7 @@ Neben dem eben beschriebenen Erzeugen einer GME-Datei benötigt man für
 eigenen Produkte auch noch die ausgedruckten Codes. Diese erhält man
 in drei einfachen Schritten:
 
- 1. Mit `tttool oid-code` erstellt man die Punktmuster.
+ 1. Mit `tttool oid-code` bzw `tttool oid-codes` erstellt man die Punktmuster.
  2. Diese bringt man in die richtige Form und legt sie ggf. über ein Motiv.
  3. Das Ergebns druckt man.
 
@@ -423,7 +423,7 @@ Pixeln ergibt.
 obigen Beispiel. Man muss nicht alle einzeln erzeugen. `tttool` kann das
 auch in einem Rutsch erledigen:
 
-    $ ./tttool oid-code example.yaml 
+    $ ./tttool oid-codes example.yaml
     Writing oid-42-START.png.. (Code 42, raw code 272)
     Writing oid-42-8066.png.. (Code 8066, raw code 3701)
     Writing oid-42-8067.png.. (Code 8067, raw code 3702)
@@ -431,7 +431,7 @@ auch in einem Rutsch erledigen:
 Hat man seinen Skripten Namen gegeben, wie oben beschrieben, dann
 bekommt man auch schönere Dateinamen für die Muster:
 
-    $ ~/projekte/tip-toi-reveng/tttool oid-code foo.yaml 
+    $ ~/projekte/tip-toi-reveng/tttool oid-codes foo.yaml
     Speaking "Hallo".
     Writing oid-42-START.png.. (Code 42, raw code 272)
     Writing oid-42-gruene_box.png.. (Code 4716, raw code 0)
