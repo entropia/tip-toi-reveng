@@ -1,5 +1,5 @@
 name:                tttool
-version:             1.7.0.2
+version:             1.7.0.3
 synopsis:            Working with files for the Tiptoi® pen
 description:         The Ravensburger Tiptoi® pen is programmed via special
                      files. Their file format has been reverse engineered; this
@@ -10,7 +10,7 @@ license:             MIT
 license-file:        LICENSE
 author:              Joachim Breitner
 maintainer:          mail@joachim-breitner.de
-copyright:           2013-2015 Joachim Breitner
+copyright:           2013-2017 Joachim Breitner
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
@@ -71,7 +71,7 @@ executable tttool
     yaml        == 0.8.*,
     HPDF        >= 1.4.10   && < 1.5,
     split       == 0.2.*,
-    optparse-applicative == 0.13.*,
+    optparse-applicative >= 0.13 && < 0.15,
     spool       == 0.1.*,
     zlib        >= 0.5      && < 0.7,
     natural-sort >= 0.1     && < 0.2
