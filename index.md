@@ -89,7 +89,12 @@ gallery:
 - title: Mon Premier Crayon
   subtitle: französisches Buch von Laurent
   link: https://www.dropbox.com/sh/47x9preiew174fh/AAAyEMqAA0Vy4VvSI5zA7788a?dl=0
-  img: /img/img/crayon.png
+  img: /img/crayon.png
+
+- title: Schatzssuche
+  subtitle: mit Video, von Michael Thon
+  link: https://github.com/m7thon/schatzsucheH4
+  img: /img/m7thon.jpg
 
 ---
 
