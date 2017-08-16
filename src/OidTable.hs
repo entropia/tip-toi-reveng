@@ -15,9 +15,6 @@ import KnownCodes
 import Utils
 import Types
 
-
--- IO technically unnecessary: https://github.com/alpheccar/HPDF/issues/7
-
 oidTable :: Conf -> String -> [(String, Word16)] -> LB.ByteString
 oidTable conf title entries | entriesPerPage < 1 = error "OID codes too large to fit on a single page"
                             | otherwise = pdfByteString docInfo a4rect $ do
