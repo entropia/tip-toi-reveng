@@ -50,9 +50,9 @@ oidTable conf title entries | entriesPerPage < 1 = error "OID codes too large to
 
             forM_ (zip thisPage positions) $ \((e,mbi),p) -> do
                 withNewContext $ do
-                    applyMatrix $ translate  (align p)
+                    applyMatrix $ translate (align p)
                     forM_ mbi $ \i -> withNewContext $ do
-                        applyMatrix $ translate  (0 :+ (-(fromIntegral imageHeightPx)/px))
+                        applyMatrix $ translate (0 :+ (- alignToPx imageHeight))
                         applyMatrix $ scale (1/px) (1/px)
                         drawXObject i
                     withNewContext $ do
@@ -122,9 +122,15 @@ oidTable conf title entries | entriesPerPage < 1 = error "OID codes too large to
     px :: Double
     px = fromIntegral (cDPI conf) / 72
 
+
+    -- Makes sure the given point is at a coordinate that is a multiple
+    -- of an pixel
     align :: Point -> Point
-    align pos = (fromIntegral (floor (realPart pos * px)) / px
-                 :+ (a4h - (fromIntegral (floor ((a4h - imagPart pos) * px)) / px)))
+    align pos = alignToPx (realPart pos) :+ (a4h - alignToPx (a4h - imagPart pos))
+
+    -- Makes sure the given distance is an interal mulitple of a pixel
+    alignToPx :: Double -> Double
+    alignToPx x = fromIntegral (floor (x * px)) / px
 
 calcPositions
     :: Double -- ^ total width
