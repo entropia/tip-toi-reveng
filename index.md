@@ -96,6 +96,11 @@ gallery:
   link: https://github.com/m7thon/schatzsucheH4
   img: /img/m7thon.jpg
 
+- title: Pias Buch
+  subtitle: mit Homepage, von André Schmid
+  link: http://tiptoi.as-webstyling.de/
+  img: /img/pias-buch.jpg
+
 ---
 
 Diese Seite enthält Information zum `tttool`, einem Werkzeug zum
