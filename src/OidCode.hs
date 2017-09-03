@@ -113,8 +113,8 @@ genRawPixels w h dpi ps code =
     (oidImage w h dpi ps code :: Image PixelRGB8)
 
 
-genRawPNG :: Int -> Int -> DPI -> PixelSize -> Word16 -> FilePath -> IO ()
-genRawPNG w h dpi ps code filename =
+genRawPNG :: Int -> Int -> DPI -> PixelSize -> String -> Word16 -> FilePath -> IO ()
+genRawPNG w h dpi ps title code filename =
     B.writeFile filename $
     encodePngWithMetadata metadata $
     (oidImage w h dpi ps code :: Image PixelYA8)
@@ -122,6 +122,6 @@ genRawPNG w h dpi ps code filename =
     metadata = mconcat
         [ singleton DpiX (fromIntegral dpi)
         , singleton DpiY (fromIntegral dpi)
-        , singleton Title $ "Tiptoi OID Code " ++ show code
+        , singleton Title title
         , singleton Software $ "tttool " ++ tttoolVersion
         ]

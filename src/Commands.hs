@@ -292,27 +292,32 @@ genPNGsForFile conf inf = do
     (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
     let codes = ("START", fromIntegral (ttProductId tt)) : M.toList totalMap
     forM_  codes $ \(s,c) -> do
-        genPNG conf c $ printf "oid-%d-%s.png" (ttProductId tt) s
+        let filename = printf "oid-%d-%s.png" (ttProductId tt) s
+        let title = printf "%s (product %d code %d)" s (ttProductId tt) c
+        genPNG conf title c filename
 
-genPNG :: Conf -> Word16 -> String -> IO ()
-genPNG conf c filename =
+genPNG :: Conf -> String -> Word16 -> String -> IO ()
+genPNG conf title c filename =
     case code2RawCode c of
         Nothing -> printf "Skipping %s, code %d not known.\n" filename c
         Just r -> do
             printf "Writing %s.. (Code %d, raw code %d)\n" filename c r
-            genRawPNG' conf r filename
+            genRawPNG' conf title r filename
 
 genPNGsForCodes :: Bool -> Conf -> [Word16] -> IO ()
 genPNGsForCodes False conf codes =
     forM_ codes $ \c -> do
-        genPNG conf c $ printf "oid-%d.png" c
+        let filename = printf "oid-%d.png" c
+        let title = printf "code %d" c
+        genPNG conf title c filename
 genPNGsForCodes True conf codes =
     forM_ codes $ \r -> do
         let filename = printf "oid-raw-%d.png" r
+        let title = printf "raw code %d" r
         printf "Writing %s... (raw code %d)\n" filename r
-        genRawPNG' conf r filename
+        genRawPNG' conf title r filename
 
-genRawPNG' :: Conf -> Word16 -> FilePath -> IO ()
+genRawPNG' :: Conf -> String -> Word16 -> FilePath -> IO ()
 genRawPNG' conf =
     genRawPNG w h (cDPI conf) (cPixelSize conf)
   where
