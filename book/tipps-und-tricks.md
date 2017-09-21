@@ -30,7 +30,20 @@ Reicht der Timer nicht aus, kann man sich mit Pseudo-Zufallszahlen behelfen:
 
 ### Algorithmen zur Erzeugung von Pseudo-Zufallszahlen
 
-(TODO)
+Als Pseudo-Zufallszahlen bezeichnet man Reihen von Zahlen, welche aus einer deterministischen Berechnung hervorgehen, und daher natürlich nicht wirklich zufällig sind, aber wie zufällig erscheinen. Verwendet man einen Timer als Startwert (_seed_), erhält man eine in der Praxis nicht vorhersagbare Zahlenfolge.
+
+Eine einfache Implementation sieht beispielsweise folgendermaßen aus:
+
+    random:
+      - T($r,65535) $rnd+=$r $rnd*=25173 $rnd+=13849
+
+Nach Aufruf von `random` befindet sich im Register `$rnd` eine Zufallszahl zwischen 0 und 65535. Der Wertebereich lässt sich durch Modulo beschränken:
+
+    random:
+      - T($r,65535) $rnd+=$r $rnd*=25173 $rnd+=13849 $wuerfel=$rnd $wuerfel%=6 $wuerfel+=1
+
+In diesem Beispiel erhält `$wuerfel` einen zufälligen Wert zwischen 1 und 6.
+
 
 
 Code-Muster in GIMP
