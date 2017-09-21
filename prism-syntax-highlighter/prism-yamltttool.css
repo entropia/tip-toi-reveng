@@ -1,0 +1,55 @@
+/* 
+ * ***************************************** *
+ * Colors of the Yamlcode for the tttool  * *
+ * ***************************************** *  
+ */
+
+.language-yamltttool .token.function {
+	color: #e6db74;  /* Color of all Yaml-Segments:  */
+}
+
+.language-yamltttool .token.string {
+	color: #a6e22e; /* Color of P(lays) and P*(lays) */
+}
+
+.language-yamltttool .token.selector {
+	color: #a6e2bb; /* Color of G(ame_starts)  */
+}
+
+.language-yamltttool .token.entity {
+	color: #a6e2bb; /* Color of C(game_stop)  */
+}
+
+.language-yamltttool .token.comment {
+	color: slategray; /* Color of Comments  */
+}
+
+.language-yamltttool .token.boolean {
+	color: #a6c2ff; /* Color of J(umps)  */
+}
+
+.language-yamltttool .token.number {
+	color: #cc6600; /* Color of all Numbers*/
+}
+
+.language-yamltttool .token.directive {
+	color: #6688ff; /* Color of the T(imer,42) */
+}
+
+.language-yamltttool .token.char {
+	color: #a6b22e;  /* Color of PA*() and PA() */
+}
+
+.language-yamltttool .token.variable {
+	color: #f8a0f8; /* Color of all $trings/$registers and registers like $123 */
+}
+
+.language-yamltttool .token.symbol {
+	color: #f8b000; /* Color of codeanalyse like ?($register,33) (00 FF) */
+}
+
+.language-yamltttool .token.attr-value {
+	color: #f8b060; /* Color of eg. (00 FF) */
+}
+
+
