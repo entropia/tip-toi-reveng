@@ -25,7 +25,7 @@ pygments_style = 'sphinx'
 todo_include_todos = False
 
 # -- Options for HTML output ----------------------------------------------
-#html_theme = 'alabaster'
+html_theme = 'default'
 html_static_path = ['_static']
 
 # -- Options for HTMLHelp output ------------------------------------------
