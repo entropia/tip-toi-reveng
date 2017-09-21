@@ -6,6 +6,9 @@ Hier kannst du zu konkreten Problemstellungen  nachlesen, wie du sie lösen kann
 Zufallszahlen
 -------------
 
+Ansage von Registerwerten
+-------------------------
+
 Code-Muster in GIMP
 -------------------
 
