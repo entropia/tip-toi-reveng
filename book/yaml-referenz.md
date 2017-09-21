@@ -14,5 +14,5 @@ Yaml-Datei-Felder
 
 (lang, comment, product-id etc.)
 
-Yaml-Skripte: Bedingugen und Befehle
+Yaml-Skripte: Bedingungen und Befehle
 -------------------------------------
