@@ -28,6 +28,16 @@ Die so erhaltenen Werte können unter Umständen bereits als Zufallszahlen einge
 
 Reicht der Timer nicht aus, kann man sich mit Pseudo-Zufallszahlen behelfen:
 
+### Zufälliges Abspielen von Audio-Dateien
+
+Wenn es nur darum geht, zufällig eine von mehreren Audio-Dateien abzuspielen, genügt der `P()`-Befehl mit mehreren Argumenten:
+
+    - P(bing, plopp, peng)
+
+Es ist nicht bekannt, wie der Zufallsgenerator hier funktioniert und wie gleichmäßig die Verteilung ist. Manche Anwender haben beobachtet, dass die erste Datei häufiger abgespielt wird.
+
+(TODO: es wäre interessant zu dokumentieren, in welchen Ravensburger-Produkten das vorkommt und wie es dort angewendet wird.)
+
 ### Algorithmen zur Erzeugung von Pseudo-Zufallszahlen
 
 Als Pseudo-Zufallszahlen bezeichnet man Reihen von Zahlen, welche aus einer deterministischen Berechnung hervorgehen, und daher natürlich nicht wirklich zufällig sind, aber wie zufällig erscheinen. Verwendet man einen Timer als Startwert (_seed_), erhält man eine in der Praxis nicht vorhersagbare Zahlenfolge.
