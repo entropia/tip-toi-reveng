@@ -38,7 +38,7 @@ Ein Register beginnt immer mit einem $ (Dollarzeichen), gefolgt von mindestens e
  
 Ein Register beinhaltet immer eine Ganzzahl, lädt man in das Register eine Fließkommazahl, wird diese zu einer abgerundeten Ganzzahl.
 
-`  - $register:=9 $register/=2 # $register wird zu 4  `
+```yaml  - $register:=9 $register/=2 # $register wird zu 4  ```
 
 Ein Register startet immer mit dem Wert 0, außer Du hast oben in der Yaml-Datei dem Register mit "init:" einen anderen Startwert zugewiesen (siehe [HIER LINK NACH OBEN]) h
 
@@ -49,7 +49,7 @@ Ein Register startet immer mit dem Wert 0, außer Du hast oben in der Yaml-Datei
 
 Der Abschnitt "script:" beinhaltet Unterabschnitte, die jeder für sich einen bestimmten OID-Code repräsentieren. Dort steht, was passieren soll, wenn der tiptoi-Benutzer einen Code antippt. Die Unterabschnitte müssen in deiner Yaml-Datei eingerückt sein.
 
-`
+```yaml
 script: # Hier beginnt der script-Abschnitt 
   
   5000: # Hier beginnt der Abschnitt für den OID-Code 5000
@@ -57,13 +57,13 @@ script: # Hier beginnt der script-Abschnitt
   
   5010: # Hier beginnt der Abschnitt für den OID-Code 5010
   - P(sound2) # Wird der OID-Code mit der Nummer 5010 angetippt, wird die Datei sound2 abgespielt
-  
-`
+```
+
 Siehe auch P().
 
 Alternativ kannst Du statt der Zahlen auch Worte benutzen
 
-`
+```yaml
 script: # Hier beginnt der script-Abschnitt 
   
   SoundAbspielen1: # Die OID für diesen Abschnitt wird vom tttool vergeben
@@ -71,19 +71,21 @@ script: # Hier beginnt der script-Abschnitt
   
   SoundAbspielen2: # Die OID für diesen Abschnitt wird vom tttool vergeben
   - P(sound2) 
-`
+```
 
 Hier werden die OIDs von tttool selber vergeben. Du kannst dir die OIDs mit dem Consolenbefehl 'oid-codes' erzeugen lassen. [Siehe Die ttt-Befehle](tttool-referenz)
 
 Mischen kannst Du diese beiden Varianten allerdings nicht.
 
-`script: 
+```yaml
+script: 
   
   SoundAbspielen1: 
   - P(sound1) 
   
   5010: 
-  - P(sound2) `
+  - P(sound2)
+  ```
 
 Führt zu einem Fehler und es wird keine GME-Datei erzeugt.
 
