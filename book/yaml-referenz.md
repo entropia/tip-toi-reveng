@@ -1,21 +1,51 @@
 # YAML-Referenz
-=============
 
 In diesem Kapitel erfährst du alles über die `.yaml`-Datei, mit der du den
 Tiptoi-Stift programmierst.
 
-YAML-Format: Eine Übersicht
----------------------------
+### YAML-Format: Eine Übersicht
 
 (Generelle Infos zu Yaml.)
 
-Yaml-Datei-Felder
-------------------
+### Yaml-Datei-Felder
 
-(lang, comment, product-id etc.)
+Ein Typischer beginn einer Yaml-Datei für die Tiptoi-Programmierung sieht so aus:
 
-Yaml-Skripte: Register, Bedingungen und Befehle
--------------------------------------
+```yaml
+product-id: 42
+welcome: hallo
+media-path: Audio/
+```
+Wobei nur die Angabe der ***product-id*** eine Pflichtangabe für gültige Yaml-Datei ist.
+
+Es können hier aber noch weitere Angaben gemacht und Felder gesetzt werden:
+
+```yaml
+product-id: 42
+welcome: willkommen
+media-path: Audio/
+language: de
+comment: Ein kurzer Kommentar
+init: $modus:=10
+```
+
+#### product-id
+
+
+#### welcome
+
+#### media-path
+
+#### language
+
+#### comment
+
+#### init
+
+
+
+### Yaml-Skripte: Register, Bedingungen und Befehle
+
 
 ### Register
 
@@ -38,12 +68,13 @@ Ein Register beginnt immer mit einem $ (Dollarzeichen), gefolgt von mindestens e
  
 Ein Register beinhaltet immer eine Ganzzahl, lädt man in das Register eine Fließkommazahl, wird diese zu einer abgerundeten Ganzzahl.
 
-```yaml  - $register:=9 $register/=2 # $register wird zu 4  ```
+```yaml  
+- $register:=9 $register/=2 # $register wird zu 4  
+```
 
 Ein Register startet immer mit dem Wert 0, außer Du hast oben in der Yaml-Datei dem Register mit "init:" einen anderen Startwert zugewiesen (siehe [HIER LINK NACH OBEN]) h
 
 ### "script:", OID-Abschnitt und Befehlszeilen
-
 
 #### Die Abschnitte 
 
@@ -91,13 +122,5 @@ Führt zu einem Fehler und es wird keine GME-Datei erzeugt.
 
 #### Die Befehlszeilen
 
-
-
-
-
-
-
-
-https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#headers
 
 
