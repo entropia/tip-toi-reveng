@@ -10,3 +10,8 @@ Code-Muster in GIMP
 -------------------
 
 Code-Muster in Adobe Photoshop
+------------------------------
+
+Druckereinstellungen
+--------------------
+(Einstellungen für Drucker, Liste kompatibler Drucker, Lösungen für typische Probleme (FAQ?))
