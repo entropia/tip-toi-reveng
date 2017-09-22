@@ -242,12 +242,14 @@ Der Befehl „/=“ teilt den Wert vom Register $r durch die Zahl hinter dem Gle
 Der Befehl „%=“ liefert das modulo des Registers mit der Zahl hinter dem Gleichheitszeichen
 
 ```yaml
-- $r%=5 # Hier wird das Modulo (Restteiler) von $r modulo 5 geliefert 
+- $r%=5 # Hier wird das Modulo (teiler Rest) von $r modulo 5 geliefert 
 ```
+
+Angenommen $r hat einen Wert von 23 und man Teil das durch 5, dann Wäre das Ergebnis 4 Rest 3. In dem Beispielen oben hätte $r nach dem Registerbefehl 3.
 
 #### Neg() (Register Negieren)
 
-Der Befehl „Neg()“ negiert den Wert eines Registers. Hat das Register zum Beispiel den Wert 5, wird nach dem Befehl der Wert -5. Aus -5 würde 5 werden.
+Der Befehl „Neg()“ negiert den Wert eines Registers. Hat das Register zum Beispiel den Wert 5, wird nach dem Befehl der Wert -5. Aus -5 würde 5 werden. Dieser Registerbefehl wird anders als die Anderen mit klammern geschrieben.
 
 ```yaml
 - Neg($r) # Hier wird der Wert des Registers $r negiert.
@@ -255,9 +257,9 @@ Der Befehl „Neg()“ negiert den Wert eines Registers. Hat das Register zum Be
 
 #### Bitweise Operatoren
 
-Um Bitweise Operatoren zu verstehen muss man verstehen wie eine Dezimalzahl in Binärschreibweise Dargestellt wird. XXXXX TEXT FOLGT XXXXX
+Um Bitweise Operatoren zu verstehen muss man verstehen wie eine Dezimalzahl in Binärschreibweise Dargestellt wird. ([siehe Wikipedia](https://de.wikipedia.org/wiki/Dualsystem))
 
-#### &= (Bitweise AND)
+#### &= (Bitweise UND)
 
 Der Befehl „&=“ wendet den Wert hinter dem Gleichheitszeichen auf das Register an. Ein bitweises UND wird auf zwei Bitfolgen gleicher Länge angewendet und führt die logische UND-Verknüpfung auf jedem Paar korrespondierender Bits durch. Das Ergebnisbit ist 1, falls beide Bits 1 sind, ansonsten 0.
 
