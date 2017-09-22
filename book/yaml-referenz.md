@@ -142,4 +142,100 @@ Führt zu einem Fehler und es wird keine GME-Datei erzeugt.
 #### Die Befehlszeilen
 
 
+### Befehle
+
+### XXXX Befehle (XXXX ... P J usw.)
+
+(EINLEITENDER TEXT)
+
+#### Registerbefehle
+
+(EINLEITENDER TEXT)
+
+#### := (Register setzen)
+
+Der Befehl „:=“ setzt das Register auf den Wert hinter dem Gleichheitszeichen
+
+```yaml
+ - $r:=5 # Hier wird das Register $r auf den Wert 5 gesetzt
+```
+
+#### += (Register erhöhen)
+
+Der Befehl „+=“ erhöht das Register um den Wert hinter dem Gleichheitszeichen
+
+```yaml
+- $r+=5 # Hier wird der Wert vom Register $r um 5 Eröht
+```
+
+#### -= (Register vermindern)
+
+Der Befehl „-=“ verkleinert den Wert des Registers um die Zahl hinter dem Gleichheitszeichen
+
+```yaml
+- $r-=5 # Hier wird der Wert vom Register $r um 5 verkleinert
+```
+
+#### *= (Register mutiplizieren)
+
+Der Befehl „*=“ multipliziert den Wert des Registers mit der Zahl hinter dem Gleichheitszeichen
+
+```yaml
+- $r*=5 # Hier wird der Wert vom Register $r mit 5 multipliziert
+```
+
+#### /= (Register teilen)
+
+Der Befehl „/=“ teilt den Wert vom Register $r durch die Zahl hinter dem Gleichheitszeichen. Dabei ist zu beachten, dass immer ein Integer (Ganzzahl) geliefert wird, wobei das Rechenergebnis abgerundet wird. Die Rechnung von 5 durch 2 ergibt also 2.
+
+```yaml
+ - $r%=5 # Hier wird der Wert vom Register $r durch 5 geteilt und abgerundet
+```
+
+#### %= (Register modulo)
+
+Der Befehl „%=“ liefert das modulo des Registers mit der Zahl hinter dem Gleichheitszeichen
+
+```yaml
+- $r%=5 # Hier wird das Modulo (Restteiler) von $r modulo 5 geliefert 
+```
+
+#### Neg() (Register Negieren)
+
+Der Befehl „Neg()“ negiert den Wert eines Registers. Hat das Register zum Beispiel den Wert 5, wird nach dem Befehl der Wert -5. Aus -5 würde 5 werden.
+
+```yaml
+- Neg($r) # Hier wird der Wert des Registers $r negiert.
+```
+
+#### Bitweise Operatoren
+
+Um Bitweise Operatoren zu verstehen muss man verstehen wie eine Dezimalzahl in Binärschreibweise Dargestellt wird. XXXXX TEXT FOLGT XXXXX
+
+#### &= (Bitweise AND)
+
+Der Befehl „&=“ wendet den Wert hinter dem Gleichheitszeichen auf das Register an. Ein bitweises UND wird auf zwei Bitfolgen gleicher Länge angewendet und führt die logische UND-Verknüpfung auf jedem Paar korrespondierender Bits durch. Das Ergebnisbit ist 1, falls beide Bits 1 sind, ansonsten 0.
+
+```yaml
+- $r&=5 # Hier wird 5 Bitweise AND auf das Register $r angewendet
+```
+
+#### Bitweise OR
+
+XXX FOLGT XXX
+
+FFF6 (written $r|=m): bitwise or to register $r the value of m
+
+#### Bitweise XOR
+
+XXX FOLGT XXX
+
+FFF7 (written $r^=m): bitwise xor to register $r the value of m
+
+
+
+
+
+
+
 
