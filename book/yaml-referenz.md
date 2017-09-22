@@ -141,18 +141,18 @@ Führt zu einem Fehler und es wird keine GME-Datei erzeugt.
 
 ### Die Befehlszeilen
 
-- innerhalb  einer Zeile, was wird ausgeführt
-- eine Zeile, Mehrzeilen, was wird ausgeführt
+- trennung der anweisungen
 - anzahl befehle/zeile
-- siehe Play
-- siehe jump
-- siehe $modus
-- siehe schleifen
+
 
 ### Bedingte Anweisung
 
 - mehrere innerhalb einer Zeile, was wird ausgeführt
 - einer pro Zeile, Mehrzeilen, was wird ausgeführt
+- siehe Play
+- siehe jump
+- siehe $modus
+- siehe schleifen
 
 ### Befehle
 
