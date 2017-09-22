@@ -205,47 +205,37 @@ Führt zu einem Fehler und es wird keine GME-Datei erzeugt.
 
 ### Registerbefehle
 
-(EINLEITENDER TEXT)
+Mit Registerbefehlen lassen sich Werte in einem Register setzen oder ändern. Registerbefehle sind in der Regel so Aufgebaut: (Register)(Anweisung)(Wert). Also zum Beispiel:
+
+```yaml
+  - $modus+=5 
+```
+In diesem Beispiel wird der Registerbefehl Addition verwendet. Das bedeutet, dass zu dem augenblicklichen Wert von $modus, 5 addiert wird.   
 
 #### := (Register setzen)
 
-Der Befehl „:=“ setzt das Register auf den Wert hinter dem Gleichheitszeichen
+Der Befehl ```:=``` setzt das Register auf den Wert hinter dem Gleichheitszeichen
 
 ```yaml
  - $r:=5 # Hier wird das Register $r auf den Wert 5 gesetzt
 ```
 
-#### += (Register erhöhen)
-
-Der Befehl „+=“ erhöht das Register um den Wert hinter dem Gleichheitszeichen
+#### += -= *= /= (Grundrechenarten)
 
 ```yaml
-- $r+=5 # Hier wird der Wert vom Register $r um 5 Eröht
+- $r+=5 # Hier wird zum Registerwert $r 5 addiert
 ```
-
-#### -= (Register vermindern)
-
-Der Befehl „-=“ verkleinert den Wert des Registers um die Zahl hinter dem Gleichheitszeichen
-
 ```yaml
-- $r-=5 # Hier wird der Wert vom Register $r um 5 verkleinert
+- $r-=5 # Hier wird vom Registerwert $r 5 subtrahiert
 ```
-
-#### *= (Register mutiplizieren)
-
-Der Befehl „*=“ multipliziert den Wert des Registers mit der Zahl hinter dem Gleichheitszeichen
-
 ```yaml
 - $r*=5 # Hier wird der Wert vom Register $r mit 5 multipliziert
 ```
-
-#### /= (Register teilen)
-
-Der Befehl „/=“ teilt den Wert vom Register $r durch die Zahl hinter dem Gleichheitszeichen. Dabei ist zu beachten, dass immer ein Integer (Ganzzahl) geliefert wird, wobei das Rechenergebnis abgerundet wird. Die Rechnung von 5 durch 2 ergibt also 2.
-
 ```yaml
  - $r%=5 # Hier wird der Wert vom Register $r durch 5 geteilt und abgerundet
 ```
+
+Der Befehl „/=“ teilt den Wert vom Register $r durch die Zahl hinter dem Gleichheitszeichen. Dabei ist zu beachten, dass immer ein Integer (Ganzzahl) geliefert und  das Ergebnis abgerundet wird. Die Rechnung von 9 durch 2 ergibt also 4.
 
 #### %= (Register modulo)
 
