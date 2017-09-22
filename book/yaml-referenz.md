@@ -9,16 +9,24 @@ Tiptoi-Stift programmierst.
 
 ### Yaml-Datei-Felder
 
-Ein Typischer beginn einer Yaml-Datei für die Tiptoi-Programmierung sieht so aus:
+In der Eingabedatei legt man zuerst ein paar allgemeine Einstellungen fest. Die einzig zwingend notwendige ist die ```product-id```. Hier wird der Code des Einschaltknopfes festgelegt, den jedes Tiptoi-Produkt hat. Hier sollte man eine Nummer nehmen, die keinem offiziellen Produkt entspricht. Erlaubt sind alle Zahlen von 1 bis 999.
+
+Wenn man eine bestehende GME-Datei als Ausgangspunkt genommen hat, sollte man sicherstellen, diese nicht auch noch auf dem Speicher des Stifts liegen zu haben. Ansonsten hat man zwei Dateien für das gleiche Produkt (die gleiche ```product-id```, s.o.) vorliegen. Welche der Stift dann nimmt, ist dann Glückssache… Man kann auch bei der nicht zu verwendenden Datei die Dateiendung ```.gme``` auf irgendetwas anderes ändern, z.B. ```.gmex```.
+
+Eine typischer Yaml-Datei für die Tiptoi-Programmierung sieht so aus:
 
 ```yaml
 product-id: 42
 welcome: hallo
-media-path: Audio/
+scripts:
+  8066:
+  - P(erstes_feld)
+  8067:
+  - P(zweites_feld)
 ```
-Wobei nur die Angabe der ***product-id*** eine Pflichtangabe für gültige Yaml-Datei ist.
+Wobei nur die Angabe der ```product-id``` eine Pflichtangabe für gültige Yaml-Datei ist. Die eigentliche Logik, also die Programmierung, landet dann in dem Abschnitt ```scripts```. Hier gibt man - mit Einrückung - die Codes des Tiptoi-Produktes an und zu jedem Code, mit Spiegelstrichen aufgelistet, die auszuführenden Skripte. 
 
-Es können hier aber noch weitere Angaben gemacht und Felder gesetzt werden:
+Es können hier im Kopf aber noch weitere Angaben gemacht und Felder gesetzt werden:
 
 ```yaml
 product-id: 42
@@ -27,20 +35,31 @@ media-path: Audio/
 language: de
 comment: Ein kurzer Kommentar
 init: $modus:=10
+scripts:
+(...)
 ```
 
 #### product-id
 
+Die Produkt-ID ist immer eine Ganzzahl, die auf dem Stift einmalig sein sollte. Gerade wenn Du deine GME-Datei anderen gibst, sollte man darauf achten, keine der von Ravensburger vergebenen IDs zu benutzen (siehe ANHANG ?)
 
 #### welcome
 
+Damit man mitbekommt, dass der Stift das eigene Produkt auch erkannt hat, kann man im Feld welcome einen oder - durch Kommas getrennt - mehrere Dateinamen von Audio-Dateien angeben. Diese Dateien sollten im gleichen Verzeichnis wie die YAML-Datei liegen, und im OGG- oder MP3-Format sein. In der YAML-Datei lässt man die Dateiendung allerdings weg.
+
+
+
 #### media-path
+
+
 
 #### language
 
 #### comment
 
 #### init
+
+#### scripts
 
 
 
@@ -66,7 +85,7 @@ Ein Register beginnt immer mit einem $ (Dollarzeichen), gefolgt von mindestens e
 
 (VERWENDUNG VON $1 usw. FOLGT)
  
-Ein Register beinhaltet immer eine Ganzzahl, lädt man in das Register eine Fließkommazahl, wird diese zu einer abgerundeten Ganzzahl.
+Der Wert in einem Register ist immer eine Ganzzahl, lädt man in das Register eine Fließkommazahl, wird diese zu einer abgerundeten Ganzzahl.
 
 ```yaml  
 - $register:=9 $register/=2 # $register wird zu 4  
