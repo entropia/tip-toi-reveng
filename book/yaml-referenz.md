@@ -24,7 +24,7 @@ scripts:
   8067:
   - P(zweites_feld)
 ```
-Wobei nur die Angabe der ```product-id``` eine Pflichtangabe für gültige Yaml-Datei ist. Die eigentliche Logik, also die Programmierung, landet dann in dem Abschnitt ```scripts```. Hier gibt man - mit Einrückung - die Codes des Tiptoi-Produktes an und zu jedem Code, mit Spiegelstrichen aufgelistet, die auszuführenden Skripte [Siehe Yaml-Skripte: Register, Bedingungen und Befehle](yaml-referenz.md#yaml-skripte-register-bedingungen-und-befehle)
+Wobei nur die Angabe der ```product-id``` eine Pflichtangabe für gültige Yaml-Datei ist. Die eigentliche Logik, also die Programmierung, landet dann in dem Abschnitt ```scripts```. Hier gibt man - mit Einrückung - die Codes des Tiptoi-Produktes an und zu jedem Code, mit Spiegelstrichen aufgelistet, die auszuführenden Skripte ([Siehe Yaml-Skripte: Register, Bedingungen und Befehle](yaml-referenz.md#yaml-skripte-register-bedingungen-und-befehle))
 
 Es können hier im Kopf aber noch weitere Angaben gemacht und Felder gesetzt werden:
 
