@@ -139,8 +139,20 @@ script:
 
 Führt zu einem Fehler und es wird keine GME-Datei erzeugt.
 
-#### Die Befehlszeilen
+### Die Befehlszeilen
 
+- innerhalb  einer Zeile, was wird ausgeführt
+- eine Zeile, Mehrzeilen, was wird ausgeführt
+- anzahl befehle/zeile
+- siehe Play
+- siehe jump
+- siehe $modus
+- siehe schleifen
+
+### Bedingte Anweisung
+
+- mehrere innerhalb einer Zeile, was wird ausgeführt
+- einer pro Zeile, Mehrzeilen, was wird ausgeführt
 
 ### Befehle
 
@@ -150,7 +162,9 @@ Führt zu einem Fehler und es wird keine GME-Datei erzeugt.
 
 #### P()
 
-(TEXT FEHLT NOCH)
+- einzel play
+- random play
+- besonderheit play und jump
 
 #### P*()
 
