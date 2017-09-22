@@ -148,7 +148,48 @@ Führt zu einem Fehler und es wird keine GME-Datei erzeugt.
 
 (EINLEITENDER TEXT)
 
-#### Registerbefehle
+#### P()
+
+(TEXT FEHLT NOCH)
+
+#### P*()
+
+(TEXT FEHLT NOCH)
+
+#### PA*()
+
+(TEXT FEHLT NOCH)
+
+#### PA*()
+
+(TEXT FEHLT NOCH)
+
+#### PA()
+
+(TEXT FEHLT NOCH)
+
+#### J()
+
+(TEXT FEHLT NOCH)
+
+#### G()
+
+(TEXT FEHLT NOCH)
+
+#### C
+
+(TEXT FEHLT NOCH)
+
+#### T()
+
+(TEXT FEHLT NOCH)
+
+#### ?() ()
+
+(TEXT FEHLT NOCH)
+
+
+### Registerbefehle
 
 (EINLEITENDER TEXT)
 
