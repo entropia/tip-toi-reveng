@@ -1,3 +1,5 @@
+.. _installation:
+
 Installation
 ============
 
@@ -9,5 +11,3 @@ Linux
 
 MacOS
 -----
-
-
