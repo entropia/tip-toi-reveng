@@ -1,15 +1,15 @@
 Erste Schritte
 ==============
 
-Dieses Kapiel erklärt dir Schritt für Schritt und an einfachen Beispielen, was du mit dem `tttool` anstellen kannst. Die Details werden dann vollständig in den nächsten Kapitel erklärt.
+Dieses Kapiel erklärt dir Schritt für Schritt und an einfachen Beispielen, was du mit dem `tttool` anstellen kannst. Die Details werden dann vollständig in den nächsten Kapiteln erklärt.
 
 Vorbereitung
 ------------
 
-Diese Übersicht geht davon aus, dass du Windows verwendest. Wenn du Linux oder einen Mac benutzt, les dir den Abschnitt :ref:`installation` durch.
+Diese Übersicht geht davon aus, dass du Windows verwendest. Wenn du Linux oder einen Mac benutzt, lies dir den Abschnitt :ref:`installation` durch.
 
 Auf der
-`Release-Seite <https://github.com/entropia/tip-toi-reveng/releases>`_ findest du eine Zip-Datei, die du herunterlädst und entpackst. Du findest darin die Datei ``tttool.exe``, die man direkt ausführen kann. Es ist keine weitere installation nötig.
+`Release-Seite <https://github.com/entropia/tip-toi-reveng/releases>`_ findest du eine Zip-Datei, die du herunterlädst und entpackst. Du findest darin die Datei ``tttool.exe``, die man direkt ausführen kann. Es ist keine weitere Installation nötig.
 
 Allerdings ist zu beachten, dass es sich dabei um ein
 Kommandozeilenprogramm handelt. Doppelt klicken bringt also nichts,
@@ -53,7 +53,7 @@ Nun solltest du in dem Verzeichnis die Datei ``Mein_Bauernhof.gme`` finden. Kopi
 
 Das wars schon! Wenn du nun den Stift einschaltest, den Bauernhof aktivierst und auf den Kuhstall tippst, solltest du deine eigene Stimme hören.
 
-.. note:: Da wir das Dateiformat nicht vollständig verstanden haben, kann es sein, das manche Elemente -- insbesondere Spiele -- nun nicht mehr funkionieren.
+.. note:: Da wir das Dateiformat nicht vollständig verstanden haben, kann es sein, dass manche Elemente -- insbesondere Spiele -- nun nicht mehr funkionieren.
 
 Tiptoi-Bücher komplett neu vertonen
 ------------------------------------

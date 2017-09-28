@@ -4,7 +4,7 @@ Vorwort
 Seit den frühen 2010er Jahren erfreut der Tiptoi-Stift aus dem Hause
 Ravensburger Kinder in Deutschland und in aller Welt. Mit ihm entlockt
 das Kind den schön gestalteten Tiptoi-Büchern und -Spielen allerlei
-Töne, Geäusche, Musik und Geschichten. Offensichtlich steckt in dem
+Töne, Geräusche, Musik und Geschichten. Offensichtlich steckt in dem
 Stift ein kleiner Computer, auf dem kleine Programme ablaufen. Da stellt
 sich dir sicherlich die Frage: Kannst du mit dem Stift noch mehr machen,
 als nur auf die original Ravensburger-Produkte zu reagieren?
@@ -22,7 +22,7 @@ der feinen Punktmuster, die auf die Produkte gedruckt sind -- bildete
 sich eine kleine Gemeinschaft von Tiptoi-Bastlern, die allerlei kleine
 und große eigene Tiptoi-Bücher und -Spiele entwickelt haben. Technisch
 dreht sich dabei alles um das ``tttool``, ein Kommandozeilenprogramm mit
-dem man die Tiptoi-Dateien und -Codes erzeugen lassen.
+dem man die Tiptoi-Dateien und -Codes erzeugt.
 
 Dieses Buch ist sozusagen das Handbuch zum ``tttool``, aber noch mehr:
 Es erklärt dir allgemeines zur Funktionsweise des Stiftes und wie du
@@ -54,8 +54,8 @@ Grafische Tools
 ---------------
 
 Das ``ttool`` ist ein Kommandozeilentool. Wer sich davon nicht
-abschrecken lässt kann tolle Sachen damit machen. Wer es einfacher haben
-will sollte sich folgende Projekte anschauen, die allesamt auf
+abschrecken lässt, kann tolle Sachen damit machen. Wer es einfacher haben
+will, sollte sich folgende Projekte anschauen, die allesamt auf
 ``tttool`` aufbauen:
 
 -  Andreas Grimme hat mit
@@ -66,7 +66,7 @@ will sollte sich folgende Projekte anschauen, die allesamt auf
    `ttmp32gme <https://github.com/thawn/ttmp32gme>`__ eine grafische
    Anwendung (Windows, OS X und Linux) erstellt, die ebenfalls
    Audio-Dateien auf den Stift lädt, und sehr schöne Übersichten zum
-   antippen druckt.
+   Antippen druckt.
 
 Weiterführende Informationen
 ----------------------------
