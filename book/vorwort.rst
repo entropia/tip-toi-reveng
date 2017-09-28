@@ -4,7 +4,7 @@ Vorwort
 Seit den frühen 2010er Jahren erfreut der Tiptoi-Stift aus dem Hause
 Ravensburger Kinder in Deutschland und in aller Welt. Mit ihm entlockt
 das Kind den schön gestalteten Tiptoi-Büchern und -Spielen allerlei
-Töne, Geäusche, Musik und Geschichten. Offensichtlich steckt in dem
+Töne, Geräusche, Musik und Geschichten. Offensichtlich steckt in dem
 Stift ein kleiner Computer, auf dem kleine Programme ablaufen. Da stellt
 sich dir sicherlich die Frage: Kannst du mit dem Stift noch mehr machen,
 als nur auf die original Ravensburger-Produkte zu reagieren?
@@ -22,7 +22,7 @@ der feinen Punktmuster, die auf die Produkte gedruckt sind -- bildete
 sich eine kleine Gemeinschaft von Tiptoi-Bastlern, die allerlei kleine
 und große eigene Tiptoi-Bücher und -Spiele entwickelt haben. Technisch
 dreht sich dabei alles um das ``tttool``, ein Kommandozeilenprogramm mit
-dem man die Tiptoi-Dateien und -Codes erzeugen lassen.
+dem man die Tiptoi-Dateien und -Codes erzeugt.
 
 Dieses Buch ist sozusagen das Handbuch zum ``tttool``, aber noch mehr:
 Es erklärt dir allgemeines zur Funktionsweise des Stiftes und wie du
@@ -54,8 +54,8 @@ Grafische Tools
 ---------------
 
 Das ``ttool`` ist ein Kommandozeilentool. Wer sich davon nicht
-abschrecken lässt kann tolle Sachen damit machen. Wer es einfacher haben
-will sollte sich folgende Projekte anschauen, die allesamt auf
+abschrecken lässt, kann tolle Sachen damit machen. Wer es einfacher haben
+will, sollte sich folgende Projekte anschauen, die allesamt auf
 ``tttool`` aufbauen:
 
 -  Andreas Grimme hat mit
@@ -66,19 +66,19 @@ will sollte sich folgende Projekte anschauen, die allesamt auf
    `ttmp32gme <https://github.com/thawn/ttmp32gme>`__ eine grafische
    Anwendung (Windows, OS X und Linux) erstellt, die ebenfalls
    Audio-Dateien auf den Stift lädt, und sehr schöne Übersichten zum
-   antippen druckt.
+   Antippen druckt.
 
 Weiterführende Informationen
 ----------------------------
 
-Das Ziel dieses Buches ist, die alles nötige über die Bastelei mit dem Tiptoi-Stift zu erklären. Doch dieses Ziel wird vermutlich nie erreicht... solltest du also mehr Informationen brauchen, findest du sie hier:
+Das Ziel dieses Buches ist, dir alles nötige über die Bastelei mit dem Tiptoi-Stift zu erklären. Doch dieses Ziel wird vermutlich nie erreicht ... solltest du also mehr Informationen brauchen, findest du sie hier:
 
-* Du solltest unbedingt die `tiptoi-Mailingliste <https://lists.nomeata.de/mailman/listinfo/tiptoi>`_ abonnieren. Hier tauschen sich alle Tiptoi-Bastler aus, und irgendwir kann dir sicher weiterhelfen. Auch freuen wir uns sehr zu erfahren, was du so mit dem ``tttool`` auf die Beine gestellt hast.
+* Du solltest unbedingt die `tiptoi-Mailingliste <https://lists.nomeata.de/mailman/listinfo/tiptoi>`_ abonnieren. Hier tauschen sich alle Tiptoi-Bastler aus, und irgendwer kann dir sicher weiterhelfen. Auch freuen wir uns sehr zu erfahren, was du so mit dem ``tttool`` auf die Beine gestellt hast.
 
 * Fehler im tttool oder Verbesserungsvorschläge, sowohl zum ``tttool`` als auch zu diesem Buch, darfst du gerne über den `Github-Bugtracker <https://github.com/entropia/tip-toi-reveng/issues>` melden.
 
 
-* Wenn du dich für technischen Detail interessierest, die das ``tttool`` eigentlich vor dir versteckt, so solltest du ins `Wiki der Github-Seite <https://github.com/entropia/tip-toi-reveng/wiki>`_ schauen.
+* Wenn du dich für technische Details interessierest, die das ``tttool`` eigentlich vor dir versteckt, so solltest du ins `Wiki der Github-Seite <https://github.com/entropia/tip-toi-reveng/wiki>`_ schauen.
 
 
 
