@@ -71,14 +71,14 @@ will sollte sich folgende Projekte anschauen, die allesamt auf
 Weiterführende Informationen
 ----------------------------
 
-Das Ziel dieses Buches ist, die alles nötige über die Bastelei mit dem Tiptoi-Stift zu erklären. Doch dieses Ziel wird vermutlich nie erreicht... solltest du also mehr Informationen brauchen, findest du sie hier:
+Das Ziel dieses Buches ist, dir alles nötige über die Bastelei mit dem Tiptoi-Stift zu erklären. Doch dieses Ziel wird vermutlich nie erreicht... solltest du also mehr Informationen brauchen, findest du sie hier:
 
-* Du solltest unbedingt die `tiptoi-Mailingliste <https://lists.nomeata.de/mailman/listinfo/tiptoi>`_ abonnieren. Hier tauschen sich alle Tiptoi-Bastler aus, und irgendwir kann dir sicher weiterhelfen. Auch freuen wir uns sehr zu erfahren, was du so mit dem ``tttool`` auf die Beine gestellt hast.
+* Du solltest unbedingt die `tiptoi-Mailingliste <https://lists.nomeata.de/mailman/listinfo/tiptoi>`_ abonnieren. Hier tauschen sich alle Tiptoi-Bastler aus, und irgendwer kann dir sicher weiterhelfen. Auch freuen wir uns sehr zu erfahren, was du so mit dem ``tttool`` auf die Beine gestellt hast.
 
 * Fehler im tttool oder Verbesserungsvorschläge, sowohl zum ``tttool`` als auch zu diesem Buch, darfst du gerne über den `Github-Bugtracker <https://github.com/entropia/tip-toi-reveng/issues>` melden.
 
 
-* Wenn du dich für technischen Detail interessierest, die das ``tttool`` eigentlich vor dir versteckt, so solltest du ins `Wiki der Github-Seite <https://github.com/entropia/tip-toi-reveng/wiki>`_ schauen.
+* Wenn du dich für technische Details interessierest, die das ``tttool`` eigentlich vor dir versteckt, so solltest du ins `Wiki der Github-Seite <https://github.com/entropia/tip-toi-reveng/wiki>`_ schauen.
 
 
 
