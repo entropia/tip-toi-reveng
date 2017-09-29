@@ -1,15 +1,14 @@
 # YAML-Referenz
 
-In diesem Kapitel erfährst du alles über die `.yaml`-Datei, mit der du den
-Tiptoi-Stift programmierst.
+In diesem Kapitel erfährst du alles, oder zumindest vieles über die `.yaml`-Datei, mit der du den Tiptoi-Stift programmierst. 
 
 ### YAML-Format: Eine Übersicht
 
-(Generelle Infos zu Yaml.)
+(HIER Generelle Infos zu Yaml.)
 
 ### Yaml-Datei-Felder
 
-In der Eingabedatei legt man zuerst ein paar allgemeine Einstellungen fest. Die einzig zwingend notwendige ist die ```product-id```. Hier wird der Code des Einschaltknopfes festgelegt, den jedes Tiptoi-Produkt hat. Hier sollte man eine Nummer nehmen, die keinem offiziellen Produkt entspricht. Erlaubt sind alle Zahlen von 1 bis 999.
+In der Eingabedatei legt man zuerst ein paar allgemeine Einstellungen fest. Die einzig zwingend notwendige ist die ```product-id```. Hier wird der Code des Einschaltknopfes festgelegt, den jedes Tiptoi-Produkt hat. Erlaubt sind alle Zahlen von 1 bis 999. Hier sollte man eine Nummer nehmen, die keinem offiziellen Produkt entspricht. Nach dem Einschalten des Stifts werden die ```product-ids``` aller GME-Datein auf dem Stift eingelesen und es kann dabei zu konflikten kommen.
 
 Wenn man eine bestehende GME-Datei als Ausgangspunkt genommen hat, sollte man sicherstellen, diese nicht auch noch auf dem Speicher des Stifts liegen zu haben. Ansonsten hat man zwei Dateien für das gleiche Produkt (die gleiche ```product-id```, s.o.) vorliegen. Welche der Stift dann nimmt, ist dann Glückssache… Man kann auch bei der nicht zu verwendenden Datei die Dateiendung ```.gme``` auf irgendetwas anderes ändern, z.B. ```.gmex```.
 
@@ -51,8 +50,6 @@ Damit man mitbekommt, dass der Stift das eigene Produkt auch erkannt hat, kann m
 
 #### media-path
 
-
-
 #### language
 
 #### comment
@@ -61,10 +58,11 @@ Damit man mitbekommt, dass der Stift das eigene Produkt auch erkannt hat, kann m
 
 #### scripts
 
-
+#### speak
 
 ### Yaml-Skripte: Register, Bedingungen und Befehle
 
+(allgemeiner text)
 
 ### Register
 
@@ -257,14 +255,14 @@ Der Befehl „Neg()“ negiert den Wert eines Registers. Hat das Register zum Be
 
 #### Bitweise Operatoren
 
-Um Bitweise Operatoren zu verstehen muss man verstehen wie eine Dezimalzahl in Binärschreibweise Dargestellt wird. ([siehe Wikipedia](https://de.wikipedia.org/wiki/Dualsystem))
+Wenn Du nicht weißt was Bitweise UND, OR und XOR ist, dann wirst Du diese Befehle wahrscheinlich nicht brauchen. Um Bitweise Operatoren zu verstehen muss man wissen wie eine Dezimalzahl in Binärschreibweise Dargestellt wird. ([siehe Wikipedia](https://de.wikipedia.org/wiki/Dualsystem))
 
 #### &= (Bitweise UND)
 
-Der Befehl „&=“ wendet den Wert hinter dem Gleichheitszeichen auf das Register an. Ein bitweises UND wird auf zwei Bitfolgen gleicher Länge angewendet und führt die logische UND-Verknüpfung auf jedem Paar korrespondierender Bits durch. Das Ergebnisbit ist 1, falls beide Bits 1 sind, ansonsten 0.
+Der Befehl „&=“ wendet den Wert hinter dem Gleichheitszeichen auf das Register an. Ein bitweises UND wird auf zwei Bitfolgen gleicher Länge angewendet und führt die logische UND-Verknüpfung auf jedem Paar korrespondierender Bits durch. Das Ergebnisbit ist 1, falls beide Bits 1 sind, ansonsten ist es 0.
 
 ```yaml
-- $r&=5 # Hier wird 5 Bitweise AND auf das Register $r angewendet
+- $r&=5 # Hier wird 5 Bitweise UND auf das Register $r angewendet
 ```
 
 #### Bitweise OR
