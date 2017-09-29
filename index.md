@@ -101,6 +101,11 @@ gallery:
   link: http://tiptoi.as-webstyling.de/
   img: /img/pias-buch.jpg
 
+- title: Bachelorarbeit
+  subtitle: von Tabea Bratzke
+  link: https://github.com/MachEsEinfach/tiptoi_Abschlussarbeit
+  img: /img/bratzke.jpg
+
 ---
 
 Diese Seite enthält Information zum `tttool`, einem Werkzeug zum
