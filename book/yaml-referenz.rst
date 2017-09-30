@@ -4,8 +4,8 @@ YAML-Referenz
 In diesem Kapitel erfährst du alle Details zur YAML-Datei, mit der du den Stift
 programmierst.
 
-YAML-Format: Eine Übersicht
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Das YAML-Format
+~~~~~~~~~~~~~~~
 
 Das YAML-Format im allgemeinen wurde nicht für dieses Projekt erfunden, sondern ist allgemein gebräuchlich um strukturierte Daten in einer menschenlesbaren Textdatei abzulegen. Eine knappe Übersicht findest du auf der `Wikipedia-Seite zu YAML <https://de.wikipedia.org/wiki/YAML>`_.
 Beachte dass in YAML Einrückungen, also Leerzeichen am Anfang der Zeile, relevant sind und die Struktur der Datei beschreiben sind!
@@ -150,9 +150,25 @@ i mit 0 gestartet.
 ``scripts``
 ^^^^^^^^^^^
 
-Dies ist der eigentliche Hauptarbeitsbereich für unsere Projekte. In
-diesem Feld werden unsere Programmierungen geschrieben.
+Format:
+  Eine Zuordnung von OID-Codes (oder Code-Namen) zu einer Liste von Skriptzeilen.
 
+Beispiel:
+  .. code:: yaml
+
+    scripts:
+      8067:
+       - P(hi)
+      haus:
+       - $mode==3? P(welcome)
+       - P(goodbye)
+
+Zweck:
+  Enthält die Logik dieses Tiptoi-Produktes, und gibt für ein OID-Code an, was der Stift machen soll, wenn du diesen Code antippst.
+
+  Statt einem konkreten OID-Code kann auch ein Code-Name angegeben werden, siehe Abschnitt „:ref:`code-namen`“.
+
+  Die Skripte werden in Detail im Abschnitt „:ref:`yaml-skripte`“ erklärt.
 
 ``language``
 ^^^^^^^^^^^^
@@ -171,23 +187,75 @@ Zweck:
 ``speak``
 ^^^^^^^^
 
-Das tttool verfügt über ein integriertes Text-2-Speech tool, welches es
-erlaubt Texte in Form von Audiofiles zu integrieren. Dies dient uns
-Beispielsweise während der Entwicklung dazu Texte nicht immer aufnehmen
-und einspeichern zu müssen. Beispiel: hallo\_welt: "Hallo Welt! Ich
-hoffe dir geht es gut." Im Beispiel wird nun automatisiert ein Audiofile
-erstellt, welches mit "P(hallo\_welt)" abgespielt werden kann.
+Format:
+  Eine Zuordnung von Dateinamen zu Text
+
+Beispiel:
+  .. code:: yaml
+
+    speak:
+       hello: "Hello, friend!"
+       goodbye: "Goodbye"
+       warning: "Watch out."
+
+Zweck:
+  Gibt an, welche Audiodateien das ``tttool`` per Text-to-Speech generieren
+  soll, sofern es die entsprechenden Audiodateien nicht findet. Dabei wird die
+  in ``language`` angegebene Sprache verwendet.
+
+
+Das tttool verfügt über ein integriertes Text-to-Speech tool, welches dir
+erlaubt Texte automatisch vorgelesen einzubauen. So kannst du deine Tiptoi-Entwicklung testen, bevor du alles nötige aufgenommen hast.
+
+Solltest du Text-to-Speech in verschiedenen Sprachen benötigen, kannst du mehrere Abschnitte mit eigener Sprache angeben:
+
+  .. code:: yaml
+
+    speak:
+    - language: en
+       hello: "Hello, friend!"
+       goodbye: "Goodbye"
+    - language: de
+       warning: "Achtung!"
+
+
+.. _code-namen:
 
 ``scriptcodes``
 ^^^^^^^^^^^^^^^
 
-YAML-Skripte: Register, Bedingungen und Befehle
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Format:
+  Eine Zuordnung von Codenamen zu OID-Code
+
+Beispiel:
+  .. code:: yaml
+
+    scriptcodes:
+       haus: 4718
+       tuer: 4716
+       warning: 4717
+
+Zweck:
+  Erlaubt dir, im Abschnitt ``scripts`` und in ``J``-Befehlen mit sprechenden Namen
+  statt OID-Codes zu arbeiten. Bei der Erstellung der GME-Datei wird in dieser
+  Zuordnung nachgeschlagen, welcher OID-Code verwendet werden soll.
+
+Du kannst sprechende Namen auch ohne ``scriptcodes`` verwenden, in diesem Fall
+wählt das ``tttool`` die Codes selbst. Damit stets die gleichen Codes verwendet
+werden, speichert es die Auswahl in einer Datei mit Endung ``.codes.yaml``, die
+nur den ``scriptcodes``-Eintrag enthält. Es steht dir frei, diese Zuordnung in
+die eigentliche YAML-Datei zu übernehmen.
+
+
+.. _yaml-skripte:
+
+YAML-Programmierung
+~~~~~~~~~~~~~~~~~~~
 
 (allgemeiner text)
 
 Register
-~~~~~~~~
+^^^^^^^^
 
 Register werden Variablen genannt, in die man im Programmverlauf Werte
 ablegen kann.
@@ -221,11 +289,8 @@ Ein Register startet immer mit dem Wert 0, außer Du hast oben in der
 YAML-Datei dem Register mit "init:" einen anderen Startwert zugewiesen
 (siehe [HIER LINK NACH OBEN]) h
 
-"script:", OID-Abschnitt und Befehlszeilen
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Die Abschnitte
-^^^^^^^^^^^^^^
+OID-Scripte
+^^^^^^^^^^^
 
 Der Abschnitt "script:" beinhaltet Unterabschnitte, die jeder für sich
 einen bestimmten OID-Code repräsentieren. Dort steht, was passieren
@@ -271,13 +336,11 @@ SoundAbspielen1: - P(sound1)
 Führt zu einem Fehler und es wird keine GME-Datei erzeugt.
 
 Die Befehlszeilen
-~~~~~~~~~~~~~~~~~
 
 -  trennung der anweisungen
 -  anzahl befehle/zeile
 
 Bedingte Anweisung
-~~~~~~~~~~~~~~~~~~
 
 -  mehrere innerhalb einer Zeile, was wird ausgeführt
 -  einer pro Zeile, Mehrzeilen, was wird ausgeführt
@@ -286,68 +349,41 @@ Bedingte Anweisung
 -  siehe $modus
 -  siehe schleifen
 
-Befehle
-~~~~~~~
-
-XXXX Befehle (XXXX ... P J usw.)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Befehlsreferenz
+~~~~~~~~~~~~~~~
 
 (EINLEITENDER TEXT)
 
-P()
-^^^
+Bedinungen
+^^^^^^^^^^
+
+``P()`` – Audio abspielen
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 -  einzel play
 -  random play
 -  besonderheit play und jump
 
-P\*()
-^^^^^
+``J()`` – Sprung
+^^^^^^^^^^^^^^^^
 
 (TEXT FEHLT NOCH)
 
-PA\*()
-^^^^^^
+``T()`` – Zufall
+^^^^^^^^^^^^^^^^
 
 (TEXT FEHLT NOCH)
 
-PA\*()
-^^^^^^
 
-(TEXT FEHLT NOCH)
+``:=`` – Register setzen
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-PA()
-^^^^
+Der Befehl ``:=`` setzt das Register auf den Wert hinter dem
+Gleichheitszeichen
 
-(TEXT FEHLT NOCH)
+.. code:: yaml
 
-J()
-^^^
-
-(TEXT FEHLT NOCH)
-
-G()
-^^^
-
-(TEXT FEHLT NOCH)
-
-C
-^
-
-(TEXT FEHLT NOCH)
-
-T()
-^^^
-
-(TEXT FEHLT NOCH)
-
-?() ()
-^^^^^^
-
-(TEXT FEHLT NOCH)
-
-Registerbefehle
-~~~~~~~~~~~~~~~
+     - $r:=5 # Hier wird das Register $r auf den Wert 5 gesetzt
 
 Mit Registerbefehlen lassen sich Werte in einem Register setzen oder
 ändern. Registerbefehle sind in der Regel so Aufgebaut:
@@ -360,18 +396,8 @@ Mit Registerbefehlen lassen sich Werte in einem Register setzen oder
 In diesem Beispiel wird der Registerbefehl Addition verwendet. Das
 bedeutet, dass zu dem augenblicklichen Wert von $modus, 5 addiert wird.
 
-:= (Register setzen)
-^^^^^^^^^^^^^^^^^^^^
-
-Der Befehl ``:=`` setzt das Register auf den Wert hinter dem
-Gleichheitszeichen
-
-.. code:: yaml
-
-     - $r:=5 # Hier wird das Register $r auf den Wert 5 gesetzt
-
-+= -= \*= /= (Grundrechenarten)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``+=``, ``-=``, ``*=``, ``/=`` – Grundrechenarten
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: yaml
 
@@ -394,8 +420,8 @@ Gleichheitszeichen. Dabei ist zu beachten, dass immer ein Integer
 (Ganzzahl) geliefert und das Ergebnis abgerundet wird. Die Rechnung von
 9 durch 2 ergibt also 4.
 
-%= (Register modulo)
-^^^^^^^^^^^^^^^^^^^^
+``%=`` – Modulo
+^^^^^^^^^^^^^^^
 
 Der Befehl „%=“ liefert das modulo des Registers mit der Zahl hinter dem
 Gleichheitszeichen
@@ -408,8 +434,8 @@ Angenommen $r hat einen Wert von 23 und man Teil das durch 5, dann Wäre
 das Ergebnis 4 Rest 3. In dem Beispielen oben hätte $r nach dem
 Registerbefehl 3.
 
-Neg() (Register Negieren)
-^^^^^^^^^^^^^^^^^^^^^^^^^
+``Neg()`` –  Register negieren
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Der Befehl „Neg()“ negiert den Wert eines Registers. Hat das Register
 zum Beispiel den Wert 5, wird nach dem Befehl der Wert -5. Aus -5 würde
@@ -420,8 +446,8 @@ geschrieben.
 
     - Neg($r) # Hier wird der Wert des Registers $r negiert.
 
-Bitweise Operatoren
-^^^^^^^^^^^^^^^^^^^
+``&=``, ``|=``, ``^=`` – bitweise Operatoren
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Wenn Du nicht weißt was Bitweise UND, OR und XOR ist, dann wirst Du
 diese Befehle wahrscheinlich nicht brauchen. Um Bitweise Operatoren zu
@@ -429,8 +455,6 @@ verstehen muss man wissen wie eine Dezimalzahl in Binärschreibweise
 Dargestellt wird. (`siehe
 Wikipedia <https://de.wikipedia.org/wiki/Dualsystem>`__)
 
-&= (Bitweise UND)
-^^^^^^^^^^^^^^^^^
 
 Der Befehl „&=“ wendet den Wert hinter dem Gleichheitszeichen auf das
 Register an. Ein bitweises UND wird auf zwei Bitfolgen gleicher Länge
@@ -442,19 +466,49 @@ sind, ansonsten ist es 0.
 
     - $r&=5 # Hier wird 5 Bitweise UND auf das Register $r angewendet
 
-Bitweise OR
-^^^^^^^^^^^
-
-XXX FOLGT XXX
-
 FFF6 (written $r\|=m): bitwise or to register $r the value of m
 
 Bitweise XOR
-^^^^^^^^^^^^
-
-XXX FOLGT XXX
 
 FFF7 (written $r^=m): bitwise xor to register $r the value of m
 
-YAML-Skripte: Bedingungen und Befehle
--------------------------------------
+Weitere Befehle
+^^^^^^^^^^^^^^^
+
+(Befehle die der normale Tiptoi-Bastler nicht braucht, aber die das ``tttool`` ausspuckt)
+
+P\*()
+-----
+
+(TEXT FEHLT NOCH)
+
+PA\*()
+------
+
+(TEXT FEHLT NOCH)
+
+PA\*()
+------
+
+(TEXT FEHLT NOCH)
+
+PA()
+----
+
+(TEXT FEHLT NOCH)
+
+G()
+---
+
+(TEXT FEHLT NOCH)
+
+C
+-
+
+(TEXT FEHLT NOCH)
+
+?() ()
+------
+
+(TEXT FEHLT NOCH)
+
