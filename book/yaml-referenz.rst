@@ -252,6 +252,8 @@ die eigentliche YAML-Datei zu übernehmen.
 YAML-Programmierung
 ~~~~~~~~~~~~~~~~~~~
 
+Die Logik einer Tiptoi-Programmierung steckt vor allem in den im ``scripts``-Feld angegebenen Skripten.
+
 (allgemeiner text)
 
 Register
@@ -360,9 +362,21 @@ Bedinungen
 ``P()`` – Audio abspielen
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
--  einzel play
--  random play
--  besonderheit play und jump
+Format 1:
+  ``P(``\ *audio-datei*\ ``)``
+Format 2:
+  ``P(``\ *audio-datei*\ ``,``\ *audio-datei*\ ``,``\ …\ ``)``
+Beispiel:
+  .. code:: yaml
+
+    haus:
+    - P(willkommen) P(zu_hause,daheim)
+
+In der ersten Form spielt der Befehl die angegene Audio-Datei ab.
+
+In der zweiten Form spielt der Befehl einen zufälligen der angegebenen Audio-Dateien ab.
+
+TODO: Besonderheit play und jump
 
 ``J()`` – Sprung
 ^^^^^^^^^^^^^^^^
