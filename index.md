@@ -252,8 +252,8 @@ der Code des *Einschaltknopfes* festgelegt, den jedes Tiptoi-Produkt
 hat. Will man ein vorhandenes Tiptoi-Produkt neu besprechen, muss man
 natürlich den Einschaltcode dieses Produktes nehmen. Erstellt man
 etwas komplett neues, sollte man hier eine Nummer nehmen, die keinem
-offiziellen Produkt entspricht. Erlaubt sind alle Zahlen von 1 bis
-1000. Von Ravensburger unbenutzt ist zur Zeit die 42.
+offiziellen Produkt entspricht. Erlaubt sind alle Zahlen von 1
+bis 1000. Von Ravensburger unbenutzt ist zur Zeit die 42.
 
 Damit man mitbekommt, dass der Stift das eigene Produkt auch erkannt
 hat, kann man im Feld `welcome` einen oder - durch Kommas getrennt -
