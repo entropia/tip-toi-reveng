@@ -62,6 +62,9 @@ In diesem Beispiel erhält `$wuerfel` einen zufälligen Wert zwischen 1 und 6.
 Code-Muster in GIMP
 -------------------
 
+Code-Muster in Adobe Photoshop
+------------------------------
+
 Druckereinstellungen
 --------------------
 (Einstellungen für Drucker, Liste kompatibler Drucker, Lösungen für typische Probleme (FAQ?))
