@@ -58,6 +58,8 @@ In diesem Beispiel erhält `$wuerfel` einen zufälligen Wert zwischen 1 und 6.
 (TODO: Angaben darüber ergänzen, wie gut dieser Algorithmus funktioniert)
 (TODO: weitere PRNG-Algorithmen)
 
+Ansage von Registerwerten
+-------------------------
 
 Code-Muster in GIMP
 -------------------
