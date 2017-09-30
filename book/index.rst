@@ -8,7 +8,7 @@ so willst du vermutlich etwas in den beiden Referenz-Kapitel nachschlagen, oder
 durch die Tipps und Tricks stöbern.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Inhaltsverzeichnis:
 
    vorwort
