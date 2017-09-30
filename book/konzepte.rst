@@ -36,12 +36,34 @@ In erster Näherung ist das eine einfache Tabelle, die zu jedem OID-Code die Aud
 Aber das ist natürlich noch mehr, denn der Stift mach ja nicht immer das gleiche, wenn man auf ein Feld tippt. Tatsächlich enthält diese Tabelle zu jedem OID-Code ein kleines Computer-Programm, dass nach dem Tippen abläuft. Dieses Programm (oder :index:`*Skript* <Skript>`) kann
  * Audio-Dateien abspielen,
  * mit Zahlenwerten rechnen,
- * diese Zahlenwerte in sogennanten *:index:`Registern <Register>* ablegen und abrufen und
- * abhängig von diesen Werten unterschiedliche Proramm-Schritte abarbeiten.
+ * diese Zahlenwerte in sogennanten :index:`Registern <Register>` ablegen und abrufen und
+ * abhängig von diesen Werten unterschiedliche Program-Schritte abarbeiten.
 
+Die Werte, mit denen gerechnet werden, sind dabei 16-bit natürlich Zahlen (also 0 bis 65535). Auch die Register (man könnte sie auch Variablen oder Speicherzellen nennen) speichern jeweils genau eine solche Zahl.
 
+Desweiteren kann eine GME-Datei noch folgendes Enthalten:
 
+ * Die Sprache der GME-Datei (Deutsch, Englisch usw.). Sollte die GME-Datei eine Sprache nennen, so wird sie nur abgespielt, wenn der Stift auf die gleiche Sprache eingestellt ist.
+ * Spiele. Die Logik mancher komplizierteren Abläufe („Finde alle Mäuse!“) sind fest im Stift eingebaut, und die GME-Datei benennt nur die relevanten Felder und Audio-Dateien. Diese Spiele sind von uns zum Teil noch nicht vollständig verstanden.
+ * Binäre Programme. Dies sind Maschinenprogramme, die direkt auf dem Prozessor des Stiftes ausgeführt werden. Auch diese sind von uns noch nicht vollständig verstanden.
 
+Praktisch alle Elemente einer GME-Datei werden über intern schnöde Nummern statt über sprechende Namen angesteuert. Insbesondere kann man aus einer GME-Datei nicht mehr die Original-Dateinamen der (oft über hundert) Audio-Dateien rekonstruieren.
 
 Wozu das ``tttool``?
 --------------------
+
+Um nun dein eigenes Tiptoi-Produkt zu erstellen, musst du eine solche GME-Datei erstellen. Nun ist das GME-Format ein unhandliches Binärformat, was du ohne Hilfsmittel nicht bearbeiten kannst. Genau dafür gibt es das ``tttool``, welches das GME-Format lesen und schreiben kann.
+
+Für die meisten Tiptoi-Bastler sind drei Hauptfunktionen wichtig:
+
+1. Das ``tttool`` kann eine GME-Datei in seine Bestandteile -- die Audio-Dateien und die Beschreibung der Logik -- zerlegen. Die Logik wird dabei in einem (halbwegs) benutzerfreundlichem, textbasiertem Format (der sogenannten *YAML-Datei*) abgelegt, dass du direkt mit einem Texteditor bearbeiten kannst.
+
+2. Natürlich beherrscht das ``tttool`` auch die andere Richtung, und kann aus einer YAML-Datei und den Audio-Dateien eine GME-Datei erstellen. Um die Entwicklung zu vereinfachen kann das ``tttool`` dabei fehlende Audio-Dateien durch mittels *Text-to-Speech* (Sprachsynthese) erzeugen.
+
+  .. warning:: Weil nicht alle Details des GME-Formats verstanden sind, können bei der Umwandlung von der GME-Datei zur YAML-Datei und zurück Teile verloren gehen, insbesondere Spiele.
+
+3. Die OID-Codes, die zum Druck eines eigenen Tiptoi-Produktes nötig sind, können per ``tttool`` im PNG- oder PDF-Format erstellt werden.
+
+Darüber Hinaus versteht verfügt das ``tttool`` über eine Reihe von Möglichkeiten zur Analyse von GME-Dateien, die vor allem zum Verstehen des GME-Formats nützlich sind.
+
+Im Detail werden die einzelnen Funktionen des Tools werden im Kapitel “:ref:`tttool`” erklärt.
