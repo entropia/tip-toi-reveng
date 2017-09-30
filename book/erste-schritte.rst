@@ -1,3 +1,5 @@
+.. _erste_schritte:
+
 Erste Schritte
 ==============
 
