@@ -20,3 +20,7 @@ durch die Tipps und Tricks stöbern.
    tipps-und-tricks
    gallerie
 
+.. toctree::
+   :caption: Anhang
+
+   genindex

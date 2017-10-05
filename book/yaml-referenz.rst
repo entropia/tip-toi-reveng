@@ -138,6 +138,8 @@ Zweck:
   Das Sprach-Feld der GME-Datei. Bei eigenen Produkten gibt es in der Regel
   kein Grund, dieses Feld anzugeben.
 
+.. _yaml-init:
+
 ``init``
 ^^^^^^^^
 
@@ -185,7 +187,7 @@ Zweck:
   Gibt die Sprache für die Sprachsynthese (siehe Feld ``speak``) an.
 
 ``speak``
-^^^^^^^^
+^^^^^^^^^
 
 Format:
   Eine Zuordnung von Dateinamen zu Text
@@ -246,118 +248,74 @@ werden, speichert es die Auswahl in einer Datei mit Endung ``.codes.yaml``, die
 nur den ``scriptcodes``-Eintrag enthält. Es steht dir frei, diese Zuordnung in
 die eigentliche YAML-Datei zu übernehmen.
 
+.. warning::
+
+   Das ``tttool`` arbeitet *entweder* mit Namen *oder* mit Nummern. Du kannst
+   die beiden Varianten nicht mischen.
+
 
 .. _yaml-skripte:
 
 YAML-Programmierung
 ~~~~~~~~~~~~~~~~~~~
 
-Die Logik einer Tiptoi-Programmierung steckt vor allem in den im ``scripts``-Feld angegebenen Skripten.
+Die Logik einer Tiptoi-Programmierung steckt vor allem in den im ``scripts``-Feld angegebenen Skripten. Es gibt zu jedem OID-Code ein Skript. Ein Skript besteht aus einer oder gegebenenfalls mehrerer Zeilen, die wiederum aus Befehlen bestehen.
 
-(allgemeiner text)
+Das einfachste Beispiel ist also
+
+.. code:: yaml
+
+     scripts:
+       2000: P(hallo)
+
+Hier wird, wenn du den OID-Code 2000 antippst, der Befehl ``P(hallo)`` ausgeführt. (Die Befehle selbst werden in Kürze erklärt.)
+
+Eine Skriptzeile kann mehrere Befehle enthalten, etwa
+
+.. code:: yaml
+
+     scripts:
+       2000: P(hallo) P(freund) J(2001)
+
+Hier werden drei Befehler nacheinander ausgeführt.
+
+.. warning::
+
+  Soweit bekannt kann es zu Problemen kommen, wenn **mehr als 8** Befehle in
+  einer Zeile stehen. Darüber hinaus interagieren manche Befehle seltsam; mehr
+  dazu im Abschnitt „:ref:`command-J`\ “.
+
+Im Allgemeinen können zu einem Skript mehrere Zeilen angegeben werden:
+
+.. code:: yaml
+
+     scripts:
+       2000:
+        - $offen==1? P(willkommen)
+        - $offen==0? P(finde_den_schluessel)
+
+Tippst du nun Code 2000 an, wird die erste Zeile ausgeführt, deren Bedingungen  alle erfüllt sind (mehr zum Programmieren mit Bedingungen im Abschnitt „:ref:`conditionals`\ “).
+
+Statt die OID-Codes numerisch anzugeben, kannst du auch sprechende Namen verwenden, siehe Abschnitt „:ref:`code-namen`\ “.
 
 Register
 ^^^^^^^^
+Viele Befehle manipulieren :index:`\ <Register>`\ *Register*. Diese
+repräsentieren Speicherzellen, in denen im Programmverlauf Werte abgelegt und
+abgerufen werden können. Man könnte sie auch Variablen nennen.
 
-Register werden Variablen genannt, in die man im Programmverlauf Werte
-ablegen kann.
+Der Name eines Registers beginnt immer mit einem `$`, gefolgt von Buchstaben,
+Zahlen oder Unterstrichen (`_`). Direkt nach dem `$` muss ein Buchstabe kommen.
 
-Ein Register beginnt immer mit einem $ (Dollarzeichen), gefolgt von
-mindestens einem und höchstens XXX Zeichen. Dabei ist zu beachten, dass
-nach dem $ immer zuerst ein Buchstabe kommen muss. Danach können die
-Zeichen A-Z, a-z, 0-9 und \_ benutzt werden.
+Alle Arithmetik auf dem Tiptoistift arbeitet mit ganzen Zahlen im Bereich 0 bis 65535). Alle Register haben zu Beginn den Wert 0, sofern du es nicht im ``init``-Feld anders verlangst (siehe Abschnitt „:ref:`yaml-init`\ “.
 
-Beispiele:
-
-.. code:: yaml
-
-        - $register:=1 # RICHTIG  
-        - $Bla_Bla:=1 # RICHTIG 
-        - $Bla-Bla:=1 # FALSCH  (???)
-        - $BlaBla7:=1 # RICHTIG 
-        - $7BlaBla:=1 # FALSCH  
-        - $Bla&Bla:=1 # FALSCH  
-
-(VERWENDUNG VON $1 usw. FOLGT)
-
-Der Wert in einem Register ist immer eine Ganzzahl, lädt man in das
-Register eine Fließkommazahl, wird diese zu einer abgerundeten Ganzzahl.
-
-.. code:: yaml
-
-    - $register:=9 $register/=2 # $register wird zu 4  
-
-Ein Register startet immer mit dem Wert 0, außer Du hast oben in der
-YAML-Datei dem Register mit "init:" einen anderen Startwert zugewiesen
-(siehe [HIER LINK NACH OBEN]) h
-
-OID-Scripte
-^^^^^^^^^^^
-
-Der Abschnitt "script:" beinhaltet Unterabschnitte, die jeder für sich
-einen bestimmten OID-Code repräsentieren. Dort steht, was passieren
-soll, wenn der tiptoi-Benutzer einen Code antippt. Die Unterabschnitte
-müssen in deiner YAML-Datei eingerückt sein.
-
-.. code:: yaml
-
-    script: # Hier beginnt der script-Abschnitt 
-      
-      5000: # Hier beginnt der Abschnitt für den OID-Code 5000
-      - P(sound1) # Wird der OID-Code mit der Nummer 5000 angetippt, wird die Datei sound1 abgespielt
-      
-      5010: # Hier beginnt der Abschnitt für den OID-Code 5010
-      - P(sound2) # Wird der OID-Code mit der Nummer 5010 angetippt, wird die Datei sound2 abgespielt
-
-Siehe auch P().
-
-Alternativ kannst Du statt der Zahlen auch Worte benutzen
-
-.. code:: yaml
-
-    script: # Hier beginnt der script-Abschnitt 
-      
-      SoundAbspielen1: # Die OID für diesen Abschnitt wird vom tttool vergeben
-      - P(sound1) 
-      
-      SoundAbspielen2: # Die OID für diesen Abschnitt wird vom tttool vergeben
-      - P(sound2) 
-
-Hier werden die OIDs von tttool selber vergeben. Du kannst dir die OIDs
-mit dem Consolenbefehl 'oid-codes' erzeugen lassen. `Siehe Die
-ttt-Befehle <tttool-referenz>`__
-
-Mischen kannst Du diese beiden Varianten allerdings nicht.
-
-\`\`\`yaml script:
-
-SoundAbspielen1: - P(sound1)
-
-5010: - P(sound2) \`\`\`
-
-Führt zu einem Fehler und es wird keine GME-Datei erzeugt.
-
-Die Befehlszeilen
-
--  trennung der anweisungen
--  anzahl befehle/zeile
-
-Bedingte Anweisung
-
--  mehrere innerhalb einer Zeile, was wird ausgeführt
--  einer pro Zeile, Mehrzeilen, was wird ausgeführt
--  siehe Play
--  siehe jump
--  siehe $modus
--  siehe schleifen
+Wenn du eine GME-Datei exportierst (siehe Abschnitt „:ref:`tttool-export`\ “), so kennt das ``tttool`` die Namen der Register nicht. In dem Fall werden Nummern verwendet (``$0``, ``$1``\ …). Es gibt in der Regel keinen Grund, dies in deinen eigenen Tiptoi-Produkten so zu machen. 
 
 Befehlsreferenz
 ~~~~~~~~~~~~~~~
 
-(EINLEITENDER TEXT)
+Im Folgenden werden die Befehle im Einzelnen erklärt: Wie du sie in der YAML-Datei schreibst, was sie bewirken, und was sonst so dabei zu beachten ist.
 
-Bedinungen
-^^^^^^^^^^
 
 ``P()`` – Audio abspielen
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -376,12 +334,13 @@ In der ersten Form spielt der Befehl die angegene Audio-Datei ab.
 
 In der zweiten Form spielt der Befehl einen zufälligen der angegebenen Audio-Dateien ab.
 
-TODO: Besonderheit play und jump
 
 ``J()`` – Sprung
 ^^^^^^^^^^^^^^^^
 
 (TEXT FEHLT NOCH)
+
+TODO: Besonderheit play und jump
 
 ``T()`` – Zufall
 ^^^^^^^^^^^^^^^^
@@ -485,6 +444,9 @@ FFF6 (written $r\|=m): bitwise or to register $r the value of m
 Bitweise XOR
 
 FFF7 (written $r^=m): bitwise xor to register $r the value of m
+
+Bedingungen
+^^^^^^^^^^^
 
 Weitere Befehle
 ^^^^^^^^^^^^^^^

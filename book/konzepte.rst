@@ -8,7 +8,7 @@ Wie funktioniert der Stift?
 
 In der Spitze des Tiptoi-Stifts steckt eine kleine Kamera. Wenn du mit dem Stift auf eine Seite eines Tiptoi-Buches tippst, so sucht die Kamera nach einem bestimmten Muster bestehend aus schwarzen Punkten. Dieses Muster ist sehr fein und mit bloßem Auge betrachtet fällt es kaum auf, aber wenn du genau hinschaust, kannst du es sehen.
 
-Das Punktmuster selbst kodiert lediglich eine Zahl (zwichen 0 un 15000, um genau zu sein), den sogenannten :index:`*OID-Code* <OID-Code>`. Die eigentliche Logik des Stift -- also, was er wann sagt, also auch die eigentlichen Audio-Dateien -- ist in der GME-Datei gespeichert.
+Das Punktmuster selbst kodiert lediglich eine Zahl (zwichen 0 un 15000, um genau zu sein), den sogenannten :index:`\ <OID-Code>`\ *OID-Code*. Die eigentliche Logik des Stift -- also, was er wann sagt, also auch die eigentlichen Audio-Dateien -- ist in der GME-Datei gespeichert.
 
 Daraus ergibt sich dass man den Stift umprogrammieren kann, indem man diese GME-Dateien ändert.
 
