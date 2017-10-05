@@ -30,7 +30,9 @@ welcome: bing, hello
 # and a list of strings as the content
 scripts:
   # We begin to specify what to do when the area in the book with the OID code
-  # 8066 is touched.
+  # 8065 is touched. Here we just print something
+  8065: P(hellp)
+  # The next one is more complicated, as we have conditional scripts
   8066:
   # The following line means: If register $mode is set to 1, then set it to 2, and
   # increment register $1 by one, and play the sound example/hello.ogg.

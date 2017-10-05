@@ -8,6 +8,14 @@
  * `./tttool oid-table` aligns images on pixel boundaries, so that a naive
    rastering of the whole page still yields crisp pixels.
    Thanks to @m7thon for the patch!
+ * If the script for an oid code contains only one line, one can simply write
+
+        house: P(welcome)
+
+   instead of
+
+        house:
+         - P(welcome)
 
 ## 1.6.1 (2016-04-17)
 

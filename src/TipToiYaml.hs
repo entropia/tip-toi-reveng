@@ -57,7 +57,7 @@ import Utils
 import TipToiYamlAux
 
 data TipToiYAML = TipToiYAML
-    { ttyScripts     :: M.Map String [String]
+    { ttyScripts     :: M.Map String (OptArray String)
     , ttyComment     :: Maybe String
     , ttyGME_Lang    :: Maybe String
     , ttyMedia_Path  :: Maybe String
@@ -65,7 +65,7 @@ data TipToiYAML = TipToiYAML
     , ttyWelcome     :: Maybe String
     , ttyProduct_Id  :: Word32
     , ttyScriptCodes :: Maybe CodeMap
-    , ttySpeak       :: Maybe SpeakSpecs
+    , ttySpeak       :: Maybe (OptArray SpeakSpec)
     , ttyLanguage    :: Maybe Language
     , ttyGames       :: Maybe [GameYaml]
     }
@@ -94,22 +94,24 @@ instance ToJSON SpeakSpec where
 
 toSpeakMap :: Language -> Maybe SpeakSpecs -> M.Map String (Language, String)
 toSpeakMap l Nothing = M.empty
-toSpeakMap l (Just (SpeakSpecs specs)) = M.unionsWith e $ map go specs
+toSpeakMap l (Just (OptArray specs)) = M.unionsWith e $ map go specs
   where
-    go (SpeakSpec ml m) = M.map ((l',)) m
+    go (SpeakSpec ml m) = M.map (l',) m
       where l' = fromMaybe l ml
     e = error "Conflicting definitions in section \"speak\""
 
 
-newtype SpeakSpecs = SpeakSpecs [SpeakSpec]
+type SpeakSpecs = OptArray SpeakSpec
 
-instance FromJSON SpeakSpecs where
-    parseJSON (Array a) = SpeakSpecs <$> mapM parseJSON  (V.toList a)
-    parseJSON v = SpeakSpecs . (:[]) <$> parseJSON v
+newtype OptArray a = OptArray [a]
 
-instance ToJSON SpeakSpecs where
-    toJSON (SpeakSpecs [x]) = toJSON x
-    toJSON (SpeakSpecs l)   = Array $ V.fromList $ map toJSON $ l
+instance FromJSON a => FromJSON (OptArray a) where
+    parseJSON (Array a) = OptArray <$> mapM parseJSON (V.toList a)
+    parseJSON v = OptArray . (:[]) <$> parseJSON v
+
+instance ToJSON a => ToJSON (OptArray a) where
+    toJSON (OptArray [x]) = toJSON x
+    toJSON (OptArray l)   = Array $ V.fromList $ map toJSON $ l
 
 type PlayListListYaml = String
 
@@ -299,7 +301,7 @@ tt2ttYaml path (TipToiFile {..}) = TipToiYAML
     , ttyComment = Just $ BC.unpack ttComment
     , ttyGME_Lang = if BC.null ttLang then Nothing else Just (BC.unpack ttLang)
     , ttyScripts = M.fromList
-        [ (show oid, map exportLine ls) | (oid, Just ls) <- ttScripts]
+        [ (show oid, OptArray $ map exportLine ls) | (oid, Just ls) <- ttScripts]
     , ttyMedia_Path = Just path
     , ttyScriptCodes = Nothing
     , ttySpeak = Nothing
@@ -766,7 +768,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
             (,,) <$>
             for [first ..last] (\oid ->
                 (oid ,) <$>
-                for (M.lookup oid m) (\raw_lines ->
+                for (M.lookup oid m) (\(OptArray raw_lines) ->
                     forAn raw_lines (\i raw_line ->
                         let d = printf "Line %d of OID %d" i oid
                             (l,s) = either error id $ parseOneLinePure parseLine d raw_line
@@ -1087,7 +1089,7 @@ debugGame productID = do
         , ttyGME_Lang = Nothing
         , ttyWelcome = Just $ "blob"
         , ttyScripts = M.fromList [
-            (show oid, [line])
+            (show oid, OptArray [line])
             | oid <- [1..15000]
             , let chars = [oid `div` 10^p `mod` 10| p <-[4,3,2,1,0]]
             , let line = ppLine t $ Line 0 [] [Play n | n <- [0..5]] ([10] ++ chars)
