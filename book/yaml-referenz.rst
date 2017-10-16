@@ -104,6 +104,8 @@ Beispiel:
 Zweck:
   Beim Aktivieren des Produktes werden die angegebenen Audio-Dateien abgespielt.
 
+.. _media-path::
+
 ``media-path``
 ^^^^^^^^^^^^^^
 
@@ -310,12 +312,22 @@ Zahlen oder Unterstrichen (`_`). Direkt nach dem `$` muss ein Buchstabe kommen.
 
 Alle Arithmetik auf dem Tiptoistift arbeitet mit ganzen Zahlen im Bereich 0 bis 65535). Alle Register haben zu Beginn den Wert 0, sofern du es nicht im ``init``-Feld anders verlangst (siehe Abschnitt „:ref:`yaml-init`\ “.
 
-Wenn du eine GME-Datei exportierst (siehe Abschnitt „:ref:`tttool-export`\ “), so kennt das ``tttool`` die Namen der Register nicht. In dem Fall werden Nummern verwendet (``$0``, ``$1``\ …). Es gibt in der Regel keinen Grund, dies in deinen eigenen Tiptoi-Produkten so zu machen. 
+Wenn du eine GME-Datei exportierst (siehe Abschnitt „:ref:`tttool-export`\ “), so kennt das ``tttool`` die Namen der Register nicht. In dem Fall werden Nummern verwendet (``$0``, ``$1``\ …). Es gibt in der Regel keinen Grund, dies in deinen eigenen Tiptoi-Produkten so zu machen.
 
 Befehlsreferenz
 ~~~~~~~~~~~~~~~
 
 Im Folgenden werden die Befehle im Einzelnen erklärt: Wie du sie in der YAML-Datei schreibst, was sie bewirken, und was sonst so dabei zu beachten ist.
+
+In der Format-Beschreibung werden folgende Platzhalter verwendet:
+
+  * *audio-datei*: Der Name einer Audio-Datei. Aus dem Namen wird, wie im Abschnitt „:ref:`media-path`\ “ beschrieben, der Dateiname der Audiodatei abgeleitet.
+  * *oid-code*: Die Nummer eines OID-Codes (und damit einer Skiptzeile), wenn ``scriptcodes`` *nicht* verwendet wird.
+  * *code-name*: Der Name eines OID-Codes (und damit einer Skiptzeile), wenn ``scriptcodes`` verwendet wird.
+  * *register*: Der Name eines Registers, mit `$`. Beispiel: `$mode`.
+  * *argument*: Entweder der Name eines Registers, oder eine Zahl. Beispiele: `$mode`, `0`, `1024`.
+
+    Der *Wert* eines Argumentes ist im ersten Fall der aktuell in dem Register gespeicherte Wert; im zwieten Fall einfach die Zahl selbst.
 
 .. _command-P:
 
@@ -363,33 +375,23 @@ Effekt:
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 Format:
-  | *register1* **:=** *wert*
-  | *register1* **:=** *register2*
+  | *register1* **:=** *argument*
 Beispiel:
   .. code:: yaml
 
     - $zuletzt := $aktuell  $aktuell := 5
 Effekt:
-  In der ersten Form wird der Wert des Register *register`* wird auf den
-  gegebenen Wert gesetzt. In der zweiten Form wird der Inhalt von *register2*
-  in *register1* gespeichert.
-
-
+  Der Wert des Registers *register* wird auf den Wert des Arguments *argument* gesetzt.
 
 ``+=``, ``-=``, ``*=``, ``/=``, ``%=`` – Arithmetik
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Format:
-  | *register1* **+=** *wert*
-  | *register1* **+=** *register2*
-  | *register1* **-=** *wert*
-  | *register1* **-=** *register2*
-  | *register1* ***=** *wert*
-  | *register1* ***=** *register2*
-  | *register1* **/=** *wert*
-  | *register1* **/=** *register2*
-  | *register1* **%=** *wert*
-  | *register1* **%=** *register2*
+  | *register* **+=** *argument*
+  | *register* **-=** *argument*
+  | *register* ***=** *argument*
+  | *register* **/=** *argument*
+  | *register* **%=** *argument*
 Beispiel:
   .. code:: yaml
 
@@ -398,10 +400,9 @@ Beispiel:
     gegner_getroffen
     - $wert := 10 $wert *= $bonus $score += $wert
 Effekt:
-  Es wird die entsprechende Rechenoperation auf *register1* und den *wert*
-  (bzw. *register2*) angewandt, und das Ergebnis in *register1* abgelegt.
+  Es wird die entsprechende Rechenoperation auf die aktuell in *register* gespeicherte Zahl und den Wert des Arguments *argument* angewandt, und das Ergebnis in *register1* abgelegt.
 
-Es wird dabei nur mit ganzen Zahlen gerechnet, und die Division (**/=**) rundet das Ergebnis immer ab. Wenn also Register `$x` den Wert 8 enthält und `$x/=3` wird ausgeführt, so enthält es den Wert 2.
+Es wird dabei nur mit ganzen Zahlen gerechnet. Insbesondere rundet die Division (**/=**) das Ergebnis stets ab. Wenn also Register `$x` den Wert 8 enthält und `$x/=3` wird ausgeführt, so enthält es den Wert 2.
 
 Der Befehl **%=** berechnet entsprechend den Divisionsrest. Wenn also Register `$x` den Wert 8 enthält und `$x%=3` wird ausgeführt, so enthält es den Wert 2.
 
@@ -424,17 +425,17 @@ Effekt:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Format:
-  | *register1* **&=** *wert*
-  | *register1* **&=** *register2*
-  | *register1* **|=** *wert*
-  | *register1* **|=** *register2*
-  | *register1* **^=** *wert*
-  | *register1* **^=** *register2*
+  | *register* **&=** *argument*
+  | *register* **|=** *argument*
+  | *register* **^=** *argument*
 Zweck:
-  Es wird die entsprechende bitweise Operation auf *register1* und den *wert*
-  (bzw. *register2*) angewandt, und das Ergebnis in *register1* abgelegt.
+  Es wird die entsprechende bitweise Operation auf die aktuell in *register*
+  gespeicherte Zahl und den Wert des Arguments *argument* an, und das Ergebnis
+  wird in *register* abgelegt.
 
-  Dabei ist **&=** das  bitweise Und, **|=** das bitweise Oder, **^=** das bitweise exklusive Oder (XOR). Wenn dir das nichts sagt, brauchst du es vermutlich nicht.
+  Dabei ist **&=** das bitweise Und, **|=** das bitweise Oder, **^=** das
+  bitweise exklusive Oder (XOR). Wenn dir das nichts sagt, brauchst du es
+  vermutlich nicht.
 
 ``T`` – Timer
 ^^^^^^^^^^^^^
@@ -457,43 +458,52 @@ Der Tiptoi-Stift verfügt über einen Zähler, der während der Benutzung hochge
 Bedingungen
 ^^^^^^^^^^^
 
+Format:
+  | *argument1* **==** *argument2*
+  | *argument1* **>=** *argument2*
+  | *argument1* **<=** *argument2*
+  | *argument1* **>**  *argument2*
+  | *argument1* **<**  *argument2*
+  | *argument1* **!=** *argument2*
+
+Beispiel:
+  .. code:: yaml
+
+    haus:
+    - $mode == 1? P(willkommen)
+    - $mode == 2? $gefunden < 3? P(finde_mehr_steine)
+    - $mode == 2? $gefunden == 3? P(raetsel_geloest)
+
+Effekt:
+   Bedingungsbefehle müssen stets am Anfang der Zeile stehen. Es wird der Wert
+   des ersten Arguments entsprechend dem Vergleichsoperator mit dem zweiten
+   Argument verglichen. Wenn alle Bedingungsbefehle einer Zeile zutreffen, dann
+   wird die Zeile ausgeführt, sonst wird die nächste Zeile des Skriptes
+   geprüft.
+
+   Die Operatoren sind:
+
+   ====== ===================
+   Befehl Bedeutung
+   ====== ===================
+   **==** gleich
+   **>=** größer oder gleich
+   **<=** kleiner oder gleich
+   **>**  echt größer
+   **<**  echot kleiner
+   **!=** ungleich
+   ====== ===================
+
 Weitere Befehle
 ^^^^^^^^^^^^^^^
 
 (Befehle die der normale Tiptoi-Bastler nicht braucht, aber die das ``tttool`` ausspuckt)
 
-P\*()
------
-
-(TEXT FEHLT NOCH)
-
-PA\*()
-------
-
-(TEXT FEHLT NOCH)
-
-PA\*()
-------
-
-(TEXT FEHLT NOCH)
-
-PA()
-----
-
-(TEXT FEHLT NOCH)
-
-G()
----
-
-(TEXT FEHLT NOCH)
-
-C
--
-
-(TEXT FEHLT NOCH)
-
-?() ()
-------
-
-(TEXT FEHLT NOCH)
+* ``P*()``
+* ``PA*()``
+* ``PA*()``
+* ``PA()``
+* ``G()``
+* ``C``
+* ``?() ()``
 
