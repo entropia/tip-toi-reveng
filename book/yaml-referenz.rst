@@ -244,9 +244,10 @@ Zweck:
 
 Du kannst sprechende Namen auch ohne ``scriptcodes`` verwenden, in diesem Fall
 wählt das ``tttool`` die Codes selbst. Damit stets die gleichen Codes verwendet
-werden, speichert es die Auswahl in einer Datei mit Endung ``.codes.yaml``, die
-nur den ``scriptcodes``-Eintrag enthält. Es steht dir frei, diese Zuordnung in
-die eigentliche YAML-Datei zu übernehmen.
+werden (und bereits gedruckte Code weiterhin funktionieren), speichert es die
+Auswahl in einer Datei mit Endung ``.codes.yaml``, die nur den
+``scriptcodes``-Eintrag enthält. Es steht dir frei, diese Zuordnung in die
+eigentliche YAML-Datei zu übernehmen.
 
 .. warning::
 
@@ -316,134 +317,142 @@ Befehlsreferenz
 
 Im Folgenden werden die Befehle im Einzelnen erklärt: Wie du sie in der YAML-Datei schreibst, was sie bewirken, und was sonst so dabei zu beachten ist.
 
+.. _command-P:
 
-``P()`` – Audio abspielen
-^^^^^^^^^^^^^^^^^^^^^^^^^
+``P`` – Audio abspielen
+^^^^^^^^^^^^^^^^^^^^^^^
 
-Format 1:
-  ``P(``\ *audio-datei*\ ``)``
-Format 2:
-  ``P(``\ *audio-datei*\ ``,``\ *audio-datei*\ ``,``\ …\ ``)``
+Format:
+  | **P(**\ *audio-datei*\ **)**
+  | **P(**\ *audio-datei*\ **,**\ *audio-datei*\ **,**\ …\ **)**
 Beispiel:
   .. code:: yaml
 
     haus:
     - P(willkommen) P(zu_hause,daheim)
 
-In der ersten Form spielt der Befehl die angegene Audio-Datei ab.
+Effekt:
+    In der ersten Form spielt der Befehl die angegene Audio-Datei ab.
 
-In der zweiten Form spielt der Befehl einen zufälligen der angegebenen Audio-Dateien ab.
+    In der zweiten Form spielt der Befehl eine zufälligen der angegebenen Audio-Dateien ab.
 
 
-``J()`` – Sprung
-^^^^^^^^^^^^^^^^
+.. _command-J:
 
-(TEXT FEHLT NOCH)
+``J`` – Sprung
+^^^^^^^^^^^^^^
 
-TODO: Besonderheit play und jump
+Format:
+  | **J(**\ *oid-code*\ **)**
+  | **J(**\ *code-name*\ **)**
+Beispiel:
+  .. code:: yaml
 
-``T()`` – Zufall
-^^^^^^^^^^^^^^^^
+    endlos:
+    - P(kein_anschluss) J(endlos)
+Effekt:
+  Der Stift führt, nach dem aktuellen Skript, das Skript mit Code *oid-code* bzw. *code-name* (wenn :ref:`scriptcodes <code-namen>` verwendet wird) aus.
 
-(TEXT FEHLT NOCH)
+.. warning::
+  Die neuen Tiptoi-Stiften (die mit der Audiobook-Funktion) verhalten sich bisweilen seltsam, wenn **J**- und **P**-Befehle gemischt werden.
+
+  TODO: Was genau passiert hier?
 
 
 ``:=`` – Register setzen
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Der Befehl ``:=`` setzt das Register auf den Wert hinter dem
-Gleichheitszeichen
+Format:
+  | *register1* **:=** *wert*
+  | *register1* **:=** *register2*
+Beispiel:
+  .. code:: yaml
 
-.. code:: yaml
+    - $zuletzt := $aktuell  $aktuell := 5
+Effekt:
+  In der ersten Form wird der Wert des Register *register`* wird auf den
+  gegebenen Wert gesetzt. In der zweiten Form wird der Inhalt von *register2*
+  in *register1* gespeichert.
 
-     - $r:=5 # Hier wird das Register $r auf den Wert 5 gesetzt
 
-Mit Registerbefehlen lassen sich Werte in einem Register setzen oder
-ändern. Registerbefehle sind in der Regel so Aufgebaut:
-(Register)(Anweisung)(Wert). Also zum Beispiel:
 
-.. code:: yaml
+``+=``, ``-=``, ``*=``, ``/=``, ``%=`` – Arithmetik
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-      - $modus+=5 
+Format:
+  | *register1* **+=** *wert*
+  | *register1* **+=** *register2*
+  | *register1* **-=** *wert*
+  | *register1* **-=** *register2*
+  | *register1* ***=** *wert*
+  | *register1* ***=** *register2*
+  | *register1* **/=** *wert*
+  | *register1* **/=** *register2*
+  | *register1* **%=** *wert*
+  | *register1* **%=** *register2*
+Beispiel:
+  .. code:: yaml
 
-In diesem Beispiel wird der Registerbefehl Addition verwendet. Das
-bedeutet, dass zu dem augenblicklichen Wert von $modus, 5 addiert wird.
+    taste_fuenf:
+    - $anzeige*=10 $anzeige+=5
+    gegner_getroffen
+    - $wert := 10 $wert *= $bonus $score += $wert
+Effekt:
+  Es wird die entsprechende Rechenoperation auf *register1* und den *wert*
+  (bzw. *register2*) angewandt, und das Ergebnis in *register1* abgelegt.
 
-``+=``, ``-=``, ``*=``, ``/=`` – Grundrechenarten
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Es wird dabei nur mit ganzen Zahlen gerechnet, und die Division (**/=**) rundet das Ergebnis immer ab. Wenn also Register `$x` den Wert 8 enthält und `$x/=3` wird ausgeführt, so enthält es den Wert 2.
 
-.. code:: yaml
+Der Befehl **%=** berechnet entsprechend den Divisionsrest. Wenn also Register `$x` den Wert 8 enthält und `$x%=3` wird ausgeführt, so enthält es den Wert 2.
 
-    - $r+=5 # Hier wird zum Registerwert $r 5 addiert
-
-.. code:: yaml
-
-    - $r-=5 # Hier wird vom Registerwert $r 5 subtrahiert
-
-.. code:: yaml
-
-    - $r*=5 # Hier wird der Wert vom Register $r mit 5 multipliziert
-
-.. code:: yaml
-
-     - $r%=5 # Hier wird der Wert vom Register $r durch 5 geteilt und abgerundet
-
-Der Befehl „/=“ teilt den Wert vom Register $r durch die Zahl hinter dem
-Gleichheitszeichen. Dabei ist zu beachten, dass immer ein Integer
-(Ganzzahl) geliefert und das Ergebnis abgerundet wird. Die Rechnung von
-9 durch 2 ergibt also 4.
-
-``%=`` – Modulo
-^^^^^^^^^^^^^^^
-
-Der Befehl „%=“ liefert das modulo des Registers mit der Zahl hinter dem
-Gleichheitszeichen
-
-.. code:: yaml
-
-    - $r%=5 # Hier wird das Modulo (teiler Rest) von $r modulo 5 geliefert 
-
-Angenommen $r hat einen Wert von 23 und man Teil das durch 5, dann Wäre
-das Ergebnis 4 Rest 3. In dem Beispielen oben hätte $r nach dem
-Registerbefehl 3.
 
 ``Neg()`` –  Register negieren
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Der Befehl „Neg()“ negiert den Wert eines Registers. Hat das Register
-zum Beispiel den Wert 5, wird nach dem Befehl der Wert -5. Aus -5 würde
-5 werden. Dieser Registerbefehl wird anders als die Anderen mit klammern
-geschrieben.
+Format:
+  | **Neg(**\ *register*\ **)**
+Beispiel:
+  .. code:: yaml
 
-.. code:: yaml
+    - Neg($r)
+Effekt:
+  Der Wert des Registers *register* wird negiert: Aus 5 wird -5 und umgekehrt.
 
-    - Neg($r) # Hier wird der Wert des Registers $r negiert.
+
 
 ``&=``, ``|=``, ``^=`` – bitweise Operatoren
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Wenn Du nicht weißt was Bitweise UND, OR und XOR ist, dann wirst Du
-diese Befehle wahrscheinlich nicht brauchen. Um Bitweise Operatoren zu
-verstehen muss man wissen wie eine Dezimalzahl in Binärschreibweise
-Dargestellt wird. (`siehe
-Wikipedia <https://de.wikipedia.org/wiki/Dualsystem>`__)
+Format:
+  | *register1* **&=** *wert*
+  | *register1* **&=** *register2*
+  | *register1* **|=** *wert*
+  | *register1* **|=** *register2*
+  | *register1* **^=** *wert*
+  | *register1* **^=** *register2*
+Zweck:
+  Es wird die entsprechende bitweise Operation auf *register1* und den *wert*
+  (bzw. *register2*) angewandt, und das Ergebnis in *register1* abgelegt.
+
+  Dabei ist **&=** das  bitweise Und, **|=** das bitweise Oder, **^=** das bitweise exklusive Oder (XOR). Wenn dir das nichts sagt, brauchst du es vermutlich nicht.
+
+``T`` – Timer
+^^^^^^^^^^^^^
+
+Format:
+  | **T(**\ *register*\ **,**\ *modulus* **)**
+Beispiel:
+  .. code:: yaml
+
+    wuerfel:
+    - T($wurf,6)
+Effekt:
+  Der Wert des Tiptoi-Zählers zu beginn des Skriptes wird (modulo dem *modulus*) im Register *register* abgelegt.
+
+Der Tiptoi-Stift verfügt über einen Zähler, der während der Benutzung hochgezählt wird. Er wird schneller hochgezählt, wenn mit dem Stift interagiert wird, er ist also nicht zur Zeitmessung geeignet. Man kann damit aber (einfache) Zufallszahlen bekommen. Mehr dazu im Abschnitt :ref:`Zufallszahlen`.
 
 
-Der Befehl „&=“ wendet den Wert hinter dem Gleichheitszeichen auf das
-Register an. Ein bitweises UND wird auf zwei Bitfolgen gleicher Länge
-angewendet und führt die logische UND-Verknüpfung auf jedem Paar
-korrespondierender Bits durch. Das Ergebnisbit ist 1, falls beide Bits 1
-sind, ansonsten ist es 0.
-
-.. code:: yaml
-
-    - $r&=5 # Hier wird 5 Bitweise UND auf das Register $r angewendet
-
-FFF6 (written $r\|=m): bitwise or to register $r the value of m
-
-Bitweise XOR
-
-FFF7 (written $r^=m): bitwise xor to register $r the value of m
+.. _conditionals:
 
 Bedingungen
 ^^^^^^^^^^^
