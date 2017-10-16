@@ -455,8 +455,8 @@ Der Tiptoi-Stift verfügt über einen Zähler, der während der Benutzung hochge
 
 .. _conditionals:
 
-Bedingungen
-^^^^^^^^^^^
+``==``, ``>=``, ``<=``, ``>``, ``<``, ``!=`` -- Bedingungen
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Format:
   | *argument1* **==** *argument2*
