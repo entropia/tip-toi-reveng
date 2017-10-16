@@ -19,8 +19,3 @@ durch die Tipps und Tricks stöbern.
    yaml-referenz
    tipps-und-tricks
    gallerie
-
-.. toctree::
-   :caption: Anhang
-
-   genindex
