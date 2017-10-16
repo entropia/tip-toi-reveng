@@ -8,7 +8,7 @@ Um eigene Tiptoi-Bücher zu gestalten brauchst du das ``tttool``.
 Windows
 -------
 
-Unter Windows lädst du von https://github.com/entropia/tip-toi-reveng/releases die neuste Version als Zip-Datei (``tttool-win32-version.zip``) herunter, und extrahierst sie. Du kannst das ``tttool`` direkt verwenden, es ist keine weitere Installation nötig.
+Unter Windows lädst du von https://github.com/entropia/tip-toi-reveng/releases die neueste Version als Zip-Datei (``tttool-win32-version.zip``) herunter, und extrahierst sie. Du kannst das ``tttool`` direkt verwenden, es ist keine weitere Installation nötig.
 
 Linux (Debian, Ubuntu und ähnliche)
 -----------------------------------
@@ -40,4 +40,4 @@ Nun solltest du im aktuellen Verzeichnis eine Datei ``tttool`` finden, die du au
 Sonstige (MacOS, andere Linuxe)
 -------------------------------
 
-Im Grunde kannst du dich an der Anleitung für Debian und Ubuntu orientieren oben, lediglich den ersten Befehl, der vor allem den Haskell-Compiler installiert, muss du anpassen. Vielleicht helfen dir die `Informationen zur Installation of Haskell <https://www.haskell.org/downloads#minimal>`_ weiter.
+Im Grunde kannst du dich an der Anleitung für Debian und Ubuntu oben orientieren, lediglich den ersten Befehl, der vor allem den Haskell-Compiler installiert, muss du anpassen. Vielleicht helfen dir die `Informationen zur Installation of Haskell <https://www.haskell.org/downloads#minimal>`_ weiter.
