@@ -7,8 +7,8 @@ programmierst.
 Das YAML-Format
 ~~~~~~~~~~~~~~~
 
-Das YAML-Format im allgemeinen wurde nicht für dieses Projekt erfunden, sondern ist allgemein gebräuchlich um strukturierte Daten in einer menschenlesbaren Textdatei abzulegen. Eine knappe Übersicht findest du auf der `Wikipedia-Seite zu YAML <https://de.wikipedia.org/wiki/YAML>`_.
-Beachte dass in YAML Einrückungen, also Leerzeichen am Anfang der Zeile, relevant sind und die Struktur der Datei beschreiben sind!
+Das YAML-Format im Allgemeinen wurde nicht für dieses Projekt erfunden, sondern ist gebräuchlich, um strukturierte Daten in einer menschenlesbaren Textdatei abzulegen. Eine knappe Übersicht findest du auf der `Wikipedia-Seite zu YAML <https://de.wikipedia.org/wiki/YAML>`_.
+Beachte, dass in YAML Einrückungen, also Leerzeichen am Anfang der Zeile, relevant sind und die Struktur der Datei beschreiben!
 
 Die YAML-Datei bearbeitest du mit dem Texteditor deiner Wahl (Notepad, vim etc.).
 
@@ -28,9 +28,9 @@ Eine typische, minimale YAML-Datei für die Tiptoi-Programmierung sieht so aus:
       - P(zweites_feld)
 
 
-Zwingend nötig ist dabei streng genommen nur das Feld ``product-id``, aber in der Regel brauchst du auch ``scripts`` um irgend etwas Sinnvolles zu machen.
+Zwingend nötig ist dabei streng genommen nur das Feld ``product-id``, aber in der Regel brauchst du auch ``scripts`` um irgendetwas Sinnvolles zu machen.
 
-Es gibt noch eine Reihe weiterer, optionaler Felder, die im Folgenden erklärt werden. Eine etwas kompliziterte Datei könnte dann zum Beispiel so aussehen:
+Es gibt noch eine Reihe weiterer, optionaler Felder, die im Folgenden erklärt werden. Eine etwas kompliziertere Datei könnte dann zum Beispiel so aussehen:
 
 .. code:: yaml
 
@@ -73,7 +73,7 @@ Zweck:
   hier angegebenen OID-Code bedruckt sein.
 
 Es sollte zu jeder Produkt-ID nur eine GME-Datei auf den Stift geladen werden. Ravensburger zählt seine Produkte fortlaufend ab 1
-hoch, und Sprachen werden mit 999 abwärts nummeriert. Wir raten dir für dein eigenes Projekt daher eine Zahl zwischen 900 und 950.
+hoch und Sprachen werden mit 999 abwärts nummeriert. Wir raten dir für dein eigenes Projekt daher eine Zahl zwischen 900 und 950 zu wählen.
 
 ``comment``
 ^^^^^^^^^^^
@@ -122,7 +122,7 @@ Zweck:
   durch den in der YAML-Datei verwendeten Dateinamen ersetzt. Das Programm
   sucht nach allen geeigneten Dateiendungen (``.wav``, ``.ogg``, ``.flac``, ``.mp3``).
 
-  Beispiel: Den im ``welcome: hello`` angegebenen Begrüßungssound würde das
+  Beispiel: Für den im ``welcome: hello`` angegebenen Begrüßungssound würde das
   ``tttool`` also die Datei ``Audio/hello.ogg`` einbinden.
 
 ``gme-lang``
@@ -138,7 +138,7 @@ Beispiel:
 
 Zweck:
   Das Sprach-Feld der GME-Datei. Bei eigenen Produkten gibt es in der Regel
-  kein Grund, dieses Feld anzugeben.
+  keinen Grund, dieses Feld anzugeben.
 
 .. _yaml-init:
 
@@ -146,9 +146,9 @@ Zweck:
 ^^^^^^^^
 
 In diesem Feld werden Strings initialisiert. Beispielsweise werden hier
-Spielmodi oder Zähler auf 0 gesetzt, damit diese Später mit einem
+Spielmodi oder Zähler auf 0 gesetzt, damit diese später mit einem
 vorgegebenen Wert starten können. Beispiel: Wird hier "$modus:=0 $i:=0"
-geschrieben, so wird nach Aktivierung des Projekts der String modus und
+geschrieben, so werden nach Aktivierung des Projekts die Strings modus und
 i mit 0 gestartet.
 
 ``scripts``
@@ -168,9 +168,9 @@ Beispiel:
        - P(goodbye)
 
 Zweck:
-  Enthält die Logik dieses Tiptoi-Produktes, und gibt für ein OID-Code an, was der Stift machen soll, wenn du diesen Code antippst.
+  Enthält die Logik dieses Tiptoi-Produktes und gibt für einen OID-Code an was geschehen soll, wenn du diesen Code antippst.
 
-  Statt einem konkreten OID-Code kann auch ein Code-Name angegeben werden, siehe Abschnitt „:ref:`code-namen`“.
+  Statt eines konkreten OID-Codes kann auch ein Code-Name angegeben werden, siehe Abschnitt „:ref:`code-namen`“.
 
   Die Skripte werden in Detail im Abschnitt „:ref:`yaml-skripte`“ erklärt.
 
@@ -209,7 +209,7 @@ Zweck:
 
 
 Das tttool verfügt über ein integriertes Text-to-Speech tool, welches dir
-erlaubt Texte automatisch vorgelesen einzubauen. So kannst du deine Tiptoi-Entwicklung testen, bevor du alles nötige aufgenommen hast.
+erlaubt, Texte automatisch vorgelesen zu bekommen. So kannst du deine Tiptoi-Entwicklung testen, bevor du alles Nötige aufgenommen hast.
 
 Solltest du Text-to-Speech in verschiedenen Sprachen benötigen, kannst du mehrere Abschnitte mit eigener Sprache angeben:
 
@@ -246,7 +246,7 @@ Zweck:
 
 Du kannst sprechende Namen auch ohne ``scriptcodes`` verwenden, in diesem Fall
 wählt das ``tttool`` die Codes selbst. Damit stets die gleichen Codes verwendet
-werden (und bereits gedruckte Code weiterhin funktionieren), speichert es die
+werden (und bereits gedruckte Codes weiterhin funktionieren), speichert es die
 Auswahl in einer Datei mit Endung ``.codes.yaml``, die nur den
 ``scriptcodes``-Eintrag enthält. Es steht dir frei, diese Zuordnung in die
 eigentliche YAML-Datei zu übernehmen.
@@ -262,7 +262,7 @@ eigentliche YAML-Datei zu übernehmen.
 YAML-Programmierung
 ~~~~~~~~~~~~~~~~~~~
 
-Die Logik einer Tiptoi-Programmierung steckt vor allem in den im ``scripts``-Feld angegebenen Skripten. Es gibt zu jedem OID-Code ein Skript. Ein Skript besteht aus einer oder gegebenenfalls mehrerer Zeilen, die wiederum aus Befehlen bestehen.
+Die Logik einer Tiptoi-Programmierung steckt vor allem in den im ``scripts``-Feld angegebenen Skripten. Es gibt zu jedem OID-Code ein Skript. Dieses besteht aus einer oder gegebenenfalls mehreren Zeilen, die wiederum aus Befehlen bestehen.
 
 Das einfachste Beispiel ist also
 
@@ -280,7 +280,7 @@ Eine Skriptzeile kann mehrere Befehle enthalten, etwa
      scripts:
        2000: P(hallo) P(freund) J(2001)
 
-Hier werden drei Befehler nacheinander ausgeführt.
+Hier werden drei Befehle nacheinander ausgeführt.
 
 .. warning::
 
@@ -297,7 +297,7 @@ Im Allgemeinen können zu einem Skript mehrere Zeilen angegeben werden:
         - $offen==1? P(willkommen)
         - $offen==0? P(finde_den_schluessel)
 
-Tippst du nun Code 2000 an, wird die erste Zeile ausgeführt, deren Bedingungen  alle erfüllt sind (mehr zum Programmieren mit Bedingungen im :ref:`Abschnitt zu Bedingungsbefehle <conditionals>`\ ).
+Tippst du nun Code 2000 an, wird die erste Zeile ausgeführt, deren Bedingungen alle erfüllt sind (mehr zum Programmieren mit Bedingungen im :ref:`Abschnitt zu Bedingungsbefehle <conditionals>`\ ).
 
 Statt die OID-Codes numerisch anzugeben, kannst du auch sprechende Namen verwenden, siehe Abschnitt „:ref:`code-namen`\ “.
 
@@ -312,7 +312,7 @@ Zahlen oder Unterstrichen (`_`). Direkt nach dem `$` muss ein Buchstabe kommen.
 
 Alle Arithmetik auf dem Tiptoistift arbeitet mit ganzen Zahlen im Bereich 0 bis 65535). Alle Register haben zu Beginn den Wert 0, sofern du es nicht im ``init``-Feld anders verlangst (siehe Abschnitt „:ref:`yaml-init`\ “.
 
-Wenn du eine GME-Datei exportierst (siehe Abschnitt „:ref:`tttool-export`\ “), so kennt das ``tttool`` die Namen der Register nicht. In dem Fall werden Nummern verwendet (``$0``, ``$1``\ …). Es gibt in der Regel keinen Grund, dies in deinen eigenen Tiptoi-Produkten so zu machen.
+Wenn du eine GME-Datei exportierst (siehe Abschnitt „:ref:`tttool-export`\ “), so kennt das ``tttool`` die Namen der Register nicht. In diesem Fall werden Nummern verwendet (``$0``, ``$1``\ …). Es gibt in der Regel keinen Grund, dies in deinen eigenen Tiptoi-Produkten so zu machen.
 
 Befehlsreferenz
 ~~~~~~~~~~~~~~~
@@ -325,9 +325,9 @@ In der Format-Beschreibung werden folgende Platzhalter verwendet:
 * *oid-code*: Die Nummer eines OID-Codes (und damit einer Skiptzeile), wenn ``scriptcodes`` *nicht* verwendet wird.
 * *code-name*: Der Name eines OID-Codes (und damit einer Skiptzeile), wenn ``scriptcodes`` verwendet wird.
 * *register*: Der Name eines Registers, mit `$`. Beispiel: `$mode`.
-* *argument*: Entweder der Name eines Registers, oder eine Zahl. Beispiele: `$mode`, `0`, `1024`.
+* *argument*: Entweder der Name eines Registers oder eine Zahl. Beispiele: `$mode`, `0`, `1024`.
 
-    Der *Wert* eines Argumentes ist im ersten Fall der aktuell in dem Register gespeicherte Wert; im zwieten Fall einfach die Zahl selbst.
+    Der *Wert* eines Argumentes ist im ersten Fall der aktuell in dem Register gespeicherte Wert; im zweiten Fall einfach die Zahl selbst.
 
 .. _command-P:
 
@@ -344,9 +344,9 @@ Beispiel:
     - P(willkommen) P(zu_hause,daheim)
 
 Effekt:
-    In der ersten Form spielt der Befehl die angegene Audio-Datei ab.
+    In der ersten Form spielt der Befehl die angegebene Audio-Datei ab.
 
-    In der zweiten Form spielt der Befehl eine zufälligen der angegebenen Audio-Dateien ab.
+    In der zweiten Form spielt der Befehl zufällig eine der angegebenen Audio-Dateien ab.
 
 
 .. _command-J:
@@ -366,7 +366,7 @@ Effekt:
   Der Stift führt, nach dem aktuellen Skript, das Skript mit Code *oid-code* bzw. *code-name* (wenn :ref:`scriptcodes <code-namen>` verwendet wird) aus.
 
 .. warning::
-  Die neuen Tiptoi-Stiften (die mit der Audiobook-Funktion) verhalten sich bisweilen seltsam, wenn **J**- und **P**-Befehle gemischt werden.
+  Die neuen Tiptoi-Stifte (die mit der Audiobook-Funktion) verhalten sich bisweilen seltsam, wenn **J**- und **P**-Befehle gemischt werden.
 
   TODO: Was genau passiert hier?
 
@@ -402,9 +402,9 @@ Beispiel:
 Effekt:
   Es wird die entsprechende Rechenoperation auf die aktuell in *register* gespeicherte Zahl und den Wert des Arguments *argument* angewandt, und das Ergebnis in *register1* abgelegt.
 
-Es wird dabei nur mit ganzen Zahlen gerechnet. Insbesondere rundet die Division (**/=**) das Ergebnis stets ab. Wenn also Register `$x` den Wert 8 enthält und `$x/=3` wird ausgeführt, so enthält es den Wert 2.
+Es wird dabei nur mit ganzen Zahlen gerechnet. Insbesondere rundet die Division (**/=**) das Ergebnis stets ab. Wenn also Register `$x` den Wert 8 enthält und `$x/=3` ausgeführt wird, so enthält es den Wert 2.
 
-Der Befehl **%=** berechnet entsprechend den Divisionsrest. Wenn also Register `$x` den Wert 8 enthält und `$x%=3` wird ausgeführt, so enthält es den Wert 2.
+Der Befehl **%=** berechnet entsprechend den Divisionsrest. Wenn also Register `$x` den Wert 8 enthält und `$x%=3` ausgeführt wird, so enthält es den Wert 2.
 
 
 ``Neg()`` –  Register negieren
@@ -430,8 +430,8 @@ Format:
   | *register* **^=** *argument*
 Zweck:
   Es wird die entsprechende bitweise Operation auf die aktuell in *register*
-  gespeicherte Zahl und den Wert des Arguments *argument* an, und das Ergebnis
-  wird in *register* abgelegt.
+  gespeicherte Zahl und den Wert des Arguments *argument* angewandt, und das Ergebnis
+  in *register* abgelegt.
 
   Dabei ist **&=** das bitweise Und, **|=** das bitweise Oder, **^=** das
   bitweise exklusive Oder (XOR). Wenn dir das nichts sagt, brauchst du es
@@ -448,7 +448,7 @@ Beispiel:
     wuerfel:
     - T($wurf,6)
 Effekt:
-  Der Wert des Tiptoi-Zählers zu beginn des Skriptes wird (modulo dem *modulus*) im Register *register* abgelegt.
+  Der Wert des Tiptoi-Zählers zu Beginn des Skriptes wird (modulo dem *modulus*) im Register *register* abgelegt.
 
 Der Tiptoi-Stift verfügt über einen Zähler, der während der Benutzung hochgezählt wird. Er wird schneller hochgezählt, wenn mit dem Stift interagiert wird, er ist also nicht zur Zeitmessung geeignet. Man kann damit aber (einfache) Zufallszahlen bekommen. Mehr dazu im Abschnitt :ref:`Zufallszahlen`.
 
@@ -490,7 +490,7 @@ Effekt:
    **>=** größer oder gleich
    **<=** kleiner oder gleich
    **>**  echt größer
-   **<**  echot kleiner
+   **<**  echt kleiner
    **!=** ungleich
    ====== ===================
 
