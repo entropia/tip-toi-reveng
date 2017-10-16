@@ -104,7 +104,7 @@ Beispiel:
 Zweck:
   Beim Aktivieren des Produktes werden die angegebenen Audio-Dateien abgespielt.
 
-.. _media-path::
+.. _media-path:
 
 ``media-path``
 ^^^^^^^^^^^^^^
@@ -297,7 +297,7 @@ Im Allgemeinen können zu einem Skript mehrere Zeilen angegeben werden:
         - $offen==1? P(willkommen)
         - $offen==0? P(finde_den_schluessel)
 
-Tippst du nun Code 2000 an, wird die erste Zeile ausgeführt, deren Bedingungen  alle erfüllt sind (mehr zum Programmieren mit Bedingungen im Abschnitt „:ref:`conditionals`\ “).
+Tippst du nun Code 2000 an, wird die erste Zeile ausgeführt, deren Bedingungen  alle erfüllt sind (mehr zum Programmieren mit Bedingungen im :ref:`Abschnitt zu Bedingungsbefehle <conditionals>`\ ).
 
 Statt die OID-Codes numerisch anzugeben, kannst du auch sprechende Namen verwenden, siehe Abschnitt „:ref:`code-namen`\ “.
 
@@ -321,11 +321,11 @@ Im Folgenden werden die Befehle im Einzelnen erklärt: Wie du sie in der YAML-Da
 
 In der Format-Beschreibung werden folgende Platzhalter verwendet:
 
-  * *audio-datei*: Der Name einer Audio-Datei. Aus dem Namen wird, wie im Abschnitt „:ref:`media-path`\ “ beschrieben, der Dateiname der Audiodatei abgeleitet.
-  * *oid-code*: Die Nummer eines OID-Codes (und damit einer Skiptzeile), wenn ``scriptcodes`` *nicht* verwendet wird.
-  * *code-name*: Der Name eines OID-Codes (und damit einer Skiptzeile), wenn ``scriptcodes`` verwendet wird.
-  * *register*: Der Name eines Registers, mit `$`. Beispiel: `$mode`.
-  * *argument*: Entweder der Name eines Registers, oder eine Zahl. Beispiele: `$mode`, `0`, `1024`.
+* *audio-datei*: Der Name einer Audio-Datei. Aus dem Namen wird, wie im Abschnitt „:ref:`media-path`\ “ beschrieben, der Dateiname der Audiodatei abgeleitet.
+* *oid-code*: Die Nummer eines OID-Codes (und damit einer Skiptzeile), wenn ``scriptcodes`` *nicht* verwendet wird.
+* *code-name*: Der Name eines OID-Codes (und damit einer Skiptzeile), wenn ``scriptcodes`` verwendet wird.
+* *register*: Der Name eines Registers, mit `$`. Beispiel: `$mode`.
+* *argument*: Entweder der Name eines Registers, oder eine Zahl. Beispiele: `$mode`, `0`, `1024`.
 
     Der *Wert* eines Argumentes ist im ersten Fall der aktuell in dem Register gespeicherte Wert; im zwieten Fall einfach die Zahl selbst.
 
