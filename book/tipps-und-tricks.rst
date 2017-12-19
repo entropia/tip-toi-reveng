@@ -92,6 +92,43 @@ und 6.
 (TODO: Angaben darüber ergänzen, wie gut dieser Algorithmus
 funktioniert) (TODO: weitere PRNG-Algorithmen)
 
+
+.. _unterbrechenvonaudio:
+
+Unterbrechen von Audio verhindern
+---------------------------------
+
+Wenn man auf einen Code tippt, der einen ``P()``-Befehl enthält, während der Tiptoi-Stift gerade eine Audio-Datei abspielt, dann wird normalerweise sofort die neue Audio-Datei abgespielt und das Abspiel der aktuellen Audio-Datei dadurch unterbrochen. Falls dies nicht erwünscht ist, so kannst du das Abspielen einer Audio-Datei folgendermaßen gegen solches Unterbrechen "schützen":
+
+::
+
+    code1:
+      - $p==1?
+      - $p:=1 J(_p0) P(audio1)
+    code2:
+      - $p==1?
+      - $p:=1 J(_p0) P(audio2)
+    ...
+    _p0:
+      - $p:=0
+
+- Das Register ``$p`` hat den Wert 0, wenn gerade nichts abgespielt wird, und 1, während etwas abgespielt wird.
+- Jedes Skript muss mit der Zeile ``- $p==1?`` beginnen. Falls ``$p`` den Wert 1 hat wird das Skript dann nicht weiter ausgeführt und ein laufendes Abspiel daher nicht unterbrochen.
+- Ein Abspiel wird durch die Konstruktion ``$p:=1 J(_p0) P(audio)`` "geschützt". Dies bewirkt, dass der Wert im Register ``$p`` auf 1 gesetzt wird und die angegebene Audio-Datei abgespielt wird. Zudem wird **nach Ende des Abspiels** zum Skript ``_p0`` gesprungen. Dies nutzt das (noch nicht verstandene) Zusammenspiel von ``J()``-Befehl und ``P()``-Befehl, wobei der ``J()``-Befehl **vor** dem ``P()``-Befehl stehen muss!
+- Das Skript ``_p0`` setzt das Register ``$p`` wieder auf den Wert 0 zurück.
+
+**Beachte:**
+
+- Zwei aufeinander folgende ``P()``-Befehle können durch die Konstruktion ``J(_p0) P(sag_dies) P(dann_das)`` leider **nicht** "geschützt" werden. Tippst du während des Abspiels der ersten Audio-Datei (``sag_dies``) auf einen OID-Code, so wird die zweite Audio-Datei (``dann_das``) nicht mehr abgespielt. Zum Skript ``_p0`` wird aber dennoch gesprungen, so dass das Register ``$p`` auf den Wert 0 zurückgesetzt wird. Varianten der ``P()``-Befehle wie etwa ``PA(sag_dies, dann_das)`` ändern daran nichts. Allerdings kann man sich behelfen, indem man eine neue Audio-Datei ``sag_dies_dann_das`` erstellt und nur einen Befehl ``P(sag_dies_dann_das)`` zum Abspielen nutzt.
+- Während der Tiptoi-Stift eine Audio-Datei abspielt können durchaus OID-Codes angetippt werden und auch einfache arithmetische Befehle ausgeführt werden (z.B. den Wert in einem Register erhöhen), ohne das Abspiel zu unterbrechen. Es dürfen nur keine ``P()``-Befehle oder ``J()``-Befehle ausgeführt werden.
+- Du kannst auch Skripte haben, die selbst "geschützte" Abspiele unterbrechen (etwa ein "Stop"-Skript)::
+
+    stop:
+      - $p:=0 P(nichts)
+
+  Du musst dann aber darauf achten, das Register ``$p`` wieder auf 0 zurück zu setzen.
+
+
 Ansage von Registerwerten
 -------------------------
 
