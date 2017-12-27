@@ -1,6 +1,6 @@
 {-# LANGUAGE BangPatterns, TupleSections, FlexibleContexts #-}
 
-module OidCode (genRawPixels, genRawPNG, DPI(..), PixelSize(..)) where
+module OidCode (genRawPixels, genRawPNG, tilePixelSize, DPI(..), PixelSize(..)) where
 
 import Data.Word
 import Data.Bits
@@ -45,6 +45,13 @@ imageFromBlackPixels width height pixels = runST $ do
     black =      promotePixel $ PixelYA8 minBound maxBound
     background = promotePixel $ PixelYA8 maxBound minBound
 
+-- | Size of one tile, in pixels
+tilePixelSize :: DPI -> PixelSize -> Int
+tilePixelSize dpi _ps = width
+  where
+    spacePerPoint = dpi `div2` 100
+    width  = 4*spacePerPoint
+
 -- | Renders a single OID Image, returns its dimensions and the black pixels therein
 singeOidImage :: DPI -> PixelSize -> Word16 -> ((Int, Int), [(Int, Int)])
 singeOidImage dpi ps code = ((width, height), pixels)
@@ -87,8 +94,8 @@ singeOidImage dpi ps code = ((width, height), pixels)
     -- Drawing combinators
     at (x, y) = map (\(x', y') -> (x + x', y + y'))
 
-    -- integer division rounded up
-    x `div2` y = ((x-1) `div` y) + 1
+-- integer division rounded up
+x `div2` y = ((x-1) `div` y) + 1
 
 oidImage :: ColorConvertible PixelYA8 p => Int -> Int -> DPI -> PixelSize -> Word16 -> Image p
 oidImage w h dpi ps code =
@@ -102,7 +109,6 @@ oidImage w h dpi ps code =
         , x' <- [x,x + cw..w-1]
         , y' <- [y,y + ch..h-1]
         ]
-
 -- Width and height in pixels
 genRawPixels :: Int -> Int -> DPI -> PixelSize -> Word16 -> B.ByteString
 genRawPixels w h dpi ps code =

@@ -23,11 +23,16 @@ oidTable conf title entries | entriesPerPage < 1 = error "OID codes too large to
         case code2RawCode rc of
             Nothing -> return (d, Nothing)
             Just c -> do
-                image <- createPDFRawImageFromByteString imageWidthPx imageHeightPx False FlateDecode $
+                let twp = tilePixelSize (cDPI conf) (cPixelSize conf)
+                let tw = fromIntegral twp / px
+                image <- createPDFRawImageFromByteString twp twp False FlateDecode $
                     compressWith defaultCompressParams { compressLevel = defaultCompression } $
-                    genRawPixels imageWidthPx imageHeightPx (cDPI conf) (cPixelSize conf) $
+                    genRawPixels twp twp (cDPI conf) (cPixelSize conf) $
                     c
-                return (d, Just image)
+                pat <- createColoredTiling 0 0 tw tw tw tw NoDistortion $ do
+                    applyMatrix $ scale (1/px) (1/px)
+                    drawXObject image
+                return (d, Just pat)
 
     let chunks = chunksOf entriesPerPage entries'
     let totalPages = length chunks
@@ -52,9 +57,8 @@ oidTable conf title entries | entriesPerPage < 1 = error "OID codes too large to
                 withNewContext $ do
                     applyMatrix $ translate (align p)
                     forM_ mbi $ \i -> withNewContext $ do
-                        applyMatrix $ translate (0 :+ (- alignToPx imageHeight))
-                        applyMatrix $ scale (1/px) (1/px)
-                        drawXObject i
+                        setColoredFillPattern i
+                        fill (Rectangle (0 :+ (- alignToPx imageHeight)) (imageWidth :+ 0))
                     withNewContext $ do
                         applyMatrix $ translate  (0 :+ (-imageHeight - subtitleSep))
                         let fontRect = Rectangle (0 :+ (-subtitleHeight)) (imageWidth :+ 0)
