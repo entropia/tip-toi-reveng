@@ -45,7 +45,7 @@ dumpAudioTo directory file = do
     createDirectoryIfMissing False directory
     forMn_ (ttAudioFiles tt) $ \n audio -> do
         let audiotype = maybe "raw" snd $ find (\(m,t) -> m `B.isPrefixOf` audio) fileMagics
-        let filename = printf "%s/%s_%d.%s" directory (takeBaseName file) n audiotype
+        let filename = printf "%s/%s_%04d.%s" directory (takeBaseName file) n audiotype
         if B.null audio
         then do
             printf "Skipping empty file %s...\n" filename
