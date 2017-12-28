@@ -8,8 +8,9 @@ import Text.Printf
 import Control.Monad
 import Control.Applicative (Applicative)
 import qualified Data.Map as M
-import Control.Monad.Writer.Strict
-import Control.Monad.State.Strict
+import Control.Monad.Writer.Lazy
+import Control.Monad.State.Lazy
+import Debug.Trace
 
 import Types
 import Constants
@@ -102,26 +103,155 @@ putTipToiFile (TipToiFile {..}) = mdo
     putWord8 $ fromIntegral (B.length ttComment)
     putBS ttComment
     putBS ttDate
+    putBS ttLang
+    putWord8 0
     seek 0x0071 -- Just to be safe
     putWord32 ipllo
     seek 0x0200 -- Just to be safe
     sto <- getAddress $ putScriptTable ttScripts
     ast <- getAddress $ putWord16 0x00 -- For now, no additional script table
-    gto <- getAddress $ putGameTable
+    gto <- getAddress $ putGameTable ttGames
     iro <- getAddress $ putInitialRegs ttInitialRegs
     mft <- getAddress $ putAudioTable ttAudioXor ttAudioFiles
-    ipllo <- getAddress $ putOffsets putWord16 $ map putPlayList ttWelcome
+    ipllo <- getAddress $ putPlayListList ttWelcome
     return ()
 
-putGameTable :: SPut
-putGameTable = mdo
-    putWord32 1 -- Hardcoded empty
-    putWord32 offset
-    offset <- getAddress $ do
-       putWord16 253
-       putWord16 0
+putGameTable :: [Game] -> SPut
+putGameTable games = putOffsets putWord32 $ map putGame games
+
+putGame :: Game -> SPut
+putGame (Game6 {..}) = mdo
+    putWord16 6
+    putWord16 (fromIntegral (length gSubgames) - gBonusSubgameCount)
+    putWord16 gRounds
+    putWord16 gBonusSubgameCount
+    putWord16 gBonusRounds
+    putWord16 gBonusTarget
+    putWord16 gUnknownI
+    putWord16 gEarlyRounds
+    putWord16 gUnknownQ
+    putWord16 gRepeatLastMedia
+    putWord16 gUnknownX
+    putWord16 gUnknownW
+    putWord16 gUnknownV
+    putWord32 spl
+    putWord32 repl
+    putWord32 fpl
+    putWord32 rspl
+    putWord32 lrspl
+    putWord32 rspl2
+    putWord32 lrspl2
+    mapM_ putWord32 sgo
+    mapM_ putWord16 gTargetScores
+    mapM_ putWord16 gBonusTargetScores
+    mapM_ putWord32 fpll
+    mapM_ putWord32 fpll2
+    putWord32 gilo
+
+
+    spl   <- getAddress $ putPlayListList gStartPlayList
+    repl  <- getAddress $ putPlayListList gRoundEndPlayList
+    fpl   <- getAddress $ putPlayListList gFinishPlayList
+    rspl  <- getAddress $ putPlayListList gRoundStartPlayList
+    lrspl <- getAddress $ putPlayListList gLaterRoundStartPlayList
+    rspl2  <- getAddress $ putPlayListList gRoundStartPlayList2
+    lrspl2 <- getAddress $ putPlayListList gLaterRoundStartPlayList2
+    fpll  <- mapM (getAddress . putPlayListList) gFinishPlayLists
+    fpll2  <- mapM (getAddress . putPlayListList) gBonusFinishPlayLists
+
+    sgo <- mapM (getAddress . putSubGame) gSubgames
+
+    gilo <- getAddress $ putGameIdList gBonusSubgameIds
+
     return ()
 
+putGame (Game253) = mdo
+    putWord16 253
+
+putGame g = mdo
+    putWord16 (gameType g)
+    putWord16 (fromIntegral $ length (gSubgames g))
+    putWord16 (gRounds g)
+    putWord16 (gUnknownC g)
+    putWord16 (gEarlyRounds g)
+    putWord16 (gRepeatLastMedia g)
+    putWord16 (gUnknownX g)
+    putWord16 (gUnknownW g)
+    putWord16 (gUnknownV g)
+    putWord32 spl
+    putWord32 repl
+    putWord32 fpl
+    putWord32 rspl
+    putWord32 lrspl
+    mapM_ putWord32 sgo
+    mapM_ putWord16 (gTargetScores g)
+    mapM_ putWord32 fpll
+
+    case g of
+        Game7 {..} -> mdo
+            putWord32 sggo
+            sggo <- getAddress $ do
+                putOffsets putWord16 $ map putGameIdList gSubgameGroups
+            return ()
+        Game8 {..} -> mdo
+            putWord32 gso
+            putWord32 gs
+            putWord32 gse1
+            putWord32 gse2
+
+            gso <- getAddress $ putOidList gGameSelectOIDs
+            gs  <- getAddress $ putArray putWord16 $ map putWord16 gGameSelect
+            gse1 <- getAddress $ putPlayListList gGameSelectErrors1
+            gse2 <- getAddress $ putPlayListList gGameSelectErrors2
+
+            return ()
+        Game9 {..} -> mdo
+            mapM_ putWord32 epll
+            epll <- mapM (getAddress . putPlayListList) gExtraPlayLists
+            return ()
+        Game10 {..} -> mdo
+            mapM_ putWord32 epll
+            epll <- mapM (getAddress . putPlayListList) gExtraPlayLists
+            return ()
+        Game16 {..} -> mdo
+            putWord32 eoids
+            mapM_ putWord32 epll
+            eoids <- getAddress $ putOidList gExtraOIDs
+            epll <- mapM (getAddress . putPlayListList) gExtraPlayLists
+            return ()
+        _ -> return ()
+
+    spl   <- getAddress $ putPlayListList $ gStartPlayList g
+    repl  <- getAddress $ putPlayListList $ gRoundEndPlayList g
+    fpl   <- getAddress $ putPlayListList $ gFinishPlayList g
+    rspl  <- getAddress $ putPlayListList $ gRoundStartPlayList g
+    lrspl <- getAddress $ putPlayListList $ gLaterRoundStartPlayList g
+    fpll  <- mapM (getAddress . putPlayListList) (gFinishPlayLists g)
+
+    sgo <- mapM (getAddress . putSubGame) (gSubgames g)
+    return ()
+
+
+
+putPlayListList :: [PlayList] -> SPut
+putPlayListList playlistlist = do
+    putOffsets putWord16 $ map putPlayList playlistlist
+
+putGameIdList :: [GameId] -> SPut
+putGameIdList = putArray putWord16 . map (putWord16 . (+1))
+
+putOidList :: [GameId] -> SPut
+putOidList = putArray putWord16 . map putWord16
+
+putSubGame :: SubGame -> SPut
+putSubGame (SubGame {..}) = mdo
+    putBS sgUnknown
+    putArray putWord16 $ map putWord16 sgOids1
+    putArray putWord16 $ map putWord16 sgOids2
+    putArray putWord16 $ map putWord16 sgOids3
+    mapM_ putWord32 pll 
+    pll  <- mapM (getAddress . putPlayListList) sgPlaylist
+    return ()
 
 putScriptTable :: [(Word16, Maybe [Line ResReg])] -> SPut
 putScriptTable [] = error "Cannot create file with an empty script table"
@@ -186,6 +316,14 @@ putCommand (Neg r) = do
     putWord16 r
     mapM_ putWord8 [0xF8, 0xFF]
     putTVal (Const 0)
+putCommand (RandomVariant v) = do
+    putWord16 0
+    mapM_ putWord8 [0xE0, 0xFF]
+    putTVal v
+putCommand (PlayAllVariant v) = do
+    putWord16 0
+    mapM_ putWord8 [0xE1, 0xFF]
+    putTVal v
 putCommand (Play n) = do
     putWord16 0
     mapM_ putWord8 [0xE8, 0xFF]
@@ -193,6 +331,10 @@ putCommand (Play n) = do
 putCommand (Random a b) = do
     putWord16 0
     mapM_ putWord8 [0x00, 0xFC]
+    putTVal (Const (lowhigh a b))
+putCommand (PlayAll a b) = do
+    putWord16 0
+    mapM_ putWord8 [0x00, 0xFB]
     putTVal (Const (lowhigh a b))
 putCommand (Game n) = do
     putWord16 0
@@ -205,6 +347,10 @@ putCommand Cancel = do
 putCommand (Jump v) = do
     putWord16 0
     mapM_ putWord8 [0xFF, 0xF8]
+    putTVal v
+putCommand (Timer r v) = do
+    putWord16 r
+    mapM_ putWord8 [0x00, 0xFF]
     putTVal v
 putCommand (NamedJump s) = error "putCommand: Unresolved NamedJump"
 putCommand (Unknown b r v) = do

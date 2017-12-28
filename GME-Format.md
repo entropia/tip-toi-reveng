@@ -29,7 +29,7 @@ The header begins with these 8 32-bit numbers, listed with their offset:
  * `0x001D`: three bytes with unknown meaning, 0 for all products seen so far. 
  * `0x0020`: a variable length string, consisting of its length (8bit), and that many characters. Commonly `CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.xx.yyyy` (varies between products, xx can also be one digit only)
  * Next is a 8 date string (`20111024`). The date string seems optional with one condition: if a language string follows the date must consist of at least one ASCII number.
- * Next is an optional language string (currently known: `GERMAN`, `DUTCH`, `FRENCH`, `ITALIAN`. If the language string is provided it must match the language of the firmware that is running on the pen (it is unclear where is is checked; the file .tiptoi.log is NOT taken into account here!) or the pen will ignore it. If the language is missing any TipToi pen will accept the file. 
+ * Next is an optional language string (currently known: `GERMAN`, `DUTCH`, `FRENCH`, `ITALIAN`. If the language string is provided it must match the language of the firmware that is running on the pen (it is unclear where is is checked; the file .tiptoi.log is NOT taken into account here!) or the pen will ignore it. If the language is missing any TipToi pen will accept the file. In the YAML file, this can be set using, for example, `gme-lang: FRENCH`
  * Next there is sequence of zeros up to and including to position 0x5f.
  * `0x0060`: 32bit offset to an *additional media file table*
  * `0x0071`: 32bit offset to the playlistlist for the the power-on sound (played, when the product is recognized. If 0, no sound is played.)
@@ -104,13 +104,17 @@ Known commands are:
  * `FFF7` (written `$r^=m`): Bitwise xor to register `$r` the value of `m`
  * `FFF8` (written `Neg($r)`): Negate register `$r`.
  * `FFF9` (written `$r:=m`): Set register `$r` to `m` or value of `$m`
+ * `FFE0` (written `P*`: play one random sample of the media list
+ * `FFE1` (written `PA*`: play all samples of the media list
  * `FFE8` (written `P(m)`): Play audio referenced by the `m`th entry in the indices list.
- * `FC00` (written `P(b-a)`): Play a random sample from that inclusive range. `a` := lowbyte(`m`), `b` := highbyte(`m`)
+ * `FB00` (written `PA(b-a)`): Play all samples from that inclusive range. `a` := lowbyte(`m`), `b` := highbyte(`m`)
+ * `FC00` (written `P(b-a)`): Play one random sample from that inclusive range. `a` := lowbyte(`m`), `b` := highbyte(`m`)
  * `FD00` (written `G(m)`): Begin game `m`.
  * `F8FF` (written `J(m)`): Jump to script `m`.
  * `FAFF` (written `C`): Cancel game mode.
+ * `FF00` (written `T($r,m)`): Writes an internal counter to `$r` with values in the range 0..m.
 
-Currently unknown commands are `FB00`, `FE00`, `FF00`, `FFE0` & `FFE1`.
+There are Currently unknown commands (e.g. `FE00`).
 
 The commands `P`, `G` , `J` and `C` seem to ignore their registers, `C` also its parameter (which always is `FFFF`).
 

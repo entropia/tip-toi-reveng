@@ -1,0 +1,177 @@
+<html>
+<head>
+    <!-- This is your prism.css File, downloadet from http://prismjs.com/download.html -->
+	<link href="prism.css" rel="stylesheet" /> 
+	
+	<!-- This is the tttool-yaml-css-definition-->
+	<link href="prism-yamltttool.css" rel="stylesheet" /> 
+	
+	
+	
+<style>
+body   {font-family: verdana;}
+</style>
+
+</head>
+<body>
+
+<h2>Example HTML</h2> 
+
+<p>Here you see an Example of a tttool-YAML for the syntax-highlighter 
+<a href="http://prismjs.com">prism</a>.
+</p>
+
+<h4>Usually Yaml-Code looks like this:</h4>
+<pre><code class="language-yaml">
+comment: This is a Testyaml, only to test Colors, not to build a gme-File
+init: $mode:=0 
+scripts:
+
+  ERSTENS:
+  - $modus==0? P(kein_modus)
+  - $modus==1? P(blob) P(modus_1)
+  - $modus==2? P(blob) P(modus_2)
+  - $modus!=0? $modus!=1? $modus!=2? P(ooops)
+</code></pre>
+
+<h4>With this Highlighter the tttool-Things look like this:</h4>
+
+<pre><code class="language-yamltttool"># Projektbezeichnung
+# Version
+
+media-path: media/sounds_%s
+language: de
+welcome: willkommen
+product-id: 42
+comment: This is a Testyaml, only to test Colors, not to build a gme-File
+init: $mode:=0 
+scripts:
+
+  ERSTENS:
+  - $modus==0? P(kein_modus)
+  - $modus==1? P(blob) P(modus_1)
+  - $modus==2? P(blob) P(modus_2)
+  - $modus!=0? $modus!=1? $modus!=2? P(ooops)
+
+  ZWEITENS:
+  - $modus==0? P(blob)
+  - $modus==1? PA*(blob, soundfile)
+  
+  DRITTENS:
+  - $modus==0? P(blob) 
+  - $modus==0? P(blob,blob,blob) 
+  - $modus==0? P(blob, blob, blob) 
+  - $modus==1? P*(sound2, sound3)
+  - $modus==1? P*(sound2,sound3)
+  - $modus==2? PA*(sound2, sound3)
+  - $modus==2? PA*(sound2,sound3)
+  - $modus==3? PA(sound2-sound3)
+  - $modus==4? G(game1)
+  - $modus==5? J(ERSTENS)
+  - $modus==6? C(game1)
+  - $modus==7? T($register,123)
+  - $modus==7? ?($a,65535) (00 FF)
+  - $1==0? P(blob) 
+  - $2==0? P(blob) 
+  
+  10204:
+    - ?($register,1024) (00 FF)
+  10205:
+    - ?($register,2048) (00 FF)
+  10206:
+    - ?($register,65535) (00 FF)
+  10207:
+    - ?($a,65535) (00 FF) P(blob) ?($register,65535) (00 FF) $register-=$a
+  10208:
+    - $mod==11? ?($a,65535) (00 FF) P(blob) $mod:=0 J(10208)
+    - $mod==0? $mod:=11 ?($register,65535) (00 FF) $register-=$a
+  10239:
+    - $register==0? $mod==11? P(english_0) $mod:=11
+    - $register>0? $mod==11? $mod:=$register $mod%=10 $register/=10 J(10239)
+    - $mod==0? P(english_0) $mod:=11 J(10239)
+    - $mod==1? P(english_1) $mod:=11 J(10239)
+    - $mod==2? P(english_2) $mod:=11 J(10239)
+    - $mod==3? P(english_3) $mod:=11 J(10239)
+    - $mod==4? P(english_4) $mod:=11 J(10239)
+    - $mod==5? P(english_5) $mod:=11 J(10239)
+    - $mod==6? P(english_6) $mod:=11 J(10239)
+    - $mod==7? P(english_7) $mod:=11 J(10239)
+    - $mod==8? P(english_8) $mod:=11 J(10239)
+    - $mod==9? P(english_9) $mod:=11 J(10239)
+    
+</code></pre>
+
+<h2>Instructions</h2> 
+
+<h4>Step 1: Get Prism</h4>
+
+<p>Download <b>prism.js</b> and <b>prism.css</b> here: <a href="http://prismjs.com/download.html">http://prismjs.com/download.html</a>. 
+There you can choose all the languages you like to show on your Website.</p>
+
+<h4>Step 2: Your HTML</h4>
+
+<p>Integrate the four files in your HTML like this:</p>
+
+
+<pre><code class="language-markup">&lt;!DOCTYPE html>
+&lt;html>
+&lt;head>
+	...
+	&lt;link href="prism.css" rel="stylesheet" />
+	&lt;link href="prism-yamltttool.css" rel="stylesheet" /> 
+&lt;/head>
+&lt;body>
+	...
+	&lt;script src="prism.js">&lt;/script>
+	&lt;script src="prism-yamltttool.js"></script>
+&lt;/body>
+&lt;/html> </code></pre>
+
+<h4>Step 3: Place your Yaml-Code</h4>
+
+<p>Wrap your Yaml-Code with <code class="language-markup">&lt;pre></code> and 
+<code class="language-markup">&lt;code class="language-yamltttool"></code> Tags.</p>
+
+<pre><code class="language-markup">&lt;!DOCTYPE html>
+&lt;html>
+&lt;head>
+	...
+	&lt;link href="prism.css" rel="stylesheet" />
+	&lt;link href="prism-yamltttool.css" rel="stylesheet" /> 
+&lt;/head>
+&lt;body>
+
+&lt;pre>&lt;code class="language-yamltttool"></code>
+<code class="language-yamltttool">media-path: media/sounds_%s
+language: de
+welcome: willkommen
+product-id: 42
+comment: This is a Testyaml, only to test Colors, not to build a gme-File
+init: $mode:=0 
+scripts:
+
+  ERSTENS:
+  - $modus==0? P(kein_modus)
+  - $modus==1? P(blob) P(modus_1)
+  - $modus==2? P(blob) P(modus_2)
+  - $modus!=0? $modus!=1? $modus!=2? P(ooops)</code>
+<code class="language-markup">&lt;/code>&lt;/pre> 
+  
+	&lt;script src="prism.js">&lt;/script>
+	&lt;script src="prism-yamltttool.js"></script>
+&lt;/body>
+&lt;/html> </code></pre>
+
+<p>Thats all.</p>
+
+<p>Visit the <a href="http://prismjs.com">prism-site</a> for more information about Highlighting.</p>
+
+
+
+    <!-- This is your prism.js File, downloadet from http://prismjs.com/download.html -->
+	<script src="prism.js"></script>
+	
+	<!-- This is the tttool-yaml-regex-definition-->
+	<script src="prism-yamltttool.js"></script>
+</body>
+</html> 

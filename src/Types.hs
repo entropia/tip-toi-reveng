@@ -45,6 +45,9 @@ data ArithOp
 data Command r
     = Play Word16
     | Random Word8 Word8
+    | PlayAll Word8 Word8
+    | PlayAllVariant (TVal r)
+    | RandomVariant (TVal r)
     | Cancel
     | Game Word16
     | ArithOp ArithOp r (TVal r)
@@ -52,6 +55,7 @@ data Command r
     | Unknown B.ByteString r (TVal r)
     | Jump (TVal r)
     | NamedJump String -- Only in YAML files, never read from GMEs
+    | Timer r (TVal r)
     deriving (Eq, Functor, Foldable)
 
 type PlayList = [Word16]
@@ -61,11 +65,13 @@ data Line r = Line Offset [Conditional r] [Command r] PlayList
 
 type ProductID = Word32
 
+
 data TipToiFile = TipToiFile
     { ttProductId :: ProductID
     , ttRawXor :: Word32
     , ttComment :: B.ByteString
     , ttDate :: B.ByteString
+    , ttLang :: B.ByteString
     , ttInitialRegs :: [Word16]
     , ttWelcome :: [PlayList]
     , ttScripts :: [(Word16, Maybe [Line ResReg])]
@@ -85,23 +91,182 @@ data TipToiFile = TipToiFile
 type PlayListList = [PlayList]
 type GameId = Word16
 
-data Game
-    = Game6 Word16 B.ByteString [PlayListList] [SubGame] [SubGame] B.ByteString [PlayListList] PlayList
-    | Game7 Word16 Word16 B.ByteString [PlayListList] [SubGame] B.ByteString [PlayListList] PlayListList
-    | Game8 Word16 Word16 B.ByteString [PlayListList] [SubGame] B.ByteString [PlayListList] [OID] [GameId] PlayListList PlayListList
+data Game =
+    CommonGame
+        { gGameType                 :: Word16
+        , gRounds                   :: Word16
+        , gUnknownC                 :: Word16
+        , gEarlyRounds              :: Word16
+        , gRepeatLastMedia          :: Word16
+        , gUnknownX                 :: Word16
+        , gUnknownW                 :: Word16
+        , gUnknownV                 :: Word16
+        , gStartPlayList            :: PlayListList
+        , gRoundEndPlayList         :: PlayListList
+        , gFinishPlayList           :: PlayListList
+        , gRoundStartPlayList       :: PlayListList
+        , gLaterRoundStartPlayList  :: PlayListList
+        , gSubgames                 :: [SubGame]
+        , gTargetScores             :: [Word16]
+        , gFinishPlayLists          :: [PlayListList]
+        }
+    | Game6
+        { gRounds                   :: Word16
+        , gBonusSubgameCount        :: Word16
+        , gBonusRounds              :: Word16
+        , gBonusTarget              :: Word16
+        , gUnknownI                 :: Word16
+        , gEarlyRounds              :: Word16
+        , gUnknownQ                 :: Word16
+        , gRepeatLastMedia          :: Word16
+        , gUnknownX                 :: Word16
+        , gUnknownW                 :: Word16
+        , gUnknownV                 :: Word16
+        , gStartPlayList            :: PlayListList
+        , gRoundEndPlayList         :: PlayListList
+        , gFinishPlayList           :: PlayListList
+        , gRoundStartPlayList       :: PlayListList
+        , gLaterRoundStartPlayList  :: PlayListList
+        , gRoundStartPlayList2      :: PlayListList
+        , gLaterRoundStartPlayList2 :: PlayListList
+        , gSubgames                 :: [SubGame]
+        , gTargetScores             :: [Word16]
+        , gBonusTargetScores        :: [Word16]
+        , gFinishPlayLists          :: [PlayListList]
+        , gBonusFinishPlayLists     :: [PlayListList]
+        , gBonusSubgameIds          :: [Word16]
+        }
+    | Game7
+        { gRounds                   :: Word16
+        , gUnknownC                 :: Word16
+        , gEarlyRounds              :: Word16
+        , gRepeatLastMedia          :: Word16
+        , gUnknownX                 :: Word16
+        , gUnknownW                 :: Word16
+        , gUnknownV                 :: Word16
+        , gStartPlayList            :: PlayListList
+        , gRoundEndPlayList         :: PlayListList
+        , gFinishPlayList           :: PlayListList
+        , gRoundStartPlayList       :: PlayListList
+        , gLaterRoundStartPlayList  :: PlayListList
+        , gSubgames                 :: [SubGame]
+        , gTargetScores             :: [Word16]
+        , gFinishPlayLists          :: [PlayListList]
+        , gSubgameGroups            :: [[GameId]]
+        }
+    | Game8
+        { gRounds                   :: Word16
+        , gUnknownC                 :: Word16
+        , gEarlyRounds              :: Word16
+        , gRepeatLastMedia          :: Word16
+        , gUnknownX                 :: Word16
+        , gUnknownW                 :: Word16
+        , gUnknownV                 :: Word16
+        , gStartPlayList            :: PlayListList
+        , gRoundEndPlayList         :: PlayListList
+        , gFinishPlayList           :: PlayListList
+        , gRoundStartPlayList       :: PlayListList
+        , gLaterRoundStartPlayList  :: PlayListList
+        , gSubgames                 :: [SubGame]
+        , gTargetScores             :: [Word16]
+        , gFinishPlayLists          :: [PlayListList]
+        , gGameSelectOIDs           :: [Word16]
+        , gGameSelect               :: [Word16]
+        , gGameSelectErrors1        :: PlayListList
+        , gGameSelectErrors2        :: PlayListList
+        }
     | Game9
+        { gRounds                   :: Word16
+        , gUnknownC                 :: Word16
+        , gEarlyRounds              :: Word16
+        , gRepeatLastMedia          :: Word16
+        , gUnknownX                 :: Word16
+        , gUnknownW                 :: Word16
+        , gUnknownV                 :: Word16
+        , gStartPlayList            :: PlayListList
+        , gRoundEndPlayList         :: PlayListList
+        , gFinishPlayList           :: PlayListList
+        , gRoundStartPlayList       :: PlayListList
+        , gLaterRoundStartPlayList  :: PlayListList
+        , gSubgames                 :: [SubGame]
+        , gTargetScores             :: [Word16]
+        , gFinishPlayLists          :: [PlayListList]
+        , gExtraPlayLists           :: [PlayListList]
+        }
     | Game10
+        { gRounds                   :: Word16
+        , gUnknownC                 :: Word16
+        , gEarlyRounds              :: Word16
+        , gRepeatLastMedia          :: Word16
+        , gUnknownX                 :: Word16
+        , gUnknownW                 :: Word16
+        , gUnknownV                 :: Word16
+        , gStartPlayList            :: PlayListList
+        , gRoundEndPlayList         :: PlayListList
+        , gFinishPlayList           :: PlayListList
+        , gRoundStartPlayList       :: PlayListList
+        , gLaterRoundStartPlayList  :: PlayListList
+        , gSubgames                 :: [SubGame]
+        , gTargetScores             :: [Word16]
+        , gFinishPlayLists          :: [PlayListList]
+        , gExtraPlayLists           :: [PlayListList]
+        }
     | Game16
+        { gRounds                   :: Word16
+        , gUnknownC                 :: Word16
+        , gEarlyRounds              :: Word16
+        , gRepeatLastMedia          :: Word16
+        , gUnknownX                 :: Word16
+        , gUnknownW                 :: Word16
+        , gUnknownV                 :: Word16
+        , gStartPlayList            :: PlayListList
+        , gRoundEndPlayList         :: PlayListList
+        , gFinishPlayList           :: PlayListList
+        , gRoundStartPlayList       :: PlayListList
+        , gLaterRoundStartPlayList  :: PlayListList
+        , gSubgames                 :: [SubGame]
+        , gTargetScores             :: [Word16]
+        , gFinishPlayLists          :: [PlayListList]
+        , gExtraOIDs                :: [Word16]
+        , gExtraPlayLists           :: [PlayListList]
+        }
     | Game253
-    | UnknownGame Word16 Word16 Word16 B.ByteString [PlayListList] [SubGame] B.ByteString [PlayListList]
     deriving Show
 
+
+gameType :: Game -> Word16
+gameType (CommonGame {gGameType = gGameType }) = gGameType
+gameType Game6 {} = 6
+gameType Game7 {} = 7
+gameType Game8 {} = 8
+gameType Game9 {} = 9
+gameType Game10 {} = 10
+gameType Game16 {} = 16
+gameType Game253 {} = 253
 
 type OID = Word16
 
-data SubGame
-    = SubGame B.ByteString [OID] [OID] [OID] [PlayListList]
+data SubGame = SubGame
+    { sgUnknown :: B.ByteString
+    , sgOids1 :: [OID]
+    , sgOids2 :: [OID]
+    , sgOids3 :: [OID]
+    , sgPlaylist :: [PlayListList]
+    }
     deriving Show
 
+
 type Transscript = M.Map Word16 String
+type CodeMap = M.Map String Word16
+
+
+-- Command options
+
+data Conf = Conf
+    { cTransscriptFile :: Maybe FilePath
+    , cCodeDim :: (Int, Int)
+    , cDPI :: Int
+    , cPixelSize :: Int
+    }
+    deriving Show
 

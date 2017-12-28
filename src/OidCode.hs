@@ -1,16 +1,21 @@
-{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE BangPatterns, TupleSections, FlexibleContexts #-}
 
-module OidCode (genRawPNG, genRawSVG, DPI(..)) where
+module OidCode (genRawPixels, genRawPNG, genRawSVG, tilePixelSize, DPI(..), PixelSize(..)) where
 
 import Data.Word
 import Data.Bits
 import Data.Functor
+import qualified Data.ByteString.Lazy as B
+import Data.Monoid
 import Control.Monad
-import Control.Monad.Writer.Strict
 import Codec.Picture
 import Codec.Picture.Types
+import Codec.Picture.Metadata
 import Control.Monad.ST
 import Control.Applicative
+import Data.Vector.Storable.ByteString
+
+import Utils
 
 import qualified Text.Blaze.Svg as S
 import qualified Text.Blaze.Svg11 as S
@@ -83,63 +88,102 @@ oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
 genRawSVG :: Word16 -> FilePath -> IO ()
 genRawSVG code filename = B.writeFile filename (renderSvg (oidSVG code))
 
-data DPI = D1200 | D600
+type DPI = Int
+type PixelSize = Int
 
-imageFromBlackPixels :: Int -> Int -> [(Int, Int)] -> Image PixelYA8
-imageFromBlackPixels width height pixels = runST $ do 
+imageFromBlackPixels :: ColorConvertible PixelYA8 p => Int -> Int -> [(Int, Int)] -> Image p
+imageFromBlackPixels width height pixels = runST $ do
     i <- createMutableImage width height background
     forM_ pixels $ \(x,y) -> do
         writePixel i x y black
     freezeImage i
   where
-    black =      PixelYA8 minBound maxBound
-    background = PixelYA8 maxBound minBound
+    black =      promotePixel $ PixelYA8 minBound maxBound
+    background = promotePixel $ PixelYA8 maxBound minBound
 
-oidImage :: DPI -> Word16 -> Image PixelYA8
-oidImage dpi code =
-    imageFromBlackPixels
-        (width *4*dotsPerPoint)
-        (height*4*dotsPerPoint)
-        (tile f)
+-- | Size of one tile, in pixels
+tilePixelSize :: DPI -> PixelSize -> Int
+tilePixelSize dpi _ps = width
   where
-    width = 100 -- in mm
-    height = 100 -- in mm
-    !dotsPerPoint | D1200 <- dpi = 12
-                  |  D600 <- dpi =  6
+    spacePerPoint = dpi `div2` 100
+    width  = 4*spacePerPoint
+
+-- | Renders a single OID Image, returns its dimensions and the black pixels therein
+singeOidImage :: DPI -> PixelSize -> Word16 -> ((Int, Int), [(Int, Int)])
+singeOidImage dpi ps code = ((width, height), pixels)
+  where
+    spacePerPoint = dpi `div2` 100
+    width  = 4*spacePerPoint
+    height = 4*spacePerPoint
+
+    pixels = mconcat $ map position $
+        zip (flip (,) <$> [3,2,1] <*> [3,2,1])
+            [ value (quart n) | n <- [0..8] ] ++
+        [ (p, centeredDot) | p <- [(0,0), (1,0), (2,0), (3,0), (0,1), (0,3) ] ] ++
+        [ ((0,2), special) ]
 
 
     quart 8 = checksum code
     quart n = (code `div` 4^n) `mod` 4
 
-    f = mconcat $ map position $
-        zip (flip (,) <$> [3,2,1] <*> [3,2,1])
-            [ value (quart n) | n <- [0..8] ] ++
-        [ (p, plain) | p <- [(0,0), (1,0), (2,0), (3,0), (0,1), (0,3) ] ] ++
-        [ ((0,2), special) ]
 
-    plain | D1200 <- dpi = [ (5,5), (5,6), (6,5), (6,6) ]
-          | D600 <- dpi  = [ (3,3) ]
+    dot = [(x,y) | x <- [1..ps], y <- [1..ps]]
 
-    s  | D1200 <- dpi = 2
-       | D600  <- dpi = 1
-    ss | D1200 <- dpi = 3
-       | D600  <- dpi = 2
-    value 0 = at ( s, s) plain
-    value 1 = at (-s, s) plain
-    value 2 = at (-s,-s) plain
-    value 3 = at ( s,-s) plain
-    special = at (ss,0)  plain
+    centeredDot | xshift < 0 || yshift < 0 = error "Dots too large. Try a smaller pixel size"
+                | otherwise = at (xshift, yshift) dot
+      where xshift = (spacePerPoint - ps) `div` 2 - 1
+            yshift = (spacePerPoint - ps) `div` 2 - 1
 
-    position ((n,m), p) = at (n*dotsPerPoint, m*dotsPerPoint) p
+    -- | how many pixels to shift dots horizontally
+    s  = dpi `div2` 600
+    -- | how many pixels to shift the special dot horizontally
+    ss = dpi `div2` 400
+
+    value 0 = at ( s, s) centeredDot
+    value 1 = at (-s, s) centeredDot
+    value 2 = at (-s,-s) centeredDot
+    value 3 = at ( s,-s) centeredDot
+    special = at (ss,0)  centeredDot
+
+    position ((n,m), p) = at (n*spacePerPoint, m*spacePerPoint) p
 
     -- Drawing combinators
-
     at (x, y) = map (\(x', y') -> (x + x', y + y'))
-    tile f = concat [ at (x*4*dotsPerPoint, y*4*dotsPerPoint) f
-                    | x <- [0..width-1], y <- [0..height-1]]
+
+-- integer division rounded up
+x `div2` y = ((x-1) `div` y) + 1
+
+oidImage :: ColorConvertible PixelYA8 p => Int -> Int -> DPI -> PixelSize -> Word16 -> Image p
+oidImage w h dpi ps code =
+    imageFromBlackPixels w h tiledPixels
+  where
+    ((cw,ch), pixels) = singeOidImage dpi ps code
+
+    tiledPixels =
+        [ (x',y')
+        | (x,y) <- pixels
+        , x' <- [x,x + cw..w-1]
+        , y' <- [y,y + ch..h-1]
+        ]
+-- Width and height in pixels
+genRawPixels :: Int -> Int -> DPI -> PixelSize -> Word16 -> B.ByteString
+genRawPixels w h dpi ps code =
+    -- All very shaky here, but it seems to work
+    B.fromStrict $
+    vectorToByteString $
+    imageData $
+    (oidImage w h dpi ps code :: Image PixelRGB8)
 
 
-
-genRawPNG :: DPI -> Word16 -> FilePath -> IO ()
-genRawPNG dpi code filename = writePng filename (oidImage dpi code)
-
+genRawPNG :: Int -> Int -> DPI -> PixelSize -> String -> Word16 -> FilePath -> IO ()
+genRawPNG w h dpi ps title code filename =
+    B.writeFile filename $
+    encodePngWithMetadata metadata $
+    (oidImage w h dpi ps code :: Image PixelYA8)
+  where
+    metadata = mconcat
+        [ singleton DpiX (fromIntegral dpi)
+        , singleton DpiY (fromIntegral dpi)
+        , singleton Title title
+        , singleton Software $ "tttool " ++ tttoolVersion
+        ]

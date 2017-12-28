@@ -10,16 +10,16 @@ scripts:
   10324: # 
   - $0< 4?
   - $0==4?
-  10243: # Barockpintopferdestute
+  10243: # Barockpintopferdestute | Pferde
   - $0< 4?
   - $0==4?
-  10306: # Europlocephalus
+  10306: # Europlocephalus | Dinosaurier
   - $0< 4?
   - $0==4?
-  10225: # Loewenmaennchen
+  10225: # Loewenmaennchen | Afrika
   - $0< 4?
   - $0==4?
-  10207: # Vorwaerts
+  10207: # Vorwaerts | Steuerung
   - $0< 4?
   - $0==4?
   10379: # 
@@ -34,7 +34,7 @@ scripts:
   10342: # 
   - $0< 4?
   - $0==4?
-  10261: # 
+  10261: # Trakehner Stute | Turnier Reit-Set
   - $0< 4?
   - $0==4?
   10397: # 
@@ -43,13 +43,13 @@ scripts:
   10336: # 
   - $0< 4?
   - $0==4?
-  10237: # Antilope
+  10237: # Antilope | Afrika
   - $0< 4?
   - $0==4?
   10314: # 
   - $0< 4?
   - $0==4?
-  10215: # Schaf
+  10215: # Schaf | Bauernhof
   - $0< 4?
   - $0==4?
   10349: # 
@@ -61,28 +61,28 @@ scripts:
   10385: # 
   - $0< 4?
   - $0==4?
-  10248: # Esel weiblich
+  10248: # Esel weiblich | Bauernhof
   - $0< 4?
   - $0==4?
-  10372: # 
+  10372: # Seehund | Amerika
   - $0< 4?
   - $0==4?
-  10273: # Flusspferd Kalb
+  10273: # Flusspferd Kalb | Afrika
   - $0< 4?
   - $0==4?
-  10350: # 
+  10350: # Grosses Panda | Asien-Australien
   - $0< 4?
   - $0==4?
-  10251: # Hengst Pferd
+  10251: # Camargue Hengst | Pferde
   - $0< 4?
   - $0==4?
-  10366: # 
+  10366: # Gelbbrustara | Amerika
   - $0< 4?
   - $0==4?
   10319: # 
   - $0< 4?
   - $0==4?
-  10218: # Kuh
+  10218: # Kuh | Bauernhof
   - $0< 4?
   - $0==4?
   10344: # 
@@ -106,22 +106,22 @@ scripts:
   10322: # 
   - $0< 4?
   - $0==4?
-  10245: # Friesenpferd
+  10245: # Friesen Hengst | Pferde
   - $0< 4?
   - $0==4?
-  10300: # Tyrannosaurus Rex
+  10300: # Tyrannosaurus Rex | Dinosaurier
   - $0< 4?
   - $0==4?
-  10223: # Ferkel
+  10223: # Ferkel | Bauernhof
   - $0< 4?
   - $0==4?
-  10201: # Lampe
+  10201: # Wissen | Steuerung
   - $0< 4? P(1) $0:=2
   - $0==4? P(1) $0:=2 C
   10400: # 
   - $0< 4?
   - $0==4?
-  10206: # FELD 3
+  10206: # Blauer Stern | Steuerung
   - $0==1? P(3)
   - $0==2? $49==$50? P(3)
   - $0==2? $49==1? ?($0,4) (E0 FF)
@@ -138,7 +138,7 @@ scripts:
   10343: # 
   - $0< 4?
   - $0==4?
-  10260: # Hannoveranerpferd
+  10260: # Hannoveranerpferd | Freizeit Reit-Set 
   - $0< 4?
   - $0==4?
   10396: # 
@@ -150,13 +150,13 @@ scripts:
   10325: # 
   - $0< 4?
   - $0==4?
-  10242: # Bernersennen Hund maennlich
+  10242: # Bernersennen Hund Welpe | Bauernhof
   - $0< 4?
   - $0==4?
-  10307: # Camarasaurus
+  10307: # Camarasaurus | Dinosaurier
   - $0< 4?
   - $0==4?
-  10224: # Loewenjunges
+  10224: # Loewenjunges | Afrika
   - $0< 4?
   - $0==4?
   10382: # 
@@ -165,7 +165,7 @@ scripts:
   10328: # 
   - $0< 4?
   - $0==4?
-  10229: # Giraffe
+  10229: # Giraffe | Afrika
   - $0< 4?
   - $0==4?
   10375: # 
@@ -174,7 +174,7 @@ scripts:
   10274: # 
   - $0< 4?
   - $0==4?
-  10357: # 
+  10357: # Koala | Asien-Australien
   - $0< 4?
   - $0==4?
   10256: # 
@@ -183,13 +183,13 @@ scripts:
   10331: # 
   - $0< 4?
   - $0==4?
-  10230: # Giraffenjunges
+  10230: # Giraffenjunges | Afrika
   - $0< 4?
   - $0==4?
   10313: # 
   - $0< 4?
   - $0==4?
-  10212: # Falabella Fohlen
+  10212: # Falabella Fohlen | Pferde
   - $0< 4?
   - $0==4?
   10283: # 
@@ -204,25 +204,25 @@ scripts:
   10323: # 
   - $0< 4?
   - $0==4?
-  10244: # Pferd
+  10244: # Barockpinto Fohlen | Pferde
   - $0< 4?
   - $0==4?
-  10301: # Spinosaurus
+  10301: # Spinosaurus | Dinosaurier
   - $0< 4?
   - $0==4?
-  10222: # Schwein
+  10222: # Schwein | Bauernhof
   - $0< 4?
   - $0==4?
-  10200: # Auge
+  10200: # Erkunden | Steuerung
   - $0< 4? P(0) $0:=1
   - $0==4? P(0) $0:=1 C
-  10367: # 
+  10367: # Grizzlybär | Amerika
   - $0< 4?
   - $0==4?
   10318: # 
   - $0< 4?
   - $0==4?
-  10219: # Kalb
+  10219: # Kalb | Bauernhof
   - $0< 4?
   - $0==4?
   10345: # 
@@ -243,16 +243,16 @@ scripts:
   10326: # 
   - $0< 4?
   - $0==4?
-  10241: # Bernersennen Hund weiblich
+  10241: # Berner Sennenhund | Bauernhof
   - $0< 4?
   - $0==4?
-  10304: # Triceratops
+  10304: # Triceratops | Dinosaurier
   - $0< 4?
   - $0==4?
-  10227: # Afrikanischer Elefantenbulle
+  10227: # Afrikanischer Elefantenbulle | Afrika
   - $0< 4?
   - $0==4?
-  10205: # FELD 2
+  10205: # roter Stern  | Steuerung
   - $0==1? P(3)
   - $0==2? $49==$50? P(3)
   - $0==2? $49==1? ?($0,5) (E0 FF)
@@ -269,7 +269,7 @@ scripts:
   10340: # 
   - $0< 4?
   - $0==4?
-  10263: # 
+  10263: # Lisa | Turnier Reit-Set
   - $0< 4?
   - $0==4?
   10395: # 
@@ -281,7 +281,7 @@ scripts:
   10275: # 
   - $0< 4?
   - $0==4?
-  10356: # 
+  10356: # Kragenechse | Asien-Australien
   - $0< 4?
   - $0==4?
   10257: # 
@@ -290,13 +290,13 @@ scripts:
   10330: # 
   - $0< 4?
   - $0==4?
-  10231: # Zebrastute
+  10231: # Zebrastute | Afrika
   - $0< 4?
   - $0==4?
-  10312: # kleiner Spinosaurus
+  10312: # kleiner Spinosaurus | Dinosaurier
   - $0< 4?
   - $0==4?
-  10213: # Golden Retriever Ruede
+  10213: # Golden Retriever Ruede | Bauernhof
   - $0< 4?
   - $0==4?
   10282: # 
@@ -308,34 +308,34 @@ scripts:
   10329: # 
   - $0< 4?
   - $0==4?
-  10228: # Afrikanisches Elefantenkalb
+  10228: # Afrikanisches Elefantenkalb | Afrika
   - $0< 4?
   - $0==4?
-  10371: # 
+  10371: # Orca | Amerika
   - $0< 4?
   - $0==4?
-  10270: # Gorilla maennlich
+  10270: # Gorilla maennlich | Afrika
   - $0< 4?
   - $0==4?
-  10353: # 
+  10353: # Tigerjunges | Asien-Australien
   - $0< 4?
   - $0==4?
-  10252: # Stute
+  10252: # Camargue Stute | Pferde
   - $0< 4?
   - $0==4?
   10335: # 
   - $0< 4?
   - $0==4?
-  10234: # Schimpanse
+  10234: # Schimpanse | Afrika
   - $0< 4?
   - $0==4?
-  10368: # 
+  10368: # Eisbär | Amerika
   - $0< 4?
   - $0==4?
   10317: # 
   - $0< 4?
   - $0==4?
-  10216: # Lamm
+  10216: # Lamm | Bauernhof
   - $0< 4?
   - $0==4?
   10269: # 
@@ -353,13 +353,13 @@ scripts:
   10240: # 
   - $0< 4?
   - $0==4?
-  10305: # Stegosaurus
+  10305: # Stegosaurus | Dinosaurier
   - $0< 4?
   - $0==4?
-  10226: # Loewenweibchen
+  10226: # Loewenweibchen | Afrika
   - $0< 4?
   - $0==4?
-  10204: # FELD 1
+  10204: # grüner Stern | Steuerung
   - $0==1? P(3)
   - $0==2? $49==$50? P(3)
   - $0==2? $49==1? ?($0,6) (E0 FF)
@@ -376,7 +376,7 @@ scripts:
   10341: # 
   - $0< 4?
   - $0==4?
-  10262: # Nina Reiterhof
+  10262: # Nina  | Freizeit Reit-Set 
   - $0< 4?
   - $0==4?
   10394: # 
@@ -391,10 +391,10 @@ scripts:
   10380: # 
   - $0< 4?
   - $0==4?
-  10308: # Pteranodon
+  10308: # Pteranodon | Dinosaurier
   - $0< 4?
   - $0==4?
-  10209: # Andalusier Stute
+  10209: # Andalusier Stute | Pferde
   - $0< 4?
   - $0==4?
   10377: # 
@@ -403,7 +403,7 @@ scripts:
   10276: # 
   - $0< 4?
   - $0==4?
-  10355: # 
+  10355: # Asiatischer Elefant | Asien-Australien
   - $0< 4?
   - $0==4?
   10254: # 
@@ -411,13 +411,13 @@ scripts:
   10333: # 
   - $0< 4?
   - $0==4?
-  10232: # Zebrafohlen
+  10232: # Zebrafohlen | Afrika
   - $0< 4?
   - $0==4?
-  10311: # kleiner Triceratops
+  10311: # kleiner Triceratops | Dinosaurier
   - $0< 4?
   - $0==4?
-  10210: # Andalusier Fohlen
+  10210: # Andalusier Fohlen | Pferde
   - $0< 4?
   - $0==4?
   10399: # 
@@ -432,31 +432,31 @@ scripts:
   10387: # 
   - $0< 4?
   - $0==4?
-  10370: # 
+  10370: # Delphin | Amerika
   - $0< 4?
   - $0==4?
-  10271: # Flusspferd weiblich
+  10271: # Flusspferd | Afrika
   - $0< 4?
   - $0==4?
-  10352: # 
+  10352: # Tiger | Asien-Australien
   - $0< 4?
   - $0==4?
-  10253: # Darkmor Pony
+  10253: # Dartmoor Pony | Pferde
   - $0< 4?
   - $0==4?
   10334: # 
   - $0< 4?
   - $0==4?
-  10235: # Schimpansen Junges
+  10235: # Schimpansen-Junges | Afrika
   - $0< 4?
   - $0==4?
-  10369: # 
+  10369: # Wolf | Amerika
   - $0< 4?
   - $0==4?
   10316: # 
   - $0< 4?
   - $0==4?
-  10217: # Katze
+  10217: # Katze sitzend | Bauernhof
   - $0< 4?
   - $0==4?
   10268: # 
@@ -477,27 +477,27 @@ scripts:
   10320: # 
   - $0< 4?
   - $0==4?
-  10247: # Ziege
+  10247: # Ziege | Bauernhof
   - $0< 4?
   - $0==4?
-  10302: # Gigantosaurus
+  10302: # Gigantosaurus | Dinosaurier
   - $0< 4?
   - $0==4?
-  10221: # Hahn
+  10221: # Hahn | Bauernhof
   - $0< 4?
   - $0==4?
-  10203: # Wuerfel
+  10203: # Spielen  | Steuerung
   - $0< 5? $0:=4 G(0)
   10339: # 
   - $0< 4?
   - $0==4?
-  10238: # Leopard
+  10238: # Leopard | Afrika
   - $0< 4?
   - $0==4?
   10364: # 
   - $0< 4?
   - $0==4?
-  10208: # Wiederholung
+  10208: # Wiederholung | Steuerung
   - $0< 4?
   - $0==4?
   10376: # 
@@ -506,7 +506,7 @@ scripts:
   10277: # 
   - $0< 4?
   - $0==4?
-  10354: # 
+  10354: # Kanguru | Asien-Australien
   - $0< 4?
   - $0==4?
   10255: # 
@@ -515,13 +515,13 @@ scripts:
   10332: # 
   - $0< 4?
   - $0==4?
-  10233: # Krokodil
+  10233: # Krokodil | Afrika
   - $0< 4?
   - $0==4?
-  10310: # kleiner Camarasaurus
+  10310: # kleiner Camarasaurus | Dinosaurier
   - $0< 4?
   - $0==4?
-  10211: # Falabella Stute
+  10211: # Falabella Stute | Pferde
   - $0< 4?
   - $0==4?
   10398: # 
@@ -536,34 +536,34 @@ scripts:
   10381: # 
   - $0< 4?
   - $0==4?
-  10309: # kleiner Tyrannosaurus Rex
+  10309: # kleiner Tyrannosaurus Rex | Dinosaurier
   - $0< 4?
   - $0==4?
-  10249: # Esel Fohlen
+  10249: # Eselfohlen | Bauernhof
   - $0< 4?
   - $0==4?
   10373: # 
   - $0< 4?
   - $0==4?
-  10272: # Gorilla weiblich
+  10272: # Gorilla Weibchen | Afrika
   - $0< 4?
   - $0==4?
-  10351: # 
+  10351: # großer Panda Junges | Asien-Australien
   - $0< 4?
   - $0==4?
-  10250: # Kater
+  10250: # Katze | Bauernhof
   - $0< 4?
   - $0==4?
   10337: # 
   - $0< 4?
   - $0==4?
-  10236: # Spitzmaulnashorn Bulle
+  10236: # Spitzmaulnashorn-Bulle | Afrika
   - $0< 4?
   - $0==4?
   10315: # 
   - $0< 4?
   - $0==4?
-  10214: # Golden Retriever Welpe
+  10214: # Golden Retriever Welpe | Bauernhof
   - $0< 4?
   - $0==4?
   10348: # 
@@ -580,25 +580,25 @@ scripts:
   10321: # 
   - $0< 4?
   - $0==4?
-  10246: # Apaluser Pferd
+  10246: # Appaloosa Pony | Pferde
   - $0< 4?
   - $0==4?
-  10303: # Velociraptor
+  10303: # Velociraptor | Dinosaurier
   - $0< 4?
   - $0==4?
-  10220: # Kaninchen
+  10220: # Kaninchen | Bauernhof
   - $0< 4?
   - $0==4?
-  10202: # Sprechblase
+  10202: # Erzählen | Steuerung
   - $0< 4? P(2) $0:=3
   - $0==4? P(2) $0:=3 C
-  10365: # 
+  10365: # Weißkopfseeadler | Amerika
   - $0< 4?
   - $0==4?
   10338: # 
   - $0< 4?
   - $0==4?
-  10239: # Info
+  10239: # Info | Steuerung
   - $0< 4? P(78)
   - $0==4?
   10347: # 

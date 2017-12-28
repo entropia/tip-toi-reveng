@@ -1,4 +1,4 @@
-module OneLineParser (parseOneLine) where
+module OneLineParser (parseOneLine, parseOneLinePure) where
 
 import System.Exit
 import Text.Parsec hiding (Line, lookAhead, spaces)
@@ -9,10 +9,6 @@ import qualified Text.Parsec as P
 -- Parser utilities
 -- | A nicer way to print an error message
 
-printLineParserErrorMessage :: String -> ParseError -> IO a
-printLineParserErrorMessage input err = do
-    putStrLn (lineParserErrorMessage input err)
-    exitFailure
 
 lineParserErrorMessage :: String -> ParseError -> String
 lineParserErrorMessage input err =
@@ -26,6 +22,12 @@ lineParserErrorMessage input err =
 
 parseOneLine :: Parser a -> String -> String -> IO a
 parseOneLine p name input =
+    case parseOneLinePure p name input of
+        Left e ->  putStrLn e >> exitFailure
+        Right l -> return l
+
+parseOneLinePure :: Parser a -> String -> String -> Either String a
+parseOneLinePure p name input =
     case P.parse p name input of
-        Left e ->  printLineParserErrorMessage input e
+        Left e ->  Left $ lineParserErrorMessage input e
         Right l -> return l

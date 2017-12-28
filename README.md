@@ -20,66 +20,47 @@ If you want to learn more please have a look into our wiki (https://github.com/e
 The tttool tool
 ---------------
 
-Use the tool `tttool.hs` to investigate the gme files and build new ones. It
+Use the tool `tttool` to investigate the gme files and build new ones. It
 supports various subcommands:
 
-    Usage: tttool [options] command
+    GME creation commands:
+    assemble                 creates a gme file from the given source
 
-    Options:
-        -t <transcriptfile>
-           in the screen output, replaces media file indices by a transscript
+    OID code creation commands:
 
-    Commands:
-        info <file.gme>...
-           general information
-        media [-d dir] <file.gme>...
-           dumps all audio samples to the given directory (default: media/)
-        scripts <file.gme>...
-           prints the decoded scripts for each OID
-        script <file.gme> <n>
-           prints the decoded scripts for the given OID
-        raw-scripts <file.gme>...
-           prints the scripts for each OID, in their raw form
-        raw-script <file.gme> <n>
-           prints the scripts for the given OID, in their raw form
-        binaries [-d dir] <file.gme>...
-           dumps all binaries to the given directory (default: binaries/)
-        games <file.gme>...
-           prints the decoded games
-        lint <file.gme>
-           checks for errors in the file or in this program
-        segments <file.gme>...
-           lists all known parts of the file, with description.
-        segment <file.gme> <pos>
-           which segment contains the given position.
-        holes <file.gme>...
-           lists all unknown parts of the file.
-        explain <file.gme>...
-           lists all parts of the file, with description and hexdump.
-        play <file.gme>
-           interactively play: Enter OIDs, and see what happens.
-        rewrite <infile.gme> <outfile.gme>
-           parses the file and serializes it again (for debugging).
-        export <infile.gme> [<outfile.yaml>]
-           dumps the file in the human-readable yaml format
-        assemble <infile.yaml> <outfile.gme>
-           creates a gme file from the given source
-        oid-code [-d DPI] <codes>
-           creates a PNG file for each given code
-           scale this to 10cm×10cm
-           By default, it creates a 1200 dpi image. With -d 600, you
-           obtain a 600 dpi image.
-           <codes> can be a range, e.g. 1,3,1000-1085.
-           Uses oid-<code>.png as the file name.
-        oid-code [-d DPI] <infile.yaml>
-           Like above, but creates one file for each code in the yaml file.
-           Uses oid-<product-id>-<scriptname or code>.png as the file name.
-        raw-oid-code [-d DPI] <raw codes>
-           creates a PNG file with the given "raw code". Usually not needed.
-           Uses oid-raw-<code>.png as the file name.
+    oid-table                creates a PDF file with all codes in the yaml file
+    oid-codes                creates PNG files for every OID in the yaml file.
+    oid-code                 creates PNG files for each given code(s)
 
-A transscript is simply a `;`-separated table of OIDs and some text, see for example [`transcript/WWW_Bauernhof.csv`](transcript/WWW_Bauernhof.csv).
+    GME analysis commands:
+    info                     Print general information about a GME file
+    export                   dumps the file in the human-readable yaml format
+    scripts                  prints the decoded scripts for each OID
+    script                   prints the decoded scripts for a specific OID
+    games                    prints the decoded games
+    lint                     checks for errors in the file or in this program
+    segments                 lists all known parts of the file, with description.
+    segment                  prints the decoded scripts for a specific OID
+    explain                  print a hexdump of a GME file with descriptions
+    holes                    lists all unknown parts of the file.
+    rewrite                  parses the file and writes it again (for debugging)
 
+    GME extraction commands:
+    media                    dumps all audio samples
+    binaries                 dumps all binaries
+
+    Simulation commands:
+    play                     interactively play a GME file
+
+Run
+
+    ./tttool --help
+
+to learn about global options (e.g. DPI settings), and
+
+    ./tttool command --help
+
+for the options of the individual command.
 
 Installation
 ------------
@@ -92,21 +73,32 @@ the github project.
 
 Otherwise, installation from source is not difficult either:
 
- 1. First install the *Haskell platform*, see http://www.haskell.org/platform/
-    for details for your system. Users of Debian or Ubuntu simply run `apt-get
-    install haskell-platform`.
+ 1. If you have not done so yet, fetch the source code and change to the
+    directory containing the code:
 
- 2. Install the dependencies. The Haskell platform comes with a tool called
-    `cabal`, and you should run the two commands
+        git clone https://github.com/entropia/tip-toi-reveng.git tttool
+        cd tttool
+
+ 2. Install the *Haskell platform*, see http://www.haskell.org/platform/
+    for details for your system. Users of Debian or Ubuntu simply run
+
+        apt-get install haskell-platform
+
+ 3. Install the development packages for ncurses, i.e.
+
+        apt-get install libncurses5-dev
+
+ 4. Install the Haskell dependencies. The Haskell platform comes with a tool
+    called `cabal`, and you should run the two commands
 
         cabal update
         cabal install --only-dependencies
 
- 3. Now you can build the program using
+ 5. Now you can build the program using
 
         cabal install --bindir=.
 
- 4. At this point, `tttool` should be ready to go. If you run
+ 6. At this point, `tttool` should be ready to go. If you run
 
         ./tttool
 
@@ -142,11 +134,10 @@ can generate a debug gme using the `debug.yaml` file, adjusting its
 debug.yaml` and loading the resulting `debug.gme` on your pen.  It will then
 read out the codes, as a sequence of english digits.
 
-We are also collecting template files, where the OIDs are commented; these can
-be found in the `./templates` directory. Please improve and contribute!
+If you want to convert existing audio files of almost any format, and you have
+`ffmpeg` installed, you can use 
 
-Again, please let us know if you have problems, but also tell us what fun
-things you did if you succeded.
+    ffmpeg -i input-audio-in-some.fmt -ar 22050 -ac 1 foo.ogg
 
 Text to speech
 --------------
@@ -183,13 +174,14 @@ Other resources in this repository
 ----------------------------------
 
  * [`oid-decoder.html`](http://htmlpreview.github.io/?https://github.com/entropia/tip-toi-reveng/blob/master/oid-decoder.html) allows you to manually decode an OID image.
- * `scripts/updates.sh` downloads all gme files from the Ravensburger server.
+ * `scripts/update.sh` downloads all gme files from the Ravensburger server (requires perl and the [XML::Simple](http://search.cpan.org/~grantm/XML-Simple/) module).  
+
+   Instead of downloading all of them, you can conveniently browse them at <http://tiptoi.vakat.de/>, a service provided by Falko Oldenburg <tiptoi@vakat.de>.
  * `gameanalyse.c` and `libtiptoi.c` is an alternative tool to investigate gme
    files. It can also [replace audio files in gme files](Audio/README.md);
    compile and run it for diagnostic output.
  * `Audio/` contains some audio files, such as digits read out.
  * `docs/` collects information about TipToi found elsewhere.
- * `matlab/` contains scripts to analyse gme files in Matlab
  * `wip/` (work in progess) contains notes about the parts of the gme files that are not
    fully understood yet.
  * `perl-tools` contains a perl based script, to generate a PDF with all OID codes from a yaml-file as well some functions to generate PNG-files, inject pHYs-chunks with resolution hints into GD generated PNG files as result from some testing

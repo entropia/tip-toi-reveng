@@ -14,6 +14,7 @@ import Control.Exception
 import System.IO.Error
 import System.Environment
 import System.Info (os)
+import System.Environment.Executable
 
 import Language
 
@@ -40,22 +41,32 @@ espeak :: Language -> FilePath -> String -> (String, [String])
 espeak lang tmp txt =
  ("espeak", ["-v", l, "-w", tmp, "-s", "120", txt])
   where
-    l = case lang of 
+    l = case lang of
             Language s    -> s
 
-espeak_contrib :: Language -> FilePath -> String -> (String, [String])
-espeak_contrib lang tmp txt =
- ("./contrib/espeak", ["-v", l, "-w", tmp, "-s", "120", txt])
+espeak_contrib :: FilePath -> Language -> FilePath -> String -> (String, [String])
+espeak_contrib myDir lang tmp txt =
+ (myDir </> "contrib" </> "espeak", ["-v", l, "-w", tmp, "-s", "120", txt])
   where
-    l = case lang of 
+    l = case lang of
             Language s    -> s
 
+say :: Language -> FilePath -> String -> (String, [String])
+say lang tmp txt =
+   ("say", ["-o", tmp, "--data-format=LEF32@8000", "-v", l, txt])
+  where
+   l = case lang of
+           Language "en" -> "Alex"
+           Language "de" -> "Anna"
+           Language "fr" -> "Thomas"
+           Language s    -> error $ "No voice for language \"" ++ s ++ "\" known."
 
-engines :: Language -> FilePath -> String -> [(String, [String])]
-engines l ft txt =
+engines :: FilePath -> Language -> FilePath -> String -> [(String, [String])]
+engines myDir l ft txt =
     [ pico l ft txt
     , espeak l ft txt
-    , espeak_contrib l ft txt
+    , espeak_contrib myDir l ft txt
+    , say l ft txt
     ]
 
 oggenc :: FilePath -> FilePath -> (String, [String])
@@ -68,7 +79,7 @@ encoders :: FilePath -> FilePath -> [(String, [String])]
 encoders from to =
     [ oggenc from to
     , oggenc_contrib from to
-    ] 
+    ]
 
 tryPrograms [] e = e
 tryPrograms ((c,args):es) e = do
@@ -100,7 +111,9 @@ textToSpeech lang txt = do
     (tmp,h) <- openTempFile (takeDirectory fn) (takeBaseName fn <.> "wav")
     hClose h
 
-    tryPrograms (engines lang tmp txt) $ do
+    (myDir,_) <- splitExecutablePath
+
+    tryPrograms (engines myDir lang tmp txt) $ do
         putStrLn "No suitable text-to-speech-engine found."
         putStrLn "Do you have libttspico-utils or espeak installed?"
 
