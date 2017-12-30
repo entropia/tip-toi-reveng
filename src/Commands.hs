@@ -30,6 +30,7 @@ import GMERun
 import PrettyPrint
 import OidCode
 import OidTable
+import OidTableSVG
 import Utils
 import TipToiYaml
 import Lint
@@ -281,10 +282,12 @@ genOidTable conf inf out = do
     (tty, codeMap) <- readTipToiYaml inf
     (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
     let codes = ("START", fromIntegral (ttProductId tt)) : sort (M.toList totalMap)
-    let pdfFile = oidTable conf inf codes
-    B.writeFile out pdfFile
+    if svg then B.writeFile out $ oidTableSvg conf inf codes
+           else B.writeFile out $ oidTable conf inf codes
   where
     sort = sortBy (Algorithms.NaturalSort.compare `on` fst)
+
+    svg = ".svg" `isSuffixOf` out
 
 genSVGsForFile :: Conf -> FilePath -> IO ()
 genSVGsForFile conf inf = do

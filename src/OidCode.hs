@@ -1,6 +1,6 @@
 {-# LANGUAGE BangPatterns, TupleSections, FlexibleContexts #-}
 
-module OidCode (genRawPixels, genRawPNG, genRawSVG, tilePixelSize, DPI(..), PixelSize(..)) where
+module OidCode (genRawPixels, oidSVGPattern, genRawPNG, genRawSVG, tilePixelSize, DPI(..), PixelSize(..)) where
 
 import Data.Word
 import Data.Bits
@@ -40,19 +40,24 @@ checksum dec = c3
     (^) = xor
     (&) = (.&.)
 
-
 oidSVG :: Word16 -> S.Svg
 oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
                            ! A.width (S.toValue "1mm")
                            ! A.height (S.toValue "1mm")
                            ! A.viewbox (S.toValue "0 0 48 48") $ do
-    S.defs pattern
+    S.defs (oidSVGPattern patid code)
     S.rect ! A.width (S.toValue "48") ! A.height (S.toValue "48")
            ! A.fill (S.toValue $ "url(#"++patid++")")
   where
+    patid = "pat-" ++ show code
+
+-- Create an OID pattern with the given id of the given code
+-- This assumes 48 dots per mm.
+oidSVGPattern :: String -> Word16 -> S.Svg
+oidSVGPattern patid code = pattern
+  where
     quart 8 = checksum code
     quart n = (code `div` 4^n) `mod` 4
-    patid = "pat-" ++ show code
 
     pattern = S.pattern ! A.width (S.toValue "48")
                         ! A.height (S.toValue "48")

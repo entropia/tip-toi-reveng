@@ -38,6 +38,7 @@ executable tttool
     Language,
     OidCode,
     OidTable,
+    OidTableSVG,
     OneLineParser,
     PlaySound,
     PrettyPrint,

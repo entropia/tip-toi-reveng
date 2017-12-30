@@ -345,14 +345,14 @@ oidTableCmd :: Mod CommandFields (Conf -> IO ())
 oidTableCmd =
     command "oid-table" $
     info parser $
-    progDesc "creates a PDF file with all codes in the yaml file"
+    progDesc "creates a PDF or SVG file with all codes in the yaml file"
   where
     parser = (\a b conf -> twoFiles "pdf" (genOidTable conf) a b) <$> yamlFileParser <*> outFileParser
 
     outFileParser :: Parser (Maybe FilePath)
     outFileParser = optional $ strArgument $ mconcat
         [ metavar "OUT"
-        , help "PDF file to write"
+        , help "PDF or SVG file to write"
         ]
 
 oidCodesCmd :: Mod CommandFields (Conf -> IO ())
