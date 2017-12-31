@@ -304,17 +304,6 @@ genImagesForFile conf inf = do
         let title = printf "%s (product %d code %d)" s (ttProductId tt) c
         genImage format conf title c filename
 
-genImage :: ImageFormat -> Conf -> String -> Word16 -> String -> IO ()
-genImage format conf title c filename =
-    case code2RawCode c of
-        Nothing -> printf "Skipping %s, code %d not known.\n" filename c
-        Just r -> do
-            printf "Writing %s.. (Code %d, raw code %d)\n" filename c r
-            case format of
-                SVG -> genRawSVG r filename
-                PNG -> genRawPNG' conf title r filename
-                PDF -> hPutStrLn stderr "this command only supports PNG and SVG" >> exitFailure
-
 genImagesForCodes :: Bool -> Conf -> [Word16] -> IO ()
 genImagesForCodes False conf codes =
     forM_ codes $ \c -> do
@@ -328,16 +317,25 @@ genImagesForCodes True conf codes =
         let filename = printf "oid-raw-%d.%s" r (suffixOf format)
         let title = printf "raw code %d" r
         printf "Writing %s... (raw code %d)\n" filename r
-        case format of
-            SVG -> genRawSVG r filename
-            PNG -> genRawPNG' conf title r filename
-            PDF -> hPutStrLn stderr "this command only supports PNG and SVG" >> exitFailure
+        genRawImage format conf title r filename
 
-genRawPNG' :: Conf -> String -> Word16 -> FilePath -> IO ()
-genRawPNG' conf =
-    genRawPNG w h (cDPI conf) (cPixelSize conf)
+genImage :: ImageFormat -> Conf -> String -> Word16 -> String -> IO ()
+genImage format conf title c filename =
+    case code2RawCode c of
+        Nothing -> printf "Skipping %s, code %d not known.\n" filename c
+        Just r -> do
+            printf "Writing %s.. (Code %d, raw code %d)\n" filename c r
+            genRawImage format conf title r filename
+
+genRawImage :: ImageFormat -> Conf -> String -> Word16 -> FilePath -> IO ()
+genRawImage PNG conf title raw_code filename =
+    genRawPNG w h (cDPI conf) (cPixelSize conf) title raw_code filename
   where
     (w,h) = cCodeDimPixels conf
+genRawImage SVG _conf _title raw_code filename =
+    genRawSVG raw_code filename
+genRawImage _ _ _ _ _ =
+    hPutStrLn stderr "this command only supports PNG and SVG" >> exitFailure
 
 cCodeDimPixels :: Conf -> (Int, Int)
 cCodeDimPixels conf = (w',h')
