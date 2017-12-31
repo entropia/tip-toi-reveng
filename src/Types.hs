@@ -262,11 +262,20 @@ type CodeMap = M.Map String Word16
 
 -- Command options
 
+data ImageFormat = SVG | PNG | PDF
+    deriving Show
+
+suffixOf :: ImageFormat -> String
+suffixOf SVG = "svg"
+suffixOf PNG = "png"
+suffixOf PDF = "pdf"
+
 data Conf = Conf
     { cTransscriptFile :: Maybe FilePath
     , cCodeDim :: (Int, Int)
     , cDPI :: Int
     , cPixelSize :: Int
+    , cImageFormat :: Maybe ImageFormat
     }
     deriving Show
 

@@ -5,7 +5,9 @@ import Numeric
 import Data.List (intercalate)
 import Options.Applicative.Help.Chunk
 import Data.Monoid
+import Data.Maybe
 import Data.Foldable (asum)
+import Data.Char (toLower)
 
 import Types
 import RangeParser
@@ -31,6 +33,7 @@ optionParser =
         <*> codeDim
         <*> dpi
         <*> pixelSize
+        <*> imageFormat
 
     transscript = optional $ strOption $ mconcat
         [ long "transscript"
@@ -54,6 +57,25 @@ optionParser =
         , showDefault
         , help "Use this many pixels (squared) per dot in when creating OID codes."
         ]
+
+    imageFormat = optional $ option parseImageFormat $ mconcat
+        [ long "image-format"
+        , short 'f'
+        , metavar "Format"
+        , showDefaultWith showImageFormat
+        , help "image format to write: PNG, PDF, SVG; not all commands support all formats)"
+        ]
+
+    showImageFormat = map toLower . show
+
+    parseImageFormat :: ReadM ImageFormat
+    parseImageFormat = eitherReader (go . map toLower)
+      where
+        go "png" = return PNG
+        go "pdf" = return PDF
+        go "svg" = return SVG
+        go f     = Left $ "Unknown image format " ++ f
+
 
     codeDim = option parseCodeDim $ mconcat
         [ long "code-dim"
@@ -347,28 +369,33 @@ oidTableCmd =
     info parser $
     progDesc "creates a PDF or SVG file with all codes in the yaml file"
   where
-    parser = (\a b conf -> twoFiles "pdf" (genOidTable conf) a b) <$> yamlFileParser <*> outFileParser
+    parser = (\a b conf ->
+        let suffix = suffixOf (fromMaybe PDF (cImageFormat conf)) in
+        twoFiles suffix (genOidTable conf) a b
+        ) <$> yamlFileParser <*> outFileParser
+
 
     outFileParser :: Parser (Maybe FilePath)
     outFileParser = optional $ strArgument $ mconcat
         [ metavar "OUT"
-        , help "PDF or SVG file to write"
+        , help "file to write (default: PDF)"
         ]
 
 oidCodesCmd :: Mod CommandFields (Conf -> IO ())
 oidCodesCmd =
     command "oid-codes" $
     info parser $
-    progDesc "creates PNG files for every OID in the yaml file." <>
+    progDesc "creates files for every OID in the yaml file (default: PNG)." <>
     footerDoc foot
   where
     foot = unChunk $ vsepChunks
-        [ paragraph "Uses oid-<code>.png as the file name."
-        , paragraph "Use the global options to configure size, resolution and blackness of the code (see ./tttool --help)."
+        [ paragraph "Uses oid-<code>.<format> as the file name."
+        , paragraph "Use the global options to configure size, file format"
+        , paragraph "resolution and blackness of the code (see ./tttool --help)."
         , paragraph $ "Note that it used to work to call \"tttool oid-code foo.yaml\". " ++
                       "Please use \"tttool oid-codes\" for that now."
         ]
-    parser = flip genSVGsForFile <$> yamlFileParser
+    parser = flip genImagesForFile <$> yamlFileParser
 
 oidCodeCmd :: Mod CommandFields (Conf -> IO ())
 oidCodeCmd =
@@ -384,7 +411,7 @@ oidCodeCmd =
                       "Please use \"tttool oid-codes\" for that now."
         ]
 
-    parser =(\raw range c -> genSVGsForCodes raw c range) <$> rawCodeSwitchParser <*> codeRangeParser
+    parser =(\raw range c -> genImagesForCodes raw c range) <$> rawCodeSwitchParser <*> codeRangeParser
 
     codeRangeParser :: Parser [Word16]
     codeRangeParser = argument (eitherReader parseRange) $ mconcat
