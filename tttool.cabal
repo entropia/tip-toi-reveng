@@ -76,7 +76,7 @@ executable tttool
     spool       == 0.1.*,
     zlib        >= 0.5      && < 0.7,
     natural-sort >= 0.1     && < 0.2,
-    blaze-svg
+    blaze-svg   == 0.3.*
 
   if impl(ghc < 7.5)
     build-depends: ghc-prim
