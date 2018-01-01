@@ -31,8 +31,8 @@ before_install:
  - test -z "$STACK" || { travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack' ; }
  # stack needs cabal :-(
  - test -z "$STACK" || sudo add-apt-repository -y ppa:hvr/ghc
- - test -z "$STACK" || sudo apt-get update
- - test -z "$STACK" || sudo apt-get install cabal-install-1.24
+ - test -z "$STACK" || travis_retry sudo apt-get update
+ - test -z "$STACK" || travis_retry sudo apt-get install cabal-install-1.24
  - test -z "$STACK" || export PATH=/opt/cabal/1.24/bin:$PATH
 
  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
@@ -42,14 +42,14 @@ before_install:
  - test -z "$WINDOWS"  || bash ./.travis-setup-windows.sh
  - test -z "$CABALVER" || bash ./.travis-setup-linux.sh
 
- - test -z "$STACK" || sudo apt-get install g++ gcc libc6-dev libffi-dev libgmp-dev make xz-utils zlib1g-dev libwww-perl
+ - test -z "$STACK" || travis_retry sudo apt-get install g++ gcc libc6-dev libffi-dev libgmp-dev make xz-utils zlib1g-dev libwww-perl
  - 'test -z "$STACK" || RESOLVER="$(HEAD -S https://www.stackage.org/$STACK|grep HEAD|tail -n1|cut -d/ -f4)"'
  - test -z "$STACK" || stack setup --resolver $RESOLVER
 
 
 install:
  - 'test -z "$STACK" || echo "resolver: $RESOLVER" > stack.yaml'
- - test -z "$STACK" || stack solver --update-config
+ - test -z "$STACK" || travis_retry stack solver --update-config
  - test -z "$STACK" || stack build --only-dependencies
 
 script:
