@@ -62,7 +62,7 @@ data TipToiYAML = TipToiYAML
     , ttyGME_Lang    :: Maybe String
     , ttyMedia_Path  :: Maybe String
     , ttyInit        :: Maybe String
-    , ttyWelcome     :: Maybe String
+    , ttyWelcome     :: Maybe PlayListListYaml
     , ttyProduct_Id  :: Word32
     , ttyScriptCodes :: Maybe CodeMap
     , ttySpeak       :: Maybe (OptArray SpeakSpec)
@@ -113,7 +113,7 @@ instance ToJSON a => ToJSON (OptArray a) where
     toJSON (OptArray [x]) = toJSON x
     toJSON (OptArray l)   = Array $ V.fromList $ map toJSON $ l
 
-type PlayListListYaml = String
+type PlayListListYaml = [String]
 
 type OIDListYaml = String
 
@@ -313,7 +313,11 @@ list2Maybe [] = Nothing
 list2Maybe xs = Just xs
 
 playListList2Yaml :: PlayListList -> PlayListListYaml
-playListList2Yaml = commas . map show . concat
+playListList2Yaml = map playList2Yaml
+
+playList2Yaml :: PlayList -> String
+playList2Yaml = commas . map show
+
 
 oidList2Yaml :: [OID] -> OIDListYaml
 oidList2Yaml = unwords . map show
@@ -469,8 +473,7 @@ game2gameYaml Game16 {..} = Game16Yaml
 game2gameYaml Game253 = Game253Yaml
 
 playListListFromYaml :: PlayListListYaml -> WithFileNames PlayListList
-playListListFromYaml =
-    fmap listify .
+playListListFromYaml = traverse $
     traverse recordFilename .
     either error id .
     parseOneLinePure parsePlayList "playlist"
@@ -761,7 +764,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
         first = fst (M.findMin m)
         last = fst (M.findMax m)
 
-    welcome_names <- parseOneLine parsePlayList "welcome" (fromMaybe "" ttyWelcome)
+    welcome_names <- concat <$> mapM (parseOneLine parsePlayList "welcome") (fromMaybe [] ttyWelcome)
 
 
     let ((prescripts, welcome, games), filenames) = resolveFileNames $
@@ -1087,7 +1090,7 @@ debugGame productID = do
         , ttySpeak = Nothing
         , ttyComment = Nothing
         , ttyGME_Lang = Nothing
-        , ttyWelcome = Just $ "blob"
+        , ttyWelcome = Just ["blob"]
         , ttyScripts = M.fromList [
             (show oid, OptArray [line])
             | oid <- [1..15000]
