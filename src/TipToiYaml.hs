@@ -45,6 +45,7 @@ import qualified Data.Traversable as T
 import Data.Traversable (for, traverse)
 import Control.Arrow
 import Control.Applicative (Applicative(..), (<*>), (<*))
+import qualified Control.Applicative
 
 import TextToSpeech
 import Language
@@ -106,8 +107,7 @@ type SpeakSpecs = OptArray SpeakSpec
 newtype OptArray a = OptArray [a]
 
 instance FromJSON a => FromJSON (OptArray a) where
-    parseJSON (Array a) = OptArray <$> mapM parseJSON (V.toList a)
-    parseJSON v = OptArray . (:[]) <$> parseJSON v
+    parseJSON v = OptArray <$> ((pure <$> parseJSON v) Control.Applicative.<|> parseJSON v)
 
 instance ToJSON a => ToJSON (OptArray a) where
     toJSON (OptArray [x]) = toJSON x
