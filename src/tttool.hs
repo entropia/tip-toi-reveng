@@ -63,18 +63,22 @@ optionParser =
         , short 'f'
         , metavar "Format"
         , showDefaultWith showImageFormat
-        , help "image format to write: PNG, PDF, SVG; not all commands support all formats)"
+        , help "image format to write: PNG, PDF, SVG, SVG+PNG (not all commands support all formats)"
         ]
 
-    showImageFormat = map toLower . show
+    showImageFormat PNG         = "png"
+    showImageFormat PDF         = "pdf"
+    showImageFormat (SVG True)  = "svg+png"
+    showImageFormat (SVG False) = "png"
 
     parseImageFormat :: ReadM ImageFormat
     parseImageFormat = eitherReader (go . map toLower)
       where
-        go "png" = return PNG
-        go "pdf" = return PDF
-        go "svg" = return SVG
-        go f     = Left $ "Unknown image format " ++ f
+        go "png"     = return PNG
+        go "pdf"     = return PDF
+        go "svg"     = return (SVG False)
+        go "svg+png" = return (SVG True)
+        go f         = Left $ "Unknown image format " ++ f
 
 
     codeDim = option parseCodeDim $ mconcat
@@ -395,7 +399,7 @@ oidCodesCmd =
         , paragraph $ "Note that it used to work to call \"tttool oid-code foo.yaml\". " ++
                       "Please use \"tttool oid-codes\" for that now."
         ]
-    parser = flip genImagesForFile <$> yamlFileParser
+    parser = flip writeImagesForFile <$> yamlFileParser
 
 oidCodeCmd :: Mod CommandFields (Conf -> IO ())
 oidCodeCmd =
@@ -411,7 +415,7 @@ oidCodeCmd =
                       "Please use \"tttool oid-codes\" for that now."
         ]
 
-    parser =(\raw range c -> genImagesForCodes raw c range) <$> rawCodeSwitchParser <*> codeRangeParser
+    parser =(\raw range c -> writeImagesForCodes raw c range) <$> rawCodeSwitchParser <*> codeRangeParser
 
     codeRangeParser :: Parser [Word16]
     codeRangeParser = argument (eitherReader parseRange) $ mconcat

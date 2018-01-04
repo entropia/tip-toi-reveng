@@ -1,6 +1,6 @@
 {-# LANGUAGE BangPatterns, TupleSections, FlexibleContexts #-}
 
-module OidCode (genRawPixels, oidSVGPattern, genRawPNG, genRawSVG, tilePixelSize, DPI(..), PixelSize(..)) where
+module OidCode (genRawPixels, oidSVGPattern, writeRawPNG, writeRawSVG, tilePixelSize, DPI(..), PixelSize(..)) where
 
 import Data.Word
 import Data.Bits
@@ -14,15 +14,18 @@ import Codec.Picture.Metadata
 import Control.Monad.ST
 import Control.Applicative
 import Data.Vector.Storable.ByteString
+import qualified Data.ByteString.Base64.Lazy
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
 
 import Utils
+import Types
 
 import qualified Text.Blaze.Svg as S
 import qualified Text.Blaze.Svg11 as S
 import qualified Text.Blaze.Svg11.Attributes as A
 import Text.Blaze.Svg11 ((!))
 import Text.Blaze.Svg.Renderer.Utf8
-import qualified Data.ByteString.Lazy as B (writeFile)
 import Control.Arrow
 
 
@@ -40,29 +43,44 @@ checksum dec = c3
     (^) = xor
     (&) = (.&.)
 
-oidSVG :: Word16 -> S.Svg
-oidSVG code = S.docTypeSvg ! A.version (S.toValue "1.1")
-                           ! A.width (S.toValue "1mm")
-                           ! A.height (S.toValue "1mm")
-                           ! A.viewbox (S.toValue "0 0 48 48") $ do
-    S.defs (oidSVGPattern patid code)
-    S.rect ! A.width (S.toValue "48") ! A.height (S.toValue "48")
-           ! A.fill (S.toValue $ "url(#"++patid++")")
+oidSVG :: Conf -> Bool -> Word16 -> S.Svg
+oidSVG conf usePNG code =
+    S.docTypeSvg ! A.version (S.toValue "1.1")
+                 ! A.width (S.toValue "1mm")
+                 ! A.height (S.toValue "1mm")
+                 ! A.viewbox (S.toValue "0 0 48 48") $ do
+        S.defs (oidSVGPattern conf usePNG patid code)
+        S.rect ! A.width (S.toValue "48") ! A.height (S.toValue "48")
+               ! A.fill (S.toValue $ "url(#"++patid++")")
   where
     patid = "pat-" ++ show code
 
 -- Create an OID pattern with the given id of the given code
 -- This assumes 48 dots per mm.
-oidSVGPattern :: String -> Word16 -> S.Svg
-oidSVGPattern patid code = pattern
+oidSVGPattern :: Conf -> Bool -> String -> Word16 -> S.Svg
+oidSVGPattern conf usePNG patid code =
+  S.pattern ! A.width (S.toValue "48")
+            ! A.height (S.toValue "48")
+            ! A.id_ (S.toValue patid)
+            ! A.patternunits (S.toValue "userSpaceOnUse") $
+  oidSVGPatternContent conf usePNG code
+
+oidSVGPatternContent :: Conf ->  Bool -> Word16 -> S.Svg
+oidSVGPatternContent conf True code =
+    S.image ! A.width (S.toValue "48")
+            ! A.height (S.toValue "48")
+            ! A.xlinkHref (S.toValue (T.pack "data:image/png;base64," <> pngBase64))
+  where
+    png = genRawPNG 48 48 (conf { cDPI = 1200 }) "" code
+    pngBase64 = T.decodeUtf8 $ B.toStrict $
+        Data.ByteString.Base64.Lazy.encode png
+
+oidSVGPatternContent _conf False code = f (0,0)
   where
     quart 8 = checksum code
     quart n = (code `div` 4^n) `mod` 4
 
-    pattern = S.pattern ! A.width (S.toValue "48")
-                        ! A.height (S.toValue "48")
-                        ! A.id_ (S.toValue patid)
-                        ! A.patternunits (S.toValue "userSpaceOnUse") $ S.g (f (0,0))
+    f :: (Integer, Integer) -> S.Svg
     f = mconcat $ map position $
         zip (flip (,) <$> [3,2,1] <*> [3,2,1])
             [ value (quart n) | n <- [0..8] ] ++
@@ -90,8 +108,10 @@ oidSVGPattern patid code = pattern
     -- Drawing combinators
     at (x, y) f = f . ((+x) *** (+y))
 
-genRawSVG :: Word16 -> FilePath -> IO ()
-genRawSVG code filename = B.writeFile filename (renderSvg (oidSVG code))
+writeRawSVG :: Conf -> Bool -> Word16 -> FilePath -> IO ()
+writeRawSVG conf usePNG code filename =
+    B.writeFile filename $
+    renderSvg (oidSVG conf usePNG code)
 
 type DPI = Int
 type PixelSize = Int
@@ -114,9 +134,12 @@ tilePixelSize dpi _ps = width
     width  = 4*spacePerPoint
 
 -- | Renders a single OID Image, returns its dimensions and the black pixels therein
-singeOidImage :: DPI -> PixelSize -> Word16 -> ((Int, Int), [(Int, Int)])
-singeOidImage dpi ps code = ((width, height), pixels)
+singeOidImage :: Conf -> Word16 -> ((Int, Int), [(Int, Int)])
+singeOidImage conf code = ((width, height), pixels)
   where
+    dpi = cDPI conf
+    ps = cPixelSize conf
+
     spacePerPoint = dpi `div2` 100
     width  = 4*spacePerPoint
     height = 4*spacePerPoint
@@ -158,11 +181,11 @@ singeOidImage dpi ps code = ((width, height), pixels)
 -- integer division rounded up
 x `div2` y = ((x-1) `div` y) + 1
 
-oidImage :: ColorConvertible PixelYA8 p => Int -> Int -> DPI -> PixelSize -> Word16 -> Image p
-oidImage w h dpi ps code =
+oidImage :: ColorConvertible PixelYA8 p => Int -> Int -> Conf -> Word16 -> Image p
+oidImage w h conf code =
     imageFromBlackPixels w h tiledPixels
   where
-    ((cw,ch), pixels) = singeOidImage dpi ps code
+    ((cw,ch), pixels) = singeOidImage conf code
 
     tiledPixels =
         [ (x',y')
@@ -171,24 +194,28 @@ oidImage w h dpi ps code =
         , y' <- [y,y + ch..h-1]
         ]
 -- Width and height in pixels
-genRawPixels :: Int -> Int -> DPI -> PixelSize -> Word16 -> B.ByteString
-genRawPixels w h dpi ps code =
+genRawPixels :: Int -> Int -> Conf -> Word16 -> B.ByteString
+genRawPixels w h conf code =
     -- All very shaky here, but it seems to work
     B.fromStrict $
     vectorToByteString $
     imageData $
-    (oidImage w h dpi ps code :: Image PixelRGB8)
+    (oidImage w h conf code :: Image PixelRGB8)
 
 
-genRawPNG :: Int -> Int -> DPI -> PixelSize -> String -> Word16 -> FilePath -> IO ()
-genRawPNG w h dpi ps title code filename =
+writeRawPNG :: Int -> Int -> Conf -> String -> Word16 -> FilePath -> IO ()
+writeRawPNG w h conf title code filename =
     B.writeFile filename $
+    genRawPNG w h conf title code
+
+genRawPNG :: Int -> Int -> Conf -> String -> Word16 -> B.ByteString
+genRawPNG w h conf title code =
     encodePngWithMetadata metadata $
-    (oidImage w h dpi ps code :: Image PixelYA8)
+    (oidImage w h conf code :: Image PixelYA8)
   where
     metadata = mconcat
-        [ singleton DpiX (fromIntegral dpi)
-        , singleton DpiY (fromIntegral dpi)
+        [ singleton DpiX (fromIntegral (cDPI conf))
+        , singleton DpiY (fromIntegral (cDPI conf))
         , singleton Title title
         , singleton Software $ "tttool " ++ tttoolVersion
         ]

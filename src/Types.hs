@@ -262,11 +262,11 @@ type CodeMap = M.Map String Word16
 
 -- Command options
 
-data ImageFormat = SVG | PNG | PDF
+data ImageFormat = SVG { withPNG :: Bool } | PNG | PDF
     deriving Show
 
 suffixOf :: ImageFormat -> String
-suffixOf SVG = "svg"
+suffixOf (SVG _) = "svg"
 suffixOf PNG = "png"
 suffixOf PDF = "pdf"
 

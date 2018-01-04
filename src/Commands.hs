@@ -284,7 +284,7 @@ genOidTable conf inf out = do
     (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
     let codes = ("START", fromIntegral (ttProductId tt)) : sort (M.toList totalMap)
     case fromMaybe PDF $ cImageFormat conf of
-        SVG -> B.writeFile out $ oidTableSvg conf inf codes
+        SVG usePNG -> B.writeFile out $ oidTableSvg conf usePNG inf codes
         PDF -> B.writeFile out $ oidTable conf inf codes
         _   -> hPutStrLn stderr "tttool oid-table supports only SVG and PDF" >> exitFailure
   where
@@ -293,8 +293,8 @@ genOidTable conf inf out = do
 isSVG :: FilePath -> Bool
 isSVG fn = ".svg" `isSuffixOf` fn
 
-genImagesForFile :: Conf -> FilePath -> IO ()
-genImagesForFile conf inf = do
+writeImagesForFile :: Conf -> FilePath -> IO ()
+writeImagesForFile conf inf = do
     (tty, codeMap) <- readTipToiYaml inf
     (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
     let codes = ("START", fromIntegral (ttProductId tt)) : M.toList totalMap
@@ -302,39 +302,39 @@ genImagesForFile conf inf = do
     forM_  codes $ \(s,c) -> do
         let filename = printf "oid-%d-%s.%s" (ttProductId tt) s (suffixOf format)
         let title = printf "%s (product %d code %d)" s (ttProductId tt) c
-        genImage format conf title c filename
+        writeImage format conf title c filename
 
-genImagesForCodes :: Bool -> Conf -> [Word16] -> IO ()
-genImagesForCodes False conf codes =
+writeImagesForCodes :: Bool -> Conf -> [Word16] -> IO ()
+writeImagesForCodes False conf codes =
     forM_ codes $ \c -> do
         let format = fromMaybe PNG (cImageFormat conf)
         let filename = printf "oid-%d.%s" c (suffixOf format)
         let title = printf "code %d" c
-        genImage format conf title c filename
-genImagesForCodes True conf codes =
+        writeImage format conf title c filename
+writeImagesForCodes True conf codes =
     forM_ codes $ \r -> do
         let format = fromMaybe PNG (cImageFormat conf)
         let filename = printf "oid-raw-%d.%s" r (suffixOf format)
         let title = printf "raw code %d" r
         printf "Writing %s... (raw code %d)\n" filename r
-        genRawImage format conf title r filename
+        writeRawImage format conf title r filename
 
-genImage :: ImageFormat -> Conf -> String -> Word16 -> String -> IO ()
-genImage format conf title c filename =
+writeImage :: ImageFormat -> Conf -> String -> Word16 -> FilePath -> IO ()
+writeImage format conf title c filename =
     case code2RawCode c of
         Nothing -> printf "Skipping %s, code %d not known.\n" filename c
         Just r -> do
             printf "Writing %s.. (Code %d, raw code %d)\n" filename c r
-            genRawImage format conf title r filename
+            writeRawImage format conf title r filename
 
-genRawImage :: ImageFormat -> Conf -> String -> Word16 -> FilePath -> IO ()
-genRawImage PNG conf title raw_code filename =
-    genRawPNG w h (cDPI conf) (cPixelSize conf) title raw_code filename
+writeRawImage :: ImageFormat -> Conf -> String -> Word16 -> FilePath -> IO ()
+writeRawImage PNG conf title raw_code filename =
+    writeRawPNG w h conf title raw_code filename
   where
     (w,h) = cCodeDimPixels conf
-genRawImage SVG _conf _title raw_code filename =
-    genRawSVG raw_code filename
-genRawImage _ _ _ _ _ =
+writeRawImage (SVG usePNG) conf _title raw_code filename =
+    writeRawSVG conf usePNG raw_code filename
+writeRawImage _ _ _ _ _ =
     hPutStrLn stderr "this command only supports PNG and SVG" >> exitFailure
 
 cCodeDimPixels :: Conf -> (Int, Int)

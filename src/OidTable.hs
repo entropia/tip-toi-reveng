@@ -27,7 +27,7 @@ oidTable conf title entries | entriesPerPage < 1 = error "OID codes too large to
                 let tw = fromIntegral twp / px
                 image <- createPDFRawImageFromByteString twp twp False FlateDecode $
                     compressWith defaultCompressParams { compressLevel = defaultCompression } $
-                    genRawPixels twp twp (cDPI conf) (cPixelSize conf) $
+                    genRawPixels twp twp conf $
                     c
                 pat <- createColoredTiling 0 0 tw tw tw tw NoDistortion $ do
                     applyMatrix $ scale (1/px) (1/px)

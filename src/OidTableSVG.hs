@@ -21,9 +21,10 @@ import Utils
 
 type Point = Complex Double
 
-oidTableSvg :: Conf -> String -> [(String, Word16)] -> LB.ByteString
-oidTableSvg conf title entries | entriesPerPage < 1 = error "OID codes too large to fit on a single page"
-                            | otherwise = renderSvg $
+oidTableSvg :: Conf -> Bool -> String -> [(String, Word16)] -> LB.ByteString
+oidTableSvg conf usePNG title entries
+    | entriesPerPage < 1 = error "OID codes too large to fit on a single page"
+    | otherwise = renderSvg $
         S.docTypeSvg  ! A.version (S.toValue "1.1")
                       ! A.width  (S.toValue (printf "%fmm" (a4w/mm) :: String))
                       ! A.height (S.toValue (printf "%fmm" (a4h/mm) :: String))
@@ -36,7 +37,7 @@ oidTableSvg conf title entries | entriesPerPage < 1 = error "OID codes too large
     S.defs $ forM_ entries $ \(d,c) ->
         case code2RawCode c of
             Nothing -> return ()
-            Just rc -> oidSVGPattern (patid c) rc
+            Just rc -> oidSVGPattern conf usePNG (patid c) rc
 
     -- For SVG, we put all on one page (and exceed the page if it is too big)
     let chunks = [entries]
