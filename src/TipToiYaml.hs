@@ -104,7 +104,7 @@ toSpeakMap l (Just (OptArray specs)) = M.unionsWith e $ map go specs
 
 type SpeakSpecs = OptArray SpeakSpec
 
-newtype OptArray a = OptArray [a]
+newtype OptArray a = OptArray { unOptArray :: [a] }
 
 instance FromJSON a => FromJSON (OptArray a) where
     parseJSON v = OptArray <$> ((pure <$> parseJSON v) Control.Applicative.<|> parseJSON v)
@@ -113,7 +113,7 @@ instance ToJSON a => ToJSON (OptArray a) where
     toJSON (OptArray [x]) = toJSON x
     toJSON (OptArray l)   = Array $ V.fromList $ map toJSON $ l
 
-type PlayListListYaml = [String]
+type PlayListListYaml = OptArray String
 
 type OIDListYaml = String
 
@@ -313,7 +313,7 @@ list2Maybe [] = Nothing
 list2Maybe xs = Just xs
 
 playListList2Yaml :: PlayListList -> PlayListListYaml
-playListList2Yaml = map playList2Yaml
+playListList2Yaml = OptArray . map playList2Yaml
 
 playList2Yaml :: PlayList -> String
 playList2Yaml = commas . map show
@@ -473,10 +473,11 @@ game2gameYaml Game16 {..} = Game16Yaml
 game2gameYaml Game253 = Game253Yaml
 
 playListListFromYaml :: PlayListListYaml -> WithFileNames PlayListList
-playListListFromYaml = traverse $
-    traverse recordFilename .
-    either error id .
-    parseOneLinePure parsePlayList "playlist"
+playListListFromYaml (OptArray ws) = traverse
+    ( traverse recordFilename .
+      either error id .
+      parseOneLinePure parsePlayList "playlist"
+    ) ws
   where listify [] = []
         listify x  = [x]
 
@@ -764,7 +765,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
         first = fst (M.findMin m)
         last = fst (M.findMax m)
 
-    welcome_names <- concat <$> mapM (parseOneLine parsePlayList "welcome") (fromMaybe [] ttyWelcome)
+    welcome_names <- mapM (parseOneLine parsePlayList "welcome") (maybe []  unOptArray ttyWelcome)
 
 
     let ((prescripts, welcome, games), filenames) = resolveFileNames $
@@ -779,7 +780,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
                     )
                 )
             ) <*>
-            traverse recordFilename welcome_names <*>
+            traverse (traverse recordFilename) welcome_names <*>
             traverse gameYaml2Game (fromMaybe [] ttyGames)
 
     preInitRegs <- M.fromList <$> parseOneLine parseInitRegs "init" (fromMaybe "" ttyInit)
@@ -846,7 +847,7 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
         , ttComment = comment
         , ttDate = BC.pack date
         , ttLang = maybe BC.empty BC.pack ttyGME_Lang
-        , ttWelcome = [welcome]
+        , ttWelcome = welcome
         , ttInitialRegs = [fromMaybe 0 (M.lookup r initRegs) | r <- [0..maxReg]]
         , ttScripts = scripts'
         , ttGames = games
@@ -1090,7 +1091,7 @@ debugGame productID = do
         , ttySpeak = Nothing
         , ttyComment = Nothing
         , ttyGME_Lang = Nothing
-        , ttyWelcome = Just ["blob"]
+        , ttyWelcome = Just (OptArray ["blob"])
         , ttyScripts = M.fromList [
             (show oid, OptArray [line])
             | oid <- [1..15000]
