@@ -31,13 +31,14 @@ oidTableSvg conf usePNG title entries
                       ! A.viewbox (S.toValue (printf "0 0 %f %f" a4w a4h :: String))
                       ! A.fontFamily (S.toValue "sans-serif")
                       $ do
-    let patid c = "pat-" ++ show c
+    let patid d c | d == show c = d
+                  | otherwise   = printf "%s-%d" d c
 
     -- Create patterns for the codes
     S.defs $ forM_ entries $ \(d,c) ->
         case code2RawCode c of
             Nothing -> return ()
-            Just rc -> oidSVGPattern conf usePNG (patid c) rc
+            Just rc -> oidSVGPattern conf usePNG (patid d c) rc
 
     -- For SVG, we put all on one page (and exceed the page if it is too big)
     let chunks = [entries]
@@ -59,19 +60,19 @@ oidTableSvg conf usePNG title entries
                     $ fromString $ "Created by tttool-" ++ tttoolVersion
 
 
-            forM_ (zip thisPage positions) $ \((e,c), x :+ y) -> do
+            forM_ (zip thisPage positions) $ \((d,c), x :+ y) -> do
                 S.rect ! A.width (S.toValue imageWidth)
                        ! A.height (S.toValue imageHeight)
                        ! A.x (S.toValue x)
                        ! A.y (S.toValue y)
-                       ! A.fill (S.toValue $ "url(#"++patid c++")")
+                       ! A.fill (S.toValue $ "url(#"++patid d c++")")
 
                 S.text_ ! A.x (S.toValue x)
                         ! A.y (S.toValue (y + imageHeight + subtitleSep + subtitleHeight))
                         ! A.textAnchor (S.toValue "left")
                         ! A.stroke (S.toValue "black")
                         ! A.fontSize (S.toValue (printf "%f" (8*pt) :: String))
-                        $ fromString e
+                        $ fromString d
   where
     -- Configure-dependent dimensions (all in pt)
     (imageWidth,imageHeight) = (*mm) *** (*mm) $ fromIntegral *** fromIntegral $cCodeDim conf

@@ -43,39 +43,37 @@ checksum dec = c3
     (^) = xor
     (&) = (.&.)
 
-oidSVG :: Conf -> Bool -> Word16 -> S.Svg
-oidSVG conf usePNG code =
+oidSVG :: Conf -> Bool -> String -> Word16 -> S.Svg
+oidSVG conf usePNG title code =
     S.docTypeSvg ! A.version (S.toValue "1.1")
                  ! A.width (S.toValue "1mm")
                  ! A.height (S.toValue "1mm")
                  ! A.viewbox (S.toValue "0 0 48 48") $ do
-        S.defs (oidSVGPattern conf usePNG patid code)
+        S.defs (oidSVGPattern conf usePNG title code)
         S.rect ! A.width (S.toValue "48") ! A.height (S.toValue "48")
-               ! A.fill (S.toValue $ "url(#"++patid++")")
-  where
-    patid = "pat-" ++ show code
+               ! A.fill (S.toValue $ "url(#"++title++")")
 
 -- Create an OID pattern with the given id of the given code
 -- This assumes 48 dots per mm.
 oidSVGPattern :: Conf -> Bool -> String -> Word16 -> S.Svg
-oidSVGPattern conf usePNG patid code =
+oidSVGPattern conf usePNG title code =
   S.pattern ! A.width (S.toValue "48")
             ! A.height (S.toValue "48")
-            ! A.id_ (S.toValue patid)
+            ! A.id_ (S.toValue title)
             ! A.patternunits (S.toValue "userSpaceOnUse") $
-  oidSVGPatternContent conf usePNG code
+  oidSVGPatternContent conf usePNG title code
 
-oidSVGPatternContent :: Conf ->  Bool -> Word16 -> S.Svg
-oidSVGPatternContent conf True code =
+oidSVGPatternContent :: Conf -> Bool -> String -> Word16 -> S.Svg
+oidSVGPatternContent conf True title code =
     S.image ! A.width (S.toValue "48")
             ! A.height (S.toValue "48")
             ! A.xlinkHref (S.toValue (T.pack "data:image/png;base64," <> pngBase64))
   where
-    png = genRawPNG 48 48 (conf { cDPI = 1200 }) "" code
+    png = genRawPNG 48 48 (conf { cDPI = 1200 }) title code
     pngBase64 = T.decodeUtf8 $ B.toStrict $
         Data.ByteString.Base64.Lazy.encode png
 
-oidSVGPatternContent _conf False code = f (0,0)
+oidSVGPatternContent _conf False _title code = f (0,0)
   where
     quart 8 = checksum code
     quart n = (code `div` 4^n) `mod` 4
@@ -108,10 +106,10 @@ oidSVGPatternContent _conf False code = f (0,0)
     -- Drawing combinators
     at (x, y) f = f . ((+x) *** (+y))
 
-writeRawSVG :: Conf -> Bool -> Word16 -> FilePath -> IO ()
-writeRawSVG conf usePNG code filename =
+writeRawSVG :: Conf -> Bool -> String -> Word16 -> FilePath -> IO ()
+writeRawSVG conf usePNG title code filename =
     B.writeFile filename $
-    renderSvg (oidSVG conf usePNG code)
+    renderSvg (oidSVG conf usePNG title code)
 
 type DPI = Int
 type PixelSize = Int

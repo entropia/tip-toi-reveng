@@ -332,8 +332,8 @@ writeRawImage PNG conf title raw_code filename =
     writeRawPNG w h conf title raw_code filename
   where
     (w,h) = cCodeDimPixels conf
-writeRawImage (SVG usePNG) conf _title raw_code filename =
-    writeRawSVG conf usePNG raw_code filename
+writeRawImage (SVG usePNG) conf title raw_code filename =
+    writeRawSVG conf usePNG title raw_code filename
 writeRawImage _ _ _ _ _ =
     hPutStrLn stderr "this command only supports PNG and SVG" >> exitFailure
 
