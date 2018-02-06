@@ -1,13 +1,7 @@
 # Changelog for tttool
 
-## 1.7 (UNRELEASED)
+## 1.8 (2018-02-06)
 
- * `./tttool oid-table` sorts naturally now, so that the sequence is `foo1`
-   `foo2` `foo10`, and not `foo1` `foo10` `foo2`.
- * Read and write the language field in the GME header (GH issue #105)
- * `./tttool oid-table` aligns images on pixel boundaries, so that a naive
-   rastering of the whole page still yields crisp pixels.
-   Thanks to @m7thon for the patch!
  * If the script for an oid code contains only one line, one can simply write
 
         house: P(welcome)
@@ -16,6 +10,23 @@
 
         house:
          - P(welcome)
+ * `./tttool oid-table` aligns images on pixel boundaries, so that a naive
+   rastering of the whole page still yields crisp pixels.
+   Thanks to @m7thon for the patch!
+ * The PDF output uses PDF patterns for much smaller PDF files.
+ * The commands `./tttool oid-code` and `./tttool oid-table` can now also
+   produce SVG output with SVG patterns:
+
+   `--image-format SVG` produces SVG with vector squares
+   for the pixels, wihle `--image-format SVG+PNG` produces SVG with a small,
+   repeated pixel graphics in the pattern
+ * Games are now more likely to be properly round-tripped (GH issue #174)
+
+## 1.7 (2017-01-08)
+
+ * `./tttool oid-table` sorts naturally now, so that the sequence is `foo1`
+   `foo2` `foo10`, and not `foo1` `foo10` `foo2`.
+ * Read and write the language field in the GME header (GH issue #105)
 
 ## 1.6.1 (2016-04-17)
 
