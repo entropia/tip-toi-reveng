@@ -341,9 +341,9 @@ cCodeDimPixels :: Conf -> (Int, Int)
 cCodeDimPixels conf = (w',h')
   where
     (w,h) = cCodeDim conf
-    -- (Roughly) 25mm per inch
-    w' = (w * cDPI conf) `div` 25
-    h' = (h * cDPI conf) `div` 25
+    -- 25.4mm per inch
+    w' = round $ fromIntegral (w * cDPI conf) / 25.4
+    h' = round $ fromIntegral (h * cDPI conf) / 25.4
 
 readTransscriptFile :: Maybe FilePath -> IO Transscript
 readTransscriptFile Nothing = return M.empty
