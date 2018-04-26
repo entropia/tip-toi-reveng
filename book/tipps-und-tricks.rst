@@ -84,7 +84,7 @@ Modulo beschränken:
 ::
 
     random:
-      - T($r,65535) $rnd+=$r $rnd*=25173 $rnd+=13849 $wuerfel=$rnd $wuerfel%=6 $wuerfel+=1
+      - T($r,65535) $rnd+=$r $rnd*=25173 $rnd+=13849 $wuerfel:=$rnd $wuerfel%=6 $wuerfel+=1
 
 In diesem Beispiel erhält ``$wuerfel`` einen zufälligen Wert zwischen 1
 und 6.
