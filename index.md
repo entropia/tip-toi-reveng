@@ -527,8 +527,23 @@ Falko Oldenburg hat eine Webseite erstellt, mit der sich die
 Ravensburger-GME-Dateien einfacher finden und herunterladen lassen:
 <http://tiptoi.vakat.de/>
 
-## Sonstiges
+## Impressum und Datenschutzerklärung
+
+Diese Webseite wird betriben von:
+
+Joachim Breitner  
+Ehbühl 33  
+71083 Herrenberg  
+<mail@joachim-breitner.de>
+
+Der Betreiber dieser Webseite speichert und erhebt keine personenbezogenen
+Daten. Die Webseite wird von on [GitHub pages](https://pages.github.com/)
+gehostet; möglicherweise speichert und verarbeitet GitHub Ihre IP-Adresse
+oder weitere Daten. Genaueres können Sie der [Datenschutzerklärung von
+Github](https://help.github.com/articles/github-privacy-statement/) entnehmen.
+
 
 Diese Website wurde mit [Jekyll](http://jekyllrb.com/) und dem Theme
 [Solo](http://chibicode.github.io/solo/) erzeugt und wird von [Github
 Pages](https://pages.github.com/) gehostet.
+
