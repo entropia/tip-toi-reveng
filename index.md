@@ -5,17 +5,17 @@ gallery:
 - title: Selbstgemachte Tier-Figuren
   subtitle: Video von Pronwan, 4 Minuten
   link: https://www.youtube.com/watch?v=Yic57Y9VORA
-  img: http://img.youtube.com/vi/Yic57Y9VORA/mqdefault.jpg
+  img: https://img.youtube.com/vi/Yic57Y9VORA/mqdefault.jpg
 
 - title: Monkey Island 3 für den Tip-Toi
   subtitle: Video von Pronwan, 8 Minuten
   url: https://www.youtube.com/watch?v=UieoGOHULVw
-  img: http://img.youtube.com/vi/UieoGOHULVw/mqdefault.jpg
+  img: https://img.youtube.com/vi/UieoGOHULVw/mqdefault.jpg
 
 - title: Erklärung zur Programmierung
   subtitle: Video von Pronwan, 24 Minuten
   link: https://www.youtube.com/watch?v=xlUr1eZKhWw
-  img: http://img.youtube.com/vi/xlUr1eZKhWw/mqdefault.jpg
+  img: https://img.youtube.com/vi/xlUr1eZKhWw/mqdefault.jpg
 
 - title: Der neu Besprochene Weltatlas
   subtitle: Blog-Post von Joachim Breitner
