@@ -529,7 +529,7 @@ Ravensburger-GME-Dateien einfacher finden und herunterladen lassen:
 
 ## Impressum und Datenschutzerklärung
 
-Diese Webseite wird betriben von:
+Diese Webseite wird betrieben von:
 
 Joachim Breitner  
 Ehbühl 33  
