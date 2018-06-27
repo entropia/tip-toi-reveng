@@ -1,5 +1,10 @@
 # Changelog for tttool
 
+## 1.8.1 (unreleased)
+
+ * The SVG patterns created with `./tttool oid-code` and `./tttool oid-codes`
+   now have `id`s that are valid (no spaces).
+
 ## 1.8 (2018-02-06)
 
  * If the script for an oid code contains only one line, one can simply write

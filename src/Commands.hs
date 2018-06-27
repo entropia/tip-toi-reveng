@@ -302,7 +302,8 @@ writeImagesForFile conf inf = do
     forM_  codes $ \(s,c) -> do
         let filename = printf "oid-%d-%s.%s" (ttProductId tt) s (suffixOf format)
         let title = printf "%s (product %d code %d)" s (ttProductId tt) c
-        writeImage format conf title c filename
+        let url   = printf "%s-%d" s c
+        writeImage format conf title url c filename
 
 writeImagesForCodes :: Bool -> Conf -> [Word16] -> IO ()
 writeImagesForCodes False conf codes =
@@ -310,31 +311,33 @@ writeImagesForCodes False conf codes =
         let format = fromMaybe PNG (cImageFormat conf)
         let filename = printf "oid-%d.%s" c (suffixOf format)
         let title = printf "code %d" c
-        writeImage format conf title c filename
+        let url   = printf "%d" c
+        writeImage format conf title url c filename
 writeImagesForCodes True conf codes =
     forM_ codes $ \r -> do
         let format = fromMaybe PNG (cImageFormat conf)
         let filename = printf "oid-raw-%d.%s" r (suffixOf format)
         let title = printf "raw code %d" r
+        let url   = printf "raw-%d" r
         printf "Writing %s... (raw code %d)\n" filename r
-        writeRawImage format conf title r filename
+        writeRawImage format conf title url r filename
 
-writeImage :: ImageFormat -> Conf -> String -> Word16 -> FilePath -> IO ()
-writeImage format conf title c filename =
+writeImage :: ImageFormat -> Conf -> String -> String -> Word16 -> FilePath -> IO ()
+writeImage format conf title url c filename =
     case code2RawCode c of
         Nothing -> printf "Skipping %s, code %d not known.\n" filename c
         Just r -> do
             printf "Writing %s.. (Code %d, raw code %d)\n" filename c r
-            writeRawImage format conf title r filename
+            writeRawImage format conf title url r filename
 
-writeRawImage :: ImageFormat -> Conf -> String -> Word16 -> FilePath -> IO ()
-writeRawImage PNG conf title raw_code filename =
+writeRawImage :: ImageFormat -> Conf -> String -> String -> Word16 -> FilePath -> IO ()
+writeRawImage PNG conf title _url raw_code filename =
     writeRawPNG w h conf title raw_code filename
   where
     (w,h) = cCodeDimPixels conf
-writeRawImage (SVG usePNG) conf title raw_code filename =
-    writeRawSVG conf usePNG title raw_code filename
-writeRawImage _ _ _ _ _ =
+writeRawImage (SVG usePNG) conf _title url raw_code filename =
+    writeRawSVG conf usePNG url raw_code filename
+writeRawImage _ _ _ _ _ _ =
     hPutStrLn stderr "this command only supports PNG and SVG" >> exitFailure
 
 cCodeDimPixels :: Conf -> (Int, Int)
