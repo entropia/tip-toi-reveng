@@ -534,7 +534,8 @@ Diese Webseite wird betrieben von:
 Joachim Breitner  
 Ehbühl 33  
 71083 Herrenberg  
-<mail@joachim-breitner.de>
+
+(Aber Fragen zum `tttool` sind auf der Tiptoi-Mailingliste besser aufgehoben, siehe Abschnitt „Community“.)
 
 Der Betreiber dieser Webseite speichert und erhebt keine personenbezogenen
 Daten. Die Webseite wird von on [GitHub pages](https://pages.github.com/)
