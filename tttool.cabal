@@ -52,13 +52,13 @@ executable tttool
     Utils
 
   build-depends:
-    base        >= 4.5 && < 4.11,
+    base        >= 4.5 && < 4.13,
     binary      >= 0.5 && < 0.9,
     containers  == 0.4.*   ||  == 0.5.*,
     directory   >= 1.2 && < 1.4,
     executable-path == 0.0.*,
     filepath    == 1.3.*   ||  == 1.4.*,
-    template-haskell >= 2.7 && < 2.13,
+    template-haskell >= 2.7 && < 2.15,
 
     JuicyPixels >= 3.2.5   &&   < 3.3,
     aeson       >= 0.7     &&   < 1.3,
