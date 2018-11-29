@@ -36,15 +36,15 @@ The header begins with these 8 32-bit numbers, listed with their offset:
 
  The following entries might exist only from Version 2.10.0901
  * `0x008C`: 32bit offset purpose unknown. Some products have 0 here.
- * `0x0090`: 32bit offset to the *game binaries table*
+ * `0x0090`: 32bit offset to the *game binaries table* (probably the games for the ZC3201)
  * `0x0094`: 32bit offset to the two OIDs for the Restart symbol and the Stop symbol
- * `0x0098`: 32bit offset to an *additional game binaries table*
+ * `0x0098`: 32bit offset to an *additional game binaries table* (probably the games for the ZC3202N)
  * `0x009C`: 32bit. purpose unknown, can be 0.
- * `0x00A0`: 32bit offset to a game binaries table, which consists of a single binary
- * `0x00A4`: 32bit number, purpose unknown (it might be the number of offsets to follow).
- * `0x00A8`: 32bit offset to another game binaries table, which also consists of a single binary
- * `0x00C8`: 32bit offset to an *additional* game binaries table with a single binary
- * `0x00CC`: 32bit offset to another *additional* game binaries table
+ * `0x00A0`: 32bit offset to a game binaries table, which consists of a single binary (probably the main binary for the ZC3201)
+ * `0x00A4`: 32bit flag, can be 0 or 1 (0 means the rest of the header is filled with 0; 1 means the rest of the header contains one or more of the following offsets)
+ * `0x00A8`: 32bit offset to another game binaries table, which also consists of a single binary (probably the main binary for the ZC3202N)
+ * `0x00C8`: 32bit offset to an *additional* game binaries table with a single binary (probably the main  binary for the ZC3203L)
+ * `0x00CC`: 32bit offset to another *additional* game binaries table (probably the games for the ZC3203L)
 
 
 The script table
