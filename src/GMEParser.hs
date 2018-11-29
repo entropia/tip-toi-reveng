@@ -429,8 +429,8 @@ getTipToiFile = getSegAt 0x00 "Header" $ do
     ttBinaries4 <- fromMaybe [] <$> maybeIndirection "Single binary 2" getBinaries
 
     jumpTo 0x00C8
-    ttBinaries5 <- fromMaybe [] <$> maybeIndirection "Binaries 5" getBinaries
-    ttBinaries6 <- fromMaybe [] <$> maybeIndirection "Binaries 6" getBinaries
+    ttBinaries5 <- fromMaybe [] <$> maybeIndirection "Single binary 3" getBinaries
+    ttBinaries6 <- fromMaybe [] <$> maybeIndirection "Binaries 3" getBinaries
 
     ttChecksum <- getChecksum
     ttChecksumCalc <- calcChecksum
