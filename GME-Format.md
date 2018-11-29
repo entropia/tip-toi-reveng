@@ -37,7 +37,7 @@ The header begins with these 8 32-bit numbers, listed with their offset:
  The following entries might exist only from Version 2.10.0901
  * `0x008C`: 32bit offset purpose unknown. Some products have 0 here. It seems that this offset points to a list of <number of mediafiles> 32bit values (0 or 1), the *media flag table*. The meaning of those flags is unknown.
  * `0x0090`: 32bit offset to the *game binaries table* (probably the games for the ZC3201)
- * `0x0094`: 32bit offset to the two OIDs for the Restart symbol and the Stop symbol
+ * `0x0094`: 32bit offset to the *special OID list*
  * `0x0098`: 32bit offset to an *additional game binaries table* (probably the games for the ZC3202N)
  * `0x009C`: 32bit. purpose unknown, can be 0.
  * `0x00A0`: 32bit offset to a game binaries table, which consists of a single binary (probably the main binary for the ZC3201)
@@ -170,6 +170,32 @@ it is an empty play script, i.e. simply `0x0000` . In 'Reise durch die
 Jahreszeiten' it is a playscript with empty script lines.
 
 TODO: When is this executed?
+
+Special OID list
+----------------
+
+This consists of 40 bytes. It contains all the OIDs that have a
+special meaning/function in the book.
+
+Example from Puzzle Ponyhof:
+
+0x00F05E40:             68 18 00 00 67 18 64 18 65 18 00 00
+                        aa aa bb bb cc cc dd dd ee ee pp pp
+0x00F05E50: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp
+0x00F05E60: 00 00 00 00 00 00 00 00 01 00 66 18
+            pp pp pp pp pp pp pp pp ff ff gg gg
+
+a: OID for the Restart symbol
+b: OID for the Stop symbol
+c: unknown, seems to be the OID for Skip symbol (needs to be confirmed)
+d: unknown
+e: unknown (in this example: OID for game mode)
+p: unknown, padding? reserved? unused?
+f: unknown, 0 or 1 (always 1 for g != 0, but can also be 1 for g = 0)
+g: unknown, (in this example: discover mode)
+
+
 
 The game binaries table
 -----------------------
