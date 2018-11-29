@@ -43,6 +43,8 @@ The header begins with these 8 32-bit numbers, listed with their offset:
  * `0x00A0`: 32bit offset to a game binaries table, which consists of a single binary
  * `0x00A4`: 32bit number, purpose unknown (it might be the number of offsets to follow).
  * `0x00A8`: 32bit offset to another game binaries table, which also consists of a single binary
+ * `0x00C8`: 32bit offset to an *additional* game binaries table with a single binary
+ * `0x00CC`: 32bit offset to another *additional* game binaries table
 
 
 The script table
