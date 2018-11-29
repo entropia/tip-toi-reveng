@@ -63,7 +63,9 @@ dumpBinariesTo directory file = do
             map (1,) ttBinaries1 ++
             map (2,) ttBinaries2 ++
             map (3,) ttBinaries3 ++
-            map (4,) ttBinaries4
+            map (4,) ttBinaries4 ++
+            map (5,) ttBinaries5 ++
+            map (6,) ttBinaries6
 
     printf "Binary Table entries: %d\n" (length binaries)
 

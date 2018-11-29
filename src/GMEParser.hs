@@ -416,17 +416,21 @@ getTipToiFile = getSegAt 0x00 "Header" $ do
     ttLang <- getBSNul
 
     jumpTo 0x0071
-    ttWelcome <- indirection "initial play lists" $ getPlayListList
+    ttWelcome <- indirection "initial play lists" getPlayListList
 
     jumpTo 0x0090
     ttBinaries1 <- fromMaybe [] <$> maybeIndirection "Binaries 1" getBinaries
     ttSpecialOIDs <- maybeIndirection "special symbols" getSpecials
-    ttBinaries2 <- fromMaybe [] <$> maybeIndirection "Binaries 1" getBinaries
+    ttBinaries2 <- fromMaybe [] <$> maybeIndirection "Binaries 2" getBinaries
 
     jumpTo 0x00A0
     ttBinaries3 <- fromMaybe [] <$> maybeIndirection "Single binary 1" getBinaries
     getWord32 --ignored
     ttBinaries4 <- fromMaybe [] <$> maybeIndirection "Single binary 2" getBinaries
+
+    jumpTo 0x00C8
+    ttBinaries5 <- fromMaybe [] <$> maybeIndirection "Binaries 5" getBinaries
+    ttBinaries6 <- fromMaybe [] <$> maybeIndirection "Binaries 6" getBinaries
 
     ttChecksum <- getChecksum
     ttChecksumCalc <- calcChecksum

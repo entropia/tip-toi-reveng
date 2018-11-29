@@ -860,6 +860,8 @@ ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
         , ttBinaries2 = []
         , ttBinaries3 = []
         , ttBinaries4 = []
+        , ttBinaries5 = []
+        , ttBinaries6 = []
         , ttSpecialOIDs = Nothing
         }, totalMap)
 
