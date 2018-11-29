@@ -35,7 +35,7 @@ The header begins with these 8 32-bit numbers, listed with their offset:
  * `0x0071`: 32bit offset to the playlistlist for the the power-on sound (played, when the product is recognized. If 0, no sound is played.)
 
  The following entries might exist only from Version 2.10.0901
- * `0x008C`: 32bit offset purpose unknown. Some products have 0 here. It seems that this offset points to a list of (<number of mediafiles> - 1) 32bit value (0 or 1) (unverified)
+ * `0x008C`: 32bit offset purpose unknown. Some products have 0 here. It seems that this offset points to a list of <number of mediafiles> 32bit values (0 or 1), the *media flag table*. The meaning of those flags is unknown.
  * `0x0090`: 32bit offset to the *game binaries table* (probably the games for the ZC3201)
  * `0x0094`: 32bit offset to the two OIDs for the Restart symbol and the Stop symbol
  * `0x0098`: 32bit offset to an *additional game binaries table* (probably the games for the ZC3202N)
