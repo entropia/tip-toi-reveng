@@ -57,11 +57,11 @@ Ab hier verläuft die Installation wie unter Linux::
 $ git clone https://github.com/entropia/tip-toi-reveng.git tttool
 $ cd tttool
 
-Falls cabal die abhängigen Pakete nicht akzeptiert, hilft es, zusätzlich die Option --allow-newer anzugeben::
+Und kompilieren::
 
 $ cabal update
-$ cabal install --only-dependencies --allow-newer
-$ cabal install --bindir=. --allow-newer
+$ cabal install --only-dependencies
+$ cabal install --bindir=.
 
 Wie zuvor befindet sich das fertige tttool nun im aktuellen Verzeichnis::
 
