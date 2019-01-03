@@ -69,7 +69,7 @@ gallery:
 
 - title: Jakobs Tiptoi-Buch
   subtitle: von Keke
-  link: http://keke.netz-zwerge.de/blog/archives/348-Meine-erste-TipToi-Erfahrung.html
+  link: https://kekex.de/blog/2016/05/21/448
   img: /img/keke.jpg
 - title: Familienbuch
   subtitle: von Achim
