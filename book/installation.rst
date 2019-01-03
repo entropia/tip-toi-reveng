@@ -37,7 +37,32 @@ Nun solltest du im aktuellen Verzeichnis eine Datei ``tttool`` finden, die du au
   …
 
 
-Sonstige (MacOS, andere Linuxe)
--------------------------------
+macOS
+-----
 
-Im Grunde kannst du dich an der Anleitung für Debian und Ubuntu oben orientieren, lediglich den ersten Befehl, der vor allem den Haskell-Compiler installiert, muss du anpassen. Vielleicht helfen dir die `Informationen zur Installation of Haskell <https://www.haskell.org/downloads#minimal>`_ weiter.
+Die Installation unter macOS verläuft ähnlich zu der unter Linux in einem Terminal-Fenster. Zunächst benötigst du, falls noch nicht installiert, die XCode command line tools::
+
+$ xcode-select --install
+
+Weiterhin benötigst du den Paketmanager Homebrew (https://brew.sh/)::
+
+$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+Mithilfe von Homebrew installierst du Haskell::
+
+$ brew install ghc cabal-install
+
+Ab hier verläuft die Installation wie unter Linux::
+
+$ git clone https://github.com/entropia/tip-toi-reveng.git tttool
+$ cd tttool
+
+Und kompilieren::
+
+$ cabal update
+$ cabal install --only-dependencies
+$ cabal install --bindir=.
+
+Wie zuvor befindet sich das fertige tttool nun im aktuellen Verzeichnis::
+
+$ ./tttool --help
