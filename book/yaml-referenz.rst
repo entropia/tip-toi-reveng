@@ -1,3 +1,5 @@
+.. _yaml-referenz:
+
 YAML-Referenz
 =============
 

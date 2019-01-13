@@ -15,7 +15,7 @@ Daraus ergibt sich, dass man den Stift umprogrammieren kann, indem man diese GME
 Was sind Anschaltfelder und Produkt-IDs?
 ----------------------------------------
 
-Nun finden sich auf deinem Tiptoi-Stift sicherlich mehrere GME-Dateien. Woher weiß der Stift, in welcher er nachschauen muss? Dazu gibt es die :index:`*Produkt-IDs* <Produkt-ID>`!
+Nun finden sich auf deinem Tiptoi-Stift sicherlich mehrere GME-Dateien. Woher weiß der Stift, in welcher er nachschauen muss? Dazu gibt es die :index:`\ <Produkt-ID>`\ *Produkt-IDs*!
 
 Wenn du einfach ein Buch öffnest und mit dem Stift irgendwo hintippst, dann liest der Stift den entsprechenden OID-Code, weiß aber nicht was er damit anfangen soll und wird dich daher auffordern, das Anschaltfeld des Produktes anzutippen.
 
@@ -33,7 +33,7 @@ Neben der Produkt-ID, wie gerade eben erklärt, sowie den Audio-Dateien, die der
 
 In erster Näherung ist das eine einfache Tabelle, die zu jedem OID-Code die Audio-Datei angibt, die abzuspielen ist.
 
-Aber da ist natürlich noch mehr, denn der Stift macht ja nicht immer das gleiche, wenn man auf ein Feld tippt. Tatsächlich enthält diese Tabelle zu jedem OID-Code ein kleines Computer-Programm, dass nach dem Tippen abläuft. Dieses Programm (oder :index:`*Skript* <Skript>`) kann
+Aber da ist natürlich noch mehr, denn der Stift macht ja nicht immer das gleiche, wenn man auf ein Feld tippt. Tatsächlich enthält diese Tabelle zu jedem OID-Code ein kleines Computer-Programm, dass nach dem Tippen abläuft. Dieses Programm (oder :index:`\ <Skript>`\ *Skript*) kann
  * Audio-Dateien abspielen,
  * mit Zahlenwerten rechnen,
  * diese Zahlenwerte in sogennanten :index:`Registern <Register>` ablegen und abrufen und
