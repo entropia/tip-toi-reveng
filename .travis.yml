@@ -18,6 +18,9 @@ env:
  - STACK=lts-7
  - STACK=lts-8
  - STACK=lts-9
+ - STACK=lts-10
+ - STACK=lts-11
+ - STACK=lts-12
  - STACK=nightly
 
 matrix:
