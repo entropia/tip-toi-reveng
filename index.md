@@ -106,6 +106,11 @@ gallery:
   link: https://github.com/MachEsEinfach/tiptoi_Abschlussarbeit
   img: /img/bratzke.jpg
 
+- title: Tier-ABC
+  subtitle: von Sebastian Dumoulin
+  link: https://www.dropbox.com/s/u2uup0ukq4oasks/meinTiere_alphabet_TipToi.zip
+  img: /img/abc.png
+
 ---
 
 Diese Seite enthält Information zum `tttool`, einem Werkzeug zum
