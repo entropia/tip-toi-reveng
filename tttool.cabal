@@ -61,7 +61,7 @@ executable tttool
     template-haskell >= 2.7 && < 2.15,
 
     JuicyPixels >= 3.2.5   &&   < 3.3,
-    aeson       >= 0.7     &&   < 1.3,
+    aeson       >= 0.7     &&   < 1.4,
     hashable    == 1.2.*,
     haskeline   == 0.7.*,
     mtl         == 2.1.*   ||  == 2.2.*,
