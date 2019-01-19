@@ -10,16 +10,7 @@ env:
  - CABALVER=2.4 GHCVER=8.6.2
  - CABALVER=head GHCVER=head  # see section about GHC HEAD snapshots
  - WINDOWS=yes
- - STACK=lts-2
- - STACK=lts-3
- - STACK=lts-4
- - STACK=lts-5
- - STACK=lts-6
- - STACK=lts-7
- - STACK=lts-8
- - STACK=lts-9
- - STACK=lts-10
- - STACK=lts-11
+ - STACK=default
  - STACK=lts-12
  - STACK=nightly
 
@@ -48,13 +39,13 @@ before_install:
  - test -z "$CABALVER" || bash ./.travis-setup-linux.sh
 
  - test -z "$STACK" || travis_retry sudo apt-get install g++ gcc libc6-dev libffi-dev libgmp-dev make xz-utils zlib1g-dev libwww-perl
- - 'test -z "$STACK" || RESOLVER="$(HEAD -S https://www.stackage.org/$STACK|grep HEAD|tail -n1|cut -d/ -f4)"'
- - test -z "$STACK" || stack setup --resolver $RESOLVER
+ - 'test -z "$STACK" -a "$STACK" != default || echo "resolver: $(HEAD -S https://www.stackage.org/$STACK|grep HEAD|tail -n1|cut -d/ -f4)" > stack.yaml'
+ - test -z "$STACK" || cat stack.yaml
+ - test -z "$STACK" || stack setup
 
 
 install:
- - 'test -z "$STACK" || echo "resolver: $RESOLVER" > stack.yaml'
- - test -z "$STACK" || travis_retry stack solver --update-config
+ # - test -z "$STACK" || travis_retry stack solver --update-config
  - test -z "$STACK" || stack build --only-dependencies
 
 script:
