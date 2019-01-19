@@ -13,20 +13,29 @@ Unter Windows lädst du von https://github.com/entropia/tip-toi-reveng/releases 
 Linux (Debian, Ubuntu und ähnliche)
 -----------------------------------
 
-Unter Linux kompilierst du das ``tttool`` selbst. Dazu brauchst du erst einmal ein paar Pakete::
+Unter Linux kompilierst du das ``tttool`` selbst.
 
-$ sudo apt-get install git haskell-platform libncurses5-dev libttspico-utils vorbis-tools
+1. Zuerst installierst du ``git``::
 
-Dann kannst lädst du dir den aktuellen Quellcode des ``tttool`` herunter::
+    $ sudo apt-get install git
 
-$ git clone https://github.com/entropia/tip-toi-reveng.git tttool
-$ cd tttool
+2. Dann kannst lädst du dir den aktuellen Quellcode des ``tttool`` herunter::
 
-Folgende Befehlsfolge installiert ein paar Bibliotheken und das ``tttool`` selbst::
+    $ git clone https://github.com/entropia/tip-toi-reveng.git tttool
+    $ cd tttool
 
-$ cabal update
-$ cabal install --only-dependencies
-$ cabal install --bindir=.
+3. Nun installierst du das Werkzeug ``stack``. Das geht am einfachsten mit
+
+  .. code::
+
+    curl -sSL https://get.haskellstack.org/ | sh
+
+  oder du folgst den ausführlicheren Anweisungen auf der `Stack-Homepage <https://docs.haskellstack.org/en/stable/install_and_upgrade/>`_.
+
+4. Zulezt baust du ``tttool``. Das dauert eine Weile::
+
+    stack install --local-bin-path .
+
 
 Nun solltest du im aktuellen Verzeichnis eine Datei ``tttool`` finden, die du ausführen kannst::
 
@@ -52,12 +61,12 @@ Mithilfe von Homebrew installierst du Haskell::
 
 $ brew install ghc cabal-install
 
-Ab hier verläuft die Installation wie unter Linux::
+Nun besorgst du dir die Quellen::
 
 $ git clone https://github.com/entropia/tip-toi-reveng.git tttool
 $ cd tttool
 
-Und kompilieren::
+und kompilierst sie::
 
 $ cabal update
 $ cabal install --only-dependencies
