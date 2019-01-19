@@ -39,7 +39,7 @@ before_install:
  - test -z "$CABALVER" || bash ./.travis-setup-linux.sh
 
  - test -z "$STACK" || travis_retry sudo apt-get install g++ gcc libc6-dev libffi-dev libgmp-dev make xz-utils zlib1g-dev libwww-perl
- - 'test -z "$STACK" -a "$STACK" != default || echo "resolver: $(HEAD -S https://www.stackage.org/$STACK|grep HEAD|tail -n1|cut -d/ -f4)" > stack.yaml'
+ - 'test -z "$STACK" -o "$STACK" = default || echo "resolver: $(HEAD -S https://www.stackage.org/$STACK|grep HEAD|tail -n1|cut -d/ -f4)" > stack.yaml'
  - test -z "$STACK" || cat stack.yaml
  - test -z "$STACK" || stack setup
 
