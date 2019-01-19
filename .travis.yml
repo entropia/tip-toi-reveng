@@ -25,7 +25,7 @@ before_install:
  - mkdir -p ~/.local/bin
  - export PATH=~/.local/bin:$PATH
  # install stack
- - test -z "$STACK" || { curl -sSL https://get.haskellstack.org/ | sh }
+ - test -z "$STACK" || { curl -sSL https://get.haskellstack.org/ | sh; }
 
  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
  - export WINEPATH='C:\Program Files (x86)\GnuWin32\bin'
