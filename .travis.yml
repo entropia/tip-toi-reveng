@@ -32,10 +32,10 @@ before_install:
  # install stack
  - 'test -z "$STACK" || { curl -sSL https://get.haskellstack.org/ | sh; }'
 
-  # stack solver needs cabal :-(
-  - test -z "$STACK" -o "$STACK" = default || sudo add-apt-repository -y ppa:hvr/ghc
-  - test -z "$STACK" -o "$STACK" = default || travis_retry sudo bash -c "apt-get update; apt-get install cabal-install-1.24"
-  - test -z "$STACK" -o "$STACK" = default || export PATH=/opt/cabal/1.24/bin:$PATH
+ # stack solver needs cabal :-(
+ - test -z "$STACK" -o "$STACK" = default || sudo add-apt-repository -y ppa:hvr/ghc
+ - test -z "$STACK" -o "$STACK" = default || travis_retry sudo bash -c "apt-get update; apt-get install cabal-install-1.24"
+ - test -z "$STACK" -o "$STACK" = default || export PATH=/opt/cabal/1.24/bin:$PATH
 
 
  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/2.4/bin:$PATH
