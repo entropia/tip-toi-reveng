@@ -3,16 +3,17 @@ language: generic
 cache:
   directories:
   - $HOME/.stack
+  - $HOME/.cabal
 
 # The following enables several GHC versions to be tested; often it's enough to test only against the last release in a major GHC version. Feel free to omit lines listings versions you don't need/want testing for.
 env:
- - CABALVER=1.18 GHCVER=7.8.3
- - CABALVER=1.22 GHCVER=7.10.1
- - CABALVER=1.24 GHCVER=8.0.1
- - CABALVER=2.0 GHCVER=8.2.2
- - CABALVER=2.2 GHCVER=8.4.4
- # - CABALVER=2.4 GHCVER=8.6.2 broken due to HPDF
- - CABALVER=head GHCVER=head  # see section about GHC HEAD snapshots
+ - GHCVER=7.8.3
+ - GHCVER=7.10.1
+ - GHCVER=8.0.1
+ - GHCVER=8.2.2
+ - GHCVER=8.4.4
+ - GHCVER=8.6.2
+ - GHCVER=head  # see section about GHC HEAD snapshots
  - WINDOWS=yes
  - STACK=default
  - STACK=lts-12
@@ -20,8 +21,8 @@ env:
 
 matrix:
   allow_failures:
-   - env: CABALVER=2.4 GHCVER=8.6.1
-   - env: CABALVER=head GHCVER=head
+   - env: GHCVER=8.6.2
+   - env: GHCVER=head
    - env: STACK=nightly
 
 # Note: the distinction between `before_install` and `install` is not important.
@@ -31,12 +32,12 @@ before_install:
  # install stack
  - 'test -z "$STACK" || { curl -sSL https://get.haskellstack.org/ | sh; }'
 
- - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
+ - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/2.4/bin:$PATH
  - export WINEPATH='C:\Program Files (x86)\GnuWin32\bin'
 
  - if [ "$WINDOWS" = yes ]; then export W=wine; else export W=""; fi
  - test -z "$WINDOWS"  || bash ./.travis-setup-windows.sh
- - test -z "$CABALVER" || bash ./.travis-setup-linux.sh
+ - test -z "$GHCVER" || bash ./.travis-setup-linux.sh
 
  - test -z "$STACK" || travis_retry sudo apt-get install g++ gcc libc6-dev libffi-dev libgmp-dev make xz-utils zlib1g-dev libwww-perl
  - 'test -z "$STACK" -o "$STACK" = default || echo "resolver: $(HEAD -S https://www.stackage.org/$STACK|grep HEAD|tail -n1|cut -d/ -f4)" > stack.yaml'
@@ -51,19 +52,18 @@ install:
  - test -z "$STACK" || stack build --only-dependencies
 
 script:
- - test -z "$CABALVER" -a -z "$WINDOWS" || $W cabal configure --enable-tests --enable-benchmarks -v2
- - test -z "$CABALVER" -a -z "$WINDOWS" || $W cabal build
- - test -z "$CABALVER" -a -z "$WINDOWS" || $W cabal test
- - test -z "$CABALVER" -a -z "$WINDOWS" || $W cabal check
- - test -z "$CABALVER" -a -z "$WINDOWS" || $W cabal sdist
+ - test -z "$GHCVER" -a -z "$WINDOWS" || $W cabal new-build
+ - test -z "$GHCVER" -a -z "$WINDOWS" || $W cabal new-test
+ - test -z "$GHCVER" -a -z "$WINDOWS" || $W cabal check
+ - test -z "$GHCVER" -a -z "$WINDOWS" || $W cabal new-sdist
  - test -z "$STACK" || stack build --test
 
 # The following scriptlet checks that the resulting source distribution can be built & installed
- - test -z "$CABALVER" -a -z "$WINDOWS" || {
+ - test -z "$GHCVER" -a -z "$WINDOWS" || {
    export SRC_TGZ=$($W cabal info . | awk '{print $2 ".tar.gz";exit}') ;
-   cd dist/;
+   cd dist-newstyle/sdist/;
    if [ -f "$SRC_TGZ" ]; then
-      $W cabal install --force-reinstalls "$SRC_TGZ";
+      $W cabal new-install "$SRC_TGZ";
    else
       echo "expected '$SRC_TGZ' not found";
       exit 1;
