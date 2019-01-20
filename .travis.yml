@@ -68,7 +68,7 @@ script:
    export SRC_TGZ=$($W cabal info . | awk '{print $2 ".tar.gz";exit}') ;
    cd dist-newstyle/sdist/;
    if [ -f "$SRC_TGZ" ]; then
-      $W cabal new-install "./$SRC_TGZ";
+      $W cabal install "./$SRC_TGZ";
    else
       echo "expected '$SRC_TGZ' not found";
       exit 1;
