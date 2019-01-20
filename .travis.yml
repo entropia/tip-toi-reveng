@@ -57,14 +57,17 @@ install:
  - test -z "$STACK" || stack build --only-dependencies
 
 script:
- - test -z "$GHCVER" -a -z "$WINDOWS" || $W cabal new-build
+ - test -z "$GHCVER" || $W cabal new-build
  #- test -z "$GHCVER" -a -z "$WINDOWS" || $W cabal new-test
- - test -z "$GHCVER" -a -z "$WINDOWS" || $W cabal check
- - test -z "$GHCVER" -a -z "$WINDOWS" || $W cabal new-sdist
+ - test -z "$GHCVER" || $W cabal check
+ - test -z "$GHCVER" || $W cabal new-sdist
+
+ - test -z "$WINDOWS" || $W cabal build
+
  - test -z "$STACK" || stack build --test
 
 # The following scriptlet checks that the resulting source distribution can be built & installed
- - test -z "$GHCVER" -a -z "$WINDOWS" || {
+ - test -z "$GHCVER" || {
    export SRC_TGZ=$($W cabal info . | awk '{print $2 ".tar.gz";exit}') ;
    cd dist-newstyle/sdist/;
    if [ -f "$SRC_TGZ" ]; then
