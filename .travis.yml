@@ -53,7 +53,7 @@ install:
 
 script:
  - test -z "$GHCVER" -a -z "$WINDOWS" || $W cabal new-build
- - test -z "$GHCVER" -a -z "$WINDOWS" || $W cabal new-test
+ #- test -z "$GHCVER" -a -z "$WINDOWS" || $W cabal new-test
  - test -z "$GHCVER" -a -z "$WINDOWS" || $W cabal check
  - test -z "$GHCVER" -a -z "$WINDOWS" || $W cabal new-sdist
  - test -z "$STACK" || stack build --test
