@@ -59,7 +59,7 @@ $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/inst
 
 Mithilfe von Homebrew installierst du Haskell::
 
-$ brew install ghc cabal-install
+$ brew install haskell-stack
 
 Nun besorgst du dir die Quellen::
 
@@ -68,9 +68,7 @@ $ cd tttool
 
 und kompilierst sie::
 
-$ cabal update
-$ cabal install --only-dependencies
-$ cabal install --bindir=.
+$ stack install --local-bin-path .
 
 Wie zuvor befindet sich das fertige tttool nun im aktuellen Verzeichnis::
 
