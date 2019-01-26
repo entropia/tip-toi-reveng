@@ -18,4 +18,3 @@ durch die Tipps und Tricks stöbern.
    tttool-referenz
    yaml-referenz
    tipps-und-tricks
-   gallerie
