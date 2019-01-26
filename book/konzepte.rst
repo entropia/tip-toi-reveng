@@ -34,6 +34,7 @@ Neben der Produkt-ID, wie gerade eben erklärt, sowie den Audio-Dateien, die der
 In erster Näherung ist das eine einfache Tabelle, die zu jedem OID-Code die Audio-Datei angibt, die abzuspielen ist.
 
 Aber da ist natürlich noch mehr, denn der Stift macht ja nicht immer das gleiche, wenn man auf ein Feld tippt. Tatsächlich enthält diese Tabelle zu jedem OID-Code ein kleines Computer-Programm, dass nach dem Tippen abläuft. Dieses Programm (oder :index:`\ <Skript>`\ *Skript*) kann
+
  * Audio-Dateien abspielen,
  * mit Zahlenwerten rechnen,
  * diese Zahlenwerte in sogennanten :index:`Registern <Register>` ablegen und abrufen und
