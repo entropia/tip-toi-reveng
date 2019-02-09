@@ -112,6 +112,11 @@ gallery:
   link: https://www.dropbox.com/s/u2uup0ukq4oasks/meinTiere_alphabet_TipToi.zip
   img: /img/abc.png
 
+- title: tip-Master
+  subtitle: von Frank
+  link: https://github.com/chemtech1/TipMaster
+  img: /img/tipmaster.png
+
 ---
 
 Diese Seite enthält Information zum `tttool`, einem Werkzeug zum
