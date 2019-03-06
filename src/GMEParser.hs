@@ -11,6 +11,8 @@ import Data.Functor
 import Control.Applicative (Applicative, (<*>))
 import Data.Maybe
 import Control.Monad
+import Control.Monad.Fail (MonadFail)
+import qualified Control.Monad.Fail 
 import Control.Monad.Writer.Strict
 import Control.Monad.State.Strict
 import Control.Monad.Reader
@@ -27,6 +29,8 @@ import Cypher
 
 newtype SGet a = SGet (RWS B.ByteString [Segment] Word32  a)
     deriving (Functor, Applicative, Monad)
+
+instance MonadFail SGet where fail = error
 
 liftGet :: G.Get a -> SGet a
 liftGet act = SGet $ do

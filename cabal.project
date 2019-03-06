@@ -1,0 +1,6 @@
+packages: .
+
+source-repository-package
+      type:     git
+      location: https://github.com/nomeata/HPDF
+      tag: 1062cf0378c6bff384380101821e6744d41d0484
