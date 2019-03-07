@@ -4,6 +4,7 @@
 , optparse-applicative, parsec, process, random, split, spool
 , stdenv, template-haskell, text, time, vector, yaml, zlib
 , pkgs
+, static
 }:
 
 let sourceByRegex = src: regexes: builtins.filterSource (path: type:
@@ -14,7 +15,7 @@ let sourceByRegex = src: regexes: builtins.filterSource (path: type:
 
 mkDerivation {
   pname = "tttool";
-  version = "1.8";
+  version = "1.8.1";
   src = sourceByRegex ../. [
     "src/"
     "src/.*"
@@ -32,4 +33,11 @@ mkDerivation {
   homepage = "https://github.com/entropia/tip-toi-reveng";
   description = "Working with files for the Tiptoi® pen";
   license = stdenv.lib.licenses.mit;
+
+  configureFlags = pkgs.lib.optional static [
+     "--ghc-option=-optl=-static"
+     "--extra-lib-dirs=${pkgs.gmp6.override { withStatic = true; }}/lib"
+     "--extra-lib-dirs=${pkgs.zlib.static}/lib"
+     "--extra-lib-dirs=${pkgs.ncurses5.override { enableStatic = true; }}/lib"
+  ];
 }
