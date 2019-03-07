@@ -21,7 +21,8 @@ lastObjectCode = 14999
 
 knownRawCodes :: V.Vector Word16
 knownRawCodes =
-  [word16Vector|
+  V.fromList [
+--  [word16Vector|
     4
     , 5
     , 6
@@ -16406,4 +16407,5 @@ knownRawCodes =
     , 12384
     , 12385
     , 12386
-    |]   
+--    |]   
+    ]
