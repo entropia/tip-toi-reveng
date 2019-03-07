@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards, DeriveGeneric, CPP, TupleSections, TemplateHaskell #-}
+{-# LANGUAGE RecordWildCards, DeriveGeneric, CPP, TupleSections #-}
 
 module TipToiYaml
     ( tt2ttYaml, ttYaml2tt
@@ -256,6 +256,7 @@ data GameYaml = CommonGameYaml
         , gyExtraPlayLists           :: [PlayListListYaml]
         }
     | Game253Yaml
+    deriving Generic
 
 data SubGameYaml = SubGameYaml
     { sgUnknown :: String
@@ -264,10 +265,23 @@ data SubGameYaml = SubGameYaml
     , sgOids3 :: OIDListYaml
     , sgPlaylist :: [PlayListListYaml]
     }
+    deriving Generic
 
 
-$(deriveJSON gameYamlOptions ''GameYaml)
-$(deriveJSON gameYamlOptions ''SubGameYaml)
+instance FromJSON GameYaml where
+    parseJSON = genericParseJSON gameYamlOptions
+instance ToJSON GameYaml where
+    toJSON = genericToJSON gameYamlOptions
+#if MIN_VERSION_aeson(0,10,0)
+    toEncoding = genericToEncoding gameYamlOptions
+#endif
+instance FromJSON SubGameYaml where
+    parseJSON = genericParseJSON gameYamlOptions
+instance ToJSON SubGameYaml where
+    toJSON = genericToJSON gameYamlOptions
+#if MIN_VERSION_aeson(0,10,0)
+    toEncoding = genericToEncoding gameYamlOptions
+#endif
 
 tipToiYamlOptions = defaultOptions
     { fieldLabelModifier = map fix . map toLower . drop 3
