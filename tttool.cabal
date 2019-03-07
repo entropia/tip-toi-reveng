@@ -69,7 +69,7 @@ executable tttool
     process     >= 1.1      &&   < 1.7,
     random      >= 1.0      &&   < 1.2,
     vector      >= 0.10     &&   < 0.13,
-    yaml        == 0.11.*,
+    yaml        >= 0.8      &&   < 0.12,
     HPDF        >= 1.4.10   && < 1.5,
     split       == 0.2.*,
     optparse-applicative >= 0.13 && < 0.15,
