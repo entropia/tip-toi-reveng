@@ -8,6 +8,7 @@ hackage:
       "polyparse".revision = (((hackage."polyparse")."1.12").revisions).default;
       "old-time".revision = (((hackage."old-time")."1.1.0.3").revisions).default;
       "haskeline".revision = (((hackage."haskeline")."0.7.4.2").revisions).default;
+      "haskeline".flags.terminfo = false;
       "split".revision = (((hackage."split")."0.2.3.3").revisions).default;
       "stm".revision = (((hackage."stm")."2.4.5.1").revisions).default;
       "HTF".revision = (((hackage."HTF")."0.13.2.5").revisions).default;

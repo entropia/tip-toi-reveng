@@ -4,7 +4,15 @@ let
   tttool-exe = args:
     let
       pkgs = localLib.iohkNix.getPkgs args;
-      haskell = localLib.nix-tools.haskell { inherit pkgs; };
+      haskellLib = pkgs.fetchFromGitHub {
+        owner  = "nomeata";
+        repo   = "haskell.nix";
+        rev    = "fd36e3f8256694884cebbe72d63177358ab15b0e";
+        sha256 = "0faxzn7labgf4jc75rrmnzq20bap2xpfv3paxg6fcfwwydcnnacs";
+        fetchSubmodules = false;
+        name   = "haskell-lib-source";
+      };
+      haskell = import haskellLib { inherit pkgs; };
       nix-tools = import ./pkgs.nix { inherit haskell pkgs; };
     in
     nix-tools.tttool.components.exes.tttool;
