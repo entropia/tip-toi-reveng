@@ -1,7 +1,11 @@
 language: nix
+
+env:
+  - TARGET=linux-exe
+  - TARGET=windows-exe
+  - TARGET=static-exe
+
 script:
   - nix-env -iA cachix -f https://cachix.org/api/v1/install
   - cachix use tttool
-  - nix-build nix -A linux-exe
-  - nix-build nix -A windows-exe
-  - nix-build nix -A static-exe
+  - nix-build nix -A $TARGET
