@@ -11,4 +11,5 @@ let
 in
  { linux-exe = tttool-exe {};
    windows-exe = tttool-exe { crossSystem = localLib.systems.examples.mingwW64;};
+   static-exe = tttool-exe { crossSystem = localLib.systems.examples.musl64;};
  }
