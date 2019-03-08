@@ -24,7 +24,11 @@ let
     pkg-def-overlays = [
       { tttool = ./tttool.nix;
         HPDF = ./HPDF.nix;
-      }];
+        conduit = ./conduit.nix;
+      }
+      (hackage: { Win32 = hackage.Win32."2.6.2.0".revisions.default; })
+      (hackage: { mintty = hackage.mintty."0.1.2".revisions.default; })
+      ];
     modules = [ ];
   };
 in
