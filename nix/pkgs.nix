@@ -20,7 +20,6 @@ let
   #  packages.cbors.flags.optimize-gmp = false;
   #
   pkgSet = haskell.mkPkgSet {
-    inherit pkgs;
     pkg-def = import ./plan.nix;
     pkg-def-overlays = [
       { tttool = ./tttool.nix;
