@@ -4,7 +4,8 @@
 
   let src = sourceByRegex ../. [
       "src/"
-      "src/.*"
+      "src/.*/"
+      "src/.*.hs"
       ".*.cabal"
       "LICENSE"
       ]; in
