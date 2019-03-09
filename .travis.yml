@@ -1,10 +1,5 @@
 language: nix
 
-env:
-  - TARGET=linux-exe
-  - TARGET=windows-exe
-  - TARGET=static-exe
-
 jobs:
   include:
     - stage: Build
