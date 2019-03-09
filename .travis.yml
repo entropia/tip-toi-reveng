@@ -19,4 +19,4 @@ script:
   - cachix use tttool
   - if [ -n "$CACHIX_SIGNING_KEY" ]; then cachix push tttool --watch-store; fi &
   - nix-build nix -A $TARGET
-  - sleep 60 # to allow cachix finish uploading
+  - sleep 10 # to allow cachix finish uploading
