@@ -4,6 +4,7 @@
 
  * The SVG patterns created with `./tttool oid-code` and `./tttool oid-codes`
    now have `id`s that are valid (no spaces).
+ * The release tarball now contains a binary for Linux as well.
 
 ## 1.8 (2018-02-06)
 
