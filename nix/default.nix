@@ -88,7 +88,8 @@ in rec {
       version=$(${release}/tttool --help|perl -ne 'print $1 if /tttool-(.*) -- The swiss army knife/')
       echo $version
       mkdir -p $out/
-      zip -r $out/tttool-$version.zip ${release}/*
+      cd ${release}
+      zip -r $out/tttool-$version.zip .
     '';
   };
 
