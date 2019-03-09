@@ -17,5 +17,5 @@ before_install:
 script:
   - nix-env -iA cachix -f https://cachix.org/api/v1/install
   - cachix use tttool
-  - cachix push tttool --watch-store &
+  - if [ -n "$CACHIX_SIGNING_KEY" ]; then push tttool --watch-store & ; fi
   - nix-build nix -A $TARGET
