@@ -4,15 +4,12 @@ module OidCode (genRawPixels, oidSVGPattern, writeRawPNG, writeRawSVG, tilePixel
 
 import Data.Word
 import Data.Bits
-import Data.Functor
 import qualified Data.ByteString.Lazy as B
-import Data.Monoid
 import Control.Monad
 import Codec.Picture
 import Codec.Picture.Types
 import Codec.Picture.Metadata
 import Control.Monad.ST
-import Control.Applicative
 import Data.Vector.Storable.ByteString
 import qualified Data.ByteString.Base64.Lazy
 import qualified Data.Text as T
@@ -99,6 +96,7 @@ oidSVGPatternContent _conf False _title code = f (0,0)
     value 1 = at (-2,2)  plain
     value 2 = at (-2,-2) plain
     value 3 = at (2,-2)  plain
+    value _ = error "value: unexpected param"
     special = at (3,0)   plain
 
     position ((n,m), p) = at (n*12, m*12) p
@@ -169,6 +167,7 @@ singeOidImage conf code = ((width, height), pixels)
     value 1 = at (-s, s) centeredDot
     value 2 = at (-s,-s) centeredDot
     value 3 = at ( s,-s) centeredDot
+    value _ = error "value: unexpected param"
     special = at (ss,0)  centeredDot
 
     position ((n,m), p) = at (n*spacePerPoint, m*spacePerPoint) p

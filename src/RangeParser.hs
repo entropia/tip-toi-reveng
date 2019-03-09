@@ -1,7 +1,6 @@
 module RangeParser (parseRange) where
 
 import Text.Printf
-import Data.Functor
 import Control.Monad
 import Text.Parsec hiding (Line, lookAhead, spaces)
 import Text.Parsec.String

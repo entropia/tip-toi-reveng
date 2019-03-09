@@ -17,14 +17,12 @@ import System.FilePath
 import Text.Printf
 import Data.Char
 import Data.Either
-import Data.Functor
 import Data.Maybe
 import Control.Monad
 import System.Directory
 import qualified Data.Map as M
 import qualified Data.Set as S
 import qualified Data.Vector as V
-import Control.Monad.Writer.Strict
 #if MIN_VERSION_time(1,5,0)
 import Data.Time.Format (defaultTimeLocale)
 #else
@@ -33,7 +31,6 @@ import System.Locale (defaultTimeLocale)
 import Data.Time (getCurrentTime, formatTime)
 import Data.Yaml hiding ((.=), Parser)
 import Data.Aeson.Types hiding ((.=), Parser)
-import Data.Aeson.TH
 import Text.Parsec hiding (Line, lookAhead, spaces)
 import Text.Parsec.String
 import qualified Text.Parsec as P

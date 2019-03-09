@@ -10,7 +10,6 @@ import Control.Applicative (Applicative)
 import qualified Data.Map as M
 import Control.Monad.Writer.Lazy
 import Control.Monad.State.Lazy
-import Debug.Trace
 
 import Types
 import Constants

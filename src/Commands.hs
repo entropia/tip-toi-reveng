@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP, RecordWildCards, TupleSections #-}
+{-# LANGUAGE LambdaCase #-}
 module Commands where
 
 import qualified Data.ByteString.Lazy as B
@@ -12,7 +13,6 @@ import Text.Printf
 import Data.Bits
 import Data.List
 import Data.Either
-import Data.Functor
 import Data.Maybe
 import Data.Function
 import Data.Ord
@@ -159,7 +159,7 @@ explain :: FilePath -> IO ()
 explain file = do
     bytes <- B.readFile file
     let (tt,segments) = parseTipToiFile bytes
-    forM_ (addHoles segments) $ \e -> case e of
+    forM_ (addHoles segments) $ \case
         Left (o,l) -> do
             printSegment (o,l,["-- unknown --"])
             printExtract bytes o l
@@ -168,6 +168,7 @@ explain file = do
             mapM_ printSegment ss
             printExtract bytes o l
             putStrLn ""
+        Right [] -> error "empty list of errors?"
 
 printExtract :: B.ByteString -> Offset -> Word32 -> IO ()
 printExtract b o 0 = return ()

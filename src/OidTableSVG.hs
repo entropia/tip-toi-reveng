@@ -2,7 +2,6 @@ module OidTableSVG where
 
 import Data.Word
 import qualified Data.ByteString.Lazy as LB
-import Control.Monad hiding (forM_)
 import Data.Foldable (forM_)
 import Text.Printf
 import Control.Arrow ((***))

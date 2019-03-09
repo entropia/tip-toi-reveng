@@ -7,7 +7,6 @@ import qualified Data.ByteString.Lazy.Char8 as BC
 import qualified Data.Binary.Get as G
 import Text.Printf
 import Data.List
-import Data.Functor
 import Control.Applicative (Applicative, (<*>))
 import Data.Maybe
 import Control.Monad
@@ -19,7 +18,6 @@ import Control.Monad.Reader
 import Control.Monad.RWS.Strict
 import Control.Exception
 import Control.Arrow
-import Debug.Trace
 
 import Types
 import Constants
@@ -36,11 +34,11 @@ liftGet :: G.Get a -> SGet a
 liftGet act = SGet $ do
     offset <- get
     bytes <- ask
-    when (offset > fromIntegral (B.length bytes)) $ do
+    when (offset > fromIntegral (B.length bytes)) $
         fail $ printf "Trying to read from offset 0x%08X, which is after the end of the file!" offset
     let (a, _, i) = G.runGetState act (B.drop (fromIntegral offset) bytes) 0
     put (offset + fromIntegral i)
-    return $ a
+    return a
 
 jumpTo :: Offset -> SGet ()
 jumpTo offset = SGet (put offset)

@@ -4,7 +4,6 @@ import System.FilePath
 import Numeric
 import Data.List (intercalate)
 import Options.Applicative.Help.Chunk
-import Data.Monoid
 import Data.Maybe
 import Data.Foldable (asum)
 import Data.Char (toLower)
