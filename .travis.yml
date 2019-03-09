@@ -17,4 +17,5 @@ before_install:
 script:
   - nix-env -iA cachix -f https://cachix.org/api/v1/install
   - cachix use tttool
+  - cachix push tttool --watch-store &
   - nix-build nix -A $TARGET
