@@ -8,11 +8,11 @@ env:
 jobs:
   include:
     - stage: Build
-      TARGET=linux-exe
-    - TARGET=windows-exe
-    - TARGET=static-exe
+      env: TARGET=linux-exe
+    - env: TARGET=windows-exe
+    - env: TARGET=static-exe
     - stage: Package
-      TARGET=release-zip
+      env: TARGET=release-zip
 
 before_install:
 - sudo mkdir -p /etc/nix
