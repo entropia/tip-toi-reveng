@@ -5,6 +5,15 @@ env:
   - TARGET=windows-exe
   - TARGET=static-exe
 
+jobs:
+  include:
+    - stage: Build
+      TARGET=linux-exe
+    - TARGET=windows-exe
+    - TARGET=static-exe
+    - stage: Package
+      TARGET=release-zip
+
 before_install:
 - sudo mkdir -p /etc/nix
 - echo "binary-caches = https://cache.nixos.org https://nixcache.reflex-frp.org https://static-haskell-nix.cachix.org https://hydra.iohk.io" | sudo tee -a /etc/nix/nix.conf > /dev/null
