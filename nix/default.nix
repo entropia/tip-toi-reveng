@@ -85,7 +85,8 @@ in rec {
     builder = pkgs.writeScript "zip-tttool-release.sh" ''
       source ${pkgs.stdenv}/setup
 
-      version=$(${release}/tttool --help|perl -ne 'print $1 if /tttool-(1.8) -- The swiss army knife/')
+      version=$(${release}/tttool --help|perl -ne 'print $1 if /tttool-(.*) -- The swiss army knife/')
+      echo $version
       mkdir -p $out/
       zip -r $out/tttool-$version.zip ${release}/*
     '';
