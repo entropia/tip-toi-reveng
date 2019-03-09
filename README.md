@@ -3,7 +3,6 @@ Das tttool hat jetzt eine deutsche Webseite für Anwender: http://tttool.entropi
 tip-toi-reveng
 ==============
 
-
 The goal of this project is to understand the file and paper format for the
 Ravensburger TipToi pen. The ultimate goal is that everyone can create their
 own books, with their own sounds.
@@ -15,7 +14,8 @@ you to dissect these files.
 The tool can also be used to generate completely new files from scratch; see
 below for details.
 
-If you want to learn more please have a look into our wiki (https://github.com/entropia/tip-toi-reveng/wiki).
+If you want to learn more please have a look into our wiki
+(https://github.com/entropia/tip-toi-reveng/wiki).
 
 The tttool tool
 ---------------
@@ -65,35 +65,11 @@ for the options of the individual command.
 Installation
 ------------
 
-This program is written in Haskell and can be installed on Windows, MacOS or Linux.
+We release `tttool` for Windows and Linux users as a zipfile. You can find them
+in the [releases section](https://github.com/entropia/tip-toi-reveng/releases)
+of the GitHub project.
 
-For Windows users, we create zipfile containing `tttool`, you can find them in
-the [releases section](https://github.com/entropia/tip-toi-reveng/releases) of
-the github project.
-
-Otherwise, installation from source is not difficult either:
-
- 1. If you have not done so yet, fetch the source code and change to the
-    directory containing the code:
-
-        git clone https://github.com/entropia/tip-toi-reveng.git tttool
-        cd tttool
-
- 2. Install the Haskell build tool `stack`, see https://docs.haskellstack.org/en/stable/install_and_upgrade/. The quick way is to type
-
-        curl -sSL https://get.haskellstack.org/ | sh
-
- 3. Build `tttool` using the command
-
-        stack install --local-bin-path .
-
- 4. At this point, `tttool` should be ready to go. If you run
-
-        ./tttool
-
-    you should see the list of commands shown above.
-
-If you have any problems, you can [report an issue via GitHub](https://github.com/entropia/tip-toi-reveng/issues).
+See `Building.md` for instructions on how to build `tttool` from source.
 
 Building your own gme files
 ---------------------------
