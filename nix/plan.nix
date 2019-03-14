@@ -8,7 +8,6 @@ hackage:
       "polyparse".revision = (((hackage."polyparse")."1.12").revisions).default;
       "old-time".revision = (((hackage."old-time")."1.1.0.3").revisions).default;
       "haskeline".revision = (((hackage."haskeline")."0.7.4.2").revisions).default;
-      "haskeline".flags.terminfo = false;
       "split".revision = (((hackage."split")."0.2.3.3").revisions).default;
       "stm".revision = (((hackage."stm")."2.4.5.1").revisions).default;
       "HTF".revision = (((hackage."HTF")."0.13.2.5").revisions).default;
@@ -39,18 +38,12 @@ hackage:
       "yaml".flags.no-exe = true;
       "yaml".flags.no-examples = true;
       "transformers-compat".revision = (((hackage."transformers-compat")."0.6.2").revisions).default;
-      "transformers-compat".flags.two = false;
-      "transformers-compat".flags.three = false;
-      "transformers-compat".flags.four = false;
-      "transformers-compat".flags.five = false;
-      "transformers-compat".flags."five-three" = true;
       "template-haskell".revision = (((hackage."template-haskell")."2.13.0.0").revisions).default;
       "mono-traversable".revision = (((hackage."mono-traversable")."1.0.9.0").revisions).default;
       "vector".revision = (((hackage."vector")."0.12.0.1").revisions).default;
       "call-stack".revision = (((hackage."call-stack")."0.1.0").revisions).default;
       "primitive".revision = (((hackage."primitive")."0.6.4.0").revisions).default;
       "time-locale-compat".revision = (((hackage."time-locale-compat")."0.1.1.5").revisions).default;
-      "time-locale-compat".flags."old-locale" = false;
       "safe".revision = (((hackage."safe")."0.3.17").revisions).default;
       "blaze-builder".revision = (((hackage."blaze-builder")."0.4.1.0").revisions).default;
       "base-compat".revision = (((hackage."base-compat")."0.10.4").revisions).default;

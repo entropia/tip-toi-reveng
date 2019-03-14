@@ -29,7 +29,25 @@ let
       (hackage: { Win32 = hackage.Win32."2.6.2.0".revisions.default; })
       (hackage: { mintty = hackage.mintty."0.1.2".revisions.default; })
       ];
-    modules = [ ];
+    modules = [
+      {
+        # The plan produced by plan-to-nix does not include all necessary flag assignments
+        packages.haskeline.flags.terminfo = false;
+        packages.transformers-compat.flags.two = false;
+        packages.transformers-compat.flags.three = false;
+        packages.transformers-compat.flags.four = false;
+        packages.transformers-compat.flags.five = false;
+        packages.transformers-compat.flags.five-three = true;
+        packages.time-locale-compat.flags.old-locale = false;
+        # Configure static building of tttool
+        packages.tttool.configureFlags = pkgs.lib.optionals (pkgs.hostPlatform.isMusl) [
+           "--ghc-option=-static"
+           "--ghc-option=-optl=-static"
+           "--extra-lib-dirs=${pkgs.gmp6.override { withStatic = true; }}/lib"
+           "--extra-lib-dirs=${pkgs.zlib.static}/lib"
+         ];
+      }
+    ];
   };
 in
   pkgSet.config.hsPkgs // { _config = pkgSet.config; }

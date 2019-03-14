@@ -28,12 +28,6 @@
     components = {
       exes = {
         "tttool" = {
-          configureFlags = pkgs.lib.optionals (pkgs.hostPlatform.isMusl) [
-             "--ghc-option=-static"
-             "--ghc-option=-optl=-static"
-             "--extra-lib-dirs=${pkgs.gmp6.override { withStatic = true; }}/lib"
-             "--extra-lib-dirs=${pkgs.zlib.static}/lib"
-          ];
           depends = (([
             (hsPkgs.base)
             (hsPkgs.binary)
