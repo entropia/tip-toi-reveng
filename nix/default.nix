@@ -2,10 +2,10 @@ let
   tttool-exe = pkgs:
     let
       haskellLib = pkgs.fetchFromGitHub {
-        owner  = "nomeata";
+        owner  = "input-output-hk";
         repo   = "haskell.nix";
-        rev    = "fd36e3f8256694884cebbe72d63177358ab15b0e";
-        sha256 = "0faxzn7labgf4jc75rrmnzq20bap2xpfv3paxg6fcfwwydcnnacs";
+        rev    = "8ee6fcfba7bb220e8d6e19106ad2ae2c25ecdf43";
+        sha256 = "1ndpxyairppcr3mnb4zi7gsvdqmncp09fgxdk8cbrh7ccb1r30kz";
         fetchSubmodules = false;
         name   = "haskell-lib-source";
       };

@@ -21,7 +21,7 @@ let
   #
   pkgSet = haskell.mkPkgSet {
     pkg-def = import ./plan.nix;
-    pkg-def-overlays = [
+    pkg-def-extras = [
       { tttool = ./tttool.nix;
         HPDF = ./HPDF.nix;
         conduit = ./conduit.nix;
