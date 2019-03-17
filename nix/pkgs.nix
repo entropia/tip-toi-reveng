@@ -8,6 +8,7 @@
 
 { pkgs ? import <nixpkgs> {}
 , haskell
+, iohk-module
 , ...
 }:
 let
@@ -30,6 +31,7 @@ let
       (hackage: { mintty = hackage.mintty."0.1.2".revisions.default; })
       ];
     modules = [
+      (iohk-module { nixpkgs = pkgs; th-packages = [ "tttool" ]; })
       {
         # The plan produced by plan-to-nix does not include all necessary flag assignments
         packages.haskeline.flags.terminfo = false;

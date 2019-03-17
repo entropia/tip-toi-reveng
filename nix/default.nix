@@ -1,3 +1,5 @@
+let localLib = import ./lib.nix; in
+
 let
   tttool-exe = pkgs:
     let
@@ -10,7 +12,8 @@ let
         name   = "haskell-lib-source";
       };
       haskell = import haskellLib { inherit pkgs; };
-      nix-tools = import ./pkgs.nix { inherit haskell pkgs; };
+      iohk-module = localLib.nix-tools.iohk-module;
+      nix-tools = import ./pkgs.nix { inherit pkgs haskell iohk-module; };
     in
     nix-tools.tttool.components.exes.tttool;
 
@@ -30,7 +33,6 @@ let
 in
 
 let
-  localLib = import ./lib.nix;
   pkgs = localLib.iohkNix.getPkgs {};
   pkgs-static = localLib.iohkNix.getPkgs { crossSystem = localLib.systems.examples.musl64; };
   pkgs-windows = localLib.iohkNix.getPkgs { crossSystem = localLib.systems.examples.mingwW64; };
