@@ -1,9 +1,10 @@
+{-# LANGUAGE QuasiQuotes #-}
 module KnownCodes where
 
 import Data.Word
 import qualified Data.Vector.Storable as V
 
--- import BakedVector
+import BakedVector
 
 code2RawCode :: Word16 -> Maybe Word16
 code2RawCode code = knownRawCodes V.!? fromIntegral code
@@ -19,9 +20,7 @@ lastObjectCode = 14999
 
 knownRawCodes :: V.Vector Word16
 knownRawCodes =
--- Temporarily disable use of Template Haskell for cross-compilation
---  [word16Vector|
-  V.fromList [
+  [word16Vector|
     4
     , 5
     , 6
@@ -16406,5 +16405,4 @@ knownRawCodes =
     , 12384
     , 12385
     , 12386
---    |]   
-    ]
+    |]   
