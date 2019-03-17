@@ -15,6 +15,7 @@ let
       haskell = pkgs.haskell // {
 	packages = pkgs.haskell.packages // {
 	  ghc843 = pkgs.haskell.packages.ghc843.override { overrides = mypkgs; };
+	  ghc863 = pkgs.haskell.packages.ghc863.override { overrides = mypkgs; };
         };
       };
     };
@@ -24,7 +25,7 @@ let
 
 in
   if windows
-  then pkgs.pkgsCross.mingw32.haskellPackages.tttool
+  then pkgs.pkgsCross.mingwW64.haskellPackages.tttool
   else if static
-  then pkgs.pkgsMusl.haskell.packages.ghc843.tttool
+  then pkgs.pkgsCross.musl64.haskell.packages.ghc864.tttool
   else pkgs.haskellPackages.tttool
