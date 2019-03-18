@@ -38,7 +38,7 @@ let
       ];
     modules = [
       # haskell.ghcHackagePatches.${compiler}
-      (iohk-module { nixpkgs = pkgs; th-packages = [ "tttool" ]; })
+      iohk-module
       {
         # The plan produced by plan-to-nix does not include all necessary flag assignments
 	# (TODO: still necessary?)
