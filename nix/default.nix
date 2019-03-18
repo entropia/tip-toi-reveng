@@ -13,8 +13,8 @@ let
       };
       haskell = import haskellLib { inherit pkgs; };
       iohk-module = localLib.nix-tools.iohk-module;
-      iohk-overlay = localLib.nix-tools.iohk-overlay;
-      nix-tools = import ./pkgs.nix { inherit pkgs haskell iohk-module iohk-overlay; };
+      iohk-extras = localLib.nix-tools.iohk-extras;
+      nix-tools = import ./pkgs.nix { inherit pkgs haskell iohk-module iohk-extras; };
     in
     nix-tools.tttool.components.exes.tttool;
 

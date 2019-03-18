@@ -9,7 +9,7 @@
 { pkgs ? import <nixpkgs> {}
 , haskell
 , iohk-module
-, iohk-overlay
+, iohk-extras
 , ...
 }:
 let
@@ -26,7 +26,7 @@ let
   pkgSet = haskell.mkPkgSet {
     pkg-def = plan;
     pkg-def-extras = [
-      iohk-overlay.${compiler}
+      iohk-extras.${compiler}
       { tttool = ./tttool.nix;
         HPDF = ./HPDF.nix;
         conduit = ./conduit.nix;
