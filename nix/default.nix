@@ -3,15 +3,16 @@ let localLib = import ./lib.nix; in
 let
   tttool-exe = pkgs:
     let
-      haskellLib = pkgs.fetchFromGitHub {
-        owner  = "input-output-hk";
-        repo   = "haskell.nix";
-        rev    = "8ee6fcfba7bb220e8d6e19106ad2ae2c25ecdf43";
-        sha256 = "1ndpxyairppcr3mnb4zi7gsvdqmncp09fgxdk8cbrh7ccb1r30kz";
-        fetchSubmodules = false;
-        name   = "haskell-lib-source";
-      };
-      haskell = import haskellLib { inherit pkgs; };
+      # haskellLib = pkgs.fetchFromGitHub {
+      #   owner  = "input-output-hk";
+      #   repo   = "haskell.nix";
+      #   rev    = "8ee6fcfba7bb220e8d6e19106ad2ae2c25ecdf43";
+      #   sha256 = "1ndpxyairppcr3mnb4zi7gsvdqmncp09fgxdk8cbrh7ccb1r30kz";
+      #   fetchSubmodules = false;
+      #   name   = "haskell-lib-source";
+      # };
+      # haskell = import haskellLib { inherit pkgs; };
+      haskell = localLib.nix-tools.haskell { inherit pkgs; };
       iohk-module = localLib.nix-tools.iohk-module;
       iohk-extras = localLib.nix-tools.iohk-extras;
       nix-tools = import ./pkgs.nix { inherit pkgs haskell iohk-module iohk-extras; };
