@@ -92,6 +92,7 @@ hackage:
       "th-abstraction".revision = (((hackage."th-abstraction")."0.2.8.0").revisions).default;
       "array".revision = (((hackage."array")."0.5.2.0").revisions).default;
       "integer-gmp".revision = (((hackage."integer-gmp")."1.0.2.0").revisions).default;
+      "network".revision = (((hackage."network")."3.0.1.0").revisions).default;
       };
     compiler = {
       version = "8.4.4";

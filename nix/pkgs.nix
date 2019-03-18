@@ -9,6 +9,7 @@
 { pkgs ? import <nixpkgs> {}
 , haskell
 , iohk-module
+, iohk-overlay
 , ...
 }:
 let
@@ -20,9 +21,12 @@ let
   #  packages.cbors.patches = [ ./one.patch ];
   #  packages.cbors.flags.optimize-gmp = false;
   #
+  plan = import ./plan.nix;
+  compiler = (plan haskell).compiler.nix-name;
   pkgSet = haskell.mkPkgSet {
-    pkg-def = import ./plan.nix;
+    pkg-def = plan;
     pkg-def-extras = [
+      iohk-overlay.${compiler}
       { tttool = ./tttool.nix;
         HPDF = ./HPDF.nix;
         conduit = ./conduit.nix;
@@ -31,6 +35,7 @@ let
       (hackage: { mintty = hackage.mintty."0.1.2".revisions.default; })
       ];
     modules = [
+      # haskell.ghcHackagePatches.${compiler}
       (iohk-module { nixpkgs = pkgs; th-packages = [ "tttool" ]; })
       {
         # The plan produced by plan-to-nix does not include all necessary flag assignments
