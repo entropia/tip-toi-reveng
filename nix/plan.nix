@@ -28,7 +28,7 @@ hackage:
       "optparse-applicative".revision = (((hackage."optparse-applicative")."0.14.2.0").revisions).default;
       "haskell-src".revision = (((hackage."haskell-src")."1.0.3.0").revisions).default;
       "dlist".revision = (((hackage."dlist")."0.8.0.4").revisions).default;
-      "conduit".revision = (((hackage."conduit")."1.3.0.3").revisions).default;
+      "conduit".revision = (((hackage."conduit")."1.3.1").revisions).default;
       "HUnit".revision = (((hackage."HUnit")."1.6.0.0").revisions).default;
       "lifted-base".revision = (((hackage."lifted-base")."0.2.3.12").revisions).default;
       "natural-sort".revision = (((hackage."natural-sort")."0.1.2").revisions).default;
@@ -122,7 +122,7 @@ hackage:
         "uuid-types" = "1.0.3";
         "optparse-applicative" = "0.14.2.0";
         "dlist" = "0.8.0.4";
-        "conduit" = "1.3.0.3";
+        "conduit" = "1.3.1";
         "HUnit" = "1.6.0.0";
         "lifted-base" = "0.2.3.12";
         "parsec" = "3.1.13.0";
