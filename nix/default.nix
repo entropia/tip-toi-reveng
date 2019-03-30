@@ -56,10 +56,11 @@ in rec {
     "example/.*"
     "Debug.yaml"
     "templates/"
-    "templates/.*md"
-    "templates/.*yaml"
+    "templates/.*\.md"
+    "templates/.*\.yaml"
     "Audio/"
-    "Audio/digits/.*"
+    "Audio/digits/"
+    "Audio/digits/.*\.ogg"
   ];
 
   contrib = ../contrib;

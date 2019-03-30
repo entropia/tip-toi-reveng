@@ -11,12 +11,12 @@
       ]; in
 
   {
-    flags = { old-locale = false; bytestring_has_builder = true; };
+    flags = {};
     package = {
       specVersion = "1.10";
-      identifier = { name = "tttool"; version = "1.8"; };
+      identifier = { name = "tttool"; version = "1.8.1"; };
       license = "MIT";
-      copyright = "2013-2017 Joachim Breitner";
+      copyright = "2013-2019 Joachim Breitner";
       maintainer = "mail@joachim-breitner.de";
       author = "Joachim Breitner";
       homepage = "https://github.com/entropia/tip-toi-reveng";
@@ -28,38 +28,36 @@
     components = {
       exes = {
         "tttool" = {
-          depends = (([
+          depends = [
+            (hsPkgs.aeson)
             (hsPkgs.base)
+            (hsPkgs.base64-bytestring)
             (hsPkgs.binary)
+            (hsPkgs.blaze-svg)
+            (hsPkgs.bytestring)
             (hsPkgs.containers)
             (hsPkgs.directory)
             (hsPkgs.executable-path)
             (hsPkgs.filepath)
-            (hsPkgs.template-haskell)
-            (hsPkgs.JuicyPixels)
-            (hsPkgs.aeson)
             (hsPkgs.hashable)
             (hsPkgs.haskeline)
+            (hsPkgs.HPDF)
+            (hsPkgs.JuicyPixels)
             (hsPkgs.mtl)
+            (hsPkgs.natural-sort)
+            (hsPkgs.optparse-applicative)
             (hsPkgs.parsec)
             (hsPkgs.process)
             (hsPkgs.random)
+            (hsPkgs.split)
+            (hsPkgs.spool)
+            (hsPkgs.template-haskell)
+            (hsPkgs.text)
+            (hsPkgs.time)
             (hsPkgs.vector)
             (hsPkgs.yaml)
-            (hsPkgs.HPDF)
-            (hsPkgs.split)
-            (hsPkgs.optparse-applicative)
-            (hsPkgs.spool)
             (hsPkgs.zlib)
-            (hsPkgs.natural-sort)
-            (hsPkgs.blaze-svg)
-            (hsPkgs.base64-bytestring)
-            (hsPkgs.text)
-            ] ++ (pkgs.lib).optional (compiler.isGhc && (compiler.version).lt "7.5") (hsPkgs.ghc-prim)) ++ (if flags.old-locale
-            then [ (hsPkgs.time) (hsPkgs.old-locale) ]
-            else [ (hsPkgs.time) ])) ++ (if flags.bytestring_has_builder
-            then [ (hsPkgs.bytestring) ]
-            else [ (hsPkgs.bytestring) (hsPkgs.bytestring-builder) ]);
+            ];
           };
         };
       };

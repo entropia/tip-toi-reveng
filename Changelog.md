@@ -1,10 +1,11 @@
 # Changelog for tttool
 
-## 1.8.1 (unreleased)
+## 1.8.1 (2019-03-30)
 
  * The SVG patterns created with `./tttool oid-code` and `./tttool oid-codes`
    now have `id`s that are valid (no spaces).
  * The release tarball now contains a binary for Linux as well.
+ * The release tarball now contains a copy of [The tttool book](http://tttool.readthedocs.io/de/latest/)
 
 ## 1.8 (2018-02-06)
 

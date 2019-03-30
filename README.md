@@ -139,7 +139,7 @@ Other resources in this repository
 ----------------------------------
 
  * [`oid-decoder.html`](http://htmlpreview.github.io/?https://github.com/entropia/tip-toi-reveng/blob/master/oid-decoder.html) allows you to manually decode an OID image.
- * `scripts/update.sh` downloads all gme files from the Ravensburger server (requires perl and the [XML::Simple](http://search.cpan.org/~grantm/XML-Simple/) module).  
+ * `scripts/update.sh` downloads all gme files from the Ravensburger server (requires perl and the [XML::Simple](http://search.cpan.org/~grantm/XML-Simple/) module).
 
    Instead of downloading all of them, you can conveniently browse them at <http://tiptoi.vakat.de/>, a service provided by Falko Oldenburg <tiptoi@vakat.de>.
  * `gameanalyse.c` and `libtiptoi.c` is an alternative tool to investigate gme

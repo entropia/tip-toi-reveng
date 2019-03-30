@@ -8,3 +8,9 @@ gameanalyse
 makegraphic
 dist
 .DS_Store
+result
+result-*
+gh-pages
+cabal.project.local
+dist-newstyle
+tts-cache

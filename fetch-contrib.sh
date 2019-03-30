@@ -33,26 +33,3 @@ cp -v playmus/playmus.exe contrib/playmus.exe
 # install espeak first in wine
 cp ~/.wine/drive_c/Programme/eSpeak/command_line/espeak.exe contrib/
 cp -r ~/.wine/drive_c/Programme/eSpeak/espeak-data/ contrib/
-
-zip --recurse-paths $zipfile \
-	tttool.exe \
-	README.md \
-	Changelog.md \
-	oid-decoder.html \
-	example \
-	example.yaml \
-	Debug.yaml \
-	oid-table.png \
-	templates/README.md \
-	templates/*.yaml \
-	transcript/*.csv \
-	wip/* \
-	Audio/digits/*.ogg \
-        contrib/oggenc.exe \
-        contrib/espeak.exe \
-        contrib/espeak-data \
-        contrib/LICENSE* \
-        contrib/README-SDL.txt \
-	contrib/*.dll \
-	contrib/playmus.exe
-echo Created $zipfile

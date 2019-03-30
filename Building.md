@@ -15,7 +15,7 @@ Building from source
     the tttool cache.
 
         nix-env -iA cachix -f https://cachix.org/api/v1/install
-	cachix use tttool
+        cachix use tttool
 
  4. Build `tttool`:
 
@@ -41,6 +41,6 @@ Making a release
 1. Ensure that the version number in `tttool.cabal` is up-to-date
 2. Run
 
-       cp -v --no-preserve=mode $(nix-build nix -A release-zip)/* .
+       nix-build nix -A release-zip
 
-3. Upload `tttool-n.m.zip`.
+3. Upload `result/tttool-n.m.zip`.
