@@ -64,27 +64,79 @@ in rec {
 
   contrib = ../contrib;
 
+  book =
+    let
+      sphinx-env = pkgs.python.withPackages(ps: [
+        ps.sphinx
+        ps.recommonmark
+      ]);
+      tex = pkgs.texlive.combine {
+        inherit (pkgs.texlive)
+          scheme-basic latexmk cmap collection-fontsrecommended
+          fncychap titlesec tabulary varwidth framed fancyvrb float parskip
+          wrapfig upquote capt-of needspace;
+      };
+    in
+    pkgs.stdenv.mkDerivation {
+      name = "tttool-book";
+
+      buildInputs = [ sphinx-env tex ];
+
+      src = builtins.path {
+        path = ../book;
+        name = "book";
+        filter = path: type:
+          baseNameOf path != "_build" &&
+          baseNameOf path != ".gitignore";
+      };
+
+      buildPhase = ''
+        source ${pkgs.stdenv}/setup
+        make html
+        make latexpdf
+        rm -f _build/html/.buildinfo
+        rm -rf _build/html/_sources
+      '';
+
+      installPhase = ''
+        mkdir -p $out/
+        mv _build/html $out/book.html
+        mv _build/latex/tttool.pdf $out/book.pdf
+      '';
+    };
+
   release = pkgs.stdenv.mkDerivation {
     name = "tttool-release";
 
-    buildInputs = [ static-exe ];
+    buildInputs = [ pkgs.perl ];
 
     builder = pkgs.writeScript "create-tttool-release.sh" ''
       source ${pkgs.stdenv}/setup
 
+      # check version
+      version=$(${static-exe}/bin/tttool --help|perl -ne 'print $1 if /tttool-(.*) -- The swiss army knife/')
+      doc_version=$(perl -ne "print \$1 if /VERSION: '(.*)'/" ${book}/book.html/_static/documentation_options.js)
+
+      if [ "$version" != "$doc_version" ]
+      then
+        echo "Mismatch between tttool version \"$version\" and book version \"$doc_version\""
+        exit 1
+      fi
+
       mkdir -p $out/
       cp -vsr ${static-files}/* $out
-      cp -v ${static-exe}/bin/tttool $out/
-      cp -v ${windows-exe}/bin/tttool.exe $out/
+      cp -vs ${static-exe}/bin/tttool $out/
+      cp -vs ${windows-exe}/bin/tttool.exe $out/
       mkdir -p $out/contrib
-      cp -vr ${contrib}/* $out/contrib/
+      cp -vsr ${contrib}/* $out/contrib/
+      cp -vsr ${book}/* $out
     '';
   };
 
   release-zip = pkgs.stdenv.mkDerivation {
     name = "tttool-release.zip";
 
-    buildInputs = [ release pkgs.perl pkgs.zip ];
+    buildInputs = [ pkgs.perl pkgs.zip ];
 
     builder = pkgs.writeScript "zip-tttool-release.sh" ''
       source ${pkgs.stdenv}/setup

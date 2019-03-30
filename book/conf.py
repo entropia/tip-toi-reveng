@@ -12,11 +12,11 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Das tttool-Buch'
-copyright = u'2017, Joachim Breitner'
+copyright = u'2019, Joachim Breitner'
 author = u'Joachim Breitner'
 
-version = u'1.7.0'
-release = u'1.7.0'
+version = u'1.8.1'
+release = version
 
 language = 'de'
 
