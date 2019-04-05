@@ -143,10 +143,14 @@ in rec {
       source ${pkgs.stdenv}/setup
 
       version=$(${release}/tttool --help|perl -ne 'print $1 if /tttool-(.*) -- The swiss army knife/')
+      base="tttool-$version"
       echo $version
-      mkdir -p $out/
-      cd ${release}
-      zip -r $out/tttool-$version.zip .
+      mkdir -p $out/$base
+      cd $out
+      cp -r ${release}/* $base/
+      chmod u+w -R $base
+      zip -r $base.zip $base
+      rm -rf $base
     '';
   };
 
