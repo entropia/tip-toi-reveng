@@ -7,6 +7,8 @@ jobs:
       env: TARGET=linux-exe
     - env: TARGET=windows-exe
     - env: TARGET=static-exe
+    - env: TARGET=osx-exe
+      os: osx
     - env: TARGET=book
     - stage: Package
       env: TARGET=release-zip
