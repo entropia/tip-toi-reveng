@@ -157,7 +157,7 @@ Sonstiges zur Einstimmug:
 
 ## Grafische Tools
 
-Das `ttool` ist ein Kommandozeilentool. Wer sich davon nicht abschrecken lässt kann tolle Sachen damit machen. Wer es einfacher haben will sollte sich folgende Projekte anschauen, die allesamt auf `tttool` aufbauen:
+Das `tttool` ist ein Kommandozeilentool. Wer sich davon nicht abschrecken lässt kann tolle Sachen damit machen. Wer es einfacher haben will sollte sich folgende Projekte anschauen, die allesamt auf `tttool` aufbauen:
 
  * Andreas Grimme hat mit [ttaudio](https://github.com/sidiandi/ttaudio#readme) eine Windows-GUI erstellt, falls man einfach nur ein paar Audio-Dateien auf den Stift laden will.
  * Till Korten hat mit [ttmp32gme](https://github.com/thawn/ttmp32gme) eine grafische Anwendung (Windows, OS X und Linux) erstellt, die ebenfalls Audio-Dateien auf den Stift lädt, und sehr schöne Übersichten zum antippen druckt. Auf [ScienceBlogs.de](http://scienceblogs.de/astrodicticum-simplex/2018/03/15/die-sternengeschichten-als-hoerbuch-auf-dem-tiptoi-stift/) beschreibt er detailliert, wie man mit ttmp32gme arbeitet.
@@ -537,6 +537,10 @@ Ansonsten wird der Tiptoi-Stift auch im [Mikrocontroller-Forum] besprochen.
 Falko Oldenburg hat eine Webseite erstellt, mit der sich die
 Ravensburger-GME-Dateien einfacher finden und herunterladen lassen:
 <http://tiptoi.vakat.de/>
+
+Cleracruza hat ein [Cheat-Sheet zum
+Debug-Modus](https://github.com/cleracruza/test-mode-cheat-sheet), mit dem man
+sich vom Stift die erkannten Codes vorlesen kann, erstellt.
 
 ## Impressum und Datenschutzerklärung
 
