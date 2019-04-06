@@ -9,6 +9,7 @@ jobs:
     - env: TARGET=static-exe
     - env: TARGET=osx-exe
       os: osx
+      # Fix OSX, see https://travis-ci.community/t/cannot-use-nix-support-on-osx/2927
       language: generic
       before_install:
       - curl https://nixos.org/nix/install | sh
