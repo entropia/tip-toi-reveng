@@ -72,7 +72,8 @@ in rec {
         -d $out/bin/osx \
         -p '@executable_path' \
         -i /usr/lib/system \
-        -i ${pkgs-osx.darwin.Libsystem}/lib/system
+        -i ${pkgs-osx.darwin.Libsystem}/lib/system \
+        -i ${pkgs-osx.darwin.Libsystem}/lib
     '';
   };
 
