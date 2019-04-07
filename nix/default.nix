@@ -71,7 +71,7 @@ in rec {
         -x $out/bin/osx/tttool \
         -d $out/bin/osx \
         -p '@executable_path' \
-        -i /usr/lib \
+        -i /usr/lib/system \
         -i ${pkgs-osx.darwin.Libsystem}/lib/system
     '';
   };
