@@ -56,10 +56,10 @@ in rec {
 
   macdylibbundler = pkgs.macdylibbundler;
 
-  osx-exe-bundle = pkgs.stdenv.mkDerivation {
+  osx-exe-bundle = pkgs-osx.stdenv.mkDerivation {
     name = "tttool-bundle";
 
-    buildInputs = [ macdylibbundler ];
+    buildInputs = [ pkgs-osx.macdylibbundler ];
 
     builder = pkgs.writeScript "zip-tttool-release.sh" ''
       source ${pkgs.stdenv}/setup
