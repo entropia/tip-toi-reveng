@@ -64,7 +64,6 @@ in rec {
     builder = pkgs.writeScript "zip-tttool-release.sh" ''
       source ${pkgs.stdenv}/setup
 
-      set -x
       mkdir -p $out/bin/osx
       cp ${osx-exe}/bin/tttool $out/bin/osx
       chmod u+w $out/bin/osx/tttool
@@ -138,6 +137,17 @@ in rec {
       '';
     };
 
+  os-switch = pkgs.writeScript "tttool-os-switch.sh" ''
+    #!/bin/bash
+    case "$OSTYPE" in
+      linux*)   exec "$(dirname "$0")/linux/tttool" "$@" ;;
+      darwin*)  exec "$(dirname "$0")/osx/tttool" "$@" ;;
+      msys*)    echo "$(dirname "$0")/tttool.exe" "$@" ;;
+      cygwin*)  echo "$(dirname "$0")/tttool.exe" "$@" ;;
+      *)        echo "unsupported operating system $OSTYPE" ;;
+    esac
+  '';
+
   release = pkgs.stdenv.mkDerivation {
     name = "tttool-release";
 
@@ -158,9 +168,13 @@ in rec {
 
       mkdir -p $out/
       cp -vsr ${static-files}/* $out
-      cp -vs ${static-exe}/bin/tttool $out/
+      mkdir $out/linux
+      cp -vs ${static-exe}/bin/tttool $out/linux
       cp -vs ${windows-exe}/bin/tttool.exe $out/
-      mkdir -p $out/contrib
+      mkdir $out/osx
+      cp -vsr ${osx-exe-bundle}/bin/osx $out/osx
+      cp -vs ${os-switch} $out/tttool
+      mkdir $out/contrib
       cp -vsr ${contrib}/* $out/contrib/
       cp -vsr ${book}/* $out
     '';
