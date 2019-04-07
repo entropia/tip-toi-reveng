@@ -44,17 +44,12 @@ let
 	# (TODO: still necessary?)
         packages.haskeline.flags.terminfo = false;
         # Configure static building of tttool
-        packages.tttool.configureFlags =
-	  pkgs.lib.optionals (pkgs.hostPlatform.isMusl) [
-            "--ghc-option=-static"
-            "--ghc-option=-optl=-static"
-            "--extra-lib-dirs=${pkgs.gmp6.override { withStatic = true; }}/lib"
-            "--extra-lib-dirs=${pkgs.zlib.static}/lib"
-          ] ++
-	  pkgs.lib.optionals (pkgs.hostPlatform.isDarwin) [
-            "--ghc-option=-static"
-            "--ghc-option=-optl=-static"
-          ];
+        packages.tttool.configureFlags = pkgs.lib.optionals (pkgs.hostPlatform.isMusl) [
+           "--ghc-option=-static"
+           "--ghc-option=-optl=-static"
+           "--extra-lib-dirs=${pkgs.gmp6.override { withStatic = true; }}/lib"
+           "--extra-lib-dirs=${pkgs.zlib.static}/lib"
+         ];
       }
     ];
   };
