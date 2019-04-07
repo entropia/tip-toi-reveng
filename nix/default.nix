@@ -32,6 +32,28 @@ let
     '';
   };
 
+  osx-bundler = pkgs: tttool:
+   pkgs.stdenv.mkDerivation {
+      name = "tttool-bundle";
+
+      buildInputs = [ pkgs.macdylibbundler ];
+
+      builder = pkgs.writeScript "zip-tttool-release.sh" ''
+        source ${pkgs.stdenv}/setup
+
+        mkdir -p $out/bin/osx
+        cp ${tttool}/bin/tttool $out/bin/osx
+        chmod u+w $out/bin/osx/tttool
+        dylibbundler \
+          -b \
+          -x $out/bin/osx/tttool \
+          -d $out/bin/osx \
+          -p '@executable_path' \
+          -i /usr/lib/system \
+          -i ${pkgs.darwin.Libsystem}/lib
+      '';
+    };
+
 in
 
 let
@@ -53,29 +75,9 @@ in rec {
   windows-exe = tttool-exe pkgs-windows;
   static-exe = tttool-exe pkgs-static;
   osx-exe = tttool-exe pkgs-osx;
+  osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
 
   macdylibbundler = pkgs.macdylibbundler;
-
-  osx-exe-bundle = pkgs-osx.stdenv.mkDerivation {
-    name = "tttool-bundle";
-
-    buildInputs = [ pkgs-osx.macdylibbundler ];
-
-    builder = pkgs.writeScript "zip-tttool-release.sh" ''
-      source ${pkgs.stdenv}/setup
-
-      mkdir -p $out/bin/osx
-      cp ${osx-exe}/bin/tttool $out/bin/osx
-      chmod u+w $out/bin/osx/tttool
-      dylibbundler \
-        -b \
-        -x $out/bin/osx/tttool \
-        -d $out/bin/osx \
-        -p '@executable_path' \
-        -i /usr/lib/system \
-        -i ${pkgs-osx.darwin.Libsystem}/lib
-    '';
-  };
 
   # playmus-static = playmus-exe pkgs-static;
   # playmus-windows = playmus-exe pkgs-windows;
@@ -142,8 +144,8 @@ in rec {
     case "$OSTYPE" in
       linux*)   exec "$(dirname "$0")/linux/tttool" "$@" ;;
       darwin*)  exec "$(dirname "$0")/osx/tttool" "$@" ;;
-      msys*)    echo "$(dirname "$0")/tttool.exe" "$@" ;;
-      cygwin*)  echo "$(dirname "$0")/tttool.exe" "$@" ;;
+      msys*)    exec "$(dirname "$0")/tttool.exe" "$@" ;;
+      cygwin*)  exec "$(dirname "$0")/tttool.exe" "$@" ;;
       *)        echo "unsupported operating system $OSTYPE" ;;
     esac
   '';
@@ -172,7 +174,7 @@ in rec {
       cp -vs ${static-exe}/bin/tttool $out/linux
       cp -vs ${windows-exe}/bin/tttool.exe $out/
       mkdir $out/osx
-      cp -vsr ${osx-exe-bundle}/bin/osx $out/osx
+      cp -vsr ${osx-exe-bundle}/bin/osx/* $out/osx
       cp -vs ${os-switch} $out/tttool
       mkdir $out/contrib
       cp -vsr ${contrib}/* $out/contrib/
