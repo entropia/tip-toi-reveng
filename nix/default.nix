@@ -66,7 +66,8 @@ in rec {
 
       mkdir -p $out/bin/osx
       cp ${osx-exe}/bin/tttool $out/bin/osx
-      dylibbundler -x $out/bin/osx/tttool -d $out/bin/osx -p '@executable_path'
+      chmod u+w $out/bin/osx/tttool
+      dylibbundler -x $out/bin/osx/tttool -d $out/bin/osx -p '@executable_path' -i /usr/lib
     '';
   };
 
