@@ -64,6 +64,7 @@ in rec {
     builder = pkgs.writeScript "zip-tttool-release.sh" ''
       source ${pkgs.stdenv}/setup
 
+      set -x
       mkdir -p $out/bin/osx
       cp ${osx-exe}/bin/tttool $out/bin/osx
       chmod u+w $out/bin/osx/tttool
@@ -73,7 +74,6 @@ in rec {
         -d $out/bin/osx \
         -p '@executable_path' \
         -i /usr/lib/system \
-        -i ${pkgs-osx.darwin.Libsystem}/lib/system \
         -i ${pkgs-osx.darwin.Libsystem}/lib
     '';
   };
