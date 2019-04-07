@@ -142,10 +142,10 @@ in rec {
   os-switch = pkgs.writeScript "tttool-os-switch.sh" ''
     #!/bin/bash
     case "$OSTYPE" in
-      linux*)   exec "$(dirname "$0")/linux/tttool" "$@" ;;
-      darwin*)  exec "$(dirname "$0")/osx/tttool" "$@" ;;
-      msys*)    exec "$(dirname "$0")/tttool.exe" "$@" ;;
-      cygwin*)  exec "$(dirname "$0")/tttool.exe" "$@" ;;
+      linux*)   exec "$(dirname "$BASH_SOURCE")/linux/tttool" "$@" ;;
+      darwin*)  exec "$(dirname "$BASH_SOURCE")/osx/tttool" "$@" ;;
+      msys*)    exec "$(dirname "$BASH_SOURCE")/tttool.exe" "$@" ;;
+      cygwin*)  exec "$(dirname "$BASH_SOURCE")/tttool.exe" "$@" ;;
       *)        echo "unsupported operating system $OSTYPE" ;;
     esac
   '';
