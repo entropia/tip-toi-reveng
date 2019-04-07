@@ -35,10 +35,16 @@ let
 in
 
 let
-  pkgs = localLib.iohkNix.getPkgs {};
-  pkgs-static = localLib.iohkNix.getPkgs { crossSystem = localLib.systems.examples.musl64; };
-  pkgs-windows = localLib.iohkNix.getPkgs { crossSystem = localLib.systems.examples.mingwW64; };
-  pkgs-osx = localLib.iohkNix.getPkgs { system = "x86_64-darwin"; };
+  overlay = self: super:
+    {
+      macdylibbundler = import ./macdylibbundler.nix { inherit (self) stdenv fetchFromGitHub; };
+    };
+  getPkgs = opts: localLib.iohkNix.getPkgs (opts // { extraOverlays = [ overlay ];});
+
+  pkgs         = getPkgs {};
+  pkgs-static  = getPkgs { crossSystem = localLib.systems.examples.musl64; };
+  pkgs-windows = getPkgs { crossSystem = localLib.systems.examples.mingwW64; };
+  pkgs-osx     = getPkgs { system = "x86_64-darwin"; };
 
   sourceByRegex = import ./source-by-regex.nix pkgs;
 
@@ -47,6 +53,8 @@ in rec {
   windows-exe = tttool-exe pkgs-windows;
   static-exe = tttool-exe pkgs-static;
   osx-exe = tttool-exe pkgs-osx;
+
+  macdylibbundler = pkgs.macdylibbundler;
 
   # playmus-static = playmus-exe pkgs-static;
   # playmus-windows = playmus-exe pkgs-windows;
