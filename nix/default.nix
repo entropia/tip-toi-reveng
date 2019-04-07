@@ -68,6 +68,7 @@ in rec {
       cp ${osx-exe}/bin/tttool $out/bin/osx
       chmod u+w $out/bin/osx/tttool
       dylibbundler \
+        -b \
         -x $out/bin/osx/tttool \
         -d $out/bin/osx \
         -p '@executable_path' \
