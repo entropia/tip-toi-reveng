@@ -56,6 +56,20 @@ in rec {
 
   macdylibbundler = pkgs.macdylibbundler;
 
+  osx-exe-bundle = pkgs.stdenv.mkDerivation {
+    name = "tttool-bundle";
+
+    buildInputs = [ macdylibbundler ];
+
+    builder = pkgs.writeScript "zip-tttool-release.sh" ''
+      source ${pkgs.stdenv}/setup
+
+      mkdir -p $out/bin/osx
+      cp ${osx-exe}/bin/tttool $out/bin/osx
+      dylibbundler -x $out/bin/tttool -d $out/bin/osx -p '@executable_path'
+    '';
+  };
+
   # playmus-static = playmus-exe pkgs-static;
   # playmus-windows = playmus-exe pkgs-windows;
 

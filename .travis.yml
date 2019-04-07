@@ -7,7 +7,7 @@ jobs:
       env: TARGET=linux-exe
     - env: TARGET=windows-exe
     - env: TARGET=static-exe
-    - env: TARGET=osx-exe
+    - env: TARGET=osx-exe-bundle
       os: osx
       # Fix OSX, see https://travis-ci.community/t/cannot-use-nix-support-on-osx/2927
       language: generic
