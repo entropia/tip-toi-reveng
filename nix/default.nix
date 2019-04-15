@@ -140,7 +140,7 @@ in rec {
     };
 
   os-switch = pkgs.writeScript "tttool-os-switch.sh" ''
-    #!/bin/bash
+    #!/usr/bin/env bash
     case "$OSTYPE" in
       linux*)   exec "$(dirname "$BASH_SOURCE")/linux/tttool" "$@" ;;
       darwin*)  exec "$(dirname "$BASH_SOURCE")/osx/tttool" "$@" ;;
@@ -185,12 +185,12 @@ in rec {
   release-zip = pkgs.stdenv.mkDerivation {
     name = "tttool-release.zip";
 
-    buildInputs = [ pkgs.perl pkgs.zip ];
+    buildInputs = with pkgs; [ perl zip bash ];
 
     builder = pkgs.writeScript "zip-tttool-release.sh" ''
       source ${pkgs.stdenv}/setup
 
-      version=$(${release}/tttool --help|perl -ne 'print $1 if /tttool-(.*) -- The swiss army knife/')
+      version=$(bash ${release}/tttool --help|perl -ne 'print $1 if /tttool-(.*) -- The swiss army knife/')
       base="tttool-$version"
       echo $version
       mkdir -p $out/$base
