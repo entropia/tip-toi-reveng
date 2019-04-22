@@ -2,7 +2,7 @@ Tipps und Tricks
 ================
 
 Hier kannst du zu konkreten Problemstellungen nachlesen, wie du sie
-lösen kannst.
+lösen kannst. Diese Kapitel lebt auch von deinen Beiträgen!
 
 
 .. _zufallszahlen:

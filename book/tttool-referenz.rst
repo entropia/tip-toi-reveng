@@ -70,6 +70,7 @@ OID-Codes auswählen
 Wenn du einfach nur ein bestimmtes Muster erzeugen willst, so verwendest du den ``oid-code``-Befehl, und gibst das Muster an. Wenn du zum Beispiel
 
 .. code::
+
   tttool oid-code 998
 
 ausführst, erstellt dir ``tttool`` eine Datei ``oid-998.png`` (oder ``oid-998.svg``, wenn du SVG als Format ausgewählt hast).
@@ -122,6 +123,9 @@ Mit folgenden Optionen kannst du das nachjustieren, wie das Muster erstellt wird
 * Die Option ``--dpi`` gibt die gewünschte Auflösung des Musters an, in der im Druck üblichen Einheit Punkt-Pro-Zoll (dots per inch). Der Standardwert ist 1200 DPI, unter Umständen genügen auch 600 DPI.
 
 * Die Option ``--pixel-size`` gibt an aus wievielen Pixel (im Quadrat) ein Punkt des Musters gebaut werden soll. Der Standardwert ist 2. Wenn du diese Zahl erhöhst bekommst du ein kräftigeres, schwärzeres Muster, das zwar stärker auffällt, aber vielleicht besser erkannt wird.
+
+.. _tttool-export:
+.. _tttool-media:
 
 GME-Dateien extrahieren
 -----------------------
