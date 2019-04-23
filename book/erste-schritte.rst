@@ -231,10 +231,10 @@ Und wenn du das Spiel neu starten, musst du alle Felder leeren:
 
 Du machst das mit zwei Skripten, weil der Tiptoi-Stift es nicht immer mag, wenn mehr als 8 Befehle in einem Skript sind. Das ``tttool`` würde dich allerdings warnen, falls du das mal vergisst.
 
-Natürlich musst du für alle 9 Felder ein Program wie ``feldOL`` schreiben, aber die sehen genau so aus wie jenes, nur statt ``OL`` steht dann da ``OM``, ``OR``, ``ML``, und so weiter. Das ist ein weing repetitiv, aber da kommtst du nicht ohne Weiteres drum rum.
+Natürlich musst du für alle 9 Felder ein Program wie ``feldOL`` schreiben, aber die sehen genau so aus wie jenes, nur statt ``OL`` steht dann da ``OM``, ``OR``, ``ML``, und so weiter. Das ist ein wenig repetitiv, aber da kommst du nicht ohne Weiteres drum rum.
 
 Nun bist du fast fertig mit der Programmierung. Es fehlt nur noch ein Detail: Du musst
-sicherstellen dass ganz am Anfang alle Register einen vernünftigen Wert haben. Wenn du nichts machst, sind die Register anfangs alle auf 0, was für die Felder und ``$set`` durchaus passt. Aber der aktuelle Spieler, ``$turn``, muss ja stets 1 oder 2 sein. Deshaben gibst du ein Init-Skript an.
+sicherstellen, dass ganz am Anfang alle Register einen vernünftigen Wert haben. Wenn du nichts machst, sind die Register anfangs alle auf 0, was für die Felder und ``$set`` durchaus passt. Aber der aktuelle Spieler, ``$turn``, muss ja stets 1 oder 2 sein. Deshaben gibst du ein Init-Skript an.
 
 .. code:: yaml
 
