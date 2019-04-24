@@ -151,8 +151,9 @@ Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
 ### Sonstiges zur Einstimmug:
 
  * Der Podcast Modellansatz [interviewte Joachim Breitner](http://modellansatz.de/papierrechner) zu dem Projekt (80 Minuten).
- * Auf der [GPN'15](https://entropia.de/GPN15) in Karlsruhe gab es einen [Vortrag zum Projekt](https://entropia.de/GPN15:Der_Tiptoi-Stift), der auch [aufgezeichnet](https://media.ccc.de/browse/conferences/gpn/gpn15/gpn15-6687-der_tiptoi-stift.html#video) wurde (63 Minuten).
+ * Auf der [GPN'15](https://entropia.de/GPN15) in Karlsruhe hielt Joachim einen [Vortrag zum Projekt](https://entropia.de/GPN15:Der_Tiptoi-Stift), der auch [aufgezeichnet](https://media.ccc.de/browse/conferences/gpn/gpn15/gpn15-6687-der_tiptoi-stift.html#video) wurde (63 Minuten).
  * Micha Reischuck zeigt einem [Screencast](https://youtu.be/QtdlwmKgg70) wie man mit GIMP die OID-Codes über Bilder legt.
+ * Bei den [Linux-Info-Tag '19](https://www.luga.de/Aktionen/LIT-2019/) in Augsburg hat Joachim den Einstieg in das Tiptoi-Basteln gezigt, der Vortrag wurde [aufgezeichnet](https://www.youtube.com/watch?v=HX1Fpx4fer8) wurde (48 Minuten).
 
 
 <!-- 2019-04-14 offline?
