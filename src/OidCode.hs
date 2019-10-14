@@ -23,6 +23,7 @@ import qualified Text.Blaze.Svg11 as S
 import qualified Text.Blaze.Svg11.Attributes as A
 import Text.Blaze.Svg11 ((!))
 import Text.Blaze.Svg.Renderer.Utf8
+import Text.Printf
 import Control.Arrow
 
 
@@ -42,13 +43,17 @@ checksum dec = c3
 
 oidSVG :: Conf -> Bool -> String -> Word16 -> S.Svg
 oidSVG conf usePNG title code =
-    S.docTypeSvg ! A.version (S.toValue "1.1")
-                 ! A.width (S.toValue "1mm")
-                 ! A.height (S.toValue "1mm")
-                 ! A.viewbox (S.toValue "0 0 48 48") $ do
+    S.docTypeSvg ! A.version (S.stringValue "1.1")
+                 ! A.width (S.stringValue (printf "%umm" w))
+                 ! A.height (S.stringValue (printf "%umm" h))
+                 ! A.viewbox (S.stringValue (printf "0 0 %u %u" (w*48) (h*48))) $ do
         S.defs (oidSVGPattern conf usePNG title code)
-        S.rect ! A.width (S.toValue "48") ! A.height (S.toValue "48")
-               ! A.fill (S.toValue $ "url(#"++title++")")
+        S.rect
+            ! A.width (S.toValue (w*48))
+            ! A.height (S.toValue (h*48))
+            ! A.fill (S.toValue $ "url(#"++title++")")
+  where
+    (w,h) = cCodeDim conf
 
 -- Create an OID pattern with the given id of the given code
 -- This assumes 48 dots per mm.
@@ -199,11 +204,21 @@ genRawPixels w h conf code =
     imageData $
     (oidImage w h conf code :: Image PixelRGB8)
 
+cCodeDimPixels :: Conf -> (Int, Int)
+cCodeDimPixels conf = (w',h')
+  where
+    (w,h) = cCodeDim conf
+    -- 25.4mm per inch
+    w' = round $ fromIntegral (w * cDPI conf) / 25.4
+    h' = round $ fromIntegral (h * cDPI conf) / 25.4
 
-writeRawPNG :: Int -> Int -> Conf -> String -> Word16 -> FilePath -> IO ()
-writeRawPNG w h conf title code filename =
+writeRawPNG :: Conf -> String -> Word16 -> FilePath -> IO ()
+writeRawPNG conf title code filename =
     B.writeFile filename $
     genRawPNG w h conf title code
+  where
+    (w,h) = cCodeDimPixels conf
+
 
 genRawPNG :: Int -> Int -> Conf -> String -> Word16 -> B.ByteString
 genRawPNG w h conf title code =

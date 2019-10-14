@@ -1,5 +1,10 @@
 # Changelog for tttool
 
+## 1.8.2 (UNRELEASED)
+
+ * The SVG images created with `./tttool oid-code` and `./tttool oid-codes`
+   respect `--code-dim`.
+
 ## 1.8.1 (2019-03-30)
 
  * The SVG patterns created with `./tttool oid-code` and `./tttool oid-codes`

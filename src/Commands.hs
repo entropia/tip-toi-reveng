@@ -338,21 +338,12 @@ writeImage format conf title url c filename =
 
 writeRawImage :: ImageFormat -> Conf -> String -> String -> Word16 -> FilePath -> IO ()
 writeRawImage PNG conf title _url raw_code filename =
-    writeRawPNG w h conf title raw_code filename
-  where
-    (w,h) = cCodeDimPixels conf
+    writeRawPNG conf title raw_code filename
 writeRawImage (SVG usePNG) conf _title url raw_code filename =
     writeRawSVG conf usePNG url raw_code filename
 writeRawImage _ _ _ _ _ _ =
     hPutStrLn stderr "this command only supports PNG and SVG" >> exitFailure
 
-cCodeDimPixels :: Conf -> (Int, Int)
-cCodeDimPixels conf = (w',h')
-  where
-    (w,h) = cCodeDim conf
-    -- 25.4mm per inch
-    w' = round $ fromIntegral (w * cDPI conf) / 25.4
-    h' = round $ fromIntegral (h * cDPI conf) / 25.4
 
 readTransscriptFile :: Maybe FilePath -> IO Transscript
 readTransscriptFile Nothing = return M.empty
