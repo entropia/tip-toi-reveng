@@ -1,0 +1,50 @@
+List of wavs contained in Chomp_Voice.bin:
+
+ 0: Key0
+ 1: Key1
+ 2: Key2
+ 3: Key3
+ 4: Key4
+ 5: Key5
+ 6: Key6
+ 7: Key7
+ 8: Key8
+ 9: Null
+10: Eins
+11: Zwei
+12: Drei
+13: Vier
+14: Fünf
+15: Sechs
+16: Sieben
+17: Acht
+18: Neun
+19: [start-up sound]
+20: [shut-down sound]
+21: [ping]
+22: [chord]
+23: "Die Batterien sind bald leer. Bitte wechsele die Batterien nach dieser Spielrunde."
+24: "Die Firmware des Tiptoi wird aktualisiert. Bitte schalte auf keinen Fall den Stift aus und entferne auch nicht die Batterien."
+25: "Die Firmware wurde erfolgreich aktualisiert. Der Stift schaltet sich nun wieder an."
+26: "Die Batterien sind leer. Der Stift schaltet sich nun ab."
+27: Testmode
+28: Start test of program
+29: Program test pass
+30: Program test fail
+31: Start test of the tip of the pen
+32: Test of the tip of the pen passed
+33: Communication to the tip of the pen failed
+34: Start test of encryption procedure
+35: Encryption procedure test passed
+36: Encryption procedure test failed
+37: Start test of UDISK file
+38: Test of UDISK file passed
+39: Test of UDISK file failed
+40: Start test of SD card file
+41: Test of SD card file passed
+42: Test of SD card file failed
+43: "Bitte berühre zuerst das Anschaltzeichen für dieses Produkt."
+44: "Der Stift schaltet sich in einer Minute automatisch ab."
+45: "Bitte lade zuerst die Audiodatei für dieses Produkt auf den Stift."
+46: "Die Batterien sind zu schwach um eine neue Firmware einzuspielen. Bitte wechsele die Batterien um die Firmware zu aktualisieren."
+47: "Wenn du die Anleitung für dieses Spiel hören möchtest, tippe auf das Infozeichen auf dem Spielplan."
