@@ -70,7 +70,7 @@ Bei beidem hilft das ``tttool``, und in beiden ist der Ausgangspunkt die sogenan
 Der erste Ton
 ~~~~~~~~~~~~~
 
-Du beginnst also mit einer einfachen YAML-Datei. Öffne den Texteditor deiner Wahl, schreibe folgendes und speichere es as ``tic-tac-toe.yaml``:
+Du beginnst also mit einer einfachen YAML-Datei. Öffne den Texteditor deiner Wahl, schreibe folgendes und speichere es als ``tic-tac-toe.yaml``:
 
 .. code:: yaml
 
@@ -87,7 +87,7 @@ sind.
 
 Die einzig wichtigen Felder sind ``product-id`` und ``scripts``. Die ``product-id``
 ist eine Nummer, die dein Projekt indentifiziert, und mit der am Ende der Stift
-die passende GME-Datei zu ausgewählten Buch findet. Das ``comment``-Feld hat
+die passende GME-Datei zum ausgewählten Buch findet. Das ``comment``-Feld hat
 keine weitere Bedeutung. Wirklich spannend ist das ``scripts``-Feld: Hier wird
 festgelegt, dass es ein Feld namens “``feldOl``” geben wird, und wenn der
 Benutzer mit dem Stift drauf geht, soll die Audiodatei namens
@@ -141,11 +141,11 @@ Wenn du diese Datei nun ausdruckst, mit dem Stift auf das Anschaltzeichen gehst,
 Spiellogik programmieren
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Nun füllst du das Spielfeld mit Leben. Dazu musst du dir, was sich das Programm „merken“ muss.
+Nun füllst du das Spielfeld mit Leben. Dazu musst du dir überlegen, was sich das Programm „merken“ muss.
 
-Für das Feld oben links müssen es sich zum Beispiel merken, ob es leer ist, von Spieler 1 (Kreuz) belegt oder von Spieler 2 (Kreis) belegt ist. Dazu verwendest du das Register ``$OL``, was entsprechend die Werte 0, 1 oder 2 speichert. Wir sprechen hier von Registern, aber man kann genau so gut Variablen oder Speicherplätze sagen.
+Für das Feld oben links muss es sich zum Beispiel merken, ob es leer ist, von Spieler 1 (Kreuz) belegt oder von Spieler 2 (Kreis) belegt ist. Dazu verwendest du das Register ``$OL``, was entsprechend die Werte 0, 1 oder 2 speichert. Wir sprechen hier von Registern, aber man kann genau so gut Variablen oder Speicherplätze sagen.
 
-Wenn ein Spieler nun ``feldOL`` antippt, und es ist schon belegt, so möchtest du ihn wissen lassen, was hier schon ist. Ist es allerdings frei, so musst du ``$OL`` entsprechend ändern. Dazu musst du natürlich natürlich wissen, wer dran ist! Das speicherst du im Register ``$turn``, mit den Werten 1 und 2.
+Wenn ein Spieler nun ``feldOL`` antippt, und es ist schon belegt, so möchtest du ihn wissen lassen, was hier schon ist. Ist es allerdings frei, so musst du ``$OL`` entsprechend ändern. Dazu musst du natürlich wissen, wer dran ist! Das speicherst du im Register ``$turn``, mit den Werten 1 und 2.
 
 Insgesamt hast du also drei Fälle, die du wie folgt aufschreibst:
 
@@ -158,11 +158,11 @@ Insgesamt hast du also drei Fälle, die du wie folgt aufschreibst:
      - $OL == 2? P(here_circle) J(next)
 
 
-Wenn der Benutzer nun das Feld antippt, prüft der Stift die drei Zeilen der Reihe nach, und führt die erste aus, wo alle Bedingungen passen. Bedingungen erkennnst du an dem Fragezeigen: Hier prüfst du, welcher Wert in ``$OL`` gespeichert ist. Den ``P(…)``-Befehl kennst du schon, der gibt eine Audiodatei aus (und um die eigentlich Audiodateien kümmerst du dich später). Mit ``$OL := $turn`` wird die Nummer des aktuellen Spielers (laut ``$turn``) in das Feld geschreiben (``$OL``).
+Wenn der Benutzer nun das Feld antippt, prüft der Stift die drei Zeilen der Reihe nach, und führt die erste aus, wo alle Bedingungen passen. Bedingungen erkennnst du an dem Fragezeigen: Hier prüfst du, welcher Wert in ``$OL`` gespeichert ist. Den ``P(…)``-Befehl kennst du schon, der gibt eine Audiodatei aus (und um die eigentliche Audiodateien kümmerst du dich später). Mit ``$OL := $turn`` wird die Nummer des aktuellen Spielers (laut ``$turn``) in das Feld geschrieben (``$OL``).
 
 In allen drei Fällen willst du allerdings noch mehr machen: Wenn ein neues Feld belegt wurde, willst du den Stift das sagen lassen. Und wenn nicht, willst du zumindest sagen, wer nun dran ist. Da das bei allen Feldern der gleiche Code sein wird, programmierst du ihn im Folgenden nur einmal, und springst den Code mit dem ``J``-Befehl (für „Jump“) an.
 
-Um zum Beispiel zu verkünden, wer eigentlich gerade dran ist, füge das folgende Skript hinzu, dass du oben mit ``J(next)`` anspringst:
+Um zum Beispiel zu verkünden, wer eigentlich gerade dran ist, füge das folgende Skript hinzu, das du oben mit ``J(next)`` anspringst:
 
 .. code:: yaml
 
@@ -220,7 +220,7 @@ Jetzt bist du fast fertig. Wenn der aktuelle Spieler gewinnt, dann willst du das
      - $turn == 1? P(player1wins) $turn := 2 J(reset)
      - $turn == 2? P(player2wins) $turn := 1 J(reset)
 
-Und wenn du das Spiel neu starten, musst du alle Felder leeren:
+Und wenn du das Spiel neu startest, musst du alle Felder leeren:
 
 .. code:: yaml
 
