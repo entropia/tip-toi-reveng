@@ -58,7 +58,7 @@ Das war es schon! Wenn du nun den Stift einschaltest, den Bauernhof aktivierst u
 Eigene Tiptoi-Produkte herstellen
 ---------------------------------
 
-Als nächstes wirst du ein komplett eigenes Tiptoi-Projekt herstellen. Als kleines Beispiel nehmen wir hier ein Tic-Tac-Toe-Spiel -- das braucht nur wenige aktive Bereiche und ist grafisch simpel, aber ziegt schon, wie du komplexere Abläufe programmierst.
+Als nächstes wirst du ein komplett eigenes Tiptoi-Projekt herstellen. Als kleines Beispiel nehmen wir hier ein Tic-Tac-Toe-Spiel -- das braucht nur wenige aktive Bereiche und ist grafisch simpel, aber zeigt schon, wie du komplexere Abläufe programmierst.
 
 Für ein Tiptoi-Produkt brauchst du zwei Komponenten:
 
