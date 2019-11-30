@@ -363,3 +363,41 @@ wordsWhen p s =  case dropWhile p s of
                       s' -> w : wordsWhen p s''
                             where (w, s'') = break p s'
 
+setLanguage :: String -> FilePath -> IO ()
+setLanguage lang file = do
+    -- much of this function could be refactored as we get more GME-modifying
+    -- commands
+
+    input <- B.readFile file
+    when (B.length input < 0x64) $ do
+        printf "Input file \"%s\" is too short to be a GME file.\n" file
+        exitFailure
+    -- figure out where to but the bytes
+    let lang' = BC.pack lang
+    let version_len = fromIntegral $ B.index input 0x20
+    let lang_offset = 0x20 + 1 + version_len + 8
+    let lang_max_length = 0x60 - lang_offset
+    when (B.length lang' > lang_max_length) $ do
+        printf "New language \"%s\" is too long, header has only space for %d bytes.\n"
+            lang lang_max_length
+        exitFailure
+
+    -- assemble file
+    let output = mconcat
+            [ B.take lang_offset input
+            , lang'
+            , B.replicate (lang_max_length - B.length lang') 0
+            , B.drop 0x60 input
+            ]
+    when (B.length input /= B.length output) $ error "Internal error in setLanguage"
+
+    -- update checksum
+    let bytes = B.take (B.length output - 4) output
+    let checksum = B.foldl' (\s b -> fromIntegral b + s) 0 bytes
+    let output' = Br.toLazyByteString $
+            Br.fromLazyByteString bytes `Br.append` Br.putWord32le checksum
+
+    B.writeFile (file ++ ".tmp") output'
+    renameFile (file ++ ".tmp") file
+
+

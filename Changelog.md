@@ -4,6 +4,8 @@
 
  * The SVG images created with `./tttool oid-code` and `./tttool oid-codes`
    respect `--code-dim`.
+ * New command `set-language` to change the language of a GME file without
+   rewriting the whole file (preserves all games etc.).
 
 ## 1.8.1 (2019-03-30)
 

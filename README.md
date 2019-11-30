@@ -24,33 +24,35 @@ Use the tool `tttool` to investigate the gme files and build new ones. It
 supports various subcommands:
 
     GME creation commands:
-    assemble                 creates a gme file from the given source
+      assemble                 creates a gme file from the given source
 
     OID code creation commands:
+      oid-table                creates a PDF or SVG file with all codes in the yaml file
+      oid-codes                creates files for every OID in the yaml file (default: PNG).
+      oid-code                 creates PNG files for each given code(s)
 
-    oid-table                creates a PDF file with all codes in the yaml file
-    oid-codes                creates PNG files for every OID in the yaml file.
-    oid-code                 creates PNG files for each given code(s)
+    GME modification commands:
+      set-language             sets the language field of an GME file
 
     GME analysis commands:
-    info                     Print general information about a GME file
-    export                   dumps the file in the human-readable yaml format
-    scripts                  prints the decoded scripts for each OID
-    script                   prints the decoded scripts for a specific OID
-    games                    prints the decoded games
-    lint                     checks for errors in the file or in this program
-    segments                 lists all known parts of the file, with description.
-    segment                  prints the decoded scripts for a specific OID
-    explain                  print a hexdump of a GME file with descriptions
-    holes                    lists all unknown parts of the file.
-    rewrite                  parses the file and writes it again (for debugging)
+      info                     Print general information about a GME file
+      export                   dumps the file in the human-readable yaml format
+      scripts                  prints the decoded scripts for each OID
+      script                   prints the decoded scripts for a specific OID
+      games                    prints the decoded games
+      lint                     checks for errors in the file or in this program
+      segments                 lists all known parts of the file, with description.
+      segment                  prints the decoded scripts for a specific OID
+      explain                  print a hexdump of a GME file with descriptions
+      holes                    lists all unknown parts of the file.
+      rewrite                  parses the file and writes it again (for debugging)
 
     GME extraction commands:
-    media                    dumps all audio samples
-    binaries                 dumps all binaries
+      media                    dumps all audio samples
+      binaries                 dumps all binaries
 
     Simulation commands:
-    play                     interactively play a GME file
+      play                     interactively play a GME file
 
 Run
 

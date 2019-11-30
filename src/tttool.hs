@@ -116,6 +116,11 @@ optionParser =
           , hidden
           ]
         , hsubparser $ mconcat
+          [ commandGroup "GME modification commands:"
+          , setLanguageCmd
+          , hidden
+          ]
+        , hsubparser $ mconcat
           [ commandGroup "GME analysis commands:"
           , infoCmd
           , exportCmd
@@ -427,6 +432,43 @@ oidCodeCmd =
         [ long "raw"
         , help "take the given codes as \"raw codes\" (rarely needed)"
         ]
+
+setLanguageCmd :: Mod CommandFields (Conf -> IO ())
+setLanguageCmd =
+    command "set-language" $
+    info parser $
+    progDesc "sets the language field of an GME file" <>
+    footerDoc foot
+  where
+    foot = unChunk $ vsepChunks
+        [ paragraph $ unwords
+          [ "If the language of a GME file is not empty and does not"
+          , "match the pen\'s language, the pen will refuse to play it."
+          , "So for example you cannot play a French GME file using a pen"
+          , "set to German. This command allows you to adjust a GME"
+          , "file\'s language to match the pen\'s language, so you can"
+          , "play the GME file."
+          ]
+        , paragraph $ unwords
+          [ "WARNING: This modifies the given GME file in place."
+          ]
+        ]
+
+    parser = (\l f c -> setLanguage l f) <$> languageParser <*> gmeFileParser
+
+    gmeFileParser :: Parser FilePath
+    gmeFileParser = strArgument $ mconcat
+        [ metavar "GME"
+        , help "GME file to modify"
+        ]
+
+    languageParser :: Parser String
+    languageParser =
+      flag' "" (long "empty") <|>
+      strArgument (mconcat
+        [ metavar "LANG"
+        , help "Language (e.g. GERMAN, ENGLISH, FRENCH, DUTCH…)"
+        ])
 
 main :: IO ()
 main = do
