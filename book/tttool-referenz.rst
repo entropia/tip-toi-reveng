@@ -164,7 +164,7 @@ Beispiel:
     tttool set-language FRENCH WWW_Bauernhof.gme
 
 Um eine sprachspezifische GME-Datei in einem Stift zu benutzen, der auf eine
-andere Sprache eingestellt ist, kann man die Sprache in der GME-Datei mit diesem Befehlr ändern. Anders als via ``export`` und ``assemble`` bleibt so alle Funktionalität erhalten.
+andere Sprache eingestellt ist, kann man die Sprache in der GME-Datei mit diesem Befehl ändern. Anders als via ``export`` und ``assemble`` bleibt so alle Funktionalität erhalten.
 
 Typische Sprachangaben sind ``GERMAN``, ``FRENCH``, ``RUSSIA``.
 
