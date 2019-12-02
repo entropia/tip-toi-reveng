@@ -15,4 +15,4 @@ let
 
   pkgs = iohkNix.pkgs;
   lib = pkgs.lib;
-in lib // { inherit iohkNix pkgs; inherit (iohkNix) nix-tools; }
+in lib // iohkNix // { inherit iohkNix pkgs; }

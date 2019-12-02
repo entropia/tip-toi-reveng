@@ -12,7 +12,7 @@ let
       #   name   = "haskell-lib-source";
       # };
       # haskell = import haskellLib { inherit pkgs; };
-      haskell = localLib.nix-tools.haskell { inherit pkgs; };
+      haskell = pkgs.callPackage localLib.nix-tools.haskell {};
       iohk-module = localLib.nix-tools.iohk-module;
       iohk-extras = localLib.nix-tools.iohk-extras;
       nix-tools = import ./pkgs.nix { inherit pkgs haskell iohk-module iohk-extras; };
