@@ -14,7 +14,7 @@
     flags = {};
     package = {
       specVersion = "1.10";
-      identifier = { name = "tttool"; version = "1.8.1"; };
+      identifier = { name = "tttool"; version = "1.9"; };
       license = "MIT";
       copyright = "2013-2019 Joachim Breitner";
       maintainer = "mail@joachim-breitner.de";

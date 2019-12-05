@@ -15,7 +15,7 @@ project = u'Das tttool-Buch'
 copyright = u'2019, Joachim Breitner'
 author = u'Joachim Breitner'
 
-version = u'1.8.1'
+version = u'1.9'
 release = version
 
 language = 'de'

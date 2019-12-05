@@ -38,7 +38,8 @@ If you have any problems, you can [report an issue via GitHub](https://github.co
 Making a release
 ----------------
 
-1. Ensure that the version number in `tttool.cabal` is up-to-date
+1. Ensure that the version number is up-to-date in:
+   `Changelog.md`, `tttool.cabal`, `book/conf.py`, `nix/tttool.nix`
 2. Run
 
        nix-build nix -A release-zip
