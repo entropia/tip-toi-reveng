@@ -13,7 +13,7 @@ Auf der
 
 Allerdings ist zu beachten, dass es sich dabei um ein
 Kommandozeilenprogramm handelt. Doppelt klicken bringt also nichts,
-sondern du musst die Eingabeaufforderung starten, in das Verzeichnis mit
+sondern du musst die Eingabeaufforderung starten, in das Verzeichnis mit der Datei
 ``tttool.exe`` wechseln und dann Befehle wie
 ``./tttool info WWW_Bauernhof.gme`` eintippen. Ein vorangestelltes ``$``
 in folgenden Listings wird nicht mit eingegeben, sondern markiert die
@@ -425,7 +425,7 @@ Nun druckst du das Bild direkt aus Gimp heraus aus, und achtest bei den Druckere
 Und jetzt?
 ~~~~~~~~~~
 
-Tic-Tac-Toe funktionert, und du hast Lust auf mehr? Dann lass dich doch auf der `Gallerie <http://tttool.entropia.de/>`_ inspirieren, und lese in den nächsten Seiten, um einen Überblick darüber zu gewinne, wie der Tiptoi-Stift funktioniert, was das ``tttool`` so alles kann, wie die YAML-Datei aufgebaut ist und was andere so alles an Tipps und Tricks für dich zusammen getragen haben.
+Tic-Tac-Toe funktionert, und du hast Lust auf mehr? Dann lass dich doch auf der `Galerie <http://tttool.entropia.de/>`_ inspirieren, und lese in den nächsten Seiten, um einen Überblick darüber zu gewinne, wie der Tiptoi-Stift funktioniert, was das ``tttool`` so alles kann, wie die YAML-Datei aufgebaut ist und was andere so alles an Tipps und Tricks für dich zusammen getragen haben.
 
 Wenn du mal nicht weiterkommst, dann darfst du dich gerne an die `Tiptoi-Mailingliste <https://lists.nomeata.de/mailman/listinfo/tiptoi>`_ wenden. Und wenn du etwas schönes Gebastelt hast, freuen wir uns immer wenn du uns auf der Mailingliste davon erzählst.
 
