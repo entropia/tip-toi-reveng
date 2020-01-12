@@ -147,10 +147,10 @@ Zweck:
 ``init``
 ^^^^^^^^
 
-In diesem Feld werden Strings initialisiert. Beispielsweise werden hier
+In diesem Feld werden Register (bzw. Variablen oder Speicherplätze) initialisiert. Beispielsweise werden hier
 Spielmodi oder Zähler auf 0 gesetzt, damit diese später mit einem
 vorgegebenen Wert starten können. Beispiel: Wird hier "$modus:=0 $i:=0"
-geschrieben, so werden nach Aktivierung des Projekts die Strings modus und
+geschrieben, so werden nach Aktivierung des Projekts die beiden Variablen modus und
 i mit 0 gestartet.
 
 ``scripts``
@@ -312,7 +312,7 @@ abgerufen werden können. Man könnte sie auch Variablen nennen.
 Der Name eines Registers beginnt immer mit einem `$`, gefolgt von Buchstaben,
 Zahlen oder Unterstrichen (`_`). Direkt nach dem `$` muss ein Buchstabe kommen.
 
-Alle Arithmetik auf dem Tiptoistift arbeitet mit ganzen Zahlen im Bereich 0 bis 65535). Alle Register haben zu Beginn den Wert 0, sofern du es nicht im ``init``-Feld anders verlangst (siehe Abschnitt „:ref:`yaml-init`\ “.
+Alle Arithmetik auf dem Tiptoistift arbeitet mit ganzen Zahlen im Bereich 0 bis 65535. Alle Register haben zu Beginn den Wert 0, sofern du es nicht im ``init``-Feld anders verlangst (siehe Abschnitt „:ref:`yaml-init`\ “).
 
 Wenn du eine GME-Datei exportierst (siehe Abschnitt „:ref:`tttool-export`\ “), so kennt das ``tttool`` die Namen der Register nicht. In diesem Fall werden Nummern verwendet (``$0``, ``$1``\ …). Es gibt in der Regel keinen Grund, dies in deinen eigenen Tiptoi-Produkten so zu machen.
 
