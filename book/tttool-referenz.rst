@@ -156,7 +156,7 @@ Sprache einer GME-Datei ändern
 
 Format:
   | **tttool** **set-language** *sprache* *datei.gme*
-  | **tttool** **set-language** **--empty** *datei.gme*
+  | **tttool** **set-language** **-**\ **-empty** *datei.gme*
 
 Beispiel:
   .. code::
