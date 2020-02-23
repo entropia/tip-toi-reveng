@@ -148,7 +148,7 @@ Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
 <div class="flexbox-fix"></div>
 </div>
 
-### Sonstiges zur Einstimmug:
+### Sonstiges zur Einstimmung:
 
  * Der Podcast Modellansatz [interviewte Joachim Breitner](http://modellansatz.de/papierrechner) zu dem Projekt (80 Minuten).
  * Auf der [GPN'15](https://entropia.de/GPN15) in Karlsruhe hielt Joachim einen [Vortrag zum Projekt](https://entropia.de/GPN15:Der_Tiptoi-Stift), der auch [aufgezeichnet](https://media.ccc.de/browse/conferences/gpn/gpn15/gpn15-6687-der_tiptoi-stift.html#video) wurde (63 Minuten).
