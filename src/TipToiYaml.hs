@@ -30,7 +30,7 @@ import System.Locale (defaultTimeLocale)
 #endif
 import Data.Time (getCurrentTime, formatTime)
 import Data.Yaml hiding ((.=), Parser)
-import Data.Aeson.Types hiding ((.=), Parser)
+import Data.Aeson.Types hiding ((.=), Parser, (<?>))
 import Text.Parsec hiding (Line, lookAhead, spaces)
 import Text.Parsec.String
 import qualified Text.Parsec as P

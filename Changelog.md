@@ -1,5 +1,10 @@
 # Changelog for tttool
 
+## 1.9.1 (UNRELEASED)
+
+ * The `set-language` command truncates long language names (like `ITALIAN`)
+   automatically.
+
 ## 1.9 (2019-12-05)
 
  * The SVG images created with `./tttool oid-code` and `./tttool oid-codes`

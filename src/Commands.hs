@@ -16,6 +16,7 @@ import Data.Either
 import Data.Maybe
 import Data.Function
 import Data.Ord
+import Data.Char
 import Control.Monad
 import System.Directory
 import qualified Data.Map as M
@@ -375,18 +376,19 @@ setLanguage lang file = do
     -- figure out where to but the bytes
     let lang' = BC.pack lang
     let version_len = fromIntegral $ B.index input 0x20
-    let lang_offset = 0x20 + 1 + version_len + 8
+    let has_date = isDigit $ chr $ fromIntegral $ B.index input (0x20 + 1 + version_len)
+    let lang_offset = 0x20 + 1 + version_len + (if has_date then 8 else 0)
     let lang_max_length = 0x60 - lang_offset
-    when (B.length lang' > lang_max_length) $ do
-        printf "New language \"%s\" is too long, header has only space for %d bytes.\n"
-            lang lang_max_length
-        exitFailure
+    let lang_trunc = B.take lang_max_length lang'
+    when (B.length lang' > lang_max_length) $
+        printf "Language \"%s\" is too long, truncating to \"%s\"\n"
+            (BC.unpack lang') (BC.unpack lang_trunc)
 
     -- assemble file
     let output = mconcat
             [ B.take lang_offset input
-            , lang'
-            , B.replicate (lang_max_length - B.length lang') 0
+            , lang_trunc
+            , B.replicate (lang_max_length - B.length lang_trunc) 0x00
             , B.drop 0x60 input
             ]
     when (B.length input /= B.length output) $ error "Internal error in setLanguage"
