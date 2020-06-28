@@ -344,7 +344,8 @@ void replaceAudio(char *inputfile, char *outputfile, char *filepath, int useNumb
 	FILE *fp;
 
 	if (gme->filesize != endofAudioData + 4){
-		fprintf(stderr, "There is data after the audio files, file would not work afterwards!\n");
+		fprintf(stderr, "There is data after the audio files, file would not work afterwards! (%lu != %u + 4)\n",
+		    gme->filesize, endofAudioData);
 		exit(1);
 	}
 
