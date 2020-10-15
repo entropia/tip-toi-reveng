@@ -281,7 +281,7 @@ segmentCmd :: Mod CommandFields (Conf -> IO ())
 segmentCmd =
     command "segment" $
     info parser $
-    progDesc "prints the decoded scripts for a specific OID"
+    progDesc "prints the segment that contains a specific offset"
   where
     parser = (\f n c -> findPosition n f)
         <$> gmeFileParser

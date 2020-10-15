@@ -42,7 +42,7 @@ supports various subcommands:
       games                    prints the decoded games
       lint                     checks for errors in the file or in this program
       segments                 lists all known parts of the file, with description.
-      segment                  prints the decoded scripts for a specific OID
+      segment                  prints the segment that contains a specific offset
       explain                  print a hexdump of a GME file with descriptions
       holes                    lists all unknown parts of the file.
       rewrite                  parses the file and writes it again (for debugging)
