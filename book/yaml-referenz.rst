@@ -259,6 +259,42 @@ eigentliche YAML-Datei zu übernehmen.
    die beiden Varianten nicht mischen.
 
 
+``restart``
+^^^^^^^^^^^
+
+Format:
+  Ein OID-Code
+
+Beispiel:
+  .. code:: yaml
+
+    restart: 12159
+
+Zweck:
+  Beim Tippen auf diesen Code wird das zuletzt ausgegebene Audio nochmal ausgegeben.
+
+
+Auch wenn man diesen dies nicht explizit in der .yaml-Datei notiert, weist das ``tttool`` einen solchen Code zu, und erzeugt ein ``RESTART``-Muster aus. 
+
+``stop``
+^^^^^^^^^^^
+
+Format:
+  Ein OID-Code
+
+Beispiel:
+  .. code:: yaml
+
+    stop: 12158
+
+Zweck:
+  Beim Tippen auf diesen Code wird die Ausgabe gestoppt
+
+
+Auch wenn man diesen dies nicht explizit in der .yaml-Datei notiert, weist das ``tttool`` einen solchen Code zu, und erzeugt ein ``STOP``-Muster aus.
+
+
+
 .. _yaml-skripte:
 
 YAML-Programmierung

@@ -84,6 +84,8 @@ Aber oft willst du einfach alle Codes eines GME-Projektes erzeugen. Dazu kannst 
 
   $ tttool oid-codes example.yaml
   Writing oid-42-START.png.. (Code 42, raw code 272)
+  Writing oid-42-RESTART.png.. (Code 13445, raw code 9250)
+  Writing oid-42-STOP.png.. (Code 13446, raw code 9251)
   Writing oid-42-8065.png.. (Code 8065, raw code 3700)
   Writing oid-42-8066.png.. (Code 8066, raw code 3701)
   Writing oid-42-8067.png.. (Code 8067, raw code 3702)
@@ -92,10 +94,11 @@ Die erste Zahl im Dateinamen ist die Produkt-ID des Projekts, was dir helfen sol
 
   $ tttool oid-codes example2.yaml
   Writing oid-42-START.png.. (Code 42, raw code 272)
-  Writing oid-42-conditional.png.. (Code 13445, raw code 9250)
-  Writing oid-42-hello.png.. (Code 13446, raw code 9251)
-  Writing oid-42-registers.png.. (Code 13447, raw code 9252)
-
+  Writing oid-42-RESTART.png.. (Code 13445, raw code 9250)
+  Writing oid-42-STOP.png.. (Code 13446, raw code 9251)
+  Writing oid-42-conditional.png.. (Code 13447, raw code 9252)
+  Writing oid-42-hello.png.. (Code 13448, raw code 9253)
+  Writing oid-42-registers.png.. (Code 13449, raw code 9254)
 
 Zuletzt kannst du auch alle Codes eines Projektes in eine einzelne PDF- oder SVG-Datei schreiben. Die Datei enthält dann eine schlichte, übersichtliche Tabelle mit Feldern für alle Codes, was sehr geschickt während der Entwicklung deines Projektes sein kann – so kannst du deine Programm-Logik schon planen und testen, bevor du dich and die grafische Gestaltung machst. Du erstellst die Tabelle einfach mit::
 
