@@ -433,6 +433,6 @@ Viel Vergnügen!
 
 
 
-.. [#] Für Windows bringt das ```tttool` die nötigen Programme mit, auf anderen
+.. [#] Für Windows bringt das ``tttool`` die nötigen Programme mit, auf anderen
    Systemen wird dich das ``tttool`` gegebenenfalls bitten, weitere Pakete zu
    installieren.
