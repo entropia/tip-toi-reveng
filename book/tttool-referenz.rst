@@ -146,7 +146,7 @@ Du kannst eine GME-Datei entpacken, und sowohl die Audio-Dateien als auch die di
 
 Der Befehl ``tttool export WWW_Bauernhof.gme`` schreibt die Logik in der GME-Datei in die Datei ``WWW_Bauernhof.yaml``, bzw. in die angegebene Ausgabedatei.
 
-Der Befehl ``tttool media WWW_Bauernhof.gme`` schreibt alle Audio-Dateien in der GME-Datei als separate Dateien, meist im OGG-Vorbis-Format mit Dateiendung ``.ogg`` in das Unterverzeichnis ``media``. Du kannst auch ein anderes Verzeichnis mittels ``-d`` angeben, aber beachte dann die ``media-path``-Einstellung in der YAML-Datei anzupassen, denn die vom ``tttool export```-Befehl erstellte YAML-Datei verweist standardmäßig auf ``media``.
+Der Befehl ``tttool media WWW_Bauernhof.gme`` schreibt alle Audio-Dateien in der GME-Datei als separate Dateien, meist im OGG-Vorbis-Format mit Dateiendung ``.ogg`` in das Unterverzeichnis ``media``. Du kannst auch ein anderes Verzeichnis mittels ``-d`` angeben, aber beachte dann die ``media-path``-Einstellung in der YAML-Datei anzupassen, denn die vom ``tttool export``-Befehl erstellte YAML-Datei verweist standardmäßig auf ``media``.
 
 .. _tttool-set-language:
 
