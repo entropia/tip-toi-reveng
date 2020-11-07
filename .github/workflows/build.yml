@@ -89,6 +89,12 @@ jobs:
 
   experiment:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+        - linux
+        - windows
+        - static
     steps:
     - uses: actions/checkout@v2
     - uses: cachix/install-nix-action@v12
@@ -98,4 +104,4 @@ jobs:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
 
-    - run: nix-build nix/new.nix -A tttool.components.exes.tttool
+    - run: nix-build nix/new.nix -A ${{ matrix.target }}

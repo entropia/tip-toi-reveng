@@ -15,16 +15,29 @@
 }:
 let
   sourceByRegex = import ./source-by-regex.nix pkgs;
+
+  src = sourceByRegex ../. [
+    "cabal.project"
+    "src/"
+    "src/.*/"
+    "src/.*.hs"
+    ".*.cabal"
+    "LICENSE"
+    ];
+
+  patchedSrc = pkgs.runCommandNoCC "tttool-src" {} ''
+    cp -r ${src} $out
+    chmod -R u+w $out
+    sed -i -e 's/with-compiler/-- with-compiler/' $out/cabal.project
+  '';
+
+  tttool = pkgs:
+    (pkgs.haskell-nix.cabalProject {
+      src = patchedSrc;
+      compiler-nix-name = "ghc8102";
+    }).tttool.components.exes.tttool;
 in
-  pkgs.pkgsCross.mingwW64.haskell-nix.cabalProject {
-    src = sourceByRegex ../. [
-      "cabal.project"
-      "src/"
-      "src/.*/"
-      "src/.*.hs"
-      ".*.cabal"
-      "LICENSE"
-      ];
-    configureArgs = "-w ghc"; # to override cabal.project
-    compiler-nix-name = "ghc8102";
+{ linux = tttool pkgs;
+  static = tttool pkgs.pkgsCross.musl64;
+  windows = tttool pkgs.pkgsCross.mingwW64;
 }
