@@ -761,10 +761,12 @@ resolveFileNames (WithFileNames (r,fns)) = (r filename_lookup, filenames)
     filename_lookup = (M.fromList (zip filenames [0..]) M.!)
 
 
-ttYaml2tt :: FilePath -> TipToiYAML -> CodeMap -> IO (TipToiFile, CodeMap)
-ttYaml2tt dir (TipToiYAML {..}) extCodeMap = do
-    now <- getCurrentTime
-    let date = formatTime defaultTimeLocale "%Y%m%d" now
+ttYaml2tt :: Bool -> FilePath -> TipToiYAML -> CodeMap -> IO (TipToiFile, CodeMap)
+ttYaml2tt no_date dir (TipToiYAML {..}) extCodeMap = do
+    date <-
+        if no_date
+        then return "19700101"
+        else formatTime defaultTimeLocale "%Y%m%d" <$> getCurrentTime
 
     let codeMap = M.unionWithKey mergeOnlyEqual
                                  extCodeMap

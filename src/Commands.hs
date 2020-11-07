@@ -142,7 +142,7 @@ play conf file = do
         if ".yaml" `isSuffixOf` file
         then do
             (tty, extraCodeMap) <- readTipToiYaml file
-            (tt, codeMap) <- ttYaml2tt (takeDirectory file) tty extraCodeMap
+            (tt, codeMap) <- ttYaml2tt True (takeDirectory file) tty extraCodeMap
             return (codeMap, tt)
         else do
             (tt,_) <- parseTipToiFile <$> B.readFile file
@@ -277,10 +277,10 @@ export inf out = do
         else writeTipToiYaml out tty
 
 
-assemble :: FilePath -> FilePath -> IO ()
-assemble inf out = do
+assemble :: Bool -> FilePath -> FilePath -> IO ()
+assemble noDate inf out = do
     (tty, codeMap) <- readTipToiYaml inf
-    (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
+    (tt, totalMap) <- ttYaml2tt noDate (takeDirectory inf) tty codeMap
     warnTipToi tt
     writeTipToiCodeYaml inf tty codeMap totalMap
     writeTipToi out tt
@@ -288,7 +288,7 @@ assemble inf out = do
 genOidTable :: Conf -> FilePath -> FilePath -> IO ()
 genOidTable conf inf out = do
     (tty, codeMap) <- readTipToiYaml inf
-    (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
+    (tt, totalMap) <- ttYaml2tt True (takeDirectory inf) tty codeMap
     let codes = ("START", fromIntegral (ttProductId tt)) : sort (M.toList totalMap)
     case fromMaybe PDF $ cImageFormat conf of
         SVG usePNG -> B.writeFile out $ oidTableSvg conf usePNG inf codes
@@ -303,7 +303,7 @@ isSVG fn = ".svg" `isSuffixOf` fn
 writeImagesForFile :: Conf -> FilePath -> IO ()
 writeImagesForFile conf inf = do
     (tty, codeMap) <- readTipToiYaml inf
-    (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
+    (tt, totalMap) <- ttYaml2tt True (takeDirectory inf) tty codeMap
     let codes = ("START", fromIntegral (ttProductId tt)) : M.toList totalMap
     let format = fromMaybe PNG (cImageFormat conf)
     forM_  codes $ \(s,c) -> do
