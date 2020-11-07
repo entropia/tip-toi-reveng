@@ -1,0 +1,7 @@
+Usage: tttool binaries [-d|--dir DIR] GME
+  dumps all binaries
+
+Available options:
+  -d,--dir DIR             Binaries output directory (default: "binaries")
+  GME                      GME file to read
+  -h,--help                Show this help text

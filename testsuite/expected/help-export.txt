@@ -1,0 +1,7 @@
+Usage: tttool export GME [OUT]
+  dumps the file in the human-readable yaml format
+
+Available options:
+  GME                      GME file to read
+  OUT                      YAML file to write
+  -h,--help                Show this help text

@@ -1,0 +1,7 @@
+Usage: tttool segment GME POS
+  prints the segment that contains a specific offset
+
+Available options:
+  GME                      GME file to read
+  POS                      offset into the file to look up, in bytes
+  -h,--help                Show this help text

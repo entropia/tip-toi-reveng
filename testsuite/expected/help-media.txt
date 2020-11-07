@@ -1,0 +1,7 @@
+Usage: tttool media [-d|--dir DIR] GME
+  dumps all audio samples
+
+Available options:
+  -d,--dir DIR             Media output directory (default: "media")
+  GME                      GME file to read
+  -h,--help                Show this help text

@@ -42,7 +42,8 @@ executable tttool
     KnownCodes,
     Types,
     Commands,
-    Utils
+    Utils,
+    Paths_tttool
 
   build-depends: aeson >= 0.7 && < 1.5
   build-depends: base >= 4.11 && < 4.13

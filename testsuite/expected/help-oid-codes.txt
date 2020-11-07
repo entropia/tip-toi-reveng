@@ -1,0 +1,15 @@
+Usage: tttool oid-codes YAML
+  creates files for every OID in the yaml file (default: PNG).
+
+Available options:
+  YAML                     Yaml file to read
+  -h,--help                Show this help text
+
+Uses oid-<code>.<format> as the file name.
+
+Use the global options to configure size, file format
+
+resolution and blackness of the code (see ./tttool --help).
+
+Note that it used to work to call "tttool oid-code foo.yaml". Please use "tttool
+oid-codes" for that now.

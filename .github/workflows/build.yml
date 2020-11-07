@@ -41,16 +41,37 @@ jobs:
         name: tttool (${{ matrix.target }})
         path: upload/
 
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v12
+    - name: "Cachix: tttool"
+      uses: cachix/cachix-action@v7
+      with:
+        name: tttool
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+    - run: nix-build nix -A tests
+
+  check-cabal-freeze:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v12
+    - name: "Cachix: tttool"
+      uses: cachix/cachix-action@v7
+      with:
+        name: tttool
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+    - run: nix-build nix -A check-cabal-freeze
+
   package:
     runs-on: ubuntu-latest
     needs: build
     steps:
     - uses: actions/checkout@v2
     - uses: cachix/install-nix-action@v12
-    - name: "Cachix: static-haskell-nix"
-      uses: cachix/cachix-action@v7
-      with:
-        name: static-haskell-nix
     - name: "Cachix: tttool"
       uses: cachix/cachix-action@v7
       with:

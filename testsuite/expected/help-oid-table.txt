@@ -1,0 +1,7 @@
+Usage: tttool oid-table YAML [OUT]
+  creates a PDF or SVG file with all codes in the yaml file
+
+Available options:
+  YAML                     Yaml file to read
+  OUT                      file to write (default: PDF)
+  -h,--help                Show this help text

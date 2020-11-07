@@ -14,3 +14,4 @@ gh-pages
 cabal.project.local
 dist-newstyle
 tts-cache
+.ghc.environment*

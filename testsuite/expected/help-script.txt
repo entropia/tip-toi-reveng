@@ -1,0 +1,8 @@
+Usage: tttool script [--raw] GME OID
+  prints the decoded scripts for a specific OID
+
+Available options:
+  --raw                    print the scripts in their raw form
+  GME                      GME file to read
+  OID                      OID to look up
+  -h,--help                Show this help text

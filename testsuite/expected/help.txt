@@ -1,0 +1,52 @@
+Usage: tttool [-t|--transscript FILE] [--code-dim W[xH]] [--dpi DPI]
+              [--pixel-size N] [-f|--image-format Format] COMMAND
+  tttool-VERSION -- The swiss army knife for the Tiptoi hacker
+
+Available options:
+  -h,--help                Show this help text
+  -t,--transscript FILE    Mapping from media file indices to plaintext. This
+                           should be a ';'-separated file, with OID codes in the
+                           first column and plain text in the second
+  --code-dim W[xH]         Generate OID codes of this size, in
+                           millimeters (default: 30)
+  --dpi DPI                Use this resolution in dpi when creating OID
+                           codes (default: 1200)
+  --pixel-size N           Use this many pixels (squared) per dot in when
+                           creating OID codes. (default: 2)
+  -f,--image-format Format image format to write: PNG, PDF, SVG, SVG+PNG (not
+                           all commands support all formats)
+
+GME creation commands:
+  assemble                 creates a gme file from the given source
+
+OID code creation commands:
+  oid-table                creates a PDF or SVG file with all codes in the yaml
+                           file
+  oid-codes                creates files for every OID in the yaml file
+                           (default: PNG).
+  oid-code                 creates PNG files for each given code(s)
+
+GME modification commands:
+  set-language             sets the language field of an GME file
+
+GME analysis commands:
+  info                     Print general information about a GME file
+  export                   dumps the file in the human-readable yaml format
+  scripts                  prints the decoded scripts for each OID
+  script                   prints the decoded scripts for a specific OID
+  games                    prints the decoded games
+  lint                     checks for errors in the file or in this program
+  segments                 lists all known parts of the file, with description.
+  segment                  prints the segment that contains a specific offset
+  explain                  print a hexdump of a GME file with descriptions
+  holes                    lists all unknown parts of the file.
+  rewrite                  parses the file and writes it again (for debugging)
+
+GME extraction commands:
+  media                    dumps all audio samples
+  binaries                 dumps all binaries
+
+Simulation commands:
+  play                     interactively play a GME file
+
+Please run "tttool COMMAND --help" for information on the particular command.

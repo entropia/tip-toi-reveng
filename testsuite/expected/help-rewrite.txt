@@ -1,0 +1,7 @@
+Usage: tttool rewrite GME OUT
+  parses the file and writes it again (for debugging)
+
+Available options:
+  GME                      GME file to read
+  OUT                      GME file to write
+  -h,--help                Show this help text

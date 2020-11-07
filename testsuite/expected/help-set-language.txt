@@ -1,0 +1,14 @@
+Usage: tttool set-language (--empty | LANG) GME
+  sets the language field of an GME file
+
+Available options:
+  LANG                     Language (e.g. GERMAN, ENGLISH, FRENCH, DUTCH…)
+  GME                      GME file to modify
+  -h,--help                Show this help text
+
+If the language of a GME file is not empty and does not match the pen's
+language, the pen will refuse to play it. So for example you cannot play a
+French GME file using a pen set to German. This command allows you to adjust a
+GME file's language to match the pen's language, so you can play the GME file.
+
+WARNING: This modifies the given GME file in place.

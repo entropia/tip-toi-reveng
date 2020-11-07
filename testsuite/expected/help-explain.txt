@@ -1,0 +1,6 @@
+Usage: tttool explain GME
+  print a hexdump of a GME file with descriptions
+
+Available options:
+  GME                      GME file to read
+  -h,--help                Show this help text

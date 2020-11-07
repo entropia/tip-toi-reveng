@@ -1,0 +1,6 @@
+Usage: tttool segments GME
+  lists all known parts of the file, with description.
+
+Available options:
+  GME                      GME file to read
+  -h,--help                Show this help text

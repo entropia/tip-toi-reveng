@@ -1,7 +1,7 @@
 let localLib = import ./lib.nix; in
 
 let
-  tttool-exe = pkgs:
+  mk-nix-tools = pkgs:
     let
       # haskellLib = pkgs.fetchFromGitHub {
       #   owner  = "input-output-hk";
@@ -17,7 +17,10 @@ let
       iohk-extras = localLib.nix-tools.iohk-extras;
       nix-tools = import ./pkgs.nix { inherit pkgs haskell iohk-module iohk-extras; };
     in
-    nix-tools.tttool.components.exes.tttool.overrideAttrs(old: {
+    nix-tools;
+
+  tttool-exe = pkgs:
+    (mk-nix-tools pkgs).tttool.components.exes.tttool.overrideAttrs(old: {
       postInstall = (old.postInstall or "") + ''
         # delete docs, not interesting here
         rm -vrf $out/share
@@ -206,5 +209,70 @@ in rec {
       rm -rf $base
     '';
   };
+
+  gme-downloads = pkgs.runCommandNoCC "gme-downloads" {
+    buildInputs = with pkgs; [ wget ];
+    outputHashMode = "recursive";
+    outputHash =  "sha256:01byby8fmqmxfg5cb5ss0pmhvf2av65sil9cqbjswky0a1mn7kp5";
+  } ''
+    mkdir -p $out
+    bash ${../testsuite/download.sh} $out
+  '';
+
+  tests = pkgs.stdenv.mkDerivation {
+    name = "tttool-tests";
+    phases = "unpackPhase checkPhase installPhase";
+    src = builtins.path {
+      path = ../testsuite;
+      filter = path: type: baseNameOf path != "output";
+    };
+    doCheck = true;
+    buildInputs = [ linux-exe pkgs.glibcLocales ];
+    checkPhase = ''
+      patchShebangs .
+      ln -s ${gme-downloads} downloaded
+      ./run.sh
+    '';
+    installPhase = "touch $out";
+  };
+
+  # The following two derivations keep the cabal.config.freeze file
+  # up to date.
+  cabal-freeze = pkgs.stdenv.mkDerivation {
+    name = "cabal-freeze";
+    src = linux-exe.src;
+    buildInputs = [ pkgs.cabal-install linux-exe.env ];
+    buildPhase = ''
+      mkdir .cabal
+      touch .cabal/config
+      HOME=$PWD cabal new-freeze --offline --enable-tests || true
+    '';
+    installPhase = ''
+      mkdir -p $out
+      echo "-- Run nix-shell ../nix -A check-cabal-freeze to update this file" > $out/cabal.project.freeze
+      cat cabal.project.freeze >> $out/cabal.project.freeze
+    '';
+  };
+
+  check-cabal-freeze = pkgs.runCommandNoCC "check-cabal-freeze" {
+      nativeBuildInputs = [ pkgs.diffutils ];
+      expected = cabal-freeze + /cabal.project.freeze;
+      actual = ../cabal.project.freeze;
+      cmd = "nix-shell nix -A check-cabal-freeze";
+      shellHook = ''
+        dest=${toString ../cabal.project.freeze}
+        rm -f $dest
+        cp -v $expected $dest
+        chmod u-w $dest
+        exit 0
+      '';
+    } ''
+      diff -r -U 3 $actual $expected ||
+        { echo "To update, please run"; echo "nix-shell . -A check-cabal-freeze"; exit 1; }
+      touch $out
+    '';
+
+ nix-tools = mk-nix-tools pkgs;
+ haskell = localLib.nix-tools.haskell { inherit pkgs; };
 
 }
