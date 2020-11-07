@@ -126,6 +126,10 @@ Zweck:
 
   Beispiel: Für den im ``welcome: hello`` angegebenen Begrüßungssound würde das
   ``tttool`` also die Datei ``Audio/hello.ogg`` einbinden.
+  
+  
+  Beispiel 2: Wenn du ``media-path: Audio/Schatzsuche_%s`` verwendest, würde bei einem ``welcome: hello`` die Datei ``Audio/Schatzsuche_hello.ogg`` eingebunden werden.
+  
 
 ``gme-lang``
 ^^^^^^^^^^^^
@@ -544,4 +548,3 @@ Weitere Befehle
 * ``G()``
 * ``C``
 * ``?() ()``
-
