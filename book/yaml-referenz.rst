@@ -403,14 +403,15 @@ Beispiel:
   .. code:: yaml
 
     endlos:
-    - P(kein_anschluss) J(endlos)
+    - P(endlose) P(kein_anschluss)
 Effekt:
-  Der Stift führt, nach dem aktuellen Skript, das Skript mit Code *oid-code* bzw. *code-name* (wenn :ref:`scriptcodes <code-namen>` verwendet wird) aus.
+  Der Stift führt, _nach dem aktuellen Skript_, das Skript mit Code *oid-code* bzw. *code-name* (wenn :ref:`scriptcodes <code-namen>` verwendet wird) aus.
 
-.. warning::
-  Die neuen Tiptoi-Stifte (die mit der Audiobook-Funktion) verhalten sich bisweilen seltsam, wenn **J**- und **P**-Befehle gemischt werden.
+Es sollte nur ein ``J``-Befehl pro Zeile existieren (bei mehreren wird der letzte ausgeführt).
 
-  TODO: Was genau passiert hier?
+Nach dem ``J``-Befehl sollte mindests ein ``P``-Befehl stehen, der ein nicht zu kurzes Audio-Schnippsel (mindestens 5ms) abspielt, sonst warten Tiptoi-Stifte (ab der zweiten Generation) beim Sprung etwa zwei Sekunden lang.
+
+Eine stille, 5ms lange Audiodatei liegt dem ``tttool`` als ``example/5ms.ogg`` bei.
 
 
 ``:=`` – Register setzen
