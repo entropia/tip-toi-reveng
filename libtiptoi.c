@@ -27,7 +27,7 @@ THE SOFTWARE.
 
 typedef struct{
 	uint32_t offset;
-	uint32_t lenght;
+	uint32_t length;
 }GME_AUDIO_FILE_TABLE;
 
 typedef struct{
@@ -84,7 +84,7 @@ uint8_t getXOR(GME_FILE *gme){
 //TODO: remove; every file should be xored seperatly to be save
 void xorAudio(GME_FILE *gme){
 	uint8_t *pos = &gme->data[gme->audioFileTable[0].offset];
-	uint8_t *end = &gme->data[gme->audioFileTable[gme->audioFileTableEntries-1].offset + gme->audioFileTable[gme->audioFileTableEntries-1].lenght];
+	uint8_t *end = &gme->data[gme->audioFileTable[gme->audioFileTableEntries-1].offset + gme->audioFileTable[gme->audioFileTableEntries-1].length];
 	const uint8_t xorff = gme->xor ^ 0xFF;
 	while (pos <= end){
 		if (*pos != 0 && *pos != 0xFF && *pos != gme->xor && *pos != xorff) {
@@ -193,8 +193,8 @@ GME_AUDIO_FILE_TABLE *createAudioTable(GME_FILE *gme, char *filepath,int useNumb
 			fscanf(fplist, "%s", audioFileName);
 		}
 		aft[i].offset = nextOffset;
-		aft[i].lenght = getFileSize(audioFileName);
-		nextOffset += aft[i].lenght;
+		aft[i].length = getFileSize(audioFileName);
+		nextOffset += aft[i].length;
 	}
 	if (!useNumbers) fclose(fplist);
 	return aft;
@@ -225,9 +225,9 @@ void addAudioFiles(GME_FILE *gme, GME_AUDIO_FILE_TABLE *aft, uint8_t *data, char
 			fprintf(stderr,"Could not open file %s\n", audioFileName);
 			return;
 		}
-		fread(cpos, 1, aft[i].lenght, fp);
+		fread(cpos, 1, aft[i].length, fp);
 		fclose(fp);
-		for (j = 0; j < aft[i].lenght; j++){
+		for (j = 0; j < aft[i].length; j++){
 			if (*cpos != 0 && *cpos != 0xFF && *cpos != gme->xor && *cpos != xorff) {
 				*cpos = (*cpos) ^gme->xor;
 			}
@@ -335,7 +335,7 @@ GME_AUDIO_SCRIPT *readFilelist(char *filelist, uint32_t firstOffset){
 //Replace audio files with files from given list
 void replaceAudio(char *inputfile, char *outputfile, char *filepath, int useNumbers){
 	GME_FILE *gme = readFile(inputfile);
-	uint32_t endofAudioData = gme->audioFileTable[gme->audioFileTableEntries - 1].offset + gme->audioFileTable[gme->audioFileTableEntries - 1].lenght;
+	uint32_t endofAudioData = gme->audioFileTable[gme->audioFileTableEntries - 1].offset + gme->audioFileTable[gme->audioFileTableEntries - 1].length;
 	uint8_t *data;
 	uint8_t *dataPos;
 	uint32_t dataLength;
@@ -344,12 +344,13 @@ void replaceAudio(char *inputfile, char *outputfile, char *filepath, int useNumb
 	FILE *fp;
 
 	if (gme->filesize != endofAudioData + 4){
-		fprintf(stderr, "There is data after the audio files, file would not work afterwards!\n");
+		fprintf(stderr, "There is data after the audio files, file would not work afterwards! (%lu != %u + 4)\n",
+		    gme->filesize, endofAudioData);
 		exit(1);
 	}
 
 	aft = createAudioTable(gme, filepath, useNumbers);
-	dataLength = aft[gme->audioFileTableEntries - 1].offset + aft[gme->audioFileTableEntries - 1].lenght + 4;
+	dataLength = aft[gme->audioFileTableEntries - 1].offset + aft[gme->audioFileTableEntries - 1].length + 4;
 	
 	data = malloc(dataLength);
 	memcpy(data, gme->data, gme->audioFileTableOffset);
@@ -419,7 +420,7 @@ void exportAudioFiles(char *inputfile, char *path, int filelistOnly){
 				fprintf(stderr, "Could not open file '%s' for writing\n", filename);
 				continue;
 			}
-			fwrite(file, 1, gme->audioFileTable[i].lenght, fp);
+			fwrite(file, 1, gme->audioFileTable[i].length, fp);
 			fclose(fp);
 		}
 	}
@@ -442,7 +443,7 @@ void hexDump(FILE *out, uint8_t* ptr1, uint8_t* ptr2){
 //	uint16_t elements;
 //
 //	for (i = 0; i < gme->audioFileTableEntries; i++){
-//		memset(&gme->data[gme->audioFileTable[i].offset], 0, gme->audioFileTable[i].lenght);
+//		memset(&gme->data[gme->audioFileTable[i].offset], 0, gme->audioFileTable[i].length);
 //	}
 //	memset(&gme->data[gme->audioFileTableOffset], 0, gme->audioFileTableEntries*8);
 //
@@ -502,7 +503,7 @@ void printInformation(char *inputfile, FILE *out){
 	fprintf(out,"\tTable offset:  %d (0x%08X)\n", gme->audioFileTableOffset, endianSwap(gme->audioFileTableOffset));
 	fprintf(out,"\tTable entries: %d\n", gme->audioFileTableEntries);
 	fprintf(out,"\tFiles offset:  %d (0x%08X)\n", gme->audioFileTable[0].offset, endianSwap(gme->audioFileTable[0].offset));
-	tmp = gme->audioFileTable[gme->audioFileTableEntries - 1].offset + gme->audioFileTable[gme->audioFileTableEntries - 1].lenght;
+	tmp = gme->audioFileTable[gme->audioFileTableEntries - 1].offset + gme->audioFileTable[gme->audioFileTableEntries - 1].length;
 	fprintf(out,"\tFiles endoff:  %d (0x%08X)\n", tmp, endianSwap(tmp));
 	fprintf(out,"\tFiles size:    %d\n", tmp - gme->audioFileTable[0].offset);
 }
