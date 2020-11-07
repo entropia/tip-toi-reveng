@@ -11,4 +11,5 @@ Scripts for OIDs from 8065 to 8067; 0/3 are disabled.
 Audio table entries: 6
 Binary tables entries: 0/0/0
 Single binary table entries: 0/0/0
-Checksum found 0x007AF393, calculated 0x007AF393
+Special OIDs: 13445, 13446
+Checksum found 0x007AF640, calculated 0x007AF640
