@@ -17,7 +17,12 @@ let
       iohk-extras = localLib.nix-tools.iohk-extras;
       nix-tools = import ./pkgs.nix { inherit pkgs haskell iohk-module iohk-extras; };
     in
-    nix-tools.tttool.components.exes.tttool;
+    nix-tools.tttool.components.exes.tttool.overrideAttrs(old: {
+      postInstall = (old.postInstall or "") + ''
+        # delete docs, not interesting here
+        rm -vrf $out/share
+      '';
+    });
 
   playmus-exe = pkgs: pkgs.stdenv.mkDerivation {
     name = "playmus";
