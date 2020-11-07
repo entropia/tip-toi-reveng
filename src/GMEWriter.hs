@@ -106,6 +106,8 @@ putTipToiFile (TipToiFile {..}) = mdo
     putWord8 0
     seek 0x0071 -- Just to be safe
     putWord32 ipllo
+    seek 0x0094
+    putWord32 sso
     seek 0x0200 -- Just to be safe
     sto <- getAddress $ putScriptTable ttScripts
     ast <- getAddress $ putWord16 0x00 -- For now, no additional script table
@@ -113,6 +115,7 @@ putTipToiFile (TipToiFile {..}) = mdo
     iro <- getAddress $ putInitialRegs ttInitialRegs
     mft <- getAddress $ putAudioTable ttAudioXor ttAudioFiles
     ipllo <- getAddress $ putPlayListList ttWelcome
+    sso <- getAddress $ putSpecialSymbols ttSpecialOIDs
     return ()
 
 putGameTable :: [Game] -> SPut
@@ -362,6 +365,14 @@ putAudioTable x as = mapFstMapSnd
     [ FunSplit (\o -> putWord32 o >> putWord32 (fromIntegral (B.length a)))
                (getAddress (putBS (cypher x a)))
     | a <- as ]
+
+putSpecialSymbols :: Maybe (Word16, Word16) -> SPut
+putSpecialSymbols Nothing =
+    replicateM_ 20 $ putWord16 0
+putSpecialSymbols (Just (restart, stop)) = do
+    putWord16 restart
+    putWord16 stop
+    replicateM_ 20 $ putWord16 0
 
 lowhigh :: Word8 -> Word8 -> Word16
 lowhigh a b = fromIntegral a + fromIntegral b * 2^8

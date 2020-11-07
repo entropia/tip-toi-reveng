@@ -142,8 +142,8 @@ play conf file = do
         if ".yaml" `isSuffixOf` file
         then do
             (tty, extraCodeMap) <- readTipToiYaml file
-            (tt, codeMap) <- ttYaml2tt True (takeDirectory file) tty extraCodeMap
-            return (codeMap, tt)
+            (tt, ttc) <- ttYaml2tt True (takeDirectory file) tty extraCodeMap
+            return (ttcScriptCodes ttc, tt)
         else do
             (tt,_) <- parseTipToiFile <$> B.readFile file
             return (M.empty, tt)
@@ -285,30 +285,38 @@ assemble noDate inf out = do
     writeTipToiCodeYaml inf tty codeMap totalMap
     writeTipToi out tt
 
-genOidTable :: Conf -> FilePath -> FilePath -> IO ()
-genOidTable conf inf out = do
+codesOfFile :: FilePath -> IO (ProductID, [(String, Word16)])
+codesOfFile inf = do
     (tty, codeMap) <- readTipToiYaml inf
     (tt, totalMap) <- ttYaml2tt True (takeDirectory inf) tty codeMap
-    let codes = ("START", fromIntegral (ttProductId tt)) : sort (M.toList totalMap)
+    writeTipToiCodeYaml inf tty codeMap totalMap
+    return $ (ttProductId tt,
+        [ ("START", fromIntegral (ttProductId tt)) ] ++
+        [ ("RESTART", fromIntegral id) | Just id <- pure $ ttcRestart totalMap ] ++
+        [ ("STOP",    fromIntegral id) | Just id <- pure $ ttcStop totalMap ] ++
+        sort (M.toList (ttcScriptCodes totalMap))
+        )
+  where
+    sort = sortBy (Algorithms.NaturalSort.compare `on` fst)
+
+genOidTable :: Conf -> FilePath -> FilePath -> IO ()
+genOidTable conf inf out = do
+    (_prod_id, codes) <- codesOfFile inf
     case fromMaybe PDF $ cImageFormat conf of
         SVG usePNG -> B.writeFile out $ oidTableSvg conf usePNG inf codes
         PDF -> B.writeFile out $ oidTable conf inf codes
         _   -> hPutStrLn stderr "tttool oid-table supports only SVG and PDF" >> exitFailure
-  where
-    sort = sortBy (Algorithms.NaturalSort.compare `on` fst)
 
 isSVG :: FilePath -> Bool
 isSVG fn = ".svg" `isSuffixOf` fn
 
 writeImagesForFile :: Conf -> FilePath -> IO ()
 writeImagesForFile conf inf = do
-    (tty, codeMap) <- readTipToiYaml inf
-    (tt, totalMap) <- ttYaml2tt True (takeDirectory inf) tty codeMap
-    let codes = ("START", fromIntegral (ttProductId tt)) : M.toList totalMap
+    (prod_id, codes) <- codesOfFile inf
     let format = fromMaybe PNG (cImageFormat conf)
     forM_  codes $ \(s,c) -> do
-        let filename = printf "oid-%d-%s.%s" (ttProductId tt) s (suffixOf format)
-        let title = printf "%s (product %d code %d)" s (ttProductId tt) c
+        let filename = printf "oid-%d-%s.%s" prod_id s (suffixOf format)
+        let title = printf "%s (product %d code %d)" s prod_id c
         let url   = printf "%s-%d" s c
         writeImage format conf title url c filename
 

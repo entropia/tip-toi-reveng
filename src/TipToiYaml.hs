@@ -1,9 +1,10 @@
-{-# LANGUAGE RecordWildCards, DeriveGeneric, CPP, TupleSections #-}
+{-# LANGUAGE RecordWildCards, DeriveGeneric, TupleSections #-}
 
 module TipToiYaml
     ( tt2ttYaml, ttYaml2tt
     , readTipToiYaml, writeTipToiYaml,writeTipToiCodeYaml
     , ttyProduct_Id
+    , TipToiCodesYAML(..)
     , debugGame
     )
 where
@@ -26,11 +27,7 @@ import System.Directory
 import qualified Data.Map as M
 import qualified Data.Set as S
 import qualified Data.Vector as V
-#if MIN_VERSION_time(1,5,0)
 import Data.Time.Format (defaultTimeLocale)
-#else
-import System.Locale (defaultTimeLocale)
-#endif
 import Data.Time (getCurrentTime, formatTime)
 import Data.Yaml hiding ((.=), Parser)
 import Data.Yaml.Pretty
@@ -70,13 +67,17 @@ data TipToiYAML = TipToiYAML
     , ttySpeak       :: Maybe (OptArray SpeakSpec)
     , ttyLanguage    :: Maybe Language
     , ttyGames       :: Maybe [GameYaml]
+    , ttyRestart     :: Maybe Word16
+    , ttyStop        :: Maybe Word16
     }
     deriving Generic
 
 data TipToiCodesYAML = TipToiCodesYAML
     { ttcScriptCodes :: CodeMap
+    , ttcRestart     :: Maybe Word16
+    , ttcStop        :: Maybe Word16
     }
-    deriving Generic
+    deriving (Eq, Generic)
 
 data SpeakSpec = SpeakSpec
     { ssLanguage :: Maybe Language
@@ -273,19 +274,15 @@ instance FromJSON GameYaml where
     parseJSON = genericParseJSON gameYamlOptions
 instance ToJSON GameYaml where
     toJSON = genericToJSON gameYamlOptions
-#if MIN_VERSION_aeson(0,10,0)
     toEncoding = genericToEncoding gameYamlOptions
-#endif
 instance FromJSON SubGameYaml where
     parseJSON = genericParseJSON gameYamlOptions
 instance ToJSON SubGameYaml where
     toJSON = genericToJSON gameYamlOptions
-#if MIN_VERSION_aeson(0,10,0)
     toEncoding = genericToEncoding gameYamlOptions
-#endif
 
 tipToiYamlOptions = defaultOptions
-    { fieldLabelModifier = map fix . map toLower . drop 3
+    { fieldLabelModifier = map (fix . toLower) . drop 3
     , omitNothingFields  = True
     }
        where fix '_' = '-'
@@ -295,20 +292,16 @@ instance FromJSON TipToiYAML where
     parseJSON = genericParseJSON tipToiYamlOptions
 instance ToJSON TipToiYAML where
     toJSON = genericToJSON tipToiYamlOptions
-#if MIN_VERSION_aeson(0,10,0)
     toEncoding = genericToEncoding tipToiYamlOptions
-#endif
 instance FromJSON TipToiCodesYAML where
     parseJSON = genericParseJSON tipToiYamlOptions
 instance ToJSON TipToiCodesYAML where
     toJSON = genericToJSON tipToiYamlOptions
-#if MIN_VERSION_aeson(0,10,0)
     toEncoding = genericToEncoding tipToiYamlOptions
-#endif
 
 
 tt2ttYaml :: String -> TipToiFile -> TipToiYAML
-tt2ttYaml path (TipToiFile {..}) = TipToiYAML
+tt2ttYaml path TipToiFile{..} = TipToiYAML
     { ttyProduct_Id = ttProductId
     , ttyInit = Just $ spaces $ [ ppCommand True M.empty [] (ArithOp Set (RegPos r) (Const n))
                                 | (r,n) <- zip [0..] ttInitialRegs , n /= 0]
@@ -322,6 +315,8 @@ tt2ttYaml path (TipToiFile {..}) = TipToiYAML
     , ttySpeak = Nothing
     , ttyLanguage = Nothing
     , ttyGames = list2Maybe $ map game2gameYaml ttGames
+    , ttyRestart = fmap fst ttSpecialOIDs
+    , ttyStop = fmap snd ttSpecialOIDs
     }
 
 list2Maybe [] = Nothing
@@ -648,7 +643,14 @@ mergeOnlyEqual :: String -> Word16 -> Word16 -> Word16
 mergeOnlyEqual _ c1 c2 | c1 == c2 = c1
 mergeOnlyEqual s c1 c2 = error $
     printf "The .yaml file specifies code %d for script \"%s\",\
-           \but the .codes.yamls file specifies %d. Please fix this!" c2 s c1
+           \ but the .codes.yaml file specifies %d. Please fix this!" c2 s c1
+
+mergeEqualMaybe :: String -> Maybe Word16 -> Maybe Word16 -> Maybe Word16
+mergeEqualMaybe s (Just c1) (Just c2) | c1 /= c2 = error $
+    printf "The .yaml file specifies code %d for action \"%s\",\
+           \ but the .codes.yaml file specifies %d. Please fix this!" c2 s c1
+mergeEqualMaybe _ Nothing c = c
+mergeEqualMaybe _ c _ = c
 
 toWord16 :: Word32 -> Word16
 toWord16 x = fromIntegral x
@@ -656,63 +658,72 @@ toWord16 x = fromIntegral x
 toWord32 :: Word16 -> Word32
 toWord32 x = fromIntegral x
 
-scriptCodes :: [String] -> CodeMap -> Word32 -> Either String (String -> Word16, CodeMap)
-scriptCodes [] codeMap productId = Right (error "scriptCodes []", codeMap)
-scriptCodes codes codeMap productId
-    | null strs || null nums = Right (lookupCode, totalMap)
+codesFor :: ProductID -> [Word16]
+codesFor productId = objectCodes
+  where
+    -- The following logic (for objectCodes) tries to use different object codes
+    -- for different projects, as far as possible. This makes the detection of not
+    -- having activated a book/product more robust.
+
+    -- We could theoretically set:
+    --    objectCodeOffsetMax = lastObjectCode - firstObjectCode.
+    -- This would assign perfectly usable object codes, and would minimize the
+    -- probability of object code collisions between products, but sometimes
+    -- object codes would wrap around from 14999 to 1000 even for small projects
+    -- which may be undesirable. We arbitrarily do not use the last 999 possible
+    -- offsets to avoid a wrap around in object codes for projects with <= 1000
+    -- object codes. This does not impose any limit on the number of object codes
+    -- per project. Every project can always use all 14000 object codes.
+    objectCodeOffsetMax = lastObjectCode - firstObjectCode - 999
+
+    -- Distribute the used object codes for different projects across the whole
+    -- range of usable object codes. We do this by multiplying the productId with
+    -- the golden ratio to achive a maximum distance between different projects,
+    -- independent of the total number of different projects.
+    -- 8035 = (14999-1000-999+1)*((sqrt(5)-1)/2)
+    objectCodeOffset = toWord16(rem (productId * 8035) (toWord32 objectCodeOffsetMax + 1))
+
+    -- objectCodes always contains _all_ possible object codes [firstObjectCode..lastObjectCode],
+    -- starting at firstObjectCode+objectCodeOffset and then wrapping around.
+    objectCodes = [firstObjectCode + objectCodeOffset .. lastObjectCode] ++ [firstObjectCode .. firstObjectCode + objectCodeOffset - 1]
+
+scriptCodes :: [String] -> TipToiCodesYAML -> Word32 -> Either String (String -> Word16, TipToiCodesYAML)
+scriptCodes [] givenCodes productId = Right (error "scriptCodes []", givenCodes)
+scriptCodes codes givenCodes productId
+    | null strs || null nums = Right (lookupCode, allCodes)
     | otherwise = Left "Cannot mix numbers and names in scripts."
   where
     (strs, nums) = partitionEithers $ map f codes
-    newStrs = filter (`M.notMember` codeMap) strs
-    usedCodes = S.fromList $ M.elems codeMap
+    newStrs = filter (`M.notMember` ttcScriptCodes givenCodes) strs
+    usedCodes = S.fromList $
+        maybeToList (ttcRestart givenCodes) ++
+        maybeToList (ttcStop givenCodes) ++
+        M.elems (ttcScriptCodes givenCodes)
 
     f s = case readMaybe s of
             Nothing -> Left s
             Just n -> Right (n::Word16)
 
--- The following logic (for objectCodes) tries to use different object codes
--- for different projects, as far as possible. This makes the detection of not
--- having activated a book/product more robust.
-
--- We could theoretically set:
---    objectCodeOffsetMax = lastObjectCode - firstObjectCode.
--- This would assign perfectly usable object codes, and would minimize the
--- probability of object code collisions between products, but sometimes
--- object codes would wrap around from 14999 to 1000 even for small projects
--- which may be undesirable. We arbitrarily do not use the last 999 possible
--- offsets to avoid a wrap around in object codes for projects with <= 1000
--- object codes. This does not impose any limit on the number of object codes
--- per project. Every project can always use all 14000 object codes.
-    objectCodeOffsetMax = lastObjectCode - firstObjectCode - 999
-
--- Distribute the used object codes for different projects across the whole
--- range of usable object codes. We do this by multiplying the productId with
--- the golden ratio to achive a maximum distance between different projects,
--- independent of the total number of different projects.
--- 8035 = (14999-1000-999+1)*((sqrt(5)-1)/2)
-    objectCodeOffset = toWord16(rem (productId * 8035) (toWord32(objectCodeOffsetMax) + 1))
-
--- objectCodes always contains _all_ possible object codes [firstObjectCode..lastObjectCode],
--- starting at firstObjectCode+objectCodeOffset and then wrapping around.
-    objectCodes = [firstObjectCode + objectCodeOffset .. lastObjectCode] ++ [firstObjectCode .. firstObjectCode + objectCodeOffset - 1]
-
-    newAssignments =
-        M.fromList $
-        zip newStrs $
+    restartCode : stopCode : availableCodes =
         filter (`S.notMember` usedCodes) $
-        objectCodes
+        codesFor productId
+
+    newAssignments = M.fromList $ zip newStrs availableCodes
 
     totalMap = M.fromList
         [ (str, fromJust $
                 readMaybe str `mplus`
-                M.lookup str codeMap `mplus`
+                M.lookup str (ttcScriptCodes givenCodes) `mplus`
                 M.lookup str newAssignments)
         | str <- codes
         ]
 
-    readCode s = case readMaybe s of
-        Nothing -> error $ printf "Cannot jump to named script \"%s\" in a yaml with numbered scripts." s
-        Just c -> c
+    allCodes = TipToiCodesYAML
+        { ttcScriptCodes = totalMap
+        , ttcRestart = ttcRestart givenCodes `mplus` Just restartCode
+        , ttcStop = ttcStop givenCodes `mplus` Just stopCode
+        }
+
     lookupCode s = case M.lookup s totalMap of
         Nothing -> error $ printf "Cannot jump to unknown script \"%s\"." s
         Just c -> c
@@ -765,18 +776,22 @@ resolveFileNames (WithFileNames (r,fns)) = (r filename_lookup, filenames)
     filename_lookup = (M.fromList (zip filenames [0..]) M.!)
 
 
-ttYaml2tt :: Bool -> FilePath -> TipToiYAML -> CodeMap -> IO (TipToiFile, CodeMap)
-ttYaml2tt no_date dir (TipToiYAML {..}) extCodeMap = do
+ttYaml2tt :: Bool -> FilePath -> TipToiYAML -> TipToiCodesYAML -> IO (TipToiFile, TipToiCodesYAML)
+ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
     date <-
         if no_date
         then return "19700101"
         else formatTime defaultTimeLocale "%Y%m%d" <$> getCurrentTime
 
-    let codeMap = M.unionWithKey mergeOnlyEqual
-                                 extCodeMap
-                                 (fromMaybe M.empty ttyScriptCodes)
+    let givenCodes = TipToiCodesYAML
+            { ttcScriptCodes =
+                M.unionWithKey mergeOnlyEqual (ttcScriptCodes extCodes) (fromMaybe M.empty ttyScriptCodes)
+            , ttcRestart = mergeEqualMaybe "restart" (ttcRestart extCodes) ttyRestart
+            , ttcStop = mergeEqualMaybe "stop" (ttcStop extCodes) ttyStop
+            }
 
-    (scriptMap, totalMap) <- either fail return $ scriptCodes (M.keys ttyScripts) codeMap ttyProduct_Id
+    (scriptMap, assignedCodes) <- either fail return $
+        scriptCodes (M.keys ttyScripts) givenCodes ttyProduct_Id
 
     let m = M.mapKeys scriptMap ttyScripts
         first = fst (M.findMin m)
@@ -817,7 +832,7 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodeMap = do
     let ttySpeakMap = toSpeakMap (fromMaybe defaultLanguage ttyLanguage) ttySpeak
 
     -- Generate text-to-spech files
-    forM (M.elems ttySpeakMap) $ \(lang, txt) ->
+    forM_ (M.elems ttySpeakMap) $ \(lang, txt) ->
         textToSpeech lang txt
 
     -- Check which files do not exist
@@ -858,7 +873,7 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodeMap = do
                     exitFailure
                | otherwise -> return $ BC.pack c
 
-    return $ (TipToiFile
+    return (TipToiFile
         { ttProductId = ttyProduct_Id
         , ttRawXor = knownRawXOR
         , ttComment = comment
@@ -879,8 +894,11 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodeMap = do
         , ttBinaries4 = []
         , ttBinaries5 = []
         , ttBinaries6 = []
-        , ttSpecialOIDs = Nothing
-        }, totalMap)
+        , ttSpecialOIDs = Just
+            ( fromMaybe 0 (ttcRestart assignedCodes)
+            , fromMaybe 0 (ttcStop assignedCodes)
+            ) -- a bit fishy, this juggling of maybes
+        }, assignedCodes)
 
 
 lexer       = P.makeTokenParser $
@@ -1042,7 +1060,7 @@ readFile' :: String -> IO B.ByteString
 readFile' filename =
     B.fromStrict <$> SB.readFile filename
 
-readTipToiYaml :: FilePath -> IO (TipToiYAML, CodeMap)
+readTipToiYaml :: FilePath -> IO (TipToiYAML, TipToiCodesYAML)
 readTipToiYaml inf = do
     content <- SBC.readFile inf
     let etty = decodeEither' content
@@ -1057,11 +1075,14 @@ readTipToiYaml inf = do
             ettcy <- decodeFileEither infCodes
             case ettcy of
                 Left e -> print e >> exitFailure
-                Right ttcy -> return (ttcScriptCodes ttcy)
-        else return M.empty
+                Right ttcy -> return ttcy
+        else return emptyCodeYaml
     return (tty, codeMap)
   where
     infCodes = codeFileName inf
+
+emptyCodeYaml :: TipToiCodesYAML
+emptyCodeYaml = TipToiCodesYAML M.empty Nothing Nothing
 
 writeTipToiYaml :: FilePath -> TipToiYAML -> IO ()
 writeTipToiYaml out tty =
@@ -1082,16 +1103,24 @@ writeTipToiYaml out tty =
         , "scriptcodes"
         ]
 
-writeTipToiCodeYaml :: FilePath -> TipToiYAML -> CodeMap -> CodeMap -> IO ()
-writeTipToiCodeYaml inf tty oldMap totalMap = do
+writeTipToiCodeYaml :: FilePath -> TipToiYAML -> TipToiCodesYAML -> TipToiCodesYAML -> IO ()
+writeTipToiCodeYaml inf tty oldCodeYaml allCodes = do
     let newCodeMap =
-            M.filterWithKey (\s v -> readMaybe s /= Just v) totalMap
+            M.filterWithKey (\s v -> readMaybe s /= Just v) (ttcScriptCodes allCodes)
             M.\\ fromMaybe M.empty (ttyScriptCodes tty)
-    if M.null newCodeMap
+
+    let newCodeYaml = TipToiCodesYAML
+            { ttcScriptCodes = newCodeMap
+            , ttcRestart = if isJust (ttcRestart allCodes) && ttcRestart allCodes /= ttyRestart tty then ttcRestart allCodes else Nothing
+            , ttcStop    = if isJust (ttcStop    allCodes) && ttcStop    allCodes /= ttyStop    tty then ttcStop    allCodes else Nothing
+            }
+
+    if newCodeYaml == emptyCodeYaml
     then do
         ex <- doesFileExist infCodes
         when ex $ removeFile infCodes
-    else when (newCodeMap /= oldMap) $ encodeFileCommented infCodes codesComment (TipToiCodesYAML { ttcScriptCodes = newCodeMap })
+    else when (newCodeYaml /= oldCodeYaml) $
+        encodeFileCommented infCodes codesComment newCodeYaml
   where
     infCodes = codeFileName inf
 
@@ -1135,6 +1164,8 @@ debugGame productID = do
             ]
         , ttyLanguage = Nothing
         , ttyGames = Nothing
+        , ttyRestart = Nothing
+        , ttyStop = Nothing
         }
   where
     t= M.fromList $
