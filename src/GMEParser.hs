@@ -28,14 +28,12 @@ import Cypher
 newtype SGet a = SGet (RWS B.ByteString [Segment] Word32  a)
     deriving (Functor, Applicative, Monad)
 
-instance MonadFail SGet where fail = error
-
 liftGet :: G.Get a -> SGet a
 liftGet act = SGet $ do
     offset <- get
     bytes <- ask
     when (offset > fromIntegral (B.length bytes)) $
-        fail $ printf "Trying to read from offset 0x%08X, which is after the end of the file!" offset
+        error $ printf "Trying to read from offset 0x%08X, which is after the end of the file!" offset
     let (a, _, i) = G.runGetState act (B.drop (fromIntegral offset) bytes) 0
     put (offset + fromIntegral i)
     return a
@@ -77,7 +75,7 @@ indirection desc act = do
     offset <- getWord32
     l <- getLength
     when (offset > l) $ do
-        fail $ printf "Trying to read from offset 0x%08X, mentioned at 0x%08X, which is after the end of the file!" offset position
+        error $ printf "Trying to read from offset 0x%08X, mentioned at 0x%08X, which is after the end of the file!" offset position
     getSegAt offset desc act
 
 indirectBS :: String -> SGet B.ByteString
@@ -115,6 +113,19 @@ getBSNul = liftGet G.getLazyByteStringNul
 
 bytesRead = SGet get
 
+expectWord8 n = do
+    n' <- getWord8
+    when (n /= n') $ do
+        b <- bytesRead
+        error $ printf "At position 0x%08X, expected %d/%02X, got %d/%02X" (b-1) n n n' n'
+
+expectWord16 n = do
+    n' <- getWord16
+    when (n /= n') $ do
+        b <- bytesRead
+        error $ printf "At position 0x%08X, expected %d/%02X, got %d/%02X" (b-1) n n n' n'
+
+
 getArray :: Integral a => SGet a -> SGet b -> SGet [b]
 getArray g1 g2 = do
     n <- g1
@@ -134,12 +145,12 @@ indirections g1 prefix g2 =
 getScripts :: SGet [(Word16, Maybe [Line ResReg])]
 getScripts = do
     last_code <- getWord16
-    0 <- getWord16
+    expectWord16 0
     first_code <- getWord16
-    0 <- getWord16
+    expectWord16 0
 
     forM [first_code .. last_code] $ \oid -> do
-        l <- maybeIndirection (show oid) $ getScript
+        l <- maybeIndirection (show oid) getScript
         return (oid,l)
 
 getScript :: SGet [Line ResReg]
@@ -151,7 +162,7 @@ getTVal = do
     case t of
      0 -> Reg <$> getWord16
      1 -> Const <$> getWord16
-     _ -> fail $ "Unknown value tag " ++ show t
+     _ -> error $ "Unknown value tag " ++ show t
 
 lineParser :: SGet (Line ResReg)
 lineParser = begin
@@ -183,12 +194,6 @@ lineParser = begin
         xs <- getArray getWord16 getWord16
         return $ Line offset conds cmds xs
 
-    expectWord8 n = do
-        n' <- getWord8
-        when (n /= n') $ do
-            b <- bytesRead
-            fail $ printf "At position 0x%08X, expected %d/%02X, got %d/%02X" (b-1) n n n' n'
-
     conditionals =
         [ (B.pack [0xF9,0xFF], Eq)
         , (B.pack [0xFA,0xFF], Gt)
@@ -198,38 +203,47 @@ lineParser = begin
         , (B.pack [0xFF,0xFF], NEq)
         ]
 
+    getConstTVal = do
+        v <- getTVal
+        case v of
+            Const n -> return n
+            _ -> do
+              b <- bytesRead
+              error $ printf "At position 0x%08X, expected a constant, got %s" (b-1) (show v)
+
     actions =
         [ (B.pack [0xE0,0xFF], \r -> do
-            unless (r == 0) $ fail "Non-zero register for RandomVariant command"
+            unless (r == 0) $ error "Non-zero register for RandomVariant command"
             v <- getTVal
             return (RandomVariant v))
         , (B.pack [0xE1,0xFF], \r -> do
-            unless (r == 0) $ fail "Non-zero register for PlayAllVariant command"
+            unless (r == 0) $ error "Non-zero register for PlayAllVariant command"
             v <- getTVal
             return (PlayAllVariant v))
         , (B.pack [0xE8,0xFF], \r -> do
-            unless (r == 0) $ fail "Non-zero register for Play command"
-            Const n <- getTVal
+            unless (r == 0) $ error "Non-zero register for Play command"
+            n <- getConstTVal
             return (Play n))
         , (B.pack [0x00,0xFC], \r -> do
-            unless (r == 0) $ fail "Non-zero register for Random command"
-            Const n <- getTVal
+            unless (r == 0) $ error "Non-zero register for Random command"
+            n <- getConstTVal
             return (Random (lowbyte n) (highbyte n)))
         , (B.pack [0x00,0xFB], \r -> do
-            unless (r == 0) $ fail "Non-zero register for PlayAll command"
-            Const n <- getTVal
+            unless (r == 0) $ error "Non-zero register for PlayAll command"
+            n <- getConstTVal
             return (PlayAll (lowbyte n) (highbyte n)))
         , (B.pack [0xFF,0xFA], \r -> do
-            unless (r == 0) $ fail "Non-zero register for Cancel command"
-            Const 0xFFFF <- getTVal
+            unless (r == 0) $ error "Non-zero register for Cancel command"
+            n <- getConstTVal
+            unless (n == 0xFFFF) $ error "Non-0xFFFF argument to Cancel command"
             return Cancel)
         , (B.pack [0xFF,0xF8], \r -> do
-            unless (r == 0) $ fail "Non-zero register for Jump command"
+            unless (r == 0) $ error "Non-zero register for Jump command"
             v <- getTVal
             return (Jump v))
         , (B.pack [0x00,0xFD], \r -> do
-            unless (r == 0) $ fail "Non-zero register for Game command"
-            Const a <- getTVal
+            unless (r == 0) $ error "Non-zero register for Game command"
+            a <- getConstTVal
             return (Game a))
         , (B.pack [0xF8,0xFF], \r -> do
             _ <- getTVal
@@ -290,7 +304,7 @@ getXor = do
              , (magic,_) <- fileMagics
              , magic `B.isPrefixOf` c
              ] of
-        [] -> fail "Could not find magic hash"
+        [] -> error "Could not find magic hash"
         (x:_) -> return x
 
 getChecksum :: SGet Word32

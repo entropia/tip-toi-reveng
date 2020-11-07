@@ -86,3 +86,16 @@ jobs:
       with:
         name: Release zip file
         path: upload/*.zip
+
+  experiment:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v12
+    - name: "Cachix: tttool"
+      uses: cachix/cachix-action@v7
+      with:
+        name: tttool
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+
+    - run: nix-build nix/new.nix -A tttool.components.exes.tttool

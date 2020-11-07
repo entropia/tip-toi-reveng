@@ -40,9 +40,8 @@ import Text.Parsec.Language (emptyDef)
 import GHC.Generics
 import qualified Data.Foldable as F
 import qualified Data.Traversable as T
-import Data.Traversable (for, traverse)
+import Data.Traversable (for)
 import Control.Arrow
-import Control.Applicative (Applicative(..), (<*>), (<*))
 import qualified Control.Applicative
 
 import TextToSpeech

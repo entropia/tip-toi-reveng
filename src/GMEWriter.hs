@@ -6,7 +6,6 @@ import qualified Data.ByteString.Lazy as B
 import qualified Data.Binary.Builder as Br
 import Text.Printf
 import Control.Monad
-import Control.Applicative (Applicative)
 import qualified Data.Map as M
 import Control.Monad.Writer.Lazy
 import Control.Monad.State.Lazy
@@ -73,7 +72,7 @@ seek :: Word32 -> SPut
 seek to = SPutM $ do
     now <- get
     when (now > to) $ do
-        fail $ printf "Cannot seek to 0x%08X, already at 0x%08X" to now
+        error $ printf "Cannot seek to 0x%08X, already at 0x%08X" to now
     tell $ (Br.fromLazyByteString (B.replicate (fromIntegral (to-now)) 0))
     modify (+ (to-now))
 

@@ -38,7 +38,7 @@ bakeString p s =
       [| let ptr = unsafeDupablePerformIO $ newForeignPtr_ $ Ptr $(litE)
          in VS.unsafeFromForeignPtr ptr 0 len :: VS.Vector $(bakeType p)
       |] where litE = return $ LitE $ StringPrimL $ unpack s
-    _ -> fail "Invalid string length."
+    _ -> error "Invalid string length."
 
 bakeVector :: Bakable a => [ a ] -> Q Exp
 bakeVector xs
@@ -46,18 +46,18 @@ bakeVector xs
 
 quoter :: (String -> Q Exp) -> QuasiQuoter
 quoter qExp = QuasiQuoter qExp unsupported unsupported unsupported
-  where unsupported = fail "Baked vectors must be used as expressions."
+  where unsupported = error "Baked vectors must be used as expressions."
 
 bakedString :: Bakable a => proxy a -> QuasiQuoter
 bakedString p = quoter $ \s ->
   case readMaybe ("\"" ++ s ++ "\"") of
-    Nothing -> fail "Failed to parse baked vector string."
+    Nothing -> error "Failed to parse baked vector string."
     Just s' -> bakeString p s'
 
 bakedVector :: forall proxy a. Bakable a => proxy a -> QuasiQuoter
 bakedVector _ = quoter $ \s ->
   case readMaybe ("[" ++ s ++ "]") of
-    Nothing -> fail "Failed to parse baked vector literal."
+    Nothing -> error "Failed to parse baked vector literal."
     Just xs -> bakeVector (xs :: [ a ])
 
 instance Bakable Int where

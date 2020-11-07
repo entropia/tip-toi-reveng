@@ -1,9 +1,10 @@
 packages: .
 
 -- same as nix
-with-compiler: ghc-8.6.3
+with-compiler: ghc-8.10.2
 
 source-repository-package
-      type:     git
-      location: https://github.com/nomeata/HPDF
-      tag: 1062cf0378c6bff384380101821e6744d41d0484
+   type:     git
+   location: https://github.com/nomeata/HPDF
+   tag: a43e6dd41e8d4e967f1fe9f6e30286a8a9dead64
+   --sha256: 1s23rnwln40jxr0vnlr0r74sjysrj4s14brvr3nhb7q1y4yb5366
