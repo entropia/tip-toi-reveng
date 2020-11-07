@@ -1,0 +1,6 @@
+Usage: tttool info GME
+  Print general information about a GME file
+
+Available options:
+  GME                      GME file to read
+  -h,--help                Show this help text

@@ -1,0 +1,9 @@
+Usage: tttool assemble [--no-date] YAML [OUT]
+  creates a gme file from the given source
+
+Available options:
+  --no-date                do not include today’s date in GME (useful for
+                           testing)
+  YAML                     Yaml file to read
+  OUT                      GME file to write
+  -h,--help                Show this help text

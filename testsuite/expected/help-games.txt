@@ -1,0 +1,6 @@
+Usage: tttool games GME
+  prints the decoded games
+
+Available options:
+  GME                      GME file to read
+  -h,--help                Show this help text

@@ -1,0 +1,15 @@
+Usage: tttool oid-code [--raw] RANGE
+  creates PNG files for each given code(s)
+
+Available options:
+  --raw                    take the given codes as "raw codes" (rarely needed)
+  RANGE                    OID range, for example e.g. 1,3,1000-1085.
+  -h,--help                Show this help text
+
+Uses oid-<code>.png as the file name.
+
+Use the global options to configure size, resolution and blackness of the code
+(see ./tttool --help).
+
+Note that it used to work to call "tttool oid-code foo.yaml". Please use "tttool
+oid-codes" for that now.

@@ -40,8 +40,10 @@ Making a release
 
 1. Ensure that the version number is up-to-date in:
    `Changelog.md`, `tttool.cabal`, `book/conf.py`, `nix/tttool.nix`
-2. Run
+2. Push to CI so that the OSX binaries are built and uploaded to the Cachix
+   cache.
+3. Run
 
        nix-build nix -A release-zip
 
-3. Upload `result/tttool-n.m.zip`.
+4. Upload `result/tttool-n.m.zip`.

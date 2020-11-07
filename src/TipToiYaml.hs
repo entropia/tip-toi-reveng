@@ -13,12 +13,15 @@ import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as BC
 import qualified Data.ByteString as SB
 import qualified Data.ByteString.Char8 as SBC
+import qualified Data.Text as T
 import System.Exit
 import System.FilePath
 import Text.Printf
 import Data.Char
 import Data.Either
 import Data.Maybe
+import Data.Function
+import Data.List
 import Control.Monad
 import System.Directory
 import qualified Data.Map as M
@@ -27,6 +30,7 @@ import qualified Data.Vector as V
 import Data.Time.Format (defaultTimeLocale)
 import Data.Time (getCurrentTime, formatTime)
 import Data.Yaml hiding ((.=), Parser)
+import Data.Yaml.Pretty
 import Data.Aeson.Types hiding ((.=), Parser, (<?>))
 import Text.Parsec hiding (Line, lookAhead, spaces)
 import Text.Parsec.String
@@ -772,10 +776,12 @@ resolveFileNames (WithFileNames (r,fns)) = (r filename_lookup, filenames)
     filename_lookup = (M.fromList (zip filenames [0..]) M.!)
 
 
-ttYaml2tt :: FilePath -> TipToiYAML -> TipToiCodesYAML -> IO (TipToiFile, TipToiCodesYAML)
-ttYaml2tt dir (TipToiYAML {..}) extCodes = do
-    now <- getCurrentTime
-    let date = formatTime defaultTimeLocale "%Y%m%d" now
+ttYaml2tt :: Bool -> FilePath -> TipToiYAML -> TipToiCodesYAML -> IO (TipToiFile, TipToiCodesYAML)
+ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
+    date <-
+        if no_date
+        then return "19700101"
+        else formatTime defaultTimeLocale "%Y%m%d" <$> getCurrentTime
 
     let givenCodes = TipToiCodesYAML
             { ttcScriptCodes =
@@ -1079,7 +1085,23 @@ emptyCodeYaml :: TipToiCodesYAML
 emptyCodeYaml = TipToiCodesYAML M.empty Nothing Nothing
 
 writeTipToiYaml :: FilePath -> TipToiYAML -> IO ()
-writeTipToiYaml = encodeFile
+writeTipToiYaml out tty =
+    SBC.writeFile out (encodePretty opts tty)
+  where
+    opts = setConfCompare (compare `on` fieldIndex) defConfig
+    fieldIndex s = fromMaybe (length fields) $ s `elemIndex` fields
+    fields = map T.pack
+        [ "product-id"
+        , "comment"
+        , "welcome"
+        , "media-path"
+        , "gme-lang"
+        , "init"
+        , "scripts"
+        , "language"
+        , "speak"
+        , "scriptcodes"
+        ]
 
 writeTipToiCodeYaml :: FilePath -> TipToiYAML -> TipToiCodesYAML -> TipToiCodesYAML -> IO ()
 writeTipToiCodeYaml inf tty oldCodeYaml allCodes = do

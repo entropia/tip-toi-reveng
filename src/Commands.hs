@@ -142,7 +142,7 @@ play conf file = do
         if ".yaml" `isSuffixOf` file
         then do
             (tty, extraCodeMap) <- readTipToiYaml file
-            (tt, ttc) <- ttYaml2tt (takeDirectory file) tty extraCodeMap
+            (tt, ttc) <- ttYaml2tt True (takeDirectory file) tty extraCodeMap
             return (ttcScriptCodes ttc, tt)
         else do
             (tt,_) <- parseTipToiFile <$> B.readFile file
@@ -277,10 +277,10 @@ export inf out = do
         else writeTipToiYaml out tty
 
 
-assemble :: FilePath -> FilePath -> IO ()
-assemble inf out = do
+assemble :: Bool -> FilePath -> FilePath -> IO ()
+assemble noDate inf out = do
     (tty, codeMap) <- readTipToiYaml inf
-    (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
+    (tt, totalMap) <- ttYaml2tt noDate (takeDirectory inf) tty codeMap
     warnTipToi tt
     writeTipToiCodeYaml inf tty codeMap totalMap
     writeTipToi out tt
@@ -288,7 +288,7 @@ assemble inf out = do
 codesOfFile :: FilePath -> IO (ProductID, [(String, Word16)])
 codesOfFile inf = do
     (tty, codeMap) <- readTipToiYaml inf
-    (tt, totalMap) <- ttYaml2tt (takeDirectory inf) tty codeMap
+    (tt, totalMap) <- ttYaml2tt True (takeDirectory inf) tty codeMap
     writeTipToiCodeYaml inf tty codeMap totalMap
     return $ (ttProductId tt,
         [ ("START", fromIntegral (ttProductId tt)) ] ++

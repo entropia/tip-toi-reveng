@@ -363,7 +363,14 @@ assembleCmd =
     info parser $
     progDesc "creates a gme file from the given source"
   where
-    parser = const <$> (twoFiles "gme" assemble <$> yamlFileParser <*> outFileParser)
+    parser = (\c a b _conf -> twoFiles "gme" (assemble c) a b)
+      <$> noDate <*> yamlFileParser <*> outFileParser
+
+    noDate :: Parser Bool
+    noDate = switch $ mconcat
+        [ long "no-date"
+        , help "do not include today’s date in GME (useful for testing)"
+        ]
 
     outFileParser :: Parser (Maybe FilePath)
     outFileParser = optional $ strArgument $ mconcat

@@ -1,0 +1,6 @@
+Usage: tttool lint GME
+  checks for errors in the file or in this program
+
+Available options:
+  GME                      GME file to read
+  -h,--help                Show this help text

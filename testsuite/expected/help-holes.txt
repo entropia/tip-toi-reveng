@@ -1,0 +1,6 @@
+Usage: tttool holes GME
+  lists all unknown parts of the file.
+
+Available options:
+  GME                      GME file to read
+  -h,--help                Show this help text

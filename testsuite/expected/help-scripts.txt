@@ -1,0 +1,7 @@
+Usage: tttool scripts [--raw] GME
+  prints the decoded scripts for each OID
+
+Available options:
+  --raw                    print the scripts in their raw form
+  GME                      GME file to read
+  -h,--help                Show this help text

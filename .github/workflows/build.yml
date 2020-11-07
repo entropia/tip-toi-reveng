@@ -1,0 +1,88 @@
+name: "Build and package"
+on:
+  pull_request:
+  push:
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+        - target: linux-exe
+          os: ubuntu-latest
+        - target: windows-exe
+          os: ubuntu-latest
+        - target: static-exe
+          os: ubuntu-latest
+        - target: osx-exe-bundle
+          os: macos-latest
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v12
+
+    - name: "Cachix: static-haskell-nix"
+      uses: cachix/cachix-action@v7
+      with:
+        name: static-haskell-nix
+
+    - name: "Cachix: tttool"
+      uses: cachix/cachix-action@v7
+      with:
+        name: tttool
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+
+    - run: nix-build nix -A ${{ matrix.target }}
+
+    # work around https://github.com/actions/upload-artifact/issues/92
+    - run: cp -RvL result upload
+    - uses: actions/upload-artifact@v2
+      with:
+        name: tttool (${{ matrix.target }})
+        path: upload/
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v12
+    - name: "Cachix: tttool"
+      uses: cachix/cachix-action@v7
+      with:
+        name: tttool
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+    - run: nix-build nix -A tests
+
+  check-cabal-freeze:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v12
+    - name: "Cachix: tttool"
+      uses: cachix/cachix-action@v7
+      with:
+        name: tttool
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+    - run: nix-build nix -A check-cabal-freeze
+
+  package:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v12
+    - name: "Cachix: tttool"
+      uses: cachix/cachix-action@v7
+      with:
+        name: tttool
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+
+    - run: nix-build nix -A release-zip
+
+    # work around https://github.com/actions/upload-artifact/issues/92
+    - run: cp -RvL result upload
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Release zip file
+        path: upload/*.zip

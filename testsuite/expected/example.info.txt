@@ -1,0 +1,14 @@
+Product ID: 42
+Raw XOR value: 0x00000039
+Magic XOR value: 0xAD
+Comment: An example GME file
+Date: 19700101
+Language: 
+Number of registers: 2
+Initial registers: [1,0]
+Initial sounds: [[1,2]]
+Scripts for OIDs from 8065 to 8067; 0/3 are disabled.
+Audio table entries: 6
+Binary tables entries: 0/0/0
+Single binary table entries: 0/0/0
+Checksum found 0x007AF393, calculated 0x007AF393
