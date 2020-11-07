@@ -120,17 +120,13 @@ Beispiel:
 Zweck:
   Gibt an, wo sich die Audiodateien befinden. Der Platzhalter ``%s`` wird dabei
   durch den in der YAML-Datei verwendeten Dateinamen ersetzt. Das Programm
-  sucht nach allen geeigneten Dateiendungen (``.wav``, ``.ogg``, ``.flac``, ``.mp3``). 
+  sucht nach allen geeigneten Dateiendungen (``.wav``, ``.ogg``, ``.flac``, ``.mp3``).
 
   Beispiel: Für den im ``welcome: hello`` angegebenen Begrüßungssound würde das
   ``tttool`` also die Datei ``Audio/hello.ogg`` einbinden.
   
-  Beginnt der Dateiname aller Deiner Sounddatein gleich, kannst du diese Prefix im media-path angeben.
-  Es werden dann alle Sounds (also auch die bei dem P()-Befehl angegebenen) mit diesem Anfang eingebunden. Wenn sich
-   mehrere Deiner tttool-Projekte einen Audio-Ordner teilen, kann das sehr viel übersichtlicher sein.
   
-  Beispiel: ``media-path: Audio/schatzsuche_%s`` würde bei einem ``welcome: hello`` die Datei ``Audio/schatzsuche_hello.ogg``
-   einbinden.
+  Beispiel 2: Wenn du ``media-path: Audio/Schatzsuche_%s`` verwendest, würde bei einem ``welcome: hello`` die Datei ``Audio/Schatzsuche_hello.ogg`` eingebunden werden.
   
 
 ``gme-lang``
@@ -514,4 +510,3 @@ Weitere Befehle
 * ``G()``
 * ``C``
 * ``?() ()``
-
