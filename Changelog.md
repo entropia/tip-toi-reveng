@@ -1,11 +1,12 @@
 # Changelog for tttool
 
-## 1.9.1 (UNRELEASED)
+## 1.10 (UNRELEASED)
 
  * The `set-language` command truncates long language names (like `ITALIAN`)
    automatically.
  * The `tttool assemble` command takes a `--no-date` argument, which is
    mostly useful for testing (to get deterministic output)
+ * The output of `tttool export` has the YAML fields in a more sensible order
 
 ## 1.9 (2019-12-05)
 
