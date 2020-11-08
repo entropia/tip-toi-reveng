@@ -40,20 +40,28 @@ let
     '';
   };
 
-  osx-bundler = pkgs: tttool: pkgs.runCommand "tttool-bundle" {
-    buildInputs = with pkgs; [ macdylibbundler ];
-  } ''
-    mkdir -p $out/bin/osx
-    cp ${tttool}/bin/tttool $out/bin/osx
-    chmod u+w $out/bin/osx/tttool
-    dylibbundler \
-      -b \
-      -x $out/bin/osx/tttool \
-      -d $out/bin/osx \
-      -p '@executable_path' \
-      -i /usr/lib/system \
-      -i ${pkgs.darwin.Libsystem}/lib
-  '';
+  osx-bundler = pkgs: tttool:
+   pkgs.stdenv.mkDerivation {
+      name = "tttool-bundle";
+
+      buildInputs = [ pkgs.macdylibbundler ];
+
+      builder = pkgs.writeScript "zip-tttool-release.sh" ''
+        source ${pkgs.stdenv}/setup
+
+        mkdir -p $out/bin/osx
+        cp ${tttool}/bin/tttool $out/bin/osx
+        chmod u+w $out/bin/osx/tttool
+        dylibbundler \
+          -b \
+          -x $out/bin/osx/tttool \
+          -d $out/bin/osx \
+          -p '@executable_path' \
+          -i /usr/lib/system \
+          -i ${pkgs.darwin.Libsystem}/lib
+      '';
+    };
+
 in
 
 let
