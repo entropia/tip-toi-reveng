@@ -43,16 +43,15 @@ let
       src = patchedSrc;
       compiler-nix-name = "ghc8102";
       index-state = "2020-11-08T00:00:00Z";
-      modules =
-      if pkgs.hostPlatform.isMusl
-      then
-        [{
-          packages.tttool.configureFlags = [ "--ghc-option=-static" ];
-          # terminfo is disabled on musl by haskell.nix, but still the flag
-          # is set in the package plan, so override this
-          packages.haskeline.flags.terminfo = false;
-        }]
-      else [];
+      modules = [{
+        packages.tttool.dontStrip = false;
+      }] ++
+      pkgs.lib.optional pkgs.hostPlatform.isMusl {
+        packages.tttool.configureFlags = [ "--ghc-option=-static" ];
+        # terminfo is disabled on musl by haskell.nix, but still the flag
+        # is set in the package plan, so override this
+        packages.haskeline.flags.terminfo = false;
+      };
     }).tttool.components.exes.tttool;
 
   osx-bundler = pkgs: tttool:
