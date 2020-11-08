@@ -33,6 +33,9 @@ fi
 
 mkdir output
 
+# clean input
+rm -f input/*.codes.yaml
+
 # Guard against changes to the help output
 $TTTOOL --help > "output/help.txt"
 
@@ -44,12 +47,10 @@ done
 # Simple example files
 $TTTOOL assemble --no-date "input/example.yaml" "output/example.gme"
 rm -f "input/example.yaml.codes"
-# should we compare binaries
-#xxd "output/example.gme" > "output/example.gme.xxd"
-#rm "output/example.gme"
 
 $TTTOOL info "output/example.gme" > "output/example.info.txt"
 $TTTOOL rewrite "output/example.gme" "output/example.rewritten.gme"
+$TTTOOL export "output/example.gme" "output/example.rexport.yaml"
 
 mkdir output/downloaded
 for gme in downloaded/*.gme; do
@@ -64,3 +65,6 @@ done
 # normalize test output
 find "output" -name \*.txt -print0 |
   xargs -0 -r sed -i -e 's/tttool-\([0-9]\+\.\)*[0-9]\+/tttool-VERSION/'
+
+# clean input
+rm -f input/*.codes.yaml
