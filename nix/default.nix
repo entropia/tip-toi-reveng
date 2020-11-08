@@ -125,7 +125,6 @@ in rec {
       };
 
       buildPhase = ''
-        source ${pkgs.stdenv}/setup
         make html
         make latexpdf
         rm -f _build/html/.buildinfo
