@@ -1,5 +1,5 @@
 let
-  sources = import ./sources.nix;
+  sources = import nix/sources.nix;
 
   # Fetch the latest haskell.nix and import its default.nix
   haskellNix = import sources.haskellNix {};
@@ -22,7 +22,7 @@ let
 
   patchedSrc = pkgs.applyPatches {
     name = "tttool-src";
-    src = sourceByRegex ../. [
+    src = sourceByRegex ./. [
       "cabal.project"
       "src/"
       "src/.*/"
@@ -86,7 +86,7 @@ in rec {
 
   macdylibbundler = pkgs.macdylibbundler;
 
-  static-files = sourceByRegex ../. [
+  static-files = sourceByRegex ./. [
     "README.md"
     "Changelog.md"
     "oid-decoder.html"
@@ -100,7 +100,7 @@ in rec {
     "Audio/digits/.*\.ogg"
   ];
 
-  contrib = ../contrib;
+  contrib = ./contrib;
 
   book =
     let
@@ -121,7 +121,7 @@ in rec {
       buildInputs = [ sphinx-env tex ];
 
       src = builtins.path {
-        path = ../book;
+        path = ./book;
         name = "book";
         filter = path: type:
           baseNameOf path != "_build" &&
@@ -212,14 +212,14 @@ in rec {
     outputHash =  "sha256:01byby8fmqmxfg5cb5ss0pmhvf2av65sil9cqbjswky0a1mn7kp5";
   } ''
     mkdir -p $out
-    bash ${../testsuite/download.sh} $out
+    bash ${./testsuite/download.sh} $out
   '';
 
   tests = pkgs.stdenv.mkDerivation {
     name = "tttool-tests";
     phases = "unpackPhase checkPhase installPhase";
     src = builtins.path {
-      path = ../testsuite;
+      path = ./testsuite;
       filter = path: type: baseNameOf path != "output";
     };
     doCheck = true;
@@ -246,7 +246,7 @@ in rec {
     '';
     installPhase = ''
       mkdir -p $out
-      echo "-- Run nix-shell nix -A check-cabal-freeze to update this file" > $out/cabal.project.freeze
+      echo "-- Run nix-shell -A check-cabal-freeze to update this file" > $out/cabal.project.freeze
       cat cabal.project.freeze >> $out/cabal.project.freeze
     '';
   };
@@ -254,8 +254,8 @@ in rec {
   check-cabal-freeze = pkgs.runCommandNoCC "check-cabal-freeze" {
       nativeBuildInputs = [ pkgs.diffutils ];
       expected = cabal-freeze + /cabal.project.freeze;
-      actual = ../cabal.project.freeze;
-      cmd = "nix-shell nix -A check-cabal-freeze";
+      actual = ./cabal.project.freeze;
+      cmd = "nix-shell -A check-cabal-freeze";
       shellHook = ''
         dest=${toString ../cabal.project.freeze}
         rm -f $dest
@@ -265,7 +265,7 @@ in rec {
       '';
     } ''
       diff -r -U 3 $actual $expected ||
-        { echo "To update, please run"; echo "nix-shell nix -A check-cabal-freeze"; exit 1; }
+        { echo "To update, please run"; echo "nix-shell -A check-cabal-freeze"; exit 1; }
       touch $out
     '';
 }
