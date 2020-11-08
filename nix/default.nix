@@ -41,7 +41,7 @@ let
   };
 
   osx-bundler = pkgs: tttool: pkgs.runCommandNoCC "tttool-bundle" {
-    buildInputs = [ pkgs.macdylibbundler ];
+    buildInputs = with pkgs; [ macdylibbundler darwin.cctools ];
   } ''
     mkdir -p $out/bin/osx
     cp ${tttool}/bin/tttool $out/bin/osx
