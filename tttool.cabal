@@ -21,7 +21,6 @@ cabal-version:       >=1.10
 executable tttool
   main-is:             tttool.hs
   other-modules:
-    BakedVector,
     Constants,
     Cypher,
     GMEParser,
@@ -67,7 +66,6 @@ executable tttool
   build-depends: random >= 1.0 && < 1.2
   build-depends: split == 0.2.*
   build-depends: spool == 0.1.*
-  build-depends: template-haskell >= 2.7 && < 2.15
   build-depends: text == 1.2.*
   build-depends: time >= 1.5 && < 1.9
   build-depends: vector >= 0.10 && < 0.13
