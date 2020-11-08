@@ -31,7 +31,7 @@ let
   tttool = pkgs:
     (pkgs.haskell-nix.cabalProject {
       src = patchedSrc;
-      compiler-nix-name = "ghc8102";
+      compiler-nix-name = "ghc884";
       index-state = "2020-11-08T00:00:00Z";
       modules =
       if pkgs.hostPlatform.isMusl
@@ -43,6 +43,7 @@ let
           packages.tttool.configureFlags = [
              "--disable-executable-dynamic"
              "--disable-shared"
+             "--ghc-option=-fPIC"
              "--ghc-option=-optl=-pthread"
              "--ghc-option=-optl=-static"
              "--ghc-option=-optl=-L${pkgs.gmp6.override { withStatic = true; }}/lib"
