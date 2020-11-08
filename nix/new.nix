@@ -4,7 +4,7 @@ let
 
   # windows crossbuilding with ghc-8.10 needs at least 20.09.
   # A peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix can help
-  nixpkgsSrc = haskellNix.sources.nixpkgs-2003;
+  nixpkgsSrc = haskellNix.sources.nixpkgs-2009;
   nixpkgsArgs = haskellNix.nixpkgsArgs;
   pkgs = import nixpkgsSrc nixpkgsArgs;
 
@@ -31,7 +31,7 @@ let
   tttool = pkgs:
     (pkgs.haskell-nix.cabalProject {
       src = patchedSrc;
-      compiler-nix-name = "ghc884";
+      compiler-nix-name = "ghc8102";
       index-state = "2020-11-08T00:00:00Z";
       modules =
       if pkgs.hostPlatform.isMusl
