@@ -89,6 +89,7 @@ jobs:
         - linux
         - windows
         - static
+      fail-fast: false
     steps:
     - uses: actions/checkout@v2
     - uses: cachix/install-nix-action@v12
