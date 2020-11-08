@@ -2,7 +2,6 @@
 module Language  where
 
 import Data.Aeson.Types
-import Control.Applicative ((<$>))
 
 newtype Language = Language String
 

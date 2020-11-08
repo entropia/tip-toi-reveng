@@ -7,11 +7,8 @@ import qualified Data.ByteString.Lazy.Char8 as BC
 import qualified Data.Binary.Get as G
 import Text.Printf
 import Data.List
-import Control.Applicative (Applicative, (<*>))
 import Data.Maybe
 import Control.Monad
-import Control.Monad.Fail (MonadFail)
-import qualified Control.Monad.Fail 
 import Control.Monad.Writer.Strict
 import Control.Monad.State.Strict
 import Control.Monad.Reader
