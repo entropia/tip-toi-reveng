@@ -43,12 +43,13 @@ let
           # is set in the package plan, so override this
           packages.haskeline.flags.terminfo = false;
           packages.tttool.configureFlags = [
-             "--disable-executable-dynamic"
-             "--disable-shared"
+             #"--disable-executable-dynamic"
+             #"--disable-shared"
+             #"--ghc-option=-v"
              "--ghc-option=-static"
-             "--ghc-option=-optl=-pthread"
-             "--ghc-option=-optl=-static"
-             "--ghc-option=-optl=-L${pkgs.gmp6.override { withStatic = true; }}/lib"
+             #"--ghc-option=-optl=-static"
+             #"--ghc-option=-optl=-pthread"
+             #"--ghc-option=-optl=-L${pkgs.gmp6.override { withStatic = true; }}/lib"
              #"--ghc-option=-optl=-L${pkgs.zlib.static}/lib"
            ];
         }]
