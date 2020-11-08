@@ -250,11 +250,12 @@ in rec {
     buildPhase = ''
       mkdir .cabal
       touch .cabal/config
+      rm cabal.project # so that cabal new-freeze does try to use HPDF via git
       HOME=$PWD cabal new-freeze --offline --enable-tests || true
     '';
     installPhase = ''
       mkdir -p $out
-      echo "-- Run nix-shell ../nix -A check-cabal-freeze to update this file" > $out/cabal.project.freeze
+      echo "-- Run nix-shell nix -A check-cabal-freeze to update this file" > $out/cabal.project.freeze
       cat cabal.project.freeze >> $out/cabal.project.freeze
     '';
   };
@@ -273,7 +274,7 @@ in rec {
       '';
     } ''
       diff -r -U 3 $actual $expected ||
-        { echo "To update, please run"; echo "nix-shell . -A check-cabal-freeze"; exit 1; }
+        { echo "To update, please run"; echo "nix-shell nix -A check-cabal-freeze"; exit 1; }
       touch $out
     '';
 }
