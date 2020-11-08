@@ -1,22 +1,13 @@
 let
   sources = import ./sources.nix;
 
-  # my overlay
-  localOverlay = self: super:
-    {
-      macdylibbundler = import ./macdylibbundler.nix { inherit (self) stdenv fetchFromGitHub; };
-    };
-
   # Fetch the latest haskell.nix and import its default.nix
   haskellNix = import sources.haskellNix {};
 
   # windows crossbuilding with ghc-8.10 needs at least 20.09.
   # A peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix can help
   nixpkgsSrc = haskellNix.sources.nixpkgs-2009;
-  nixpkgsArgs =
-    haskellNix.nixpkgsArgs // {
-      overlays = haskellNix.nixpkgsArgs.overlays ++ [ localOverlay ];
-    };
+  nixpkgsArgs = haskellNix.nixpkgsArgs;
 
   pkgs = import nixpkgsSrc nixpkgsArgs;
   pkgs-osx = import nixpkgsSrc (nixpkgsArgs // { system = "x86_64-darwin"; });
@@ -29,9 +20,6 @@ let
       ( type == "directory"  && match (relPath + "/") != null
       || match relPath != null)) src;
 
-  # Remove the with-compiler flag from cabal.project
-  # We do that to help users that want to build with plain cabal
-  # but it confuses `cabal new-configure` when run by nix
   patchedSrc = pkgs.applyPatches {
     name = "tttool-src";
     src = sourceByRegex ../. [
@@ -42,6 +30,9 @@ let
       ".*.cabal"
       "LICENSE"
       ];
+    # Remove the with-compiler flag from cabal.project
+    # We include that to help users that want to build with plain cabal but it
+    # confuses haskell.nix, so remove it here
     postPatch = ''
       sed -i -e 's/with-compiler/-- with-compiler/' cabal.project
     '';
