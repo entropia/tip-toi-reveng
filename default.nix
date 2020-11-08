@@ -128,7 +128,6 @@ in rec {
       };
 
       buildPhase = ''
-        source ${pkgs.stdenv}/setup
         make html
         make latexpdf
         rm -f _build/html/.buildinfo
@@ -145,65 +144,53 @@ in rec {
   os-switch = pkgs.writeScript "tttool-os-switch.sh" ''
     #!/usr/bin/env bash
     case "$OSTYPE" in
-      linux*)   exec "$(dirname "$BASH_SOURCE")/linux/tttool" "$@" ;;
-      darwin*)  exec "$(dirname "$BASH_SOURCE")/osx/tttool" "$@" ;;
-      msys*)    exec "$(dirname "$BASH_SOURCE")/tttool.exe" "$@" ;;
-      cygwin*)  exec "$(dirname "$BASH_SOURCE")/tttool.exe" "$@" ;;
+      linux*)   exec "$(dirname "''${BASH_SOURCE[0]}")/linux/tttool" "$@" ;;
+      darwin*)  exec "$(dirname "''${BASH_SOURCE[0]}")/osx/tttool" "$@" ;;
+      msys*)    exec "$(dirname "''${BASH_SOURCE[0]}")/tttool.exe" "$@" ;;
+      cygwin*)  exec "$(dirname "''${BASH_SOURCE[0]}")/tttool.exe" "$@" ;;
       *)        echo "unsupported operating system $OSTYPE" ;;
     esac
   '';
 
-  release = pkgs.stdenv.mkDerivation {
-    name = "tttool-release";
-
+  release = pkgs.runCommandNoCC "tttool-release" {
     buildInputs = [ pkgs.perl ];
+  } ''
+    # check version
+    version=$(${static-exe}/bin/tttool --help|perl -ne 'print $1 if /tttool-(.*) -- The swiss army knife/')
+    doc_version=$(perl -ne "print \$1 if /VERSION: '(.*)'/" ${book}/book.html/_static/documentation_options.js)
 
-    builder = pkgs.writeScript "create-tttool-release.sh" ''
-      source ${pkgs.stdenv}/setup
+    if [ "$version" != "$doc_version" ]
+    then
+      echo "Mismatch between tttool version \"$version\" and book version \"$doc_version\""
+      exit 1
+    fi
 
-      # check version
-      version=$(${static-exe}/bin/tttool --help|perl -ne 'print $1 if /tttool-(.*) -- The swiss army knife/')
-      doc_version=$(perl -ne "print \$1 if /VERSION: '(.*)'/" ${book}/book.html/_static/documentation_options.js)
+    mkdir -p $out/
+    cp -vsr ${static-files}/* $out
+    mkdir $out/linux
+    cp -vs ${static-exe}/bin/tttool $out/linux
+    cp -vs ${windows-exe}/bin/tttool.exe $out/
+    mkdir $out/osx
+    cp -vsr ${osx-exe-bundle}/bin/osx/* $out/osx
+    cp -vs ${os-switch} $out/tttool
+    mkdir $out/contrib
+    cp -vsr ${contrib}/* $out/contrib/
+    cp -vsr ${book}/* $out
+  '';
 
-      if [ "$version" != "$doc_version" ]
-      then
-        echo "Mismatch between tttool version \"$version\" and book version \"$doc_version\""
-        exit 1
-      fi
-
-      mkdir -p $out/
-      cp -vsr ${static-files}/* $out
-      mkdir $out/linux
-      cp -vs ${static-exe}/bin/tttool $out/linux
-      cp -vs ${windows-exe}/bin/tttool.exe $out/
-      mkdir $out/osx
-      cp -vsr ${osx-exe-bundle}/bin/osx/* $out/osx
-      cp -vs ${os-switch} $out/tttool
-      mkdir $out/contrib
-      cp -vsr ${contrib}/* $out/contrib/
-      cp -vsr ${book}/* $out
-    '';
-  };
-
-  release-zip = pkgs.stdenv.mkDerivation {
-    name = "tttool-release.zip";
-
-    buildInputs = with pkgs; [ perl zip bash ];
-
-    builder = pkgs.writeScript "zip-tttool-release.sh" ''
-      source ${pkgs.stdenv}/setup
-
-      version=$(bash ${release}/tttool --help|perl -ne 'print $1 if /tttool-(.*) -- The swiss army knife/')
-      base="tttool-$version"
-      echo $version
-      mkdir -p $out/$base
-      cd $out
-      cp -r ${release}/* $base/
-      chmod u+w -R $base
-      zip -r $base.zip $base
-      rm -rf $base
-    '';
-  };
+  release-zip = pkgs.runCommandNoCC "tttool-release.zip" {
+    buildInputs = with pkgs; [ perl zip ];
+  } ''
+    version=$(bash ${release}/tttool --help|perl -ne 'print $1 if /tttool-(.*) -- The swiss army knife/')
+    base="tttool-$version"
+    echo "Zipping tttool version $version"
+    mkdir -p $out/$base
+    cd $out
+    cp -r ${release}/* $base/
+    chmod u+w -R $base
+    zip -r $base.zip $base
+    rm -rf $base
+  '';
 
   gme-downloads = pkgs.runCommandNoCC "gme-downloads" {
     buildInputs = with pkgs; [ wget ];

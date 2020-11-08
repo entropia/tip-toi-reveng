@@ -75,9 +75,8 @@ jobs:
 
     - run: nix-build -A release-zip
 
-    # work around https://github.com/actions/upload-artifact/issues/92
-    - run: cp -RvL result upload
+    - run: unzip -d upload ./result/*.zip
     - uses: actions/upload-artifact@v2
       with:
         name: Release zip file
-        path: upload/*.zip
+        path: upload
