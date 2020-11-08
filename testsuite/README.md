@@ -19,8 +19,8 @@ to automatically rebuild.
 
 To run the test suite with nix, run
 
-    nix ../nix -A tests
+    nix .. -A tests
 
 If the downloaded files changed, change the `outputHash` in
-`../nix/default.nix` a bit, run the above, and then copy the new hash from the
+`../default.nix` a bit, run the above, and then copy the new hash from the
 error message into the `.nix` file.

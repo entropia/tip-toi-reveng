@@ -19,7 +19,7 @@ Building from source
 
  4. Build `tttool`:
 
-        nix-build nix -A linux-exe
+        nix-build -A linux-exe
 
     The first time this can take a long time. Run it over night.
 
@@ -44,6 +44,6 @@ Making a release
    cache.
 3. Run
 
-       nix-build nix -A release-zip
+       nix-build -A release-zip
 
 4. Upload `result/tttool-n.m.zip`.

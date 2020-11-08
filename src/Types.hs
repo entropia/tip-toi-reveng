@@ -7,7 +7,6 @@ where
 import qualified Data.ByteString.Lazy as B
 import Data.Word
 import qualified Data.Map as M
-import Data.Foldable (Foldable)
 
 -- Main data types
 
@@ -23,7 +22,7 @@ type ResReg = Word16
 data TVal r
     = Reg r
     | Const Word16
-    deriving (Eq, Functor, Foldable)
+    deriving (Eq, Show, Functor, Foldable)
 
 data Conditional r = Cond (TVal r) CondOp (TVal r)
     deriving (Eq, Functor, Foldable)

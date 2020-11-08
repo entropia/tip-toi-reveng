@@ -1,44 +1,58 @@
-let localLib = import ./lib.nix; in
-
 let
-  mk-nix-tools = pkgs:
-    let
-      # haskellLib = pkgs.fetchFromGitHub {
-      #   owner  = "input-output-hk";
-      #   repo   = "haskell.nix";
-      #   rev    = "8ee6fcfba7bb220e8d6e19106ad2ae2c25ecdf43";
-      #   sha256 = "1ndpxyairppcr3mnb4zi7gsvdqmncp09fgxdk8cbrh7ccb1r30kz";
-      #   fetchSubmodules = false;
-      #   name   = "haskell-lib-source";
-      # };
-      # haskell = import haskellLib { inherit pkgs; };
-      haskell = localLib.nix-tools.haskell { inherit pkgs; };
-      iohk-module = localLib.nix-tools.iohk-module;
-      iohk-extras = localLib.nix-tools.iohk-extras;
-      nix-tools = import ./pkgs.nix { inherit pkgs haskell iohk-module iohk-extras; };
-    in
-    nix-tools;
+  sources = import nix/sources.nix;
 
-  tttool-exe = pkgs:
-    (mk-nix-tools pkgs).tttool.components.exes.tttool.overrideAttrs(old: {
-      postInstall = (old.postInstall or "") + ''
-        # delete docs, not interesting here
-        rm -vrf $out/share
-      '';
-    });
+  # Fetch the latest haskell.nix and import its default.nix
+  haskellNix = import sources.haskellNix {};
 
-  playmus-exe = pkgs: pkgs.stdenv.mkDerivation {
-    name = "playmus";
-    src = ../playmus;
-    buildInputs = [ pkgs.SDL pkgs.SDL_mixer ];
-    builder = pkgs.writeScript "compile-playmus" ''
-      source ${pkgs.stdenv}/setup
-      mkdir -p $out/bin
-      find
-      pwd
-      gcc $src/playmus.c -o $out/bin/playmus `sdl-config --cflags --libs` -lSDL_mixer -static -optl=-static
+  # windows crossbuilding with ghc-8.10 needs at least 20.09.
+  # A peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix can help
+  nixpkgsSrc = haskellNix.sources.nixpkgs-2009;
+  nixpkgsArgs = haskellNix.nixpkgsArgs;
+
+  pkgs = import nixpkgsSrc nixpkgsArgs;
+  pkgs-osx = import nixpkgsSrc (nixpkgsArgs // { system = "x86_64-darwin"; });
+
+  # a nicer filterSource
+  sourceByRegex =
+    src: regexes: builtins.filterSource (path: type:
+      let relPath = pkgs.lib.removePrefix (toString src + "/") (toString path); in
+      let match = builtins.match (pkgs.lib.strings.concatStringsSep "|" regexes); in
+      ( type == "directory"  && match (relPath + "/") != null
+      || match relPath != null)) src;
+
+  patchedSrc = pkgs.applyPatches {
+    name = "tttool-src";
+    src = sourceByRegex ./. [
+      "cabal.project"
+      "src/"
+      "src/.*/"
+      "src/.*.hs"
+      ".*.cabal"
+      "LICENSE"
+      ];
+    # Remove the with-compiler flag from cabal.project
+    # We include that to help users that want to build with plain cabal but it
+    # confuses haskell.nix, so remove it here
+    postPatch = ''
+      sed -i -e 's/with-compiler/-- with-compiler/' cabal.project
     '';
   };
+
+  tttool-exe = pkgs:
+    (pkgs.haskell-nix.cabalProject {
+      src = patchedSrc;
+      compiler-nix-name = "ghc8102";
+      index-state = "2020-11-08T00:00:00Z";
+      modules = [{
+        packages.tttool.dontStrip = false;
+      }] ++
+      pkgs.lib.optional pkgs.hostPlatform.isMusl {
+        packages.tttool.configureFlags = [ "--ghc-option=-static" ];
+        # terminfo is disabled on musl by haskell.nix, but still the flag
+        # is set in the package plan, so override this
+        packages.haskeline.flags.terminfo = false;
+      };
+    }).tttool.components.exes.tttool;
 
   osx-bundler = pkgs: tttool:
    pkgs.stdenv.mkDerivation {
@@ -46,7 +60,7 @@ let
 
       buildInputs = [ pkgs.macdylibbundler ];
 
-      builder = pkgs.writeScript "zip-tttool-release.sh" ''
+      builder = pkgs.writeScript "tttool-osx-bundler.sh" ''
         source ${pkgs.stdenv}/setup
 
         mkdir -p $out/bin/osx
@@ -62,35 +76,16 @@ let
       '';
     };
 
-in
-
-let
-  overlay = self: super:
-    {
-      macdylibbundler = import ./macdylibbundler.nix { inherit (self) stdenv fetchFromGitHub; };
-    };
-  getPkgs = opts: localLib.iohkNix.getPkgs (opts // { extraOverlays = [ overlay ];});
-
-  pkgs         = getPkgs {};
-  pkgs-static  = getPkgs { crossSystem = localLib.systems.examples.musl64; };
-  pkgs-windows = getPkgs { crossSystem = localLib.systems.examples.mingwW64; };
-  pkgs-osx     = getPkgs { system = "x86_64-darwin"; };
-
-  sourceByRegex = import ./source-by-regex.nix pkgs;
-
 in rec {
-  linux-exe = tttool-exe pkgs;
-  windows-exe = tttool-exe pkgs-windows;
-  static-exe = tttool-exe pkgs-static;
-  osx-exe = tttool-exe pkgs-osx;
+  linux-exe      = tttool-exe pkgs;
+  windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64;
+  static-exe     = tttool-exe pkgs.pkgsCross.musl64;
+  osx-exe        = tttool-exe pkgs-osx;
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
 
   macdylibbundler = pkgs.macdylibbundler;
 
-  # playmus-static = playmus-exe pkgs-static;
-  # playmus-windows = playmus-exe pkgs-windows;
-
-  static-files = sourceByRegex ../. [
+  static-files = sourceByRegex ./. [
     "README.md"
     "Changelog.md"
     "oid-decoder.html"
@@ -104,7 +99,7 @@ in rec {
     "Audio/digits/.*\.ogg"
   ];
 
-  contrib = ../contrib;
+  contrib = ./contrib;
 
   book =
     let
@@ -125,7 +120,7 @@ in rec {
       buildInputs = [ sphinx-env tex ];
 
       src = builtins.path {
-        path = ../book;
+        path = ./book;
         name = "book";
         filter = path: type:
           baseNameOf path != "_build" &&
@@ -203,14 +198,14 @@ in rec {
     outputHash =  "sha256:01byby8fmqmxfg5cb5ss0pmhvf2av65sil9cqbjswky0a1mn7kp5";
   } ''
     mkdir -p $out
-    bash ${../testsuite/download.sh} $out
+    bash ${./testsuite/download.sh} $out
   '';
 
   tests = pkgs.stdenv.mkDerivation {
     name = "tttool-tests";
     phases = "unpackPhase checkPhase installPhase";
     src = builtins.path {
-      path = ../testsuite;
+      path = ./testsuite;
       filter = path: type: baseNameOf path != "output";
     };
     doCheck = true;
@@ -232,11 +227,12 @@ in rec {
     buildPhase = ''
       mkdir .cabal
       touch .cabal/config
+      rm cabal.project # so that cabal new-freeze does try to use HPDF via git
       HOME=$PWD cabal new-freeze --offline --enable-tests || true
     '';
     installPhase = ''
       mkdir -p $out
-      echo "-- Run nix-shell ../nix -A check-cabal-freeze to update this file" > $out/cabal.project.freeze
+      echo "-- Run nix-shell -A check-cabal-freeze to update this file" > $out/cabal.project.freeze
       cat cabal.project.freeze >> $out/cabal.project.freeze
     '';
   };
@@ -244,10 +240,10 @@ in rec {
   check-cabal-freeze = pkgs.runCommandNoCC "check-cabal-freeze" {
       nativeBuildInputs = [ pkgs.diffutils ];
       expected = cabal-freeze + /cabal.project.freeze;
-      actual = ../cabal.project.freeze;
-      cmd = "nix-shell nix -A check-cabal-freeze";
+      actual = ./cabal.project.freeze;
+      cmd = "nix-shell -A check-cabal-freeze";
       shellHook = ''
-        dest=${toString ../cabal.project.freeze}
+        dest=${toString ./cabal.project.freeze}
         rm -f $dest
         cp -v $expected $dest
         chmod u-w $dest
@@ -255,11 +251,7 @@ in rec {
       '';
     } ''
       diff -r -U 3 $actual $expected ||
-        { echo "To update, please run"; echo "nix-shell . -A check-cabal-freeze"; exit 1; }
+        { echo "To update, please run"; echo "nix-shell -A check-cabal-freeze"; exit 1; }
       touch $out
     '';
-
- nix-tools = mk-nix-tools pkgs;
- haskell = localLib.nix-tools.haskell { inherit pkgs; };
-
 }

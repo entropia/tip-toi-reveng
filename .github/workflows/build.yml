@@ -27,7 +27,7 @@ jobs:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
 
-    - run: nix-build nix -A ${{ matrix.target }}
+    - run: nix-build -A ${{ matrix.target }}
 
     # work around https://github.com/actions/upload-artifact/issues/92
     - run: cp -RvL result upload
@@ -47,7 +47,7 @@ jobs:
       with:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
-    - run: nix-build nix -A tests
+    - run: nix-build -A tests
 
   check-cabal-freeze:
     runs-on: ubuntu-latest
@@ -59,7 +59,7 @@ jobs:
       with:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
-    - run: nix-build nix -A check-cabal-freeze
+    - run: nix-build -A check-cabal-freeze
 
   package:
     runs-on: ubuntu-latest
@@ -73,7 +73,7 @@ jobs:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
 
-    - run: nix-build nix -A release-zip
+    - run: nix-build -A release-zip
 
     - run: unzip -d upload ./result/*.zip
     - uses: actions/upload-artifact@v2
