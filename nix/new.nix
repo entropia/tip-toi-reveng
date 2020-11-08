@@ -22,11 +22,13 @@ let
   # Remove the with-comiler flag from cabal.project
   # We do that to help users that want to build with plain cabal
   # but it confuses `cabal new-configure` when run by nix
-  patchedSrc = pkgs.runCommandNoCC "tttool-src" {} ''
-    cp -r ${src} $out
-    chmod -R u+w $out
-    sed -i -e 's/with-compiler/-- with-compiler/' $out/cabal.project
-  '';
+  patchedSrc = pkgs.applyPatches {
+    name = "tttool-src";
+    inherit src;
+    postPatch = ''
+      sed -i -e 's/with-compiler/-- with-compiler/' cabal.project
+    '';
+  };
 
   tttool = pkgs:
     (pkgs.haskell-nix.cabalProject {
