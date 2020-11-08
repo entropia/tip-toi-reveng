@@ -2,9 +2,9 @@ let
   # Fetch the latest haskell.nix and import its default.nix
   haskellNix = import (builtins.fetchTarball "https://github.com/input-output-hk/haskell.nix/archive/c00cc0cfedf03ee3f21de420882189adbb0801d8.tar.gz") {};
 
-# windows crossbuilding needs at least 20.09.
-# A peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix can help
-  nixpkgsSrc = haskellNix.sources.nixpkgs-2009;
+  # windows crossbuilding with ghc-8.10 needs at least 20.09.
+  # A peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix can help
+  nixpkgsSrc = haskellNix.sources.nixpkgs-2003;
   nixpkgsArgs = haskellNix.nixpkgsArgs;
   pkgs = import nixpkgsSrc nixpkgsArgs;
 
@@ -43,7 +43,7 @@ let
           packages.tttool.configureFlags = [
              "--disable-executable-dynamic"
              "--disable-shared"
-             "--ghc-option=-fPIC"
+             "--ghc-option=-static"
              "--ghc-option=-optl=-pthread"
              "--ghc-option=-optl=-static"
              "--ghc-option=-optl=-L${pkgs.gmp6.override { withStatic = true; }}/lib"
