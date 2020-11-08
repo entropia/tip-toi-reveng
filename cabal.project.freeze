@@ -1,4 +1,4 @@
--- Run nix-shell nix -A check-cabal-freeze to update this file
+-- Run nix-shell -A check-cabal-freeze to update this file
 constraints: any.HPDF ==1.4.10,
              any.JuicyPixels ==3.3.5,
              any.aeson ==1.4.7.1,

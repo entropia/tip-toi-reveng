@@ -257,7 +257,7 @@ in rec {
       actual = ./cabal.project.freeze;
       cmd = "nix-shell -A check-cabal-freeze";
       shellHook = ''
-        dest=${toString ../cabal.project.freeze}
+        dest=${toString ./cabal.project.freeze}
         rm -f $dest
         cp -v $expected $dest
         chmod u-w $dest
