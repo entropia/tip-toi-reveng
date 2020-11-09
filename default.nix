@@ -2,7 +2,6 @@
 let
   sources = import nix/sources.nix;
 
-
   # patch haskell.nix to work around
   # https://github.com/input-output-hk/haskell.nix/issues/917
   haskellNixSrc =
@@ -105,8 +104,6 @@ in rec {
   osx-exe        = tttool-exe pkgs-osx
      "0rnn4q0gx670nzb5zp7xpj7kmgqjmxcj2zjl9jqqz8czzlbgzmkh";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
-
-  macdylibbundler = pkgs.macdylibbundler;
 
   static-files = sourceByRegex ./. [
     "README.md"
@@ -250,7 +247,7 @@ in rec {
     buildPhase = ''
       mkdir .cabal
       touch .cabal/config
-      rm cabal.project # so that cabal new-freeze does try to use HPDF via git
+      rm cabal.project # so that cabal new-freeze does not try to use HPDF via git
       HOME=$PWD cabal new-freeze --offline --enable-tests || true
     '';
     installPhase = ''
