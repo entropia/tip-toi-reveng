@@ -1,8 +1,22 @@
+{ checkMaterialization ? false }:
 let
   sources = import nix/sources.nix;
 
+
+  # patch haskell.nix to work around
+  # https://github.com/input-output-hk/haskell.nix/issues/917
+  haskellNixSrc =
+    let prepkgs = import sources.nixpkgs {};
+    in prepkgs.applyPatches {
+      name = "haskell.nix-patched";
+      src = sources.haskellNix;
+      postPatch = ''
+        sed -i -e s/pkgs.evalPackages.fetchgit/pkgs.fetchgit/ lib/cabal-project-parser.nix
+      '';
+    };
+
   # Fetch the latest haskell.nix and import its default.nix
-  haskellNix = import sources.haskellNix {};
+  haskellNix = import haskellNixSrc {};
 
   # windows crossbuilding with ghc-8.10 needs at least 20.09.
   # A peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix can help
@@ -20,30 +34,35 @@ let
       ( type == "directory"  && match (relPath + "/") != null
       || match relPath != null)) src;
 
-  patchedSrc = pkgs.applyPatches {
-    name = "tttool-src";
-    src = sourceByRegex ./. [
-      "cabal.project"
-      "src/"
-      "src/.*/"
-      "src/.*.hs"
-      ".*.cabal"
-      "LICENSE"
-      ];
-    # Remove the with-compiler flag from cabal.project
-    # We include that to help users that want to build with plain cabal but it
-    # confuses haskell.nix, so remove it here
-    postPatch = ''
-      sed -i -e 's/with-compiler/-- with-compiler/' cabal.project
-    '';
-  };
-
-  tttool-exe = pkgs:
+  tttool-exe = pkgs: sha256:
     (pkgs.haskell-nix.cabalProject {
-      src = patchedSrc;
+      src = sourceByRegex ./. [
+          "cabal.project"
+          "src/"
+          "src/.*/"
+          "src/.*.hs"
+          ".*.cabal"
+          "LICENSE"
+        ];
+
+      # Pinning the input to the constraint solver
       compiler-nix-name = "ghc8102";
       index-state = "2020-11-08T00:00:00Z";
+      plan-sha256 = sha256;
+      inherit checkMaterialization;
+
+      # This overrides the `with-compiler` in cabal.project
+      # haskell.nix does pass `--with-ghc=…`, but not `-w`, so cabal will
+      # still read with-compiler from the project, but there is no way to use
+      # an equivalent of `--with-ghc` in `cabal.project`
+      # Also see https://github.com/input-output-hk/haskell.nix/issues/916
+      cabalProject = builtins.replaceStrings
+        [ "with-compiler" ]
+        [ "-- with-compiler" ]
+        (builtins.readFile ./cabal.project);
+
       modules = [{
+        # smaller files
         packages.tttool.dontStrip = false;
       }] ++
       pkgs.lib.optional pkgs.hostPlatform.isMusl {
@@ -77,10 +96,14 @@ let
     };
 
 in rec {
-  linux-exe      = tttool-exe pkgs;
-  windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64;
-  static-exe     = tttool-exe pkgs.pkgsCross.musl64;
-  osx-exe        = tttool-exe pkgs-osx;
+  linux-exe      = tttool-exe pkgs
+     "0rnn4q0gx670nzb5zp7xpj7kmgqjmxcj2zjl9jqqz8czzlbgzmkh";
+  windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
+     "01js5rp6y29m7aif6bsb0qplkh2az0l15nkrrb6m3rz7jrrbcckh";
+  static-exe     = tttool-exe pkgs.pkgsCross.musl64
+     "0gbkyg8max4mhzzsm9yihsp8n73zw86m3pwvlw8170c75p3vbadv";
+  osx-exe        = tttool-exe pkgs-osx
+     "0rnn4q0gx670nzb5zp7xpj7kmgqjmxcj2zjl9jqqz8czzlbgzmkh";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
 
   macdylibbundler = pkgs.macdylibbundler;

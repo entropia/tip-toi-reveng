@@ -20,29 +20,28 @@ cabal-version:       >=1.10
 
 executable tttool
   main-is:             tttool.hs
-  other-modules:
-    Constants,
-    Cypher,
-    GMEParser,
-    GMERun,
-    GMEWriter,
-    Lint,
-    Language,
-    OidCode,
-    OidTable,
-    OidTableSVG,
-    OneLineParser,
-    PlaySound,
-    PrettyPrint,
-    RangeParser,
-    TipToiYaml,
-    TipToiYamlAux,
-    TextToSpeech,
-    KnownCodes,
-    Types,
-    Commands,
-    Utils,
-    Paths_tttool
+  other-modules: Commands
+  other-modules: Constants
+  other-modules: Cypher
+  other-modules: GMEParser
+  other-modules: GMERun
+  other-modules: GMEWriter
+  other-modules: KnownCodes
+  other-modules: Language
+  other-modules: Lint
+  other-modules: OidCode
+  other-modules: OidTable
+  other-modules: OidTableSVG
+  other-modules: OneLineParser
+  other-modules: Paths_tttool
+  other-modules: PlaySound
+  other-modules: PrettyPrint
+  other-modules: RangeParser
+  other-modules: TextToSpeech
+  other-modules: TipToiYaml
+  other-modules: TipToiYamlAux
+  other-modules: Types
+  other-modules: Utils
 
   build-depends: aeson >= 0.10 && < 1.5
   build-depends: base >= 4.11 && < 4.15

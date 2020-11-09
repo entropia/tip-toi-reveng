@@ -27,7 +27,7 @@ jobs:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
 
-    - run: nix-build -A ${{ matrix.target }}
+    - run: nix-build --arg checkMaterialization true -A ${{ matrix.target }}
 
     # work around https://github.com/actions/upload-artifact/issues/92
     - run: cp -RvL result upload
