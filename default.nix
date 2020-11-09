@@ -192,7 +192,7 @@ in rec {
     cp -vsr ${static-files}/* $out
     mkdir $out/linux
     cp -vs ${static-exe}/bin/tttool $out/linux
-    cp -vs ${windows-exe}/bin/tttool.exe $out/
+    cp -vs ${windows-exe}/bin/* $out/
     mkdir $out/osx
     cp -vsr ${osx-exe-bundle}/bin/osx/* $out/osx
     cp -vs ${os-switch} $out/tttool
