@@ -9,7 +9,7 @@ Building from source
 
  2. Install the `nix` tool, if you do not have it yet:
 
-        bash <(curl https://nixos.org/nix/install)
+        bash <(curl -L https://nixos.org/nix/install)
 
  3. (Optional, but saves building time:) Install the Cachix tool, and enable
     the tttool cache.
