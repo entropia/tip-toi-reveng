@@ -2,20 +2,8 @@
 let
   sources = import nix/sources.nix;
 
-  # patch haskell.nix to work around
-  # https://github.com/input-output-hk/haskell.nix/issues/917
-  haskellNixSrc =
-    let prepkgs = import sources.nixpkgs {};
-    in prepkgs.applyPatches {
-      name = "haskell.nix-patched";
-      src = sources.haskellNix;
-      postPatch = ''
-        sed -i -e s/pkgs.evalPackages.fetchgit/pkgs.fetchgit/ lib/cabal-project-parser.nix
-      '';
-    };
-
   # Fetch the latest haskell.nix and import its default.nix
-  haskellNix = import haskellNixSrc {};
+  haskellNix = import sources.haskellNix {};
 
   # windows crossbuilding with ghc-8.10 needs at least 20.09.
   # A peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix can help
