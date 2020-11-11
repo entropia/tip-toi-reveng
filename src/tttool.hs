@@ -318,9 +318,15 @@ playCmd :: Mod CommandFields (Conf -> IO ())
 playCmd =
     command "play" $
     info parser $
-    progDesc "interactively play a GME file"
+    progDesc "interactively play a GME or YAML file"
   where
-    parser = flip play <$> gmeFileParser
+    parser = flip play <$> gmeOrYamlFileParser
+
+    gmeOrYamlFileParser :: Parser FilePath
+    gmeOrYamlFileParser = strArgument $ mconcat
+        [ metavar "FILE"
+        , help "GME or YAML file to read"
+        ]
 
 
 rewriteCmd :: Mod CommandFields (Conf -> IO ())
