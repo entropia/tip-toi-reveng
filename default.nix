@@ -50,16 +50,6 @@ let
       plan-sha256 = sha256;
       inherit checkMaterialization;
 
-      # This overrides the `with-compiler` in cabal.project
-      # haskell.nix does pass `--with-ghc=…`, but not `-w`, so cabal will
-      # still read with-compiler from the project, but there is no way to use
-      # an equivalent of `--with-ghc` in `cabal.project`
-      # Also see https://github.com/input-output-hk/haskell.nix/issues/916
-      cabalProject = builtins.replaceStrings
-        [ "with-compiler" ]
-        [ "-- with-compiler" ]
-        (builtins.readFile ./cabal.project);
-
       modules = [{
         # smaller files
         packages.tttool.dontStrip = false;
