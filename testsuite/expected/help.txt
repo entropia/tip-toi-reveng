@@ -47,6 +47,6 @@ GME extraction commands:
   binaries                 dumps all binaries
 
 Simulation commands:
-  play                     interactively play a GME file
+  play                     interactively play a GME or YAML file
 
 Please run "tttool COMMAND --help" for information on the particular command.
