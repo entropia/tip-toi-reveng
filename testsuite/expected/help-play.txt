@@ -1,5 +1,5 @@
-Usage: tttool play GME
-  interactively play a GME file
+Usage: tttool play FILE
+  interactively play a GME or YAML file
 
 Available options:
   FILE                     GME or YAML file to read
