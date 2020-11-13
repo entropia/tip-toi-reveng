@@ -16,6 +16,8 @@ jobs:
           os: ubuntu-latest
         - target: osx-exe-bundle
           os: macos-latest
+        - target: book
+          os: ubuntu-latest
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -62,6 +64,10 @@ jobs:
     - run: nix-build -A check-cabal-freeze
 
   package:
+    # this will only work when the jobs above have uploaded
+    # their stuff to the nix cache, which will only work
+    # in this repository
+    if: github.repository == 'entropia/tip-toi-reveng'
     runs-on: ubuntu-latest
     needs: build
     steps:
