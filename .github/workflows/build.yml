@@ -19,6 +19,7 @@ jobs:
         - target: book
           os: ubuntu-latest
 
+    name: Build ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
