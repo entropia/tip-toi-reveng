@@ -409,6 +409,9 @@ getRealGame gGameType = do
 getInitialRegs :: SGet [Word16]
 getInitialRegs = getArray getWord16 getWord16
 
+getMediaFlags :: Int -> SGet [Word16]
+getMediaFlags size = getArray (return size) getWord16
+
 getSpecials :: SGet (Word16, Word16)
 getSpecials = (,) <$> getWord16 <*> getWord16
 
@@ -431,7 +434,8 @@ getTipToiFile = getSegAt 0x00 "Header" $ do
     jumpTo 0x0071
     ttWelcome <- indirection "initial play lists" getPlayListList
 
-    jumpTo 0x0090
+    jumpTo 0x008C
+    ttMediaFlags <- maybeIndirection "Mediaflags" (getMediaFlags (length ttAudioFiles))
     ttBinaries1 <- fromMaybe [] <$> maybeIndirection "Binaries 1" getBinaries
     ttSpecialOIDs <- maybeIndirection "special symbols" getSpecials
     ttBinaries2 <- fromMaybe [] <$> maybeIndirection "Binaries 2" getBinaries

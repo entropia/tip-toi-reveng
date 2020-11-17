@@ -885,6 +885,7 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
         , ttAudioFiles = files
         , ttAudioXor = knownXOR
         , ttAudioFilesDoubles = False
+        , ttMediaFlags = Nothing
         , ttChecksum = 0x00
         , ttChecksumCalc = 0x00
         , ttBinaries1 = []

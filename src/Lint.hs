@@ -23,6 +23,9 @@ lintTipToi tt segments = do
             forM_ wrong $ \line -> do
                 printf "    %s\n" (ppLine M.empty line)
 
+    forM_ (fromMaybe [] (ttMediaFlags tt)) $ \f ->
+        when (f > 1) $ printf "Media flag >1: %d" f
+
     let overlapping_segments =
             filter (\((o1,l1,_),(o2,l2,_)) -> o1+l1 > o2) $
             zip segments (tail segments)
