@@ -11,17 +11,16 @@ Building from source
 
         bash <(curl -L https://nixos.org/nix/install)
 
- 3. (Optional, but saves building time:) Install the Cachix tool, and enable
-    the tttool cache.
+ 3. Install the Cachix tool, and enable the tttool cache.
 
         nix-env -iA cachix -f https://cachix.org/api/v1/install
         cachix use tttool
 
+    (This step is optional, but will save a lot of time.)
+
  4. Build `tttool`:
 
         nix-build -A linux-exe
-
-    The first time this can take a long time. Run it over night.
 
  5. Copy the resulting program to the current directory:
 
