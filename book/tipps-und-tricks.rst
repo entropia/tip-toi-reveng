@@ -128,18 +128,9 @@ Wenn man auf einen Code tippt, der einen ``P()``-Befehl enthält, während der T
 
   Du musst dann aber darauf achten, das Register ``$p`` wieder auf 0 zurück zu setzen.
 
+Hintergrundmuster
+-----------------
 
-Ansage von Registerwerten
--------------------------
+Es kann optisch schöner sein, wenn nicht nur die aktiven Bereiche eines Tiptoi-Werkes mit OID-Codes versehen sind, sondern alle. Dazu kannst du ein neutrales Muster verwenden, dass vom Tiptoi-Stift einfach ignoriert wird, und das auch ein laufendes Skript nicht unterbricht. Dieses Muster erzeugst du mit::
 
-Code-Muster in GIMP
--------------------
-
-Code-Muster in Adobe Photoshop
-------------------------------
-
-Druckereinstellungen
---------------------
-
-(Einstellungen für Drucker, Liste kompatibler Drucker, Lösungen für
-typische Probleme (FAQ?))
+  $ ./tttool oid-code --raw 65535
