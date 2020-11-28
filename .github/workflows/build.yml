@@ -65,10 +65,9 @@ jobs:
     - run: nix-build -A check-cabal-freeze
 
   package:
-    # this will only work when the jobs above have uploaded
-    # their stuff to the nix cache, which will only work
-    # in this repository
-    if: github.repository == 'entropia/tip-toi-reveng'
+    # this will only work when the jobs above have uploaded their stuff to the
+    # nix cache, which will not work for pull requests from other repositories
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     needs: build
     steps:
