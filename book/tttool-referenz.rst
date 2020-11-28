@@ -121,7 +121,7 @@ Muster-Einstellungen
 
 Mit folgenden Optionen kannst du das nachjustieren, wie das Muster erstellt wird -- je nach Drucker funktionieren andere Einstellungen besser.
 
-* Mit der Option ``--code-dim`` legst du fest, wie groß das Muster erzeugt werden soll. Du kannst entweder eine Zahl angeben, dann bekommst du ein Quadrat mit der angegebenen Seitenlänge in Millimeter, also ``--code-dim 30`` für ein 3×3cm Quadrat (dies ist die Standard-Einstellung). Oder du gibst mit zwei Zahlen die Breite und Höhe an, etwa ``-code-dim 210x297`` für ein Muster in A4-Größe.
+* Mit der Option ``--code-dim`` legst du fest, wie groß das Muster erzeugt werden soll. Du kannst entweder eine Zahl angeben, dann bekommst du ein Quadrat mit der angegebenen Seitenlänge in Millimeter, also ``--code-dim 30`` für ein 3×3cm Quadrat (dies ist die Standard-Einstellung). Oder du gibst mit zwei Zahlen die Breite und Höhe an, etwa ``--code-dim 210x297`` für ein Muster in A4-Größe.
 
 * Die Option ``--dpi`` gibt die gewünschte Auflösung des Musters an, in der im Druck üblichen Einheit Punkt-Pro-Zoll (dots per inch). Der Standardwert ist 1200 DPI, unter Umständen genügen auch 600 DPI.
 

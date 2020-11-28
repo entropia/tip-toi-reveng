@@ -390,6 +390,13 @@ Effekt:
 
     In der zweiten Form spielt der Befehl zufällig eine der angegebenen Audio-Dateien ab.
 
+Hinweis:
+    Wenn der Dateiname Zeichen enthält außer *a-z*, *0-9* und *_*, dann muss der Dateiname in Anführungszeichen stehen.
+Beispiel:
+  .. code:: yaml
+
+    haus:
+    - P("Willkommen zu Hause")
 
 .. _command-J:
 

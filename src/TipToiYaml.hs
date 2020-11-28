@@ -955,7 +955,7 @@ parsePlayList :: Parser [String]
 parsePlayList = P.commaSep lexer $ parseAudioRef
 
 parseAudioRef :: Parser String
-parseAudioRef = P.lexeme lexer $ many1 (alphaNum <|> char '_')
+parseAudioRef = (P.lexeme lexer $ many1 (alphaNum <|> char '_')) <|> P.stringLiteral lexer
 
 parseScriptRef :: Parser String
 parseScriptRef = P.lexeme lexer $ many1 (alphaNum <|> char '_')
