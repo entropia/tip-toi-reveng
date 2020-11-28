@@ -2,10 +2,6 @@ name: "Build and package"
 on:
   pull_request:
   push:
-
-env:
-  SECRETS_ARE_AVAILABLE: ${{ secrets.SECRETS_ARE_AVAILABLE }}
-
 jobs:
   build:
     strategy:
@@ -71,8 +67,8 @@ jobs:
   package:
     # this will only work when the jobs above have uploaded
     # their stuff to the nix cache, which will only work
-    # if secrets are available
-    if: ${{ env.SECRETS_ARE_AVAILABLE }}
+    # in this repository
+    if: github.repository == 'entropia/tip-toi-reveng'
     runs-on: ubuntu-latest
     needs: build
     steps:
