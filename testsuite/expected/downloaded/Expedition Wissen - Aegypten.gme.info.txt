@@ -1,0 +1,16 @@
+Product ID: 34
+Raw XOR value: 0x00000025
+Magic XOR value: 0xDE
+Comment: CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.10.0901
+Date: 20150114
+Language: 
+Number of registers: 51
+Initial registers: [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+Initial sounds: [[907,908],[908]]
+Scripts for OIDs from 34 to 3583; 3018/3550 are disabled.
+Audio table entries: 909
+Audio table repeated twice
+Binary tables entries: 14/14/14
+Single binary table entries: 1/1/1
+Special OIDs: 3010, 3009
+Checksum found 0xC3F06F70, calculated 0xC3F06F70

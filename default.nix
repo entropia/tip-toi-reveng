@@ -193,10 +193,10 @@ in rec {
   gme-downloads = pkgs.runCommandNoCC "gme-downloads" {
     buildInputs = with pkgs; [ wget ];
     outputHashMode = "recursive";
-    outputHash =  "sha256:01byby8fmqmxfg5cb5ss0pmhvf2av65sil9cqbjswky0a1mn7kp5";
+    outputHash =  "sha256:02cayz36ajaw8lv2kri54vmd6qid5w4vn4s6dmagq583f887b03l";
   } ''
     mkdir -p $out
-    bash ${./testsuite/download.sh} $out
+    bash ${./testsuite/download.sh} ${./testsuite/gme-files-test.txt} $out
   '';
 
   tests = pkgs.stdenv.mkDerivation {
