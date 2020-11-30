@@ -9,7 +9,7 @@ Initial registers: [1]
 Initial sounds: [[374,375]]
 Scripts for OIDs from 5710 to 5824; 1/115 are disabled.
 Audio table entries: 376
-Audio table repeated twice
+Audio table copy: Equal
 Binary tables entries: 0/0/0
 Single binary table entries: 0/0/0
 Checksum found 0x486306C9, calculated 0x486306C9

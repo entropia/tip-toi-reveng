@@ -9,7 +9,7 @@ Initial registers: [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 Initial sounds: [[2212,2213]]
 Scripts for OIDs from 8000 to 13237; 3906/5238 are disabled.
 Audio table entries: 2214
-Audio table repeated twice
+Audio table copy: Equal
 Binary tables entries: 8/8/8
 Single binary table entries: 1/1/1
 Special OIDs: 12159, 12158

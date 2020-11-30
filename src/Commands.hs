@@ -117,7 +117,7 @@ dumpInfo conf file = do
         (fst (head st)) (fst (last st))
         (length (filter (isNothing . snd) st)) (length st)
     printf "Audio table entries: %d\n" (length ttAudioFiles)
-    when ttAudioFilesDoubles $ printf "Audio table repeated twice\n"
+    printf "Audio table copy: %s\n" (show ttAudioFilesDoubles)
     printf "Binary tables entries: %d/%d/%d\n"
         (length ttBinaries1)
         (length ttBinaries2)

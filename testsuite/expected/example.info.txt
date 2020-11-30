@@ -9,6 +9,7 @@ Initial registers: [1,0]
 Initial sounds: [[1,2]]
 Scripts for OIDs from 8065 to 8067; 0/3 are disabled.
 Audio table entries: 6
+Audio table copy: Absent
 Binary tables entries: 0/0/0
 Single binary table entries: 0/0/0
 Special OIDs: 13445, 13446
