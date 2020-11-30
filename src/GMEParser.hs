@@ -270,7 +270,7 @@ getBinaries = do
         binary <- getSegAt offset (BC.unpack desc) (getBS length)
         return (desc, binary)
 
-getAudios :: Word32 -> SGet ([B.ByteString], Bool, Word8)
+getAudios :: Word32 -> SGet ([B.ByteString], Similarity, Word8)
 getAudios rawXor = do
     until <- lookAhead getWord32
     x <- case () of
@@ -278,19 +278,26 @@ getAudios rawXor = do
              | otherwise             -> lookAhead $ jumpTo until >> getXor
     offset <- bytesRead
     let n_entries = fromIntegral ((until - offset) `div` 8)
-    at_doubled <- lookAhead $ do
-        half1 <- getBS (n_entries * 8 `div` 2)
-        half2 <- getBS (n_entries * 8 `div` 2)
-        return $ half1 == half2
-    let n_entries' | at_doubled = n_entries `div` 2
-                   | otherwise  = n_entries
+    similarity <- determine_similiarity <$> lookAhead (getBS (n_entries * 8))
+    let n_entries' | Absent <- similarity = n_entries
+                   | otherwise = n_entries `div` 2
     decoded <- forM [0..n_entries'-1] $ \n -> do
         cypher x <$> indirectBS (show n)
-    -- Fix segment
-    when at_doubled $ lookAhead $ getSeg "Audio table copy" $
+    -- pretend we read the rest too
+    unless (similarity == Absent) $ lookAhead $ getSeg "Audio table copy" $
         replicateM_ (fromIntegral n_entries') (getWord32 >> getWord32)
 
-    return (decoded, at_doubled, x)
+    return (decoded, similarity, x)
+  where
+    -- Fuzzy comparison: More than 80% the same?
+    determine_similiarity bs
+        | a == b            = Equal
+        | 5 * same >= 4 * n = Similar
+        | otherwise         = Absent
+      where
+        (a,b) = B.splitAt (B.length bs `div` 2) bs
+        n = fromIntegral (B.length a)
+        same = length [ () | (x,y) <- B.zip a b, x == y ]
 
 getXor :: SGet Word8
 getXor = do
@@ -307,7 +314,7 @@ getXor = do
 getChecksum :: SGet Word32
 getChecksum = do
     l <- getLength
-    getSegAt (l-4) "Checksum" $ getWord32
+    getSegAt (l-4) "Checksum" getWord32
 
 calcChecksum :: SGet Word32
 calcChecksum = do

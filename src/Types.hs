@@ -64,6 +64,7 @@ data Line r = Line Offset [Conditional r] [Command r] PlayList
 
 type ProductID = Word32
 
+data Similarity = Absent | Equal | Similar deriving (Show, Eq)
 
 data TipToiFile = TipToiFile
     { ttProductId :: ProductID
@@ -76,7 +77,7 @@ data TipToiFile = TipToiFile
     , ttScripts :: [(Word16, Maybe [Line ResReg])]
     , ttGames :: [Game]
     , ttAudioFiles :: [B.ByteString]
-    , ttAudioFilesDoubles :: Bool
+    , ttAudioFilesDoubles :: Similarity
     , ttAudioXor :: Word8
     , ttMediaFlags :: Maybe [Word16]
     , ttBinaries1 :: [(B.ByteString, B.ByteString)]

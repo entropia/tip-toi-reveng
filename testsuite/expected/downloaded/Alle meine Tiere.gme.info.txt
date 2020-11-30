@@ -8,7 +8,8 @@ Number of registers: 3
 Initial registers: [0,0,0]
 Initial sounds: [[18,25]]
 Scripts for OIDs from 4201 to 4282; 0/82 are disabled.
-Audio table entries: 1086
+Audio table entries: 543
+Audio table copy: Similar
 Binary tables entries: 0/0/0
 Single binary table entries: 1/1/1
 Special OIDs: 4210, 0
