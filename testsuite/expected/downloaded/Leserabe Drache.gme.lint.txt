@@ -1,0 +1,2 @@
+All lines do satisfy hypothesis "play indicies are correct"!
+All lines do satisfy hypothesis "media indicies are correct"!

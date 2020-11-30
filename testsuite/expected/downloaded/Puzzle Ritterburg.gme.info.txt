@@ -1,0 +1,15 @@
+Product ID: 15
+Raw XOR value: 0x000000EA
+Magic XOR value: 0xE2
+Comment: CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.6.0925
+Date: 20110126
+Language: 
+Number of registers: 1
+Initial registers: [1]
+Initial sounds: [[374,375]]
+Scripts for OIDs from 5710 to 5824; 1/115 are disabled.
+Audio table entries: 376
+Audio table repeated twice
+Binary tables entries: 0/0/0
+Single binary table entries: 0/0/0
+Checksum found 0x486306C9, calculated 0x486306C9
