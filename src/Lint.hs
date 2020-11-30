@@ -11,8 +11,7 @@ import PrettyPrint
 lintTipToi :: TipToiFile -> Segments -> IO ()
 lintTipToi tt segments = do
     let hyps = [ (hyp1, "play indicies are correct")
-               , (hyp2 (fromIntegral (length (ttAudioFiles tt))),
-                  "media indicies are correct")
+               , (hyp2, "media indicies are correct")
                ]
     forM_ hyps $ \(hyp, desc) -> do
         let wrong = filter (not . hyp) (concat (mapMaybe snd (ttScripts tt)))
@@ -41,8 +40,11 @@ lintTipToi tt segments = do
                          0 <= b && b < fromIntegral (length mi)
             ok _ = True
 
-    hyp2 :: Word16 -> Line ResReg -> Bool
-    hyp2 n (Line _ _ _ mi) = all (<= n) mi
+    media_count :: Word16
+    media_count  = fromIntegral (length (ttAudioFiles tt))
+
+    hyp2 :: Line ResReg -> Bool
+    hyp2 (Line _ _ _ mi) = all (< media_count) mi
 
     report :: Segment -> Segment -> IO ()
     report (o1,l1,d1) (o2,l2,d2)
