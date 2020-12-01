@@ -102,8 +102,17 @@ playTTAudio i = do
     let bs = ttAudioFiles tt !! fromIntegral i
     liftIO $ playSound bs
 
+-- Rules for J(): jumps are executed last; the last J() wins.
+-- Effectively this is like a jump register is set, which is consulted after
+-- all other commands have executed. Simulate this by moving the last Jump
+-- to the end of the list and discarding all others.
+moveJumpsLast Nothing  []              = []
+moveJumpsLast (Just x) []              = [x]
+moveJumpsLast _        (Jump v : acts) = moveJumpsLast (Just (Jump v)) acts
+moveJumpsLast j        (x : acts)      = x : (moveJumpsLast j acts)
+
 applyLine :: Line Word16 -> GMEM Word16 ()
-applyLine (Line _ _ acts playlist) = go acts
+applyLine (Line _ _ acts playlist) = go (moveJumpsLast Nothing acts)
   where
     go (Neg r : acts) = do
         modReg r neg
