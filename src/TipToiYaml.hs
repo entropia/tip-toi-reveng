@@ -843,11 +843,9 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
         Just (lang, txt) -> do
             Right <$> readFile' (ttsFileName lang txt)
         Nothing -> do
-            let paths = [ combine dir relpath
-                    | ext <- map snd fileMagics
-                    , let pat = fromMaybe "%s" ttyMedia_Path
-                    , let relpath = printf pat fn <.> ext
-                    ]
+            let pat = fromMaybe "%s" ttyMedia_Path
+            let basePath = printf pat fn
+            let paths = map (combine dir) (basePath : [basePath <.> ext | (_,ext) <- fileMagics ])
             ex <- filterM doesFileExist paths
             case ex of
                 [] -> do
@@ -955,7 +953,7 @@ parsePlayList :: Parser [String]
 parsePlayList = P.commaSep lexer $ parseAudioRef
 
 parseAudioRef :: Parser String
-parseAudioRef = (P.lexeme lexer $ many1 (alphaNum <|> char '_')) <|> P.stringLiteral lexer
+parseAudioRef = (P.lexeme lexer $ many1 (alphaNum <|> char '_' <|> char '.')) <|> P.stringLiteral lexer
 
 parseScriptRef :: Parser String
 parseScriptRef = P.lexeme lexer $ many1 (alphaNum <|> char '_')
