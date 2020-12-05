@@ -8,23 +8,31 @@ import qualified Data.Map as M
 import Types
 import PrettyPrint
 
-lintTipToi :: TipToiFile -> Segments -> IO ()
+lintTipToi :: TipToiFile -> Segments -> IO (Bool)
 lintTipToi tt segments = do
     let hyps = [ (hyp1, "play indicies are correct")
                , (hyp2, "media indicies are correct")
                , (hyp3, "at most one jump per line, as last action")
                ]
-    forM_ hyps $ \(hyp, desc) -> do
+    hyp_result <- forM hyps $ \(hyp, desc) -> do
         let wrong = filter (not . hyp) (concat (mapMaybe snd (ttScripts tt)))
         if null wrong
-        then printf "All lines do satisfy hypothesis \"%s\"!\n" desc
+        then do
+            printf "All lines do satisfy hypothesis \"%s\"!\n" desc
+            return True
         else do
             printf "These lines do not satisfy hypothesis \"%s\":\n" desc
             forM_ wrong $ \line -> do
                 printf "    %s\n" (ppLine M.empty line)
+            return False
 
-    forM_ (fromMaybe [] (ttMediaFlags tt)) $ \f ->
-        when (f > 1) $ printf "Media flag >1: %d" f
+    media_result <- forM (fromMaybe [] (ttMediaFlags tt)) $ \f ->
+        if (f > 1)
+        then do
+            printf "Media flag >1: %d" f
+            return False
+        else do
+            return True
 
     let overlapping_segments =
             filter (\((o1,l1,_),(o2,l2,_)) -> o1+l1 > o2) $
@@ -33,6 +41,9 @@ lintTipToi tt segments = do
         printf "Overlapping segments: %d\n"
             (length overlapping_segments)
         mapM_ (uncurry report) overlapping_segments
+
+    let no_failures = (all (==True)) $ (hyp_result ++ media_result ++ [null overlapping_segments])
+    return no_failures
   where
     hyp1 :: Line ResReg -> Bool
     hyp1 (Line _ _ as mi) = all ok as

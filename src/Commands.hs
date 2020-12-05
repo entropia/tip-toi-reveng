@@ -133,7 +133,8 @@ dumpInfo conf file = do
 lint :: FilePath -> IO ()
 lint file = do
     (tt,segments) <- parseTipToiFile <$> B.readFile file
-    lintTipToi tt segments
+    result <- lintTipToi tt segments
+    when (result == False) exitFailure
 
 play :: Conf -> FilePath -> IO ()
 play conf file = do
