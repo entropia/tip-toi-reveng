@@ -12,6 +12,7 @@ lintTipToi :: TipToiFile -> Segments -> IO ()
 lintTipToi tt segments = do
     let hyps = [ (hyp1, "play indicies are correct")
                , (hyp2, "media indicies are correct")
+               , (hyp3, "at most one jump per line, as last action")
                ]
     forM_ hyps $ \(hyp, desc) -> do
         let wrong = filter (not . hyp) (concat (mapMaybe snd (ttScripts tt)))
@@ -45,6 +46,13 @@ lintTipToi tt segments = do
 
     hyp2 :: Line ResReg -> Bool
     hyp2 (Line _ _ _ mi) = all (< media_count) mi
+
+    max_one_jump_at_end [] = True
+    max_one_jump_at_end (Jump x : acts) = null acts
+    max_one_jump_at_end (x : acts) = max_one_jump_at_end acts
+
+    hyp3 :: Line ResReg -> Bool
+    hyp3 (Line _ _ as _) = max_one_jump_at_end as
 
     report :: Segment -> Segment -> IO ()
     report (o1,l1,d1) (o2,l2,d2)
