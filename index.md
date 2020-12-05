@@ -187,6 +187,9 @@ haben.
 
 [tiptoi-Mailingliste]: https://lists.nomeata.de/mailman/listinfo/tiptoi
 
+Spam protection for this mailing list gracefully provided by the MXGuardDog <a
+href="http://mxguarddog.com/firewall/">spam firewall</a>.
+
 Wer tiefergehende Informationen zum Tiptoi-Stift sucht sollte auch mal ins
 [Wiki der Github-Seite] schauen. Dort sind viele technische Details zum Stift
 zusammengetragen worden.
