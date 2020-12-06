@@ -8,7 +8,7 @@ import qualified Data.Map as M
 import Types
 import PrettyPrint
 
-lintTipToi :: TipToiFile -> Segments -> IO (Bool)
+lintTipToi :: TipToiFile -> Segments -> IO Bool
 lintTipToi tt segments = do
     let hyps = [ (hyp1, "play indicies are correct")
                , (hyp2, "media indicies are correct")
@@ -42,8 +42,7 @@ lintTipToi tt segments = do
             (length overlapping_segments)
         mapM_ (uncurry report) overlapping_segments
 
-    let no_failures = (all (==True)) $ (hyp_result ++ media_result ++ [null overlapping_segments])
-    return no_failures
+    return $ and $ hyp_result ++ media_result ++ [null overlapping_segments]
   where
     hyp1 :: Line ResReg -> Bool
     hyp1 (Line _ _ as mi) = all ok as
