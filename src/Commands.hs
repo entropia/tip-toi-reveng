@@ -292,8 +292,8 @@ codesOfFile inf = do
     writeTipToiCodeYaml inf tty codeMap totalMap
     return $ (ttProductId tt,
         [ ("START", fromIntegral (ttProductId tt)) ] ++
-        [ ("RESTART", fromIntegral id) | Just id <- pure $ ttcRestart totalMap ] ++
-        [ ("STOP",    fromIntegral id) | Just id <- pure $ ttcStop totalMap ] ++
+        [ ("REPLAY", fromIntegral id) | Just id <- pure $ ttcReplay totalMap ] ++
+        [ ("STOP",   fromIntegral id) | Just id <- pure $ ttcStop totalMap ] ++
         sort (M.toList (ttcScriptCodes totalMap))
         )
   where

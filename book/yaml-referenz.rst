@@ -263,7 +263,7 @@ eigentliche YAML-Datei zu übernehmen.
    die beiden Varianten nicht mischen.
 
 
-``restart``
+``replay``
 ^^^^^^^^^^^
 
 Format:
@@ -272,13 +272,13 @@ Format:
 Beispiel:
   .. code:: yaml
 
-    restart: 12159
+    replay: 12159
 
 Zweck:
   Beim Tippen auf diesen Code wird das zuletzt ausgegebene Audio nochmal ausgegeben.
 
 
-Auch wenn man diesen dies nicht explizit in der .yaml-Datei notiert, weist das ``tttool`` einen solchen Code zu, und erzeugt ein ``RESTART``-Muster aus. 
+Auch wenn man diesen dies nicht explizit in der .yaml-Datei notiert, weist das ``tttool`` einen solchen Code zu, und erzeugt ein ``REPLAY``-Muster aus.
 
 ``stop``
 ^^^^^^^^^^^

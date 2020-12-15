@@ -66,14 +66,14 @@ data TipToiYAML = TipToiYAML
     , ttySpeak       :: Maybe (OptArray SpeakSpec)
     , ttyLanguage    :: Maybe Language
     , ttyGames       :: Maybe [GameYaml]
-    , ttyRestart     :: Maybe Word16
+    , ttyReplay      :: Maybe Word16
     , ttyStop        :: Maybe Word16
     }
     deriving Generic
 
 data TipToiCodesYAML = TipToiCodesYAML
     { ttcScriptCodes :: CodeMap
-    , ttcRestart     :: Maybe Word16
+    , ttcReplay      :: Maybe Word16
     , ttcStop        :: Maybe Word16
     }
     deriving (Eq, Generic)
@@ -314,7 +314,7 @@ tt2ttYaml path TipToiFile{..} = TipToiYAML
     , ttySpeak = Nothing
     , ttyLanguage = Nothing
     , ttyGames = list2Maybe $ map game2gameYaml ttGames
-    , ttyRestart = fmap fst ttSpecialOIDs
+    , ttyReplay = fmap fst ttSpecialOIDs
     , ttyStop = fmap snd ttSpecialOIDs
     }
 
@@ -695,7 +695,7 @@ scriptCodes codes givenCodes productId
     (strs, nums) = partitionEithers $ map f codes
     newStrs = filter (`M.notMember` ttcScriptCodes givenCodes) strs
     usedCodes = S.fromList $
-        maybeToList (ttcRestart givenCodes) ++
+        maybeToList (ttcReplay givenCodes) ++
         maybeToList (ttcStop givenCodes) ++
         M.elems (ttcScriptCodes givenCodes)
 
@@ -703,7 +703,7 @@ scriptCodes codes givenCodes productId
             Nothing -> Left s
             Just n -> Right (n::Word16)
 
-    restartCode : stopCode : availableCodes =
+    replayCode : stopCode : availableCodes =
         filter (`S.notMember` usedCodes) $
         codesFor productId
 
@@ -719,7 +719,7 @@ scriptCodes codes givenCodes productId
 
     allCodes = TipToiCodesYAML
         { ttcScriptCodes = totalMap
-        , ttcRestart = ttcRestart givenCodes `mplus` Just restartCode
+        , ttcReplay = ttcReplay givenCodes `mplus` Just replayCode
         , ttcStop = ttcStop givenCodes `mplus` Just stopCode
         }
 
@@ -785,7 +785,7 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
     let givenCodes = TipToiCodesYAML
             { ttcScriptCodes =
                 M.unionWithKey mergeOnlyEqual (ttcScriptCodes extCodes) (fromMaybe M.empty ttyScriptCodes)
-            , ttcRestart = mergeEqualMaybe "restart" (ttcRestart extCodes) ttyRestart
+            , ttcReplay = mergeEqualMaybe "replay" (ttcReplay extCodes) ttyReplay
             , ttcStop = mergeEqualMaybe "stop" (ttcStop extCodes) ttyStop
             }
 
@@ -893,7 +893,7 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
         , ttBinaries5 = []
         , ttBinaries6 = []
         , ttSpecialOIDs = Just
-            ( fromMaybe 0 (ttcRestart assignedCodes)
+            ( fromMaybe 0 (ttcReplay assignedCodes)
             , fromMaybe 0 (ttcStop assignedCodes)
             ) -- a bit fishy, this juggling of maybes
         }, assignedCodes)
@@ -1109,7 +1109,7 @@ writeTipToiCodeYaml inf tty oldCodeYaml allCodes = do
 
     let newCodeYaml = TipToiCodesYAML
             { ttcScriptCodes = newCodeMap
-            , ttcRestart = if isJust (ttcRestart allCodes) && ttcRestart allCodes /= ttyRestart tty then ttcRestart allCodes else Nothing
+            , ttcReplay = if isJust (ttcReplay allCodes) && ttcReplay allCodes /= ttyReplay tty then ttcReplay allCodes else Nothing
             , ttcStop    = if isJust (ttcStop    allCodes) && ttcStop    allCodes /= ttyStop    tty then ttcStop    allCodes else Nothing
             }
 
@@ -1162,7 +1162,7 @@ debugGame productID = do
             ]
         , ttyLanguage = Nothing
         , ttyGames = Nothing
-        , ttyRestart = Nothing
+        , ttyReplay = Nothing
         , ttyStop = Nothing
         }
   where

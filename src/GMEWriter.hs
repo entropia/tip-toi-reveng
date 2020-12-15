@@ -368,8 +368,8 @@ putAudioTable x as = mapFstMapSnd
 putSpecialSymbols :: Maybe (Word16, Word16) -> SPut
 putSpecialSymbols Nothing =
     replicateM_ 20 $ putWord16 0
-putSpecialSymbols (Just (restart, stop)) = do
-    putWord16 restart
+putSpecialSymbols (Just (replay, stop)) = do
+    putWord16 replay
     putWord16 stop
     replicateM_ 20 $ putWord16 0
 
