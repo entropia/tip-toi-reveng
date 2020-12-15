@@ -125,7 +125,7 @@ Nun brauchst du noch den zugehörigen Ausdruck mit den Punktmustern. Auch hier m
 
 erstellt dir das ``tttool`` die Datei ``tic-tac-tiptoi.pdf``, die alle
 Punktmuster für dein Werk in einer nüchternen, aber praktischen Tabelle
-enthält. Du siehst dort neben dem Feld für ``feldOL`` auch eines mit der Beschriftung ``START``, dem Anschaltzeichen für dein Produkt, sowie ``RESTART`` und ``STOP``, die man erstmal ignorieren darf.
+enthält. Du siehst dort neben dem Feld für ``feldOL`` auch eines mit der Beschriftung ``START``, dem Anschaltzeichen für dein Produkt, sowie ``REPLAY`` und ``STOP``, die man erstmal ignorieren darf.
 
 Wenn du diese Datei nun ausdruckst, mit dem Stift auf das Anschaltzeichen gehst, und danach auf das andere Feld, solltest du eine Roboterstimme hören, die „Du hast oben links hingetippt.“ sagt.
 

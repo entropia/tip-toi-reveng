@@ -186,7 +186,7 @@ Example from Puzzle Ponyhof:
 0x00F05E60: 00 00 00 00 00 00 00 00 01 00 66 18
             pp pp pp pp pp pp pp pp ff ff gg gg
 
-a: OID for the Restart symbol
+a: OID for the Replay symbol
 b: OID for the Stop symbol
 c: unknown, seems to be the OID for Skip symbol (needs to be confirmed)
 d: unknown
