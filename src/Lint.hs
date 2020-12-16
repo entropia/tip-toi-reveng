@@ -8,22 +8,31 @@ import qualified Data.Map as M
 import Types
 import PrettyPrint
 
-lintTipToi :: TipToiFile -> Segments -> IO ()
+lintTipToi :: TipToiFile -> Segments -> IO Bool
 lintTipToi tt segments = do
     let hyps = [ (hyp1, "play indicies are correct")
                , (hyp2, "media indicies are correct")
+               , (hyp3, "at most one jump per line, as last action")
                ]
-    forM_ hyps $ \(hyp, desc) -> do
+    hyp_result <- forM hyps $ \(hyp, desc) -> do
         let wrong = filter (not . hyp) (concat (mapMaybe snd (ttScripts tt)))
         if null wrong
-        then printf "All lines do satisfy hypothesis \"%s\"!\n" desc
+        then do
+            printf "All lines do satisfy hypothesis \"%s\"!\n" desc
+            return True
         else do
             printf "These lines do not satisfy hypothesis \"%s\":\n" desc
             forM_ wrong $ \line -> do
                 printf "    %s\n" (ppLine M.empty line)
+            return False
 
-    forM_ (fromMaybe [] (ttMediaFlags tt)) $ \f ->
-        when (f > 1) $ printf "Media flag >1: %d" f
+    media_result <- forM (fromMaybe [] (ttMediaFlags tt)) $ \f ->
+        if (f > 1)
+        then do
+            printf "Media flag >1: %d" f
+            return False
+        else do
+            return True
 
     let overlapping_segments =
             filter (\((o1,l1,_),(o2,l2,_)) -> o1+l1 > o2) $
@@ -32,6 +41,8 @@ lintTipToi tt segments = do
         printf "Overlapping segments: %d\n"
             (length overlapping_segments)
         mapM_ (uncurry report) overlapping_segments
+
+    return $ and $ hyp_result ++ media_result ++ [null overlapping_segments]
   where
     hyp1 :: Line ResReg -> Bool
     hyp1 (Line _ _ as mi) = all ok as
@@ -45,6 +56,13 @@ lintTipToi tt segments = do
 
     hyp2 :: Line ResReg -> Bool
     hyp2 (Line _ _ _ mi) = all (< media_count) mi
+
+    max_one_jump_at_end [] = True
+    max_one_jump_at_end (Jump x : acts) = null acts
+    max_one_jump_at_end (x : acts) = max_one_jump_at_end acts
+
+    hyp3 :: Line ResReg -> Bool
+    hyp3 (Line _ _ as _) = max_one_jump_at_end as
 
     report :: Segment -> Segment -> IO ()
     report (o1,l1,d1) (o2,l2,d2)

@@ -133,7 +133,8 @@ dumpInfo conf file = do
 lint :: FilePath -> IO ()
 lint file = do
     (tt,segments) <- parseTipToiFile <$> B.readFile file
-    lintTipToi tt segments
+    all_good <- lintTipToi tt segments
+    unless all_good exitFailure
 
 play :: Conf -> FilePath -> IO ()
 play conf file = do
@@ -409,5 +410,4 @@ setLanguage lang file = do
 
     B.writeFile (file ++ ".tmp") output'
     renameFile (file ++ ".tmp") file
-
 
