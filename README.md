@@ -70,6 +70,9 @@ Installation
 We release `tttool` for Windows and Linux users as a zipfile. You can find them
 in the [releases section](https://github.com/entropia/tip-toi-reveng/releases)
 of the GitHub project.
+For Linux users:
+- Install libttspico-utils: `sudo apt install libttspico-utils`
+- Install vorbis-tools: `sudo apt install vorbis-tools`
 
 See `Building.md` for instructions on how to build `tttool` from source.
 
