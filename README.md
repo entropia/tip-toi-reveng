@@ -70,9 +70,8 @@ Installation
 We release `tttool` for Windows and Linux users as a zipfile. You can find them
 in the [releases section](https://github.com/entropia/tip-toi-reveng/releases)
 of the GitHub project.  
-For Linux users:
-- Install libttspico-utils: `sudo apt install libttspico-utils`
-- Install vorbis-tools: `sudo apt install vorbis-tools`
+
+Linux users likely want to install additional packages. On Debian or Ubuntu, run `sudo apt install libttspico-utils vorbis-tools`
 
 See `Building.md` for instructions on how to build `tttool` from source.
 
@@ -155,4 +154,3 @@ Other resources in this repository
  * `wip/` (work in progess) contains notes about the parts of the gme files that are not
    fully understood yet.
  * `perl-tools` contains a perl based script, to generate a PDF with all OID codes from a yaml-file as well some functions to generate PNG-files, inject pHYs-chunks with resolution hints into GD generated PNG files as result from some testing
-
