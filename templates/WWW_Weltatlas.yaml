@@ -1027,7 +1027,7 @@ scripts:
     12307: # Albanien
      - $0==1?
 
-    12308: # Ein Kompass zeigt..
+    12308: # page 4 cyprus
      - $0==1?
     12309: # Malta
      - $0==1?
@@ -1153,7 +1153,7 @@ scripts:
      - $0==1?
     12370: # Matroschka
      - $0==1?
-    12371: # Portugal
+    12371: # page 3 Portugal- olive
      - $0==1?
     12372: # Ätna
      - $0==1?
@@ -1208,7 +1208,7 @@ scripts:
 
 ### Asien
 
-    12394: # Taiwan
+    12394: # page 3 spain- flamenco
      - $0==1?
     12395: # Ballett
      - $0==1?
@@ -1226,9 +1226,9 @@ scripts:
      - $0==1?
     12422:
      - $0==1?
-    12423:
+    12423: # page 5 Asia title
      - $0==1?
-    12424:
+    12424: # page 5 Asia description
      - $0==1?
     12425:
      - $0==1?
@@ -1537,9 +1537,9 @@ scripts:
      - $0==1?
     12594:
      - $0==1?
-    12598:
+    12598: # page 7 Africa title
      - $0==1?
-    12599:
+    12599: # page 7 Africa description
      - $0==1?
     12600:
      - $0==1?
@@ -1800,9 +1800,9 @@ scripts:
      - $0==1?
     12744:
      - $0==1?
-    12745:
+    12745: # page 9 Northamerica title
      - $0==1?
-    12746:
+    12746: # page 9 Norrhamerica description
      - $0==1?
     12747:
      - $0==1?
@@ -2005,9 +2005,9 @@ scripts:
      - $0==1?
     12860:
      - $0==1?
-    12862:
+    12862: # page 12 Southamerica title
      - $0==1?
-    12863:
+    12863: # page 12 Southamerica description
      - $0==1?
     12864:
      - $0==1?
@@ -2175,9 +2175,9 @@ scripts:
      - $0==1?
     12957:
      - $0==1?
-    12958:
+    12958: # page 13 Australia title
      - $0==1?
-    12959:
+    12959: # page 13 Australia description
      - $0==1?
     12960:
      - $0==1?
@@ -2360,9 +2360,9 @@ scripts:
      - $0==1?
     13056:
      - $0==1?
-    13057:
+    13057: # page 15 party title
      - $0==1?
-    13058:
+    13058: # page 15 party description
      - $0==1?
     13059:
      - $0==1?
