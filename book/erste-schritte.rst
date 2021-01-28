@@ -22,8 +22,7 @@ sondern du musst die Eingabeaufforderung starten, in das Verzeichnis mit der Dat
    Ein vorangestelltes ``$``
    in folgenden Listings wird nicht mit eingegeben, sondern markiert die
    Zeilen, die einzugeben sind. Wenn dir das neu ist, dann sei dir das Kapitel
-   `Einführung in die Kommandozeile <https://tutorial.djangogirls.org/de/intro_to_command_line/>`__
-    eines Python-Kurses empfohlen.
+   `Einführung in die Kommandozeile <https://tutorial.djangogirls.org/de/intro_to_command_line/>`__ eines Python-Kurses empfohlen.
 
 Töne in Tiptoi-Büchern ändern
 -----------------------------
