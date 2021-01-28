@@ -15,12 +15,15 @@ Allerdings ist zu beachten, dass es sich dabei um ein
 Kommandozeilenprogramm handelt. Doppelt klicken bringt also nichts,
 sondern du musst die Eingabeaufforderung starten, in das Verzeichnis mit der Datei
 ``tttool.exe`` wechseln und dann Befehle wie
-``./tttool info WWW_Bauernhof.gme`` eintippen. Ein vorangestelltes ``$``
-in folgenden Listings wird nicht mit eingegeben, sondern markiert die
-Zeilen, die einzugeben sind. Wenn dir das neu ist, dann sei dir ein kleines
-`Tutorial zur
-Kommandozeile <http://www.owih.org/2012/03/04/xp-kommandozeile-teil-1/>`__
-empfohlen.
+``./tttool info WWW_Bauernhof.gme`` eintippen.
+
+.. note::
+
+   Ein vorangestelltes ``$``
+   in folgenden Listings wird nicht mit eingegeben, sondern markiert die
+   Zeilen, die einzugeben sind. Wenn dir das neu ist, dann sei dir das Kapitel
+   `Einführung in die Kommandozeile <https://tutorial.djangogirls.org/de/intro_to_command_line/>`__
+    eines Python-Kurses empfohlen.
 
 Töne in Tiptoi-Büchern ändern
 -----------------------------
