@@ -29,7 +29,7 @@ Töne in Tiptoi-Büchern ändern
 
 Als erstes einfaches Projekt kannst du in einem deiner Tiptoi-Bücher ein paar Töne ändern. Überrasche dein Kind doch, indem du deine eigene Stimme ertönen lässt! Als Beispiel nehmen wir das Buch „Wieso? Weshalb? Warum? -- Bauernhof“, aber du kannst diese Anleitung auch mit einem anderen Buch verfolgen.
 
-Zu jedem Tiptoi-Produkt gehört eine „GME-Datei“, die sowohl die Töne als auch die Programmlogik enthält -- in unserem Fall ``WWW_Bauernhof.gme``. Du findest sie auf dem Tiptoi-Stift selbst, oder auf der `Ravensburger Download-Seite <https://www.tiptoi.com/de/start/anleitung-haendischer-download/index.html>`_. Kopiere Sie in den Ordner mit dem ``tttool.exe``.
+Zu jedem Tiptoi-Produkt gehört eine „GME-Datei“, die sowohl die Töne als auch die Programmlogik enthält -- in unserem Fall ``WWW_Bauernhof.gme``. Du findest sie auf dem Tiptoi-Stift selbst, oder auf der `Ravensburger Download-Seite <https://www.ravensburger.de/entdecken/ravensburger-marken/tiptoi/tiptoi-service-faq/fragen-zum-haendischen-download/index.html>`_. Kopiere Sie in den Ordner mit dem ``tttool.exe``.
 
 Führe nun die folgenden beiden Befehle aus:
 
