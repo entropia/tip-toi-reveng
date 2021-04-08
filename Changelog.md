@@ -1,6 +1,6 @@
 # Changelog for tttool
 
-## 1.10 (UNRELEASED)
+## 1.10 (2021-04-08)
 
  * Audio filenames can now be quoted, to support filenames with characters
    outside the range `a-zA-Z0-9_`. Audio files can also be given including
