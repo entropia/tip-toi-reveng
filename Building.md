@@ -39,10 +39,12 @@ Making a release
 
 1. Ensure that the version number is up-to-date in:
    `Changelog.md`, `tttool.cabal`, `book/conf.py`
-2. Push to CI so that the OSX binaries are built and uploaded to the Cachix
+2. Run `nix-build --arg checkMaterialization` and update hashes in `defaul.nix`
+   until it no longer complains.
+3. Push to CI so that the OSX binaries are built and uploaded to the Cachix
    cache.
-3. Run
+4. Run
 
        nix-build -A release-zip
 
-4. Upload `result/tttool-n.m.zip`.
+5. Upload `result/tttool-n.m.zip`.
