@@ -172,3 +172,12 @@ andere Sprache eingestellt ist, kann man die Sprache in der GME-Datei mit diesem
 Typische Sprachangaben sind ``GERMAN``, ``FRENCH``, ``RUSSIA``.
 
 Achtung: Der Befehl überschreibt die angegebene GME-Datei.
+
+Tip:
+  Um die Sprache aller .gme Dateien die auf dem Tiptoi selbst liegen auf ein mal zu ändern, kann, in einer Bash kompatiblen konsole in Mac OS, folgendes ausgeführt werden
+  
+  .. code:: bash
+
+    for file in /Volumes/tiptoi/*.gme; do tttool set-language GERMAN $file; done
+  
+  
