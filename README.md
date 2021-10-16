@@ -9,10 +9,8 @@ own books, with their own sounds.
 
 The current status is that we understood most of the file format (see the
 [GME file format specification](GME-Format.md)). We provide a tool that allows
-you to dissect these files.
-
-The tool can also be used to generate completely new files from scratch; see
-below for details.
+you to dissect these files.  The tool can also be used to generate completely
+new files from scratch; see below for details.
 
 If you want to learn more please have a look into our wiki
 (https://github.com/entropia/tip-toi-reveng/wiki).
