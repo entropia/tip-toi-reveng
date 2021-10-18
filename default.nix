@@ -193,7 +193,8 @@ in rec {
   gme-downloads = pkgs.runCommandNoCC "gme-downloads" {
     buildInputs = with pkgs; [ wget ];
     outputHashMode = "recursive";
-    outputHash =  "sha256:02cayz36ajaw8lv2kri54vmd6qid5w4vn4s6dmagq583f887b03l";
+    # This hash may change as Ravensburger edits their GME files
+    outputHash =  "sha256:0f4pvh4bmddabr3mycscjx08nv8xkkvh5lrqij0bwsyviajsqycm";
   } ''
     mkdir -p $out
     bash ${./testsuite/download.sh} ${./testsuite/gme-files-test.txt} $out
