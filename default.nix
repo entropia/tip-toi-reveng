@@ -33,8 +33,8 @@ let
         ];
 
       # Pinning the input to the constraint solver
-      compiler-nix-name = "ghc8102";
-      index-state = "2020-11-08T00:00:00Z";
+      compiler-nix-name = "ghc8107";
+      index-state = "2020-10-15T00:00:00Z";
       plan-sha256 = sha256;
       inherit checkMaterialization;
 
@@ -74,13 +74,13 @@ let
 
 in rec {
   linux-exe      = tttool-exe pkgs
-     "0j2xsr8bxx6nhwpixdxvvqi69yjby2wpgn0y53ryhnz9idhvhv79";
+     "0j2xsr8bxx6nhwpixdxvvqi69yjby2wpgn0y53ryhnz9idhvhv70";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
-     "08sx2487am7vsqpbr0k6l1ray48cpfkk5i2f484q4zkdmc8956il";
+     "08sx2487am7vsqpbr0k6l1ray48cpfkk5i2f484q4zkdmc8956i0";
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
-     "120mpypd6sjw8adh9blsss8nxhcv9b0jrjsrlqymx59x2zwiy0jx";
+     "120mpypd6sjw8adh9blsss8nxhcv9b0jrjsrlqymx59x2zwiy0j0";
   osx-exe        = tttool-exe pkgs-osx
-     "0j2xsr8bxx6nhwpixdxvvqi69yjby2wpgn0y53ryhnz9idhvhv79";
+     "0j2xsr8bxx6nhwpixdxvvqi69yjby2wpgn0y53ryhnz9idhvhv70";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
 
   static-files = sourceByRegex ./. [
