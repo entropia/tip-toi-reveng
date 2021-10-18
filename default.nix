@@ -205,7 +205,10 @@ in rec {
     phases = "unpackPhase checkPhase installPhase";
     src = builtins.path {
       path = ./testsuite;
-      filter = path: type: baseNameOf path != "output";
+      filter = path: type:
+        baseNameOf path != "output" &&
+        baseNameOf path != "downloaded" &&
+        baseNameOf path != "all-gmes";
     };
     doCheck = true;
     buildInputs = [ linux-exe pkgs.glibcLocales ];

@@ -2,7 +2,7 @@ Product ID: 61
 Raw XOR value: 0x000000FA
 Magic XOR value: 0x16
 Comment: CHOMPTECH DATA FORMAT CopyRight 2009 Ver2.10.0901
-Date: 20141021
+Date: 20210611
 Language: 
 Number of registers: 71
 Initial registers: [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -13,4 +13,4 @@ Audio table copy: Equal
 Binary tables entries: 1/1/1
 Single binary table entries: 1/1/1
 Special OIDs: 9756, 0
-Checksum found 0x0092FB3D, calculated 0x0092FB3D
+Checksum found 0x00931E25, calculated 0x00931E25
