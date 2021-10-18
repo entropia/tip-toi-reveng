@@ -206,9 +206,9 @@ in rec {
     src = builtins.path {
       path = ./testsuite;
       filter = path: type:
-        baseNameOf path != "output" &&
-        baseNameOf path != "downloaded" &&
-        baseNameOf path != "all-gmes";
+        path != builtins.toString ./testsuite/output &&
+        path != builtins.toString ./testsuite/downloaded &&
+        path != builtins.toString ./testsuite/all-gmes;
     };
     doCheck = true;
     buildInputs = [ linux-exe pkgs.glibcLocales ];
