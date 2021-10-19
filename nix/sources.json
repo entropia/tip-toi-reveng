@@ -10,17 +10,5 @@
         "type": "tarball",
         "url": "https://github.com/input-output-hk/haskell.nix/archive/cd9beb4ef5441de71cf0df1ae8914213c7d4ade3.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
-    },
-    "nixpkgs": {
-        "branch": "release-21.05",
-        "description": "Nix Packages collection",
-        "homepage": "",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "f001876680c0e32a89bced8d02d2c61250684e17",
-        "sha256": "1b8v059srls3c4yfvq4pvw3rshszzv4lyn1fg4xh1prdnjddxq8w",
-        "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/f001876680c0e32a89bced8d02d2c61250684e17.tar.gz",
-        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }

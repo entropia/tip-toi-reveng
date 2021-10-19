@@ -7,7 +7,7 @@ let
 
   # windows crossbuilding with ghc-8.10 needs at least 20.09.
   # A peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix can help
-  nixpkgsSrc = haskellNix.sources.nixpkgs-2009;
+  nixpkgsSrc = haskellNix.sources.nixpkgs-2105;
   nixpkgsArgs = haskellNix.nixpkgsArgs;
 
   pkgs = import nixpkgsSrc nixpkgsArgs;
