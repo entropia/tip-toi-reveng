@@ -74,13 +74,13 @@ let
 
 in rec {
   linux-exe      = tttool-exe pkgs
-     "0j2xsr8bxx6nhwpixdxvvqi69yjby2wpgn0y53ryhnz9idhvhv70";
+     "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5an";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
-     "08sx2487am7vsqpbr0k6l1ray48cpfkk5i2f484q4zkdmc8956i0";
+     "02xhzh63ivgvvisw8w5dblh2bq75w2cx3d54xzxp7nqs21bxmzkw";
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
-     "120mpypd6sjw8adh9blsss8nxhcv9b0jrjsrlqymx59x2zwiy0j0";
+     "02ysfb0d5s45mmcnkvc59j3w7hcz0h8l0lhfxii3a0y89jp6cy9l";
   osx-exe        = tttool-exe pkgs-osx
-     "0j2xsr8bxx6nhwpixdxvvqi69yjby2wpgn0y53ryhnz9idhvhv70";
+     "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5an";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
 
   static-files = sourceByRegex ./. [
