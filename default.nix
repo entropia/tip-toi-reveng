@@ -235,7 +235,9 @@ in rec {
     installPhase = ''
       mkdir -p $out
       echo "-- Run nix-shell -A check-cabal-freeze to update this file" > $out/cabal.project.freeze
-      cat cabal.project.freeze >> $out/cabal.project.freeze
+      cat cabal.project.freeze |
+        grep -v -F active-repositories: |
+        grep -v -F index-state: >> $out/cabal.project.freeze
     '';
   };
 
