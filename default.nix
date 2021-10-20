@@ -7,7 +7,7 @@ let
 
   # windows crossbuilding with ghc-8.10 needs at least 20.09.
   # A peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix can help
-  nixpkgsSrc = haskellNix.sources.nixpkgs-2009;
+  nixpkgsSrc = haskellNix.sources.nixpkgs-2105;
   nixpkgsArgs = haskellNix.nixpkgsArgs;
 
   pkgs = import nixpkgsSrc nixpkgsArgs;
@@ -33,8 +33,8 @@ let
         ];
 
       # Pinning the input to the constraint solver
-      compiler-nix-name = "ghc8102";
-      index-state = "2020-11-08T00:00:00Z";
+      compiler-nix-name = "ghc8107";
+      index-state = "2020-10-15T00:00:00Z";
       plan-sha256 = sha256;
       inherit checkMaterialization;
 
@@ -74,13 +74,13 @@ let
 
 in rec {
   linux-exe      = tttool-exe pkgs
-     "0j2xsr8bxx6nhwpixdxvvqi69yjby2wpgn0y53ryhnz9idhvhv79";
+     "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5an";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
-     "08sx2487am7vsqpbr0k6l1ray48cpfkk5i2f484q4zkdmc8956il";
+     "02xhzh63ivgvvisw8w5dblh2bq75w2cx3d54xzxp7nqs21bxmzkw";
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
-     "120mpypd6sjw8adh9blsss8nxhcv9b0jrjsrlqymx59x2zwiy0jx";
+     "02ysfb0d5s45mmcnkvc59j3w7hcz0h8l0lhfxii3a0y89jp6cy9l";
   osx-exe        = tttool-exe pkgs-osx
-     "0j2xsr8bxx6nhwpixdxvvqi69yjby2wpgn0y53ryhnz9idhvhv79";
+     "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5an";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
 
   static-files = sourceByRegex ./. [
@@ -107,7 +107,7 @@ in rec {
       ]);
       tex = pkgs.texlive.combine {
         inherit (pkgs.texlive)
-          scheme-basic latexmk cmap collection-fontsrecommended
+          scheme-basic babel-german latexmk cmap collection-fontsrecommended
           fncychap titlesec tabulary varwidth framed fancyvrb float parskip
           wrapfig upquote capt-of needspace;
       };
@@ -235,7 +235,9 @@ in rec {
     installPhase = ''
       mkdir -p $out
       echo "-- Run nix-shell -A check-cabal-freeze to update this file" > $out/cabal.project.freeze
-      cat cabal.project.freeze >> $out/cabal.project.freeze
+      cat cabal.project.freeze |
+        grep -v -F active-repositories: |
+        grep -v -F index-state: >> $out/cabal.project.freeze
     '';
   };
 
