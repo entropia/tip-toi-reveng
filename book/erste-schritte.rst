@@ -85,7 +85,7 @@ Du beginnst also mit einer einfachen YAML-Datei. Öffne den Texteditor deiner Wa
 `YAML <https://de.wikipedia.org/wiki/YAML>`_ ist ein generisches Datenformat,
 das du mit einem beliebigen Texteditor erstellen und bearbeiten kannst. Beachte
 dabei dass in YAML Einrückungen, also Leerzeichen am Anfang der Zeile, wichtig
-sind.
+sind. Beachte auch, dass die Dateiendung ``.yaml`` lautet, und nicht ``.yml``.
 
 Die einzig wichtigen Felder sind ``product-id`` und ``scripts``. Die ``product-id``
 ist eine Nummer, die dein Projekt indentifiziert, und mit der am Ende der Stift
