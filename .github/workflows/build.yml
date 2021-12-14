@@ -23,7 +23,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v14
+    - uses: cachix/install-nix-action@v16
     - name: "Cachix: tttool"
       uses: cachix/cachix-action@v7
       with:
