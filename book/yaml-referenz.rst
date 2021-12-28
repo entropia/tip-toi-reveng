@@ -222,10 +222,10 @@ Solltest du Text-to-Speech in verschiedenen Sprachen benötigen, kannst du mehre
   .. code:: yaml
 
     speak:
-    - language: en
+     - language: en
        hello: "Hello, friend!"
        goodbye: "Goodbye"
-    - language: de
+     - language: de
        warning: "Achtung!"
 
 
