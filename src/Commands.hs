@@ -139,7 +139,7 @@ play :: Conf -> FilePath -> IO ()
 play conf file = do
     t <- readTransscriptFile (cTransscriptFile conf)
     (cm,tt) <-
-        if ".yaml" `isSuffixOf` file
+        if ".yaml" `isSuffixOf` file || ".yml" `isSuffixOf` file
         then do
             (tty, extraCodeMap) <- readTipToiYaml file
             (tt, ttc) <- ttYaml2tt True (takeDirectory file) tty extraCodeMap
