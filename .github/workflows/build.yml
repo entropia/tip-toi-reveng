@@ -25,10 +25,13 @@ jobs:
     - uses: actions/checkout@v2
     - uses: cachix/install-nix-action@v16
     - name: "Cachix: tttool"
-      uses: cachix/cachix-action@v7
+      uses: cachix/cachix-action@v10
       with:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+
+    # until https://github.com/cachix/cachix-action/issues/86 is fixed:
+    - run: cachix watch-store tttool &
 
     - run: nix-build --arg checkMaterialization true -A ${{ matrix.target }}
 
