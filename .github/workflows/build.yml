@@ -15,7 +15,9 @@ jobs:
         - target: static-exe
           os: ubuntu-latest
         - target: osx-exe-bundle
-          os: macos-latest
+          # we can use macos-latest against once we use a newer version of
+          # macdylibbundler (see https://github.com/tweag/ormolu/pull/835)
+          os: macos-10.15
         - target: book
           os: ubuntu-latest
 
