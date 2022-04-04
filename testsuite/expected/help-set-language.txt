@@ -9,6 +9,7 @@ Available options:
 If the language of a GME file is not empty and does not match the pen's
 language, the pen will refuse to play it. So for example you cannot play a
 French GME file using a pen set to German. This command allows you to adjust a
-GME file's language to match the pen's language, so you can play the GME file.
+GME file's language, and either remove it completely (with --empty) or to match
+the pen's language, so you can play the GME file.
 
 WARNING: This modifies the given GME file in place.

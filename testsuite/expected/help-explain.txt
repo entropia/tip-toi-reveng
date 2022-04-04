@@ -1,6 +1,7 @@
-Usage: tttool explain GME
+Usage: tttool explain GME [--dont-skip]
   print a hexdump of a GME file with descriptions
 
 Available options:
   GME                      GME file to read
+  --dont-skip              don't omit long segments
   -h,--help                Show this help text
