@@ -459,8 +459,8 @@ setLanguageCmd =
           , "match the pen\'s language, the pen will refuse to play it."
           , "So for example you cannot play a French GME file using a pen"
           , "set to German. This command allows you to adjust a GME"
-          , "file\'s language to match the pen\'s language, so you can"
-          , "play the GME file."
+          , "file\'s language, and either remove it completely (with --empty)"
+          , "or to match the pen\'s language, so you can play the GME file."
           ]
         , paragraph $ unwords
           [ "WARNING: This modifies the given GME file in place."
