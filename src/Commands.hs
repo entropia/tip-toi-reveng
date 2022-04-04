@@ -156,24 +156,24 @@ segments file = do
 
 printSegment (o,l,desc) = printf "At 0x%08X Size %8d: %s\n" o l (ppDesc desc)
 
-explain :: FilePath -> IO ()
-explain file = do
+explain :: FilePath -> Bool -> IO ()
+explain file don'tSkip = do
     bytes <- B.readFile file
     let (tt,segments) = parseTipToiFile bytes
     forM_ (addHoles segments) $ \case
         Left (o,l) -> do
             printSegment (o,l,["-- unknown --"])
-            printExtract bytes o l
+            printExtract don'tSkip bytes o l
             putStrLn ""
         Right ss@((o,l,_):_) -> do
             mapM_ printSegment ss
-            printExtract bytes o l
+            printExtract don'tSkip bytes o l
             putStrLn ""
         Right [] -> error "empty list of errors?"
 
-printExtract :: B.ByteString -> Offset -> Word32 -> IO ()
-printExtract b o 0 = return ()
-printExtract b o l = do
+printExtract :: Bool -> B.ByteString -> Offset -> Word32 -> IO ()
+printExtract _ b o 0 = return ()
+printExtract don'tSkip b o l = do
     let o1 = o .&. 0xFFFFFFF0
     lim_forM_ [o1, o1+0x10 .. (o + l-1)] $ \s -> do
         let s' = max o s
@@ -185,7 +185,7 @@ printExtract b o l = do
             (prettyHex (extract s' l' b))
   where
     lim_forM_ l act
-        = if length l > 30
+        = if length l > 30 && not don'tSkip
           then do act (head l)
                   printf "   (skipping %d lines)\n" (length l - 2) :: IO ()
                   act (last l)

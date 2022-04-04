@@ -312,7 +312,13 @@ explainCmd =
     info parser $
     progDesc "print a hexdump of a GME file with descriptions"
   where
-    parser = const <$> (explain <$> gmeFileParser)
+    parser = const <$> (explain <$> gmeFileParser <*> don'tSkipParser)
+
+    don'tSkipParser :: Parser Bool
+    don'tSkipParser = switch $ mconcat
+        [ long "dont-skip"
+        , help "don't omit long segments "
+        ]
 
 playCmd :: Mod CommandFields (Conf -> IO ())
 playCmd =
