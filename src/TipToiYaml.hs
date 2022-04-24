@@ -796,7 +796,7 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
         first = fst (M.findMin m)
         last = fst (M.findMax m)
 
-    welcome_names <- mapM (parseOneLine parsePlayList "welcome") (maybe []  unOptArray ttyWelcome)
+    welcome_names <- mapM (parseOneLine parsePlayList "welcome") (maybe [] unOptArray ttyWelcome)
 
 
     let ((prescripts, welcome, games), filenames) = resolveFileNames $
@@ -909,7 +909,6 @@ parseLine :: Parser ([Word16] -> Line Register, [String])
 parseLine = do
     conds <- many (P.try parseCond)
     (acts, filenames) <- parseCommands 0
-    eof
     return (Line 0 conds acts, filenames)
 
 descP d p = p <?> d
