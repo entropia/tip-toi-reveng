@@ -21,8 +21,8 @@ let
       ( type == "directory"  && match (relPath + "/") != null
       || match relPath != null)) src;
 
-  tttool-exe = pkgs: sha256:
-    (pkgs.haskell-nix.cabalProject {
+  tttool-project = pkgs: sha256:
+    pkgs.haskell-nix.cabalProject {
       src = sourceByRegex ./. [
           "cabal.project"
           "src/"
@@ -48,7 +48,12 @@ let
         # is set in the package plan, so override this
         packages.haskeline.flags.terminfo = false;
       };
-    }).tttool.components.exes.tttool;
+    };
+
+  tttool-exe = pkgs: sha256:
+    (tttool-project pkgs sha256).tttool.components.exes.tttool;
+  tttool-shell = pkgs: sha256:
+    (tttool-project pkgs sha256).shellFor {};
 
   osx-bundler = pkgs: tttool:
    pkgs.stdenv.mkDerivation {
@@ -73,6 +78,8 @@ let
     };
 
 in rec {
+  shell          = tttool-shell pkgs
+     "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5an";
   linux-exe      = tttool-exe pkgs
      "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5an";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
