@@ -28,6 +28,6 @@ parseOneLine p name input =
 
 parseOneLinePure :: Parser a -> String -> String -> Either String a
 parseOneLinePure p name input =
-    case P.parse p name input of
+    case P.parse (p <* eof) name input of
         Left e ->  Left $ lineParserErrorMessage input e
         Right l -> return l
