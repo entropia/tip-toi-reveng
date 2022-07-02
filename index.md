@@ -117,6 +117,12 @@ gallery:
   link: https://github.com/chemtech1/TipMaster
   img: /img/tipmaster.png
 
+- title: soundolino
+  subtitle: Unterrichtsmaterial-Platform
+  link: https://www.soundolino.ch/
+  img: /img/soundolino.png
+
+
 ---
 
 Diese Seite enthält Information zum `tttool`, einem Werkzeug zum
