@@ -61,11 +61,16 @@ will, sollte sich folgende Projekte anschauen, die allesamt auf
    `ttaudio <https://github.com/sidiandi/ttaudio#readme>`__ eine
    Windows-GUI erstellt, falls man einfach nur ein paar Audio-Dateien
    auf den Stift laden will.
+
 -  Till Korten hat mit
    `ttmp32gme <https://github.com/thawn/ttmp32gme>`__ eine grafische
    Anwendung (Windows, OS X und Linux) erstellt, die ebenfalls
    Audio-Dateien auf den Stift lädt und sehr schöne Übersichten zum
    Antippen druckt.
+
+-  Auf der Plattform https://soundolino.ch/ kann man Tiptoi-kompatible Sticker
+   mit für den Unterrichtseinsatz geeigneter Vertonung bestellen, selber drucken und
+   auf der Webseite auch sehr einfach mit eigenen Tönen versehen.
 
 Weiterführende Informationen
 ----------------------------
