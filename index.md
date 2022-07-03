@@ -120,7 +120,7 @@ gallery:
 - title: soundolino
   subtitle: Unterrichtsmaterial-Platform
   link: https://www.soundolino.ch/
-  img: /img/soundolino.png
+  img: /img/soundolino.jpg
 
 
 ---
