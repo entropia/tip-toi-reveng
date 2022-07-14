@@ -122,6 +122,11 @@ gallery:
   link: https://www.soundolino.ch/
   img: /img/soundolino.jpg
 
+- title: Rätsel-Einkleber für ein ???-Freundebuch
+  subtitle: von jabgh
+  link: https://github.com/jabgh/tiptoi-DreiFragezeichenRaetsel
+  img: /img/drei-fragezeichen.jpg
+
 
 ---
 
