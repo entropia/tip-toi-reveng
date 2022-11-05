@@ -108,7 +108,7 @@ in rec {
 
   book =
     let
-      sphinx-env = pkgs.python.withPackages(ps: [
+      sphinx-env = pkgs.python3.withPackages(ps: [
         ps.sphinx
         ps.recommonmark
       ]);
