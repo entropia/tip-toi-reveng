@@ -7,7 +7,8 @@ let
 
   # Peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix
   # for supported nixpkgs and ghc versions
-  nixpkgsSrc = haskellNix.sources.nixpkgs-2205;
+  # or https://github.com/input-output-hk/haskell.nix/blob/master/docs/reference/supported-ghc-versions.md
+  nixpkgsSrc = haskellNix.sources.nixpkgs-unstable;
   nixpkgsArgs = haskellNix.nixpkgsArgs;
 
   pkgs = import nixpkgsSrc nixpkgsArgs;
