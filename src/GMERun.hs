@@ -2,7 +2,7 @@
 module GMERun (playTipToi, execOID) where
 
 import Text.Printf
-import Data.Bits
+import Data.Bits hiding (And)
 import Data.List
 import qualified Data.Map as M
 import Control.Monad.State.Strict

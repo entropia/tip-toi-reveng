@@ -35,7 +35,7 @@ let
 
       # Pinning the input to the constraint solver
       compiler-nix-name = "ghc924";
-      index-state = "2022-01-04T00:00:00Z";
+      index-state = "2022-11-04T00:00:00Z";
       plan-sha256 = sha256;
       inherit checkMaterialization;
 
@@ -80,9 +80,9 @@ let
 
 in rec {
   shell          = tttool-shell pkgs
-     "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5a0";
+     "sha256-1lFwcot5HpKEEefE2uvYhBWkvE+8ne8yGUlGb+ma6eo=";
   linux-exe      = tttool-exe pkgs
-     "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5a0";
+     "sha256-1lFwcot5HpKEEefE2uvYhBWkvE+8ne8yGUlGb+ma6eo=";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
      "02xhzh63ivgvvisw8w5dblh2bq75w2cx3d54xzxp7nqs21bxmzk0";
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
@@ -230,6 +230,8 @@ in rec {
 
   # The following two derivations keep the cabal.config.freeze file
   # up to date.
+  cabal-cmd = "nix-shell -A check-cabal-freeze default.nix";
+
   cabal-freeze = pkgs.stdenv.mkDerivation {
     name = "cabal-freeze";
     src = linux-exe.src;
@@ -237,12 +239,11 @@ in rec {
     buildPhase = ''
       mkdir .cabal
       touch .cabal/config
-      rm cabal.project # so that cabal new-freeze does not try to use HPDF via git
       HOME=$PWD cabal new-freeze --offline --enable-tests || true
     '';
     installPhase = ''
       mkdir -p $out
-      echo "-- Run nix-shell -A check-cabal-freeze to update this file" > $out/cabal.project.freeze
+      echo "-- Run ${cabal-cmd} to update this file" > $out/cabal.project.freeze
       cat cabal.project.freeze |
         grep -v -F active-repositories: |
         grep -v -F index-state: >> $out/cabal.project.freeze
@@ -253,7 +254,6 @@ in rec {
       nativeBuildInputs = [ pkgs.diffutils ];
       expected = cabal-freeze + /cabal.project.freeze;
       actual = ./cabal.project.freeze;
-      cmd = "nix-shell -A check-cabal-freeze";
       shellHook = ''
         dest=${toString ./cabal.project.freeze}
         rm -f $dest
@@ -263,7 +263,7 @@ in rec {
       '';
     } ''
       diff -r -U 3 $actual $expected ||
-        { echo "To update, please run"; echo "nix-shell -A check-cabal-freeze"; exit 1; }
+        { echo "To update, please run ${cabal-cmd}"; exit 1; }
       touch $out
     '';
 }
