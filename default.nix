@@ -5,9 +5,9 @@ let
   # Fetch the latest haskell.nix and import its default.nix
   haskellNix = import sources.haskellNix {};
 
-  # windows crossbuilding with ghc-8.10 needs at least 20.09.
-  # A peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix can help
-  nixpkgsSrc = haskellNix.sources.nixpkgs-2105;
+  # Peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix
+  # for supported nixpkgs and ghc versions
+  nixpkgsSrc = haskellNix.sources.nixpkgs-2205;
   nixpkgsArgs = haskellNix.nixpkgsArgs;
 
   pkgs = import nixpkgsSrc nixpkgsArgs;
@@ -33,8 +33,8 @@ let
         ];
 
       # Pinning the input to the constraint solver
-      compiler-nix-name = "ghc8107";
-      index-state = "2020-10-15T00:00:00Z";
+      compiler-nix-name = "ghc924";
+      index-state = "2022-01-04T00:00:00Z";
       plan-sha256 = sha256;
       inherit checkMaterialization;
 
@@ -79,15 +79,15 @@ let
 
 in rec {
   shell          = tttool-shell pkgs
-     "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5an";
+     "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5a0";
   linux-exe      = tttool-exe pkgs
-     "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5an";
+     "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5a0";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
-     "02xhzh63ivgvvisw8w5dblh2bq75w2cx3d54xzxp7nqs21bxmzkw";
+     "02xhzh63ivgvvisw8w5dblh2bq75w2cx3d54xzxp7nqs21bxmzk0";
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
-     "02ysfb0d5s45mmcnkvc59j3w7hcz0h8l0lhfxii3a0y89jp6cy9l";
+     "02ysfb0d5s45mmcnkvc59j3w7hcz0h8l0lhfxii3a0y89jp6cy90";
   osx-exe        = tttool-exe pkgs-osx
-     "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5an";
+     "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5a0";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
 
   static-files = sourceByRegex ./. [
