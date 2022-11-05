@@ -405,7 +405,7 @@ getRealGame gGameType = do
       9 -> return $ Game9 {..}
       10 -> return $ Game10 {..}
       16 -> return $ Game16 {..}
-      253 -> return Game253
+      -- 253 -> error "dead code, handled above"
       _ -> return $ CommonGame {..}
   where
     getIf :: (Word16 -> Bool) -> SGet a -> SGet a
