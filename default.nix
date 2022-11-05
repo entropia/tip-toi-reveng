@@ -83,13 +83,13 @@ let
 
 in rec {
   shell          = tttool-shell pkgs
-     "sha256-1lFwcot5HpKEEefE2uvYhBWkvE+8ne8yGUlGb+ma6eo=";
+     "1sp9kblnyij934rfz7dw9yya85c4v3mxmi77262947kridr70lfn";
   linux-exe      = tttool-exe pkgs
-     "sha256-1lFwcot5HpKEEefE2uvYhBWkvE+8ne8yGUlGb+ma6eo=";
+     "1sp9kblnyij934rfz7dw9yya85c4v3mxmi77262947kridr70lfn";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
-     "sha256-jTYiVgmhT/9oaYwuRtb0iWazHc0WzoDCnFQ+GTr1Aq0=";
+     "1b82ylx1jgjlkk181khnrlfv6rl9ykb4cblcd5lgykx115b24dld";
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
-     "sha256-1lFwcot5HpKEEefE2uvYhBWkvE+8ne8yGUlGb+ma6eo=";
+     "1sp9kblnyij934rfz7dw9yya85c4v3mxmi77262947kridr70lfn";
   osx-exe        = tttool-exe pkgs-osx
      "0s8b8wrzdyislim07dkd3zbi6skhi5lygdlnn2vcz13nmhk9d5a0";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
