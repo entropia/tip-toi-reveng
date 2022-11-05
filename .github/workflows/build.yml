@@ -26,9 +26,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v16
+    - uses: cachix/install-nix-action@v18
     - name: "Cachix: tttool"
-      uses: cachix/cachix-action@v10
+      uses: cachix/cachix-action@v12
       with:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
@@ -50,9 +50,9 @@ jobs:
     needs: build
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v16
+    - uses: cachix/install-nix-action@v18
     - name: "Cachix: tttool"
-      uses: cachix/cachix-action@v7
+      uses: cachix/cachix-action@v12
       with:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
@@ -78,9 +78,9 @@ jobs:
     needs: build
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v16
+    - uses: cachix/install-nix-action@v18
     - name: "Cachix: tttool"
-      uses: cachix/cachix-action@v7
+      uses: cachix/cachix-action@v12
       with:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
