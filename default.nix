@@ -54,7 +54,10 @@ let
   tttool-exe = pkgs: sha256:
     (tttool-project pkgs sha256).tttool.components.exes.tttool;
   tttool-shell = pkgs: sha256:
-    (tttool-project pkgs sha256).shellFor {};
+    (tttool-project pkgs sha256).shellFor {
+      buildInputs = [ pkgs.ghcid ];
+    };
+
 
   osx-bundler = pkgs: tttool:
    pkgs.stdenv.mkDerivation {

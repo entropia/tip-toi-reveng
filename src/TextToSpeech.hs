@@ -1,5 +1,3 @@
-{-# LANGUAGE NondecreasingIndentation #-}
-
 module TextToSpeech where
 
 import System.Directory
@@ -104,24 +102,23 @@ textToSpeech :: Language -> String -> IO ()
 textToSpeech lang txt = do
     ex <- doesFileExist fn
     if ex then return () else do
+        createDirectoryIfMissing True (takeDirectory fn)
 
-    createDirectoryIfMissing True (takeDirectory fn)
+        putStrLn $ "Speaking \"" ++ txt ++ "\"."
+        (tmp,h) <- openTempFile (takeDirectory fn) (takeBaseName fn <.> "wav")
+        hClose h
 
-    putStrLn $ "Speaking \"" ++ txt ++ "\"."  
-    (tmp,h) <- openTempFile (takeDirectory fn) (takeBaseName fn <.> "wav")
-    hClose h
+        (myDir,_) <- splitExecutablePath
 
-    (myDir,_) <- splitExecutablePath
+        tryPrograms (engines myDir lang tmp txt) $ do
+            putStrLn "No suitable text-to-speech-engine found."
+            putStrLn "Do you have libttspico-utils or espeak installed?"
 
-    tryPrograms (engines myDir lang tmp txt) $ do
-        putStrLn "No suitable text-to-speech-engine found."
-        putStrLn "Do you have libttspico-utils or espeak installed?"
+        tryPrograms (encoders tmp fn) $ do
+            putStrLn "Could not find \"oggenc\"."
+            putStrLn "Do you have vorbis-tools installed?"
 
-    tryPrograms (encoders tmp fn) $ do
-        putStrLn "Could not find \"oggenc\"."
-        putStrLn "Do you have vorbis-tools installed?"
-
-    removeFile tmp
-    return ()
+        removeFile tmp
+        return ()
   where
     fn = ttsFileName lang txt

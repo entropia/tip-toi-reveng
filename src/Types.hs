@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveFunctor, DeriveFoldable #-}
-
 module Types
     ( module Types, Word8, Word16, Word32 )
 where

@@ -1,5 +1,3 @@
-{-# LANGUAGE BangPatterns, TupleSections, FlexibleContexts #-}
-
 module OidCode (genRawPixels, oidSVGPattern, writeRawPNG, writeRawSVG, tilePixelSize, DPI(..), PixelSize(..)) where
 
 import Data.Word

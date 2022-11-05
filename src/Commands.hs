@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, RecordWildCards, TupleSections #-}
+{-# LANGUAGE CPP, RecordWildCards #-}
 {-# LANGUAGE LambdaCase #-}
 module Commands where
 

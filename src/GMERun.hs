@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
 module GMERun (playTipToi, execOID) where
 
 import Text.Printf

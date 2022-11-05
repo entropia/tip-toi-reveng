@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, RecordWildCards #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module GMEParser (parseTipToiFile) where
 

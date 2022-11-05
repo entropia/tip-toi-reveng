@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, RecursiveDo, RecordWildCards, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables #-}
+{-# LANGUAGE RecursiveDo, RecordWildCards, GADTs #-}
 
 module GMEWriter (writeTipToiFile) where
 
