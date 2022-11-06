@@ -91,7 +91,7 @@ in rec {
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
      "1sp9kblnyij934rfz7dw9yya85c4v3mxmi77262947kridr70lfn";
   osx-exe        = tttool-exe pkgs-osx
-     "sha256-1lFwcot5HpKEEefE2uvYhBWkvE+8ne8yGUlGb+ma6eo=";
+     "1sp9kblnyij934rfz7dw9yya85c4v3mxmi77262947kridr70lfn";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
 
   static-files = sourceByRegex ./. [
