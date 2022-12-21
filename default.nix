@@ -83,15 +83,15 @@ let
 
 in rec {
   shell          = tttool-shell pkgs
-     "1sp9kblnyij934rfz7dw9yya85c4v3mxmi77262947kridr70lfn";
+     "1i97b1n9jpn94218ixdg27ysq3ncizm3v6d3ivl5l63qc2010cbr";
   linux-exe      = tttool-exe pkgs
-     "1sp9kblnyij934rfz7dw9yya85c4v3mxmi77262947kridr70lfn";
+     "1i97b1n9jpn94218ixdg27ysq3ncizm3v6d3ivl5l63qc2010cbr";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
      "1b82ylx1jgjlkk181khnrlfv6rl9ykb4cblcd5lgykx115b24dld";
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
-     "1sp9kblnyij934rfz7dw9yya85c4v3mxmi77262947kridr70lfn";
+     "1i97b1n9jpn94218ixdg27ysq3ncizm3v6d3ivl5l63qc2010cbr";
   osx-exe        = tttool-exe pkgs-osx
-     "1sp9kblnyij934rfz7dw9yya85c4v3mxmi77262947kridr70lfn";
+     "1i97b1n9jpn94218ixdg27ysq3ncizm3v6d3ivl5l63qc2010cbr";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
 
   static-files = sourceByRegex ./. [
