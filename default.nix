@@ -83,9 +83,9 @@ in rec {
   linux-exe      = tttool-exe pkgs
      "0wylkf6lv46xa4phw8aad10g2qs7r80y9h30r9m8l1aj3v84fpl5";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
-     "02xhzh63ivgvvisw8w5dblh2bq75w2cx3d54xzxp7nqs21bxmzkw";
+     "1nz28dd2zq3ilvj561wxzq7n0vahv1gfgm63mfsl0cm39vmld5a3";
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
-     "02ysfb0d5s45mmcnkvc59j3w7hcz0h8l0lhfxii3a0y89jp6cy9l";
+     "1j5hv52n5qmrv6vcss5bmgh1j4rwyf11fbprj5lf71bi33bwr638";
   osx-exe        = tttool-exe pkgs-osx
      "0wylkf6lv46xa4phw8aad10g2qs7r80y9h30r9m8l1aj3v84fpl5";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
