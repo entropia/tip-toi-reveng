@@ -73,7 +73,7 @@ jobs:
   package:
     # this will only work when the jobs above have uploaded their stuff to the
     # nix cache, which will not work for pull requests from other repositories
-    if: github.event_name != 'pull_request'
+    if: github.repository == 'entropia/tip-toi-reveng'
     runs-on: ubuntu-latest
     needs: build
     steps:
