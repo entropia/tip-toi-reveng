@@ -74,7 +74,7 @@ oidTableSvg conf usePNG title entries
                         $ fromString d
   where
     -- Configure-dependent dimensions (all in pt)
-    (imageWidth,imageHeight) = (*mm) *** (*mm) $ fromIntegral *** fromIntegral $cCodeDim conf
+    (imageWidth,imageHeight) = (*mm) *** (*mm) $ fromIntegral *** fromIntegral $ cCodeDim conf
 
     -- Static dimensions (all in pt)
 

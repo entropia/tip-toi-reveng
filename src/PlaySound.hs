@@ -1,5 +1,3 @@
-{-# LANGUAGE NondecreasingIndentation #-}
-
 module PlaySound (playSound) where
 
 import System.Process

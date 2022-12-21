@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeSynonymInstances, RecordWildCards #-}
+{-# LANGUAGE RecordWildCards #-}
 module PrettyPrint where
 
 import qualified Data.ByteString.Lazy as B

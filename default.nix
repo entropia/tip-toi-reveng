@@ -5,9 +5,10 @@ let
   # Fetch the latest haskell.nix and import its default.nix
   haskellNix = import sources.haskellNix {};
 
-  # windows crossbuilding with ghc-8.10 needs at least 20.09.
-  # A peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix can help
-  nixpkgsSrc = haskellNix.sources.nixpkgs-2105;
+  # Peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix
+  # for supported nixpkgs and ghc versions
+  # or https://github.com/input-output-hk/haskell.nix/blob/master/docs/reference/supported-ghc-versions.md
+  nixpkgsSrc = haskellNix.sources.nixpkgs-unstable;
   nixpkgsArgs = haskellNix.nixpkgsArgs;
 
   pkgs = import nixpkgsSrc nixpkgsArgs;
@@ -33,8 +34,8 @@ let
         ];
 
       # Pinning the input to the constraint solver
-      compiler-nix-name = "ghc8107";
-      index-state = "2020-10-15T00:00:00Z";
+      compiler-nix-name = "ghc924";
+      index-state = "2022-11-04T00:00:00Z";
       plan-sha256 = sha256;
       inherit checkMaterialization;
 
@@ -53,7 +54,10 @@ let
   tttool-exe = pkgs: sha256:
     (tttool-project pkgs sha256).tttool.components.exes.tttool;
   tttool-shell = pkgs: sha256:
-    (tttool-project pkgs sha256).shellFor {};
+    (tttool-project pkgs sha256).shellFor {
+      buildInputs = [ pkgs.ghcid ];
+    };
+
 
   osx-bundler = pkgs: tttool:
    pkgs.stdenv.mkDerivation {
@@ -79,15 +83,15 @@ let
 
 in rec {
   shell          = tttool-shell pkgs
-     "0wylkf6lv46xa4phw8aad10g2qs7r80y9h30r9m8l1aj3v84fpl5";
+     "1i97b1n9jpn94218ixdg27ysq3ncizm3v6d3ivl5l63qc2010cbr";
   linux-exe      = tttool-exe pkgs
-     "0wylkf6lv46xa4phw8aad10g2qs7r80y9h30r9m8l1aj3v84fpl5";
+     "1i97b1n9jpn94218ixdg27ysq3ncizm3v6d3ivl5l63qc2010cbr";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
-     "1nz28dd2zq3ilvj561wxzq7n0vahv1gfgm63mfsl0cm39vmld5a3";
+     "0y2ri2ww7d39dgqxmjz9m00ybmxcpr624cafhq1zdhmizyknirzj";
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
-     "1j5hv52n5qmrv6vcss5bmgh1j4rwyf11fbprj5lf71bi33bwr638";
+     "1i97b1n9jpn94218ixdg27ysq3ncizm3v6d3ivl5l63qc2010cbr";
   osx-exe        = tttool-exe pkgs-osx
-     "0wylkf6lv46xa4phw8aad10g2qs7r80y9h30r9m8l1aj3v84fpl5";
+     "1i97b1n9jpn94218ixdg27ysq3ncizm3v6d3ivl5l63qc2010cbr";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
 
   static-files = sourceByRegex ./. [
@@ -108,7 +112,7 @@ in rec {
 
   book =
     let
-      sphinx-env = pkgs.python.withPackages(ps: [
+      sphinx-env = pkgs.python3.withPackages(ps: [
         ps.sphinx
         ps.recommonmark
       ]);
@@ -229,6 +233,8 @@ in rec {
 
   # The following two derivations keep the cabal.config.freeze file
   # up to date.
+  cabal-cmd = "nix-shell -A check-cabal-freeze default.nix";
+
   cabal-freeze = pkgs.stdenv.mkDerivation {
     name = "cabal-freeze";
     src = linux-exe.src;
@@ -236,12 +242,11 @@ in rec {
     buildPhase = ''
       mkdir .cabal
       touch .cabal/config
-      rm cabal.project # so that cabal new-freeze does not try to use HPDF via git
       HOME=$PWD cabal new-freeze --offline --enable-tests || true
     '';
     installPhase = ''
       mkdir -p $out
-      echo "-- Run nix-shell -A check-cabal-freeze to update this file" > $out/cabal.project.freeze
+      echo "-- Run ${cabal-cmd} to update this file" > $out/cabal.project.freeze
       cat cabal.project.freeze |
         grep -v -F active-repositories: |
         grep -v -F index-state: >> $out/cabal.project.freeze
@@ -252,7 +257,6 @@ in rec {
       nativeBuildInputs = [ pkgs.diffutils ];
       expected = cabal-freeze + /cabal.project.freeze;
       actual = ./cabal.project.freeze;
-      cmd = "nix-shell -A check-cabal-freeze";
       shellHook = ''
         dest=${toString ./cabal.project.freeze}
         rm -f $dest
@@ -262,7 +266,7 @@ in rec {
       '';
     } ''
       diff -r -U 3 $actual $expected ||
-        { echo "To update, please run"; echo "nix-shell -A check-cabal-freeze"; exit 1; }
+        { echo "To update, please run ${cabal-cmd}"; exit 1; }
       touch $out
     '';
 }

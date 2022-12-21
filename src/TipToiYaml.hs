@@ -1,5 +1,4 @@
-{-# LANGUAGE RecordWildCards, DeriveGeneric, TupleSections #-}
-
+{-# LANGUAGE RecordWildCards #-}
 module TipToiYaml
     ( tt2ttYaml, ttYaml2tt
     , readTipToiYaml, writeTipToiYaml,writeTipToiCodeYaml

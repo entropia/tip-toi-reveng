@@ -73,7 +73,7 @@ oidTable conf title entries | entriesPerPage < 1 = error "OID codes too large to
         }
 
     -- Configure-dependent dimensions (all in pt)
-    (imageWidth,imageHeight) = (*mm) *** (*mm) $ fromIntegral *** fromIntegral $cCodeDim conf
+    (imageWidth,imageHeight) = (*mm) *** (*mm) $ fromIntegral *** fromIntegral $ cCodeDim conf
 
     -- Static dimensions (all in pt)
 

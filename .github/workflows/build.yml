@@ -16,19 +16,17 @@ jobs:
         - target: static-exe
           os: ubuntu-latest
         - target: osx-exe-bundle
-          # we can use macos-latest against once we use a newer version of
-          # macdylibbundler (see https://github.com/tweag/ormolu/pull/835)
-          os: macos-10.15
+          os: macos-latest
         - target: book
           os: ubuntu-latest
 
     name: Build ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v16
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v18
     - name: "Cachix: tttool"
-      uses: cachix/cachix-action@v10
+      uses: cachix/cachix-action@v12
       with:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
@@ -40,7 +38,7 @@ jobs:
 
     # work around https://github.com/actions/upload-artifact/issues/92
     - run: cp -RvL result upload
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: tttool (${{ matrix.target }})
         path: upload/
@@ -49,10 +47,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-    - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v16
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v18
     - name: "Cachix: tttool"
-      uses: cachix/cachix-action@v7
+      uses: cachix/cachix-action@v12
       with:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
@@ -61,10 +59,10 @@ jobs:
   check-cabal-freeze:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v16
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v18
     - name: "Cachix: tttool"
-      uses: cachix/cachix-action@v7
+      uses: cachix/cachix-action@v12
       with:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
@@ -77,10 +75,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-    - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v16
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v18
     - name: "Cachix: tttool"
-      uses: cachix/cachix-action@v7
+      uses: cachix/cachix-action@v12
       with:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
@@ -88,7 +86,7 @@ jobs:
     - run: nix-build -A release-zip
 
     - run: unzip -d upload ./result/*.zip
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: Release zip file
         path: upload

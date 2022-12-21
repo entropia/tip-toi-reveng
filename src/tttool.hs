@@ -5,7 +5,6 @@ import Numeric
 import Data.List (intercalate)
 import Options.Applicative.Help.Chunk
 import Data.Maybe
-import Data.Foldable (asum)
 import Data.Char (toLower)
 
 import Types
