@@ -1,5 +1,9 @@
 # Changelog for tttool
 
+## 1.11 (2022-12-21)
+
+ * New command `set-product-id`
+
 ## 1.10 (2021-04-08)
 
  * Audio filenames can now be quoted, to support filenames with characters

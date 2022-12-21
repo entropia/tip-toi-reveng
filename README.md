@@ -31,6 +31,7 @@ supports various subcommands:
 
     GME modification commands:
       set-language             sets the language field of an GME file
+      set-product-id           changes the product id an GME file
 
     GME analysis commands:
       info                     Print general information about a GME file

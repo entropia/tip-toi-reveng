@@ -1,0 +1,12 @@
+Usage: tttool set-product-id PRODUCT-ID GME
+  changes the product id an GME file
+
+Available options:
+  PRODUCT-ID               Product id (typically < 1000)
+  GME                      GME file to modify
+  -h,--help                Show this help text
+
+It may be useful change the product id of a GME file without touching the rest
+of the file.
+
+WARNING: This modifies the given GME file in place.

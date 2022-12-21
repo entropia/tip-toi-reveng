@@ -172,3 +172,21 @@ andere Sprache eingestellt ist, kann man die Sprache in der GME-Datei mit diesem
 Typische Sprachangaben sind ``GERMAN``, ``FRENCH``, ``RUSSIA``.
 
 Achtung: Der Befehl überschreibt die angegebene GME-Datei.
+
+.. _tttool-set-product-id:
+
+Product-Id einer GME-Datei ändern
+------------------------------
+
+Format:
+  | **tttool** **set-product-id** *id* *datei.gme*
+
+Beispiel:
+  .. code::
+
+    tttool set-product-id 991 WWW_Bauernhof.gme
+
+Es kann manchmal nützlich sein, die Produkt-ID einer GME-Datei zu ändern, etwa um mehrere
+Versionen auf einen Stift zu laden.
+
+Achtung: Der Befehl überschreibt die angegebene GME-Datei.

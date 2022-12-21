@@ -118,6 +118,7 @@ optionParser =
         , hsubparser $ mconcat
           [ commandGroup "GME modification commands:"
           , setLanguageCmd
+          , setProductIdCmd
           , hidden
           ]
         , hsubparser $ mconcat
@@ -487,6 +488,38 @@ setLanguageCmd =
       strArgument (mconcat
         [ metavar "LANG"
         , help "Language (e.g. GERMAN, ENGLISH, FRENCH, DUTCH…)"
+        ])
+
+setProductIdCmd :: Mod CommandFields (Conf -> IO ())
+setProductIdCmd =
+    command "set-product-id" $
+    info parser $
+    progDesc "changes the product id an GME file" <>
+    footerDoc foot
+  where
+    foot = unChunk $ vsepChunks
+        [ paragraph $ unwords
+          [ "It may be useful change the product id of a GME file without touching"
+          , "the rest of the file."
+          ]
+        , paragraph $ unwords
+          [ "WARNING: This modifies the given GME file in place."
+          ]
+        ]
+
+    parser = (\l f c -> setProductId l f) <$> productIdParser <*> gmeFileParser
+
+    gmeFileParser :: Parser FilePath
+    gmeFileParser = strArgument $ mconcat
+        [ metavar "GME"
+        , help "GME file to modify"
+        ]
+
+    productIdParser :: Parser ProductID
+    productIdParser =
+      argument auto (mconcat
+        [ metavar "PRODUCT-ID"
+        , help "Product id (typically < 1000)"
         ])
 
 main :: IO ()

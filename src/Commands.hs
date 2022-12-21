@@ -411,3 +411,33 @@ setLanguage lang file = do
     renameFile (file ++ ".tmp") file
 
 
+setProductId :: ProductID -> FilePath -> IO ()
+setProductId productid file = do
+    -- TODO: Refactor together with setLanguage
+    -- commands
+
+    input <- B.readFile file
+    when (B.length input < 0x64) $ do
+        printf "Input file \"%s\" is too short to be a GME file.\n" file
+        exitFailure
+    -- figure out where to but the bytes
+    let offset = 0x14
+    let length = 4
+    -- assemble file
+    let output = Br.toLazyByteString $ mconcat
+            [ Br.fromLazyByteString $ B.take offset input
+            , Br.putWord32le productid
+            , Br.fromLazyByteString $ B.drop (offset + length) input
+            ]
+    when (B.length input /= B.length output) $ error "Internal error in setProductId"
+
+    -- update checksum
+    let bytes = B.take (B.length output - 4) output
+    let checksum = B.foldl' (\s b -> fromIntegral b + s) 0 bytes
+    let output' = Br.toLazyByteString $
+            Br.fromLazyByteString bytes `Br.append` Br.putWord32le checksum
+
+    B.writeFile (file ++ ".tmp") output'
+    renameFile (file ++ ".tmp") file
+
+
