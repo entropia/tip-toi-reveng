@@ -1,6 +1,6 @@
 # Changelog for tttool
 
-## 1.11 (UNRELEASED)
+## 1.11 (2023-02-11)
 
  * New command `set-product-id`
 
