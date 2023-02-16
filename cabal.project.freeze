@@ -1,4 +1,4 @@
--- Run nix-shell -A check-cabal-freeze default.nix to update this file
+-- Run nix develop .#update-cabal-freeze to update this file
 constraints: any.HPDF ==1.4.10,
              any.JuicyPixels ==3.3.7,
              any.OneTuple ==0.3.1,
