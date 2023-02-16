@@ -20,7 +20,7 @@ Building from source
 
  4. Build `tttool`:
 
-        nix-build -A linux-exe
+        nix build .#linux-exe
 
  5. Copy the resulting program to the current directory:
 
@@ -39,12 +39,15 @@ Making a release
 
 1. Ensure that the version number is up-to-date in:
    `Changelog.md`, `tttool.cabal`, `book/conf.py`
-2. Run `nix-build --arg checkMaterialization` and update hashes in `defaul.nix`
-   until it no longer complains.
+2. Run
+
+       nix flake check
+
+   and update the hashes in `default.nix` until it no longer complains.
 3. Push to CI so that the OSX binaries are built and uploaded to the Cachix
    cache.
 4. Run
 
-       nix-build -A release-zip
+       nix build
 
 5. Upload `result/tttool-n.m.zip`.

@@ -1,4 +1,4 @@
-{ checkMaterialization ? false, haskellNix }:
+{ checkMaterialization, haskellNix }:
 let
   # Fetch the latest haskell.nix and import its default.nix
   # haskellNix = import haskellNixSrc {};
@@ -231,7 +231,7 @@ in rec {
 
   # The following two derivations keep the cabal.config.freeze file
   # up to date.
-  cabal-cmd = "nix-shell -A check-cabal-freeze default.nix";
+  cabal-cmd = "nix develop .#update-cabal-freeze";
 
   cabal-freeze = pkgs.stdenv.mkDerivation {
     name = "cabal-freeze";
@@ -256,7 +256,13 @@ in rec {
       expected = cabal-freeze + /cabal.project.freeze;
       actual = ./cabal.project.freeze;
       shellHook = ''
-        dest=${toString ./cabal.project.freeze}
+        if ! diff -q $PWD/cabal.project.freeze ${toString ./cabal.project.freeze}
+        then
+          echo "$PWD/cabal.project.freeze and ${toString ./cabal.project.freeze} differ."
+          echo "Is this run from the right directory?"
+          exit 1
+        fi
+        dest=./cabal.project.freeze
         rm -f $dest
         cp -v $expected $dest
         chmod u-w $dest
