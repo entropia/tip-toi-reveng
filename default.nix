@@ -1,18 +1,16 @@
-{ checkMaterialization ? false }:
+{ checkMaterialization ? false, haskellNix }:
 let
-  sources = import nix/sources.nix;
-
   # Fetch the latest haskell.nix and import its default.nix
-  haskellNix = import sources.haskellNix {};
+  # haskellNix = import haskellNixSrc {};
 
   # Peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix
   # for supported nixpkgs and ghc versions
   # or https://github.com/input-output-hk/haskell.nix/blob/master/docs/reference/supported-ghc-versions.md
-  nixpkgsSrc = haskellNix.sources.nixpkgs-unstable;
+  nixpkgsSrc = haskellNix.internal.compat;
   nixpkgsArgs = haskellNix.nixpkgsArgs;
 
-  pkgs = import nixpkgsSrc nixpkgsArgs;
-  pkgs-osx = import nixpkgsSrc (nixpkgsArgs // { system = "x86_64-darwin"; });
+  pkgs = (haskellNix.internal.compat { system = "x86_64-linux"; }).pkgs-unstable;
+  pkgs-osx = (haskellNix.internal.compat { system = "x86_64-darwin"; }).pkgs-unstable;
 
   # a nicer filterSource
   sourceByRegex =
