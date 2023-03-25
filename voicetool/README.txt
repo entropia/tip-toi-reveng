@@ -1,6 +1,6 @@
 The tiptoi firmware files contain a block of wav files that are used by
 the pen on various occations, e.g. startup, shutdown and debug mode
-(see voicestrings.txt for a complete list).
+(see wavs.txt for a complete list).
 
 As the original firmware contains spoken chinese it is difficult to
 use the debug mode.
