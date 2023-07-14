@@ -19,6 +19,8 @@ jobs:
           os: macos-latest
         - target: book
           os: ubuntu-latest
+        - target: shell
+          os: ubuntu-latest
 
     name: Build ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
