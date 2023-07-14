@@ -34,8 +34,8 @@ let
         ];
 
       # Pinning the input to the constraint solver
-      compiler-nix-name = "ghc924";
-      index-state = "2022-11-04T00:00:00Z";
+      compiler-nix-name = "ghc928";
+      index-state = "2023-07-14T00:00:00Z";
       plan-sha256 = sha256;
       inherit checkMaterialization;
 
@@ -83,15 +83,15 @@ let
 
 in rec {
   shell          = tttool-shell pkgs
-     "1i97b1n9jpn94218ixdg27ysq3ncizm3v6d3ivl5l63qc2010cbr";
+     "12fm0i61zhah9yrkf0lmpybrcl0q91gb3krib12zz6qg5fx0lbw7";
   linux-exe      = tttool-exe pkgs
-     "1i97b1n9jpn94218ixdg27ysq3ncizm3v6d3ivl5l63qc2010cbr";
+     "12fm0i61zhah9yrkf0lmpybrcl0q91gb3krib12zz6qg5fx0lbw7";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
-     "0y2ri2ww7d39dgqxmjz9m00ybmxcpr624cafhq1zdhmizyknirzj";
+     "1x16mjjx4wnzksmpi4jg6ykvfvdshrhp58gciy9lfslavy9clf3a";
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
-     "1i97b1n9jpn94218ixdg27ysq3ncizm3v6d3ivl5l63qc2010cbr";
+     "12fm0i61zhah9yrkf0lmpybrcl0q91gb3krib12zz6qg5fx0lbw7";
   osx-exe        = tttool-exe pkgs-osx
-     "1i97b1n9jpn94218ixdg27ysq3ncizm3v6d3ivl5l63qc2010cbr";
+     "0jmcpd8l6smj0zqkx4cx6ma2v3cvxmwws0s92ssrc6ginpis3gkb";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
 
   static-files = sourceByRegex ./. [
