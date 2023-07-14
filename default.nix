@@ -3,13 +3,20 @@ let
   sources = import nix/sources.nix;
 
   # Fetch the latest haskell.nix and import its default.nix
-  haskellNix = import sources.haskellNix {};
+  haskellNix = import sources.haskellNix {
+  };
 
   # Peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix
   # for supported nixpkgs and ghc versions
   # or https://github.com/input-output-hk/haskell.nix/blob/master/docs/reference/supported-ghc-versions.md
   nixpkgsSrc = haskellNix.sources.nixpkgs-unstable;
-  nixpkgsArgs = haskellNix.nixpkgsArgs;
+  nixpkgsArgs = haskellNix.nixpkgsArgs // {
+    overlays = haskellNix.nixpkgsArgs.overlays ++ [
+      (self: super: {
+        pulse = super.libpulseaudio; # for haskell.nix
+      })
+    ];
+  };
 
   pkgs = import nixpkgsSrc nixpkgsArgs;
   pkgs-osx = import nixpkgsSrc (nixpkgsArgs // { system = "x86_64-darwin"; });
@@ -55,7 +62,11 @@ let
     (tttool-project pkgs sha256).tttool.components.exes.tttool;
   tttool-shell = pkgs: sha256:
     (tttool-project pkgs sha256).shellFor {
-      buildInputs = [ pkgs.ghcid ];
+      buildInputs = with pkgs; [
+        ghcid
+        picotts
+        vorbis-tools
+      ];
     };
 
 
@@ -83,13 +94,13 @@ let
 
 in rec {
   shell          = tttool-shell pkgs
-     "12fm0i61zhah9yrkf0lmpybrcl0q91gb3krib12zz6qg5fx0lbw7";
+     "0jmcpd8l6smj0zqkx4cx6ma2v3cvxmwws0s92ssrc6ginpis3gkb";
   linux-exe      = tttool-exe pkgs
-     "12fm0i61zhah9yrkf0lmpybrcl0q91gb3krib12zz6qg5fx0lbw7";
+     "0jmcpd8l6smj0zqkx4cx6ma2v3cvxmwws0s92ssrc6ginpis3gkb";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
      "1x16mjjx4wnzksmpi4jg6ykvfvdshrhp58gciy9lfslavy9clf3a";
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
-     "12fm0i61zhah9yrkf0lmpybrcl0q91gb3krib12zz6qg5fx0lbw7";
+     "0jmcpd8l6smj0zqkx4cx6ma2v3cvxmwws0s92ssrc6ginpis3gkb";
   osx-exe        = tttool-exe pkgs-osx
      "sha256-hy8KuisPm/9FWDHPsV5IGFCWl7+VAjezT1DBH0wE1Yk=";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
