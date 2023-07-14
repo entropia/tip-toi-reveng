@@ -26,7 +26,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v3
-    - uses: cachix/install-nix-action@v18
+    - uses: cachix/install-nix-action@v22
     - name: "Cachix: tttool"
       uses: cachix/cachix-action@v12
       with:
@@ -50,7 +50,7 @@ jobs:
     needs: build
     steps:
     - uses: actions/checkout@v3
-    - uses: cachix/install-nix-action@v18
+    - uses: cachix/install-nix-action@v22
     - name: "Cachix: tttool"
       uses: cachix/cachix-action@v12
       with:
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: cachix/install-nix-action@v18
+    - uses: cachix/install-nix-action@v22
     - name: "Cachix: tttool"
       uses: cachix/cachix-action@v12
       with:
@@ -78,7 +78,7 @@ jobs:
     needs: build
     steps:
     - uses: actions/checkout@v3
-    - uses: cachix/install-nix-action@v18
+    - uses: cachix/install-nix-action@v22
     - name: "Cachix: tttool"
       uses: cachix/cachix-action@v12
       with:
