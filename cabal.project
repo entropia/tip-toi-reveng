@@ -1,7 +1,7 @@
 packages: .
 
 -- same as nix
-with-compiler: ghc-9.2.4
+with-compiler: ghc-9.2.8
 
 source-repository-package
    type:     git
