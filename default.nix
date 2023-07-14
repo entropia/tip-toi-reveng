@@ -98,11 +98,11 @@ in rec {
   linux-exe      = tttool-exe pkgs
      "0jmcpd8l6smj0zqkx4cx6ma2v3cvxmwws0s92ssrc6ginpis3gkb";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
-     "1x16mjjx4wnzksmpi4jg6ykvfvdshrhp58gciy9lfslavy9clf3a";
+     "0674c017qxng0xil4yi4wsf2kr7yb9dyzpzxq7jd50dflzvm3qzz";
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
      "0jmcpd8l6smj0zqkx4cx6ma2v3cvxmwws0s92ssrc6ginpis3gkb";
   osx-exe        = tttool-exe pkgs-osx
-     "12fm0i61zhah9yrkf0lmpybrcl0q91gb3krib12zz6qg5fx0lbw7";
+     "0jmcpd8l6smj0zqkx4cx6ma2v3cvxmwws0s92ssrc6ginpis3gkb";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
 
   static-files = sourceByRegex ./. [
