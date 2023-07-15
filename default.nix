@@ -16,6 +16,8 @@ let
         # these help haskell.nix to resolve system library dependencies
         dsound = null;
         pulse = super.libpulseaudio;
+        # to work around https://github.com/input-output-hk/haskell.nix/issues/2002
+        kmod = super.kmod.override { xz = self.xz.override { enableStatic = false;};};
       })
     ];
   };
