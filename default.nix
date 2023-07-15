@@ -13,7 +13,9 @@ let
   nixpkgsArgs = haskellNix.nixpkgsArgs // {
     overlays = haskellNix.nixpkgsArgs.overlays ++ [
       (self: super: {
-        pulse = super.libpulseaudio; # for haskell.nix
+        # these help haskell.nix to resolve system library dependencies
+        dsound = null;
+        pulse = super.libpulseaudio;
       })
     ];
   };
