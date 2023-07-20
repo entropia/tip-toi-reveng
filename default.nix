@@ -53,6 +53,9 @@ let
       modules = [{
         # smaller files
         packages.tttool.dontStrip = false;
+        packages.proteaaudio.components.library.build-tools = pkgs.lib.mkForce [
+          pkgs.buildPackages.haskellPackages.c2hs
+        ];
       }] ++
       pkgs.lib.optional pkgs.hostPlatform.isMusl {
         packages.tttool.configureFlags = [ "--ghc-option=-static" ];
