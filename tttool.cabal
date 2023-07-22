@@ -70,7 +70,7 @@ executable tttool
   build-depends: vector >= 0.10 && < 0.13
   build-depends: yaml >= 0.8 && < 0.12
   build-depends: zlib >= 0.5 && < 0.7
-  build-depends: proteaaudio ^>= 0.9.4
+  build-depends: proteaaudio ^>= 1.0
 
   hs-source-dirs:      src
   default-language:    GHC2021
