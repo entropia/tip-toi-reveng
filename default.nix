@@ -105,7 +105,7 @@ in rec {
   linux-exe      = tttool-exe pkgs
      "1x9v6vgycidmjaapxfvc6zn3zwawahh9ly3kx8sp0w42j3h8d50d";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
-     "0674c017qxng0xil4yi4wsf2kr7yb9dyzpzxq7jd50dflzvm3qzz";
+     "0b7kka4105rh0fagx25a9plangdpvh1ca7r2kfyiq6kya7hnlgz3";
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
      "1x9v6vgycidmjaapxfvc6zn3zwawahh9ly3kx8sp0w42j3h8d50d";
   osx-exe        = tttool-exe pkgs-osx
