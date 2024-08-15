@@ -3,6 +3,11 @@
 layout: default
 
 gallery:
+- title: Tami und der Schattenkönig
+  subtitle: Komplexes Rollenspiel von Jens Georg
+  link: https://github.com/JG55JG/Tami-und-der-Schattenkoenig
+  img: https://img.youtube.com/vi/sRXvWUkbedM/mqdefault.jpg
+
 - title: Selbstgemachte Tier-Figuren
   subtitle: Video von Pronwan, 4 Minuten
   link: https://www.youtube.com/watch?v=Yic57Y9VORA
