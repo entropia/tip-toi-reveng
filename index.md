@@ -8,6 +8,11 @@ gallery:
   link: https://github.com/JG55JG/Tami-und-der-Schattenkoenig
   img: https://img.youtube.com/vi/sRXvWUkbedM/mqdefault.jpg
 
+- title: soundolino
+  subtitle: Unterrichtsmaterial-Platform
+  link: https://www.soundolino.ch/
+  img: /img/soundolino.jpg
+
 - title: Selbstgemachte Tier-Figuren
   subtitle: Video von Pronwan, 4 Minuten
   link: https://www.youtube.com/watch?v=Yic57Y9VORA
@@ -121,11 +126,6 @@ gallery:
   subtitle: von Frank
   link: https://github.com/chemtech1/TipMaster
   img: /img/tipmaster.png
-
-- title: soundolino
-  subtitle: Unterrichtsmaterial-Platform
-  link: https://www.soundolino.ch/
-  img: /img/soundolino.jpg
 
 - title: Rätsel-Einkleber für ein ???-Freundebuch
   subtitle: von jabgh
