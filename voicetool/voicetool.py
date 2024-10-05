@@ -1,4 +1,4 @@
-#/bin/env python
+#/bin/env python3
 #
 # compile and decompile Anyka/Chomptech firmware voice files
 # 
@@ -30,7 +30,7 @@ def decompile(infilename, outbasename, force=False, quiet=False):
     # the number of contained offsets
     data = infile.read(4) 
     first_offset = struct.unpack('<I', data)[0]
-    num = first_offset / 4 - 1
+    num = int(first_offset / 4) - 1
     offsets.append(first_offset)    
 
     # first read all offsets, we read one offset more
@@ -148,10 +148,12 @@ if args.subparser_name == "compile":
     else:
         out = "%s.bin" % args.inputbasename
     compile(args.inputbasename, out, args.numwavs, args.force, args.quiet)
-else:
+elif args.subparser_name == "decompile":
     if args.outputbasename:
         out = args.outputbasename
     else:
         out = args.binfile.split(".bin")[0]
     decompile(args.binfile, out, args.force, args.quiet)
+else:
+    parser.print_help()
 
