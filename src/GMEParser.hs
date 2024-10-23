@@ -443,7 +443,7 @@ getTipToiFile = getSegAt 0x00 "Header" $ do
 
     jumpTo 0x008C
     ttMediaFlags <- maybeIndirection "Mediaflags" (getMediaFlags (length ttAudioFiles))
-    ttBinaryGames3201 <- fromMaybe [] <$> maybeIndirection "Binary games 2301" getBinaries
+    ttBinaryGames3201 <- fromMaybe [] <$> maybeIndirection "Binary games 3201" getBinaries
     ttSpecialOIDs <- maybeIndirection "special symbols" getSpecials
     ttBinaryGames3202N <- fromMaybe [] <$> maybeIndirection "Binary games 3202N" getBinaries
 
@@ -453,8 +453,8 @@ getTipToiFile = getSegAt 0x00 "Header" $ do
     ttBinaryMain3202N <- fromMaybe [] <$> maybeIndirection "Main binary 3202N" getBinaries
 
     jumpTo 0x00C8
-    ttBinaryMain3202L <- fromMaybe [] <$> maybeIndirection "Main binary 3202L" getBinaries
-    ttBinaryGames3202L <- fromMaybe [] <$> maybeIndirection "Binary games 3202L" getBinaries
+    ttBinaryMain3203L <- fromMaybe [] <$> maybeIndirection "Main binary 3203L" getBinaries
+    ttBinaryGames3203L <- fromMaybe [] <$> maybeIndirection "Binary games 3203L" getBinaries
 
     ttChecksum <- getChecksum
     ttChecksumCalc <- calcChecksum

@@ -52,6 +52,7 @@ import PrettyPrint
 import OneLineParser
 import Utils
 import TipToiYamlAux
+import BinaryPath
 
 data TipToiYAML = TipToiYAML
     { ttyScripts     :: M.Map String (OptArray String)
@@ -65,6 +66,7 @@ data TipToiYAML = TipToiYAML
     , ttySpeak       :: Maybe (OptArray SpeakSpec)
     , ttyLanguage    :: Maybe Language
     , ttyGames       :: Maybe [GameYaml]
+    , ttyBinaries    :: Maybe BinariesYaml
     , ttyReplay      :: Maybe Word16
     , ttyStop        :: Maybe Word16
     }
@@ -81,6 +83,16 @@ data SpeakSpec = SpeakSpec
     { ssLanguage :: Maybe Language
     , ssSpeak    :: M.Map String String
     }
+
+data BinariesYaml = BinariesYaml
+    { bsyMain3202   :: Maybe (OptArray String)
+    , bsyMain3202N  :: Maybe (OptArray String)
+    , bsyMain3203L  :: Maybe (OptArray String)
+    , bsyGames3202  :: Maybe (OptArray String)
+    , bsyGames3202N :: Maybe (OptArray String)
+    , bsyGames3203L :: Maybe (OptArray String)
+    }
+    deriving Generic
 
 instance FromJSON SpeakSpec where
     parseJSON v = do
@@ -296,6 +308,11 @@ instance FromJSON TipToiCodesYAML where
 instance ToJSON TipToiCodesYAML where
     toJSON = genericToJSON tipToiYamlOptions
     toEncoding = genericToEncoding tipToiYamlOptions
+instance FromJSON BinariesYaml where
+    parseJSON = genericParseJSON tipToiYamlOptions
+instance ToJSON BinariesYaml where
+    toJSON = genericToJSON tipToiYamlOptions
+    toEncoding = genericToEncoding tipToiYamlOptions
 
 
 tt2ttYaml :: String -> TipToiFile -> TipToiYAML
@@ -315,7 +332,16 @@ tt2ttYaml path TipToiFile{..} = TipToiYAML
     , ttyGames = list2Maybe $ map game2gameYaml ttGames
     , ttyReplay = fmap fst ttSpecialOIDs
     , ttyStop = fmap snd ttSpecialOIDs
+    , ttyBinaries = Just BinariesYaml
+      { bsyGames3202   = bins "games3201"  ttBinaryGames3201
+      , bsyGames3202N  = bins "games3202N" ttBinaryGames3202N
+      , bsyGames3203L  = bins "games3203L" ttBinaryGames3203L
+      , bsyMain3202    = bins "main3202"   ttBinaryMain3201
+      , bsyMain3202N   = bins "main3202N"  ttBinaryMain3202N
+      , bsyMain3203L   = bins "main3203L"  ttBinaryMain3203L
+      }
     }
+  where bins g bs = Just (OptArray (map fst (binariesWithPath defaultBinariesPath g bs)))
 
 list2Maybe [] = Nothing
 list2Maybe xs = Just xs
@@ -887,10 +913,10 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
         , ttChecksumCalc = 0x00
         , ttBinaryGames3201 = []
         , ttBinaryGames3202N = []
-        , ttBinaryGames3202L = []
+        , ttBinaryGames3203L = []
         , ttBinaryMain3201 = []
         , ttBinaryMain3202N = []
-        , ttBinaryMain3202L = []
+        , ttBinaryMain3203L = []
         , ttSpecialOIDs = Just
             ( fromMaybe 0 (ttcReplay assignedCodes)
             , fromMaybe 0 (ttcStop assignedCodes)
@@ -1160,6 +1186,7 @@ debugGame productID = do
             ]
         , ttyLanguage = Nothing
         , ttyGames = Nothing
+        , ttyBinaries = Nothing
         , ttyReplay = Nothing
         , ttyStop = Nothing
         }

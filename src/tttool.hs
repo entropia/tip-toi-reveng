@@ -11,6 +11,7 @@ import Types
 import RangeParser
 import Commands
 import Utils
+import BinaryPath
 
 -- Parameter parsing
 
@@ -248,7 +249,7 @@ binariesCmd =
         , short 'd'
         , metavar "DIR"
         , help "Binaries output directory"
-        , value "binaries"
+        , value defaultBinariesPath
         , showDefault
         ]
 

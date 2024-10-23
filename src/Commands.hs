@@ -36,6 +36,7 @@ import OidTableSVG
 import Utils
 import TipToiYaml
 import Lint
+import BinaryPath
 
 -- Main commands
 
@@ -58,21 +59,15 @@ dumpAudioTo directory file = do
 
 dumpBinariesTo :: FilePath -> FilePath -> IO ()
 dumpBinariesTo directory file = do
-    (TipToiFile {..},_) <- parseTipToiFile <$> B.readFile file
+    (tt,_) <- parseTipToiFile <$> B.readFile file
 
-    let binaries =
-          map ("games3201",)  ttBinaryGames3201 ++
-          map ("games3202N",) ttBinaryGames3202N ++
-          map ("games3202L",) ttBinaryGames3202L ++
-          map ("main3201",)   ttBinaryMain3201 ++
-          map ("main3202N",)  ttBinaryMain3202N ++
-          map ("main3202L",)  ttBinaryMain3202L
+    let binaries = allBinariesWithPath directory tt
 
     printf "Binary Table entries: %d\n" (length binaries)
 
-    forM_ binaries $ \(subdir,(desc,binary)) -> do
-        createDirectoryIfMissing False (printf "%s/%s" directory subdir)
-        let filename = printf "%s/%s/%s" directory subdir (BC.unpack desc)
+    createDirectoryIfMissing False directory
+    forM_ binaries $ \(filename, binary) -> do
+        createDirectoryIfMissing False (takeDirectory filename)
         if B.null binary
         then do
             printf "Skipping empty file %s...\n" filename
@@ -121,11 +116,11 @@ dumpInfo conf file = do
     printf "Binary tables entries: %d/%d/%d\n"
         (length ttBinaryGames3201)
         (length ttBinaryGames3202N)
-        (length ttBinaryGames3202L)
+        (length ttBinaryGames3203L)
     printf "Main binary table entries: %d/%d/%d\n"
         (length ttBinaryMain3201)
         (length ttBinaryMain3202N)
-        (length ttBinaryMain3202L)
+        (length ttBinaryMain3203L)
     for_ ttSpecialOIDs $ \(oid1, oid2) ->
         printf "Special OIDs: %d, %d\n" oid1 oid2
     printf "Checksum found 0x%08X, calculated 0x%08X\n" ttChecksum ttChecksumCalc

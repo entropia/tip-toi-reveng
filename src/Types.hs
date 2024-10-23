@@ -83,10 +83,10 @@ data TipToiFile = TipToiFile
     , ttMediaFlags :: Maybe [Word16]
     , ttBinaryGames3201 :: Binaries
     , ttBinaryGames3202N :: Binaries
-    , ttBinaryGames3202L :: Binaries
+    , ttBinaryGames3203L :: Binaries
     , ttBinaryMain3201 :: Binaries
     , ttBinaryMain3202N :: Binaries
-    , ttBinaryMain3202L :: Binaries
+    , ttBinaryMain3203L :: Binaries
     , ttSpecialOIDs :: Maybe (Word16, Word16)
     , ttChecksum :: Word32
     , ttChecksumCalc :: Word32

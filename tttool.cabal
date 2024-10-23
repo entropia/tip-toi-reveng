@@ -20,6 +20,7 @@ extra-source-files:  README.md Changelog.md
 
 executable tttool
   main-is:             tttool.hs
+  other-modules: BinaryPath
   other-modules: Commands
   other-modules: Constants
   other-modules: Cypher
