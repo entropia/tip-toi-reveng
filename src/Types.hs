@@ -64,6 +64,9 @@ type ProductID = Word32
 
 data Similarity = Absent | Equal | Similar deriving (Show, Eq)
 
+type Binary = (B.ByteString, B.ByteString)
+type Binaries = [Binary]
+
 data TipToiFile = TipToiFile
     { ttProductId :: ProductID
     , ttRawXor :: Word32
@@ -78,12 +81,12 @@ data TipToiFile = TipToiFile
     , ttAudioFilesDoubles :: Similarity
     , ttAudioXor :: Word8
     , ttMediaFlags :: Maybe [Word16]
-    , ttBinaries1 :: [(B.ByteString, B.ByteString)]
-    , ttBinaries2 :: [(B.ByteString, B.ByteString)]
-    , ttBinaries3 :: [(B.ByteString, B.ByteString)]
-    , ttBinaries4 :: [(B.ByteString, B.ByteString)]
-    , ttBinaries5 :: [(B.ByteString, B.ByteString)]
-    , ttBinaries6 :: [(B.ByteString, B.ByteString)]
+    , ttBinaryGames3201 :: Binaries
+    , ttBinaryGames3202N :: Binaries
+    , ttBinaryGames3202L :: Binaries
+    , ttBinaryMain3201 :: Binaries
+    , ttBinaryMain3202N :: Binaries
+    , ttBinaryMain3202L :: Binaries
     , ttSpecialOIDs :: Maybe (Word16, Word16)
     , ttChecksum :: Word32
     , ttChecksumCalc :: Word32

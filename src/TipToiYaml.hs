@@ -885,12 +885,12 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
         , ttMediaFlags = Nothing
         , ttChecksum = 0x00
         , ttChecksumCalc = 0x00
-        , ttBinaries1 = []
-        , ttBinaries2 = []
-        , ttBinaries3 = []
-        , ttBinaries4 = []
-        , ttBinaries5 = []
-        , ttBinaries6 = []
+        , ttBinaryGames3201 = []
+        , ttBinaryGames3202N = []
+        , ttBinaryGames3202L = []
+        , ttBinaryMain3201 = []
+        , ttBinaryMain3202N = []
+        , ttBinaryMain3202L = []
         , ttSpecialOIDs = Just
             ( fromMaybe 0 (ttcReplay assignedCodes)
             , fromMaybe 0 (ttcStop assignedCodes)
