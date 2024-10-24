@@ -67,6 +67,7 @@ data TipToiYAML = TipToiYAML
     , ttyLanguage    :: Maybe Language
     , ttyGames       :: Maybe [GameYaml]
     , ttyBinaries    :: Maybe BinariesYaml
+    , ttyExtra_Media  :: Maybe String
     , ttyReplay      :: Maybe Word16
     , ttyStop        :: Maybe Word16
     }
@@ -85,10 +86,10 @@ data SpeakSpec = SpeakSpec
     }
 
 data BinariesYaml = BinariesYaml
-    { bsyMain3202   :: Maybe (OptArray String)
+    { bsyMain3201   :: Maybe (OptArray String)
     , bsyMain3202N  :: Maybe (OptArray String)
     , bsyMain3203L  :: Maybe (OptArray String)
-    , bsyGames3202  :: Maybe (OptArray String)
+    , bsyGames3201  :: Maybe (OptArray String)
     , bsyGames3202N :: Maybe (OptArray String)
     , bsyGames3203L :: Maybe (OptArray String)
     }
@@ -333,13 +334,14 @@ tt2ttYaml path TipToiFile{..} = TipToiYAML
     , ttyReplay = fmap fst ttSpecialOIDs
     , ttyStop = fmap snd ttSpecialOIDs
     , ttyBinaries = Just BinariesYaml
-      { bsyGames3202   = bins "games3201"  ttBinaryGames3201
+      { bsyGames3201   = bins "games3201"  ttBinaryGames3201
       , bsyGames3202N  = bins "games3202N" ttBinaryGames3202N
       , bsyGames3203L  = bins "games3203L" ttBinaryGames3203L
-      , bsyMain3202    = bins "main3202"   ttBinaryMain3201
+      , bsyMain3201    = bins "main3201"   ttBinaryMain3201
       , bsyMain3202N   = bins "main3202N"  ttBinaryMain3202N
       , bsyMain3203L   = bins "main3203L"  ttBinaryMain3203L
       }
+    , ttyExtra_Media = Nothing
     }
   where bins g bs = Just (OptArray (map fst (binariesWithPath defaultBinariesPath g bs)))
 
@@ -794,11 +796,23 @@ recordFilename :: String -> WithFileNames Word16
 recordFilename fn = WithFileNames (($ fn), (fn :))
 
 resolveFileNames :: WithFileNames a -> (a, [String])
-resolveFileNames (WithFileNames (r,fns)) = (r filename_lookup, filenames)
+resolveFileNames (WithFileNames (r,fns)) = (r filename_lookup, reverse filenames)
   where
-    filenames = S.toList $ S.fromList $ fns []
-    filename_lookup = (M.fromList (zip filenames [0..]) M.!)
+    filename_map :: M.Map String Word16
+    filenames :: [String] -- in reverse order of first appearance
+    (filename_map, filenames) = foldl' go (M.empty,[]) (fns [])
+      where
+        go (m,fns) f | f `M.member` m = (m, fns)
+                     | otherwise      = (M.insert f (fromIntegral (M.size m)) m, f:fns)
+    filename_lookup = (filename_map M.!)
 
+
+binaries2tt :: Maybe (OptArray String) -> IO Binaries
+binaries2tt Nothing = return []
+binaries2tt (Just (OptArray bs)) = forM bs $ \path -> do
+  bin <- readFile' path
+  let desc = BC.pack (take 8 (takeFileName path))
+  return (desc, bin)
 
 ttYaml2tt :: Bool -> FilePath -> TipToiYAML -> TipToiCodesYAML -> IO (TipToiFile, TipToiCodesYAML)
 ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
@@ -822,10 +836,11 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
         last = fst (M.findMax m)
 
     welcome_names <- mapM (parseOneLine parsePlayList "welcome") (maybe [] unOptArray ttyWelcome)
+    extra_media_names <- maybe (pure []) (parseOneLine parsePlayList "extra_media") ttyExtra_Media
 
-
-    let ((prescripts, welcome, games), filenames) = resolveFileNames $
-            (,,) <$>
+    let ((_, prescripts, games, welcome), filenames) = resolveFileNames $
+            (,,,) <$>
+            traverse recordFilename extra_media_names <*>
             for [first ..last] (\oid ->
                 (oid ,) <$>
                 for (M.lookup oid m) (\(OptArray raw_lines) ->
@@ -836,8 +851,8 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
                     )
                 )
             ) <*>
-            traverse (traverse recordFilename) welcome_names <*>
-            traverse gameYaml2Game (fromMaybe [] ttyGames)
+            traverse gameYaml2Game (fromMaybe [] ttyGames) <*>
+            traverse (traverse recordFilename) welcome_names
 
     preInitRegs <- M.fromList <$> parseOneLine parseInitRegs "init" (fromMaybe "" ttyInit)
 
@@ -860,7 +875,6 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
         textToSpeech lang txt
 
     -- Check which files do not exist
-
 
     -- Not very nice, better to use something like Control.Applicative.Error if
     -- it were in base, and not fixed to String.
@@ -887,6 +901,14 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
         ([],files)  -> return files
         (errors, _) -> putStr (unlines errors) >> exitFailure
 
+
+    ttBinaryGames3201  <- binaries2tt $ ttyBinaries >>= bsyGames3201
+    ttBinaryGames3202N <- binaries2tt $ ttyBinaries >>= bsyGames3202N
+    ttBinaryGames3203L <- binaries2tt $ ttyBinaries >>= bsyGames3203L
+    ttBinaryMain3201   <- binaries2tt $ ttyBinaries >>= bsyMain3201
+    ttBinaryMain3202N  <- binaries2tt $ ttyBinaries >>= bsyMain3202N
+    ttBinaryMain3203L  <- binaries2tt $ ttyBinaries >>= bsyMain3203L
+
     comment <- case ttyComment of
         Nothing -> return $ BC.pack $ "created with tttool version " ++ tttoolVersion
         Just c | length c > maxCommentLength -> do
@@ -911,12 +933,12 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
         , ttMediaFlags = Nothing
         , ttChecksum = 0x00
         , ttChecksumCalc = 0x00
-        , ttBinaryGames3201 = []
-        , ttBinaryGames3202N = []
-        , ttBinaryGames3203L = []
-        , ttBinaryMain3201 = []
-        , ttBinaryMain3202N = []
-        , ttBinaryMain3203L = []
+        , ttBinaryGames3201
+        , ttBinaryGames3202N
+        , ttBinaryGames3203L
+        , ttBinaryMain3201
+        , ttBinaryMain3202N
+        , ttBinaryMain3203L
         , ttSpecialOIDs = Just
             ( fromMaybe 0 (ttcReplay assignedCodes)
             , fromMaybe 0 (ttcStop assignedCodes)
@@ -1122,6 +1144,7 @@ writeTipToiYaml out tty =
         , "scripts"
         , "language"
         , "speak"
+        , "extra-media"
         , "scriptcodes"
         ]
 
@@ -1187,6 +1210,7 @@ debugGame productID = do
         , ttyLanguage = Nothing
         , ttyGames = Nothing
         , ttyBinaries = Nothing
+        , ttyExtra_Media = Nothing
         , ttyReplay = Nothing
         , ttyStop = Nothing
         }

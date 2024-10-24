@@ -105,8 +105,17 @@ putTipToiFile (TipToiFile {..}) = mdo
     putWord8 0
     seek 0x0071 -- Just to be safe
     putWord32 ipllo
-    seek 0x0094
+    seek 0x0090
+    putWord32 binsg3201
     putWord32 sso
+    putWord32 binsg3202N
+    putWord32 0
+    putWord32 binsm3201
+    putWord32 1
+    putWord32 binsm3202N
+    seek 0x00C8
+    putWord32 binsm3203L
+    putWord32 binsg3203L
     seek 0x0200 -- Just to be safe
     sto <- getAddress $ putScriptTable ttScripts
     ast <- getAddress $ putWord16 0x00 -- For now, no additional script table
@@ -115,6 +124,12 @@ putTipToiFile (TipToiFile {..}) = mdo
     mft <- getAddress $ putAudioTable ttAudioXor ttAudioFiles
     ipllo <- getAddress $ putPlayListList ttWelcome
     sso <- getAddress $ putSpecialSymbols ttSpecialOIDs
+    binsm3201  <- getAddress $ putBinaries ttBinaryMain3201
+    binsm3202N <- getAddress $ putBinaries ttBinaryMain3202N
+    binsm3203L <- getAddress $ putBinaries ttBinaryMain3203L
+    binsg3201  <- getAddress $ putBinaries ttBinaryGames3201
+    binsg3202N <- getAddress $ putBinaries ttBinaryGames3202N
+    binsg3203L <- getAddress $ putBinaries ttBinaryGames3203L
     return ()
 
 putGameTable :: [Game] -> SPut
@@ -364,6 +379,19 @@ putAudioTable x as = mapFstMapSnd
     [ FunSplit (\o -> putWord32 o >> putWord32 (fromIntegral (B.length a)))
                (getAddress (putBS (cypher x a)))
     | a <- as ]
+
+putBinaries :: Binaries -> SPut
+putBinaries bs = do
+  putWord16 (fromIntegral (length bs))
+  putBS $ B.replicate 14 0
+  mapFstMapSnd 
+    [ FunSplit (\o -> do
+                  putWord32 o
+                  putWord32 (fromIntegral (B.length bin))
+                  putBS (B.take 8 (desc <> B.replicate 8 0))
+               )
+               (getAddress (putBS bin))
+    | (desc, bin) <- bs ]
 
 putSpecialSymbols :: Maybe (Word16, Word16) -> SPut
 putSpecialSymbols Nothing =

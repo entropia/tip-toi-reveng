@@ -263,7 +263,7 @@ getBinaries :: SGet [(B.ByteString, B.ByteString)]
 getBinaries = do
     n <- getWord16
     _ <- getBS 14 -- padding
-    forM [0..n - 1] $ \n -> do
+    replicateM (fromIntegral n) $ do
         offset <- getWord32
         length <- getWord32
         desc <- getBS 8
