@@ -131,6 +131,6 @@ Wenn man auf einen Code tippt, der einen ``P()``-Befehl enthält, während der T
 Hintergrundmuster
 -----------------
 
-Es kann optisch schöner sein, wenn nicht nur die aktiven Bereiche eines Tiptoi-Werkes mit OID-Codes versehen sind, sondern alle. Dazu kannst du ein neutrales Muster verwenden, dass vom Tiptoi-Stift einfach ignoriert wird, und das auch ein laufendes Skript nicht unterbricht. Dieses Muster erzeugst du mit::
+Es kann optisch schöner sein, wenn nicht nur die aktiven Bereiche eines Tiptoi-Werkes mit OID-Codes versehen sind, sondern alle. Dazu kannst du ein neutrales Muster verwenden, das vom Tiptoi-Stift einfach ignoriert wird, und das auch ein laufendes Skript nicht unterbricht. Dieses Muster erzeugst du mit::
 
   $ ./tttool oid-code --raw 65535
