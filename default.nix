@@ -3,13 +3,24 @@ let
   sources = import nix/sources.nix;
 
   # Fetch the latest haskell.nix and import its default.nix
-  haskellNix = import sources.haskellNix {};
+  haskellNix = import sources.haskellNix {
+  };
 
   # Peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix
   # for supported nixpkgs and ghc versions
   # or https://github.com/input-output-hk/haskell.nix/blob/master/docs/reference/supported-ghc-versions.md
   nixpkgsSrc = haskellNix.sources.nixpkgs-unstable;
-  nixpkgsArgs = haskellNix.nixpkgsArgs;
+  nixpkgsArgs = haskellNix.nixpkgsArgs // {
+    overlays = haskellNix.nixpkgsArgs.overlays ++ [
+      (self: super: {
+        # these help haskell.nix to resolve system library dependencies
+        dsound = null;
+        pulse = super.libpulseaudio;
+        # to work around https://github.com/input-output-hk/haskell.nix/issues/2002
+        kmod = super.kmod.override { xz = self.xz.override { enableStatic = false;};};
+      })
+    ];
+  };
 
   pkgs = import nixpkgsSrc nixpkgsArgs;
   pkgs-osx = import nixpkgsSrc (nixpkgsArgs // { system = "x86_64-darwin"; });
@@ -42,6 +53,9 @@ let
       modules = [{
         # smaller files
         packages.tttool.dontStrip = false;
+        packages.proteaaudio.components.library.build-tools = pkgs.lib.mkForce [
+          pkgs.buildPackages.haskellPackages.c2hs
+        ];
       }] ++
       pkgs.lib.optional pkgs.hostPlatform.isMusl {
         packages.tttool.configureFlags = [ "--ghc-option=-static" ];
@@ -55,7 +69,11 @@ let
     (tttool-project pkgs sha256).tttool.components.exes.tttool;
   tttool-shell = pkgs: sha256:
     (tttool-project pkgs sha256).shellFor {
-      buildInputs = [ pkgs.ghcid ];
+      buildInputs = with pkgs; [
+        ghcid
+        picotts
+        vorbis-tools
+      ];
     };
 
 
@@ -83,15 +101,15 @@ let
 
 in rec {
   shell          = tttool-shell pkgs
-     "12fm0i61zhah9yrkf0lmpybrcl0q91gb3krib12zz6qg5fx0lbw7";
+     "1x9v6vgycidmjaapxfvc6zn3zwawahh9ly3kx8sp0w42j3h8d50d";
   linux-exe      = tttool-exe pkgs
-     "12fm0i61zhah9yrkf0lmpybrcl0q91gb3krib12zz6qg5fx0lbw7";
+     "1x9v6vgycidmjaapxfvc6zn3zwawahh9ly3kx8sp0w42j3h8d50d";
   windows-exe    = tttool-exe pkgs.pkgsCross.mingwW64
-     "1x16mjjx4wnzksmpi4jg6ykvfvdshrhp58gciy9lfslavy9clf3a";
+     "0b7kka4105rh0fagx25a9plangdpvh1ca7r2kfyiq6kya7hnlgz3";
   static-exe     = tttool-exe pkgs.pkgsCross.musl64
-     "12fm0i61zhah9yrkf0lmpybrcl0q91gb3krib12zz6qg5fx0lbw7";
+     "1x9v6vgycidmjaapxfvc6zn3zwawahh9ly3kx8sp0w42j3h8d50d";
   osx-exe        = tttool-exe pkgs-osx
-     "12fm0i61zhah9yrkf0lmpybrcl0q91gb3krib12zz6qg5fx0lbw7";
+     "1x9v6vgycidmjaapxfvc6zn3zwawahh9ly3kx8sp0w42j3h8d50d";
   osx-exe-bundle = osx-bundler pkgs-osx osx-exe;
 
   static-files = sourceByRegex ./. [
