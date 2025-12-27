@@ -1,18 +1,16 @@
-{ checkMaterialization ? false }:
+{ checkMaterialization, haskellNix }:
 let
-  sources = import nix/sources.nix;
-
   # Fetch the latest haskell.nix and import its default.nix
-  haskellNix = import sources.haskellNix {};
+  # haskellNix = import haskellNixSrc {};
 
   # Peek at https://github.com/input-output-hk/haskell.nix/blob/master/ci.nix
   # for supported nixpkgs and ghc versions
   # or https://github.com/input-output-hk/haskell.nix/blob/master/docs/reference/supported-ghc-versions.md
-  nixpkgsSrc = haskellNix.sources.nixpkgs-unstable;
+  nixpkgsSrc = haskellNix.internal.compat;
   nixpkgsArgs = haskellNix.nixpkgsArgs;
 
-  pkgs = import nixpkgsSrc nixpkgsArgs;
-  pkgs-osx = import nixpkgsSrc (nixpkgsArgs // { system = "x86_64-darwin"; });
+  pkgs = (haskellNix.internal.compat { system = "x86_64-linux"; }).pkgs-unstable;
+  pkgs-osx = (haskellNix.internal.compat { system = "x86_64-darwin"; }).pkgs-unstable;
 
   # a nicer filterSource
   sourceByRegex =
@@ -233,7 +231,7 @@ in rec {
 
   # The following two derivations keep the cabal.config.freeze file
   # up to date.
-  cabal-cmd = "nix-shell -A check-cabal-freeze default.nix";
+  cabal-cmd = "nix develop .#update-cabal-freeze";
 
   cabal-freeze = pkgs.stdenv.mkDerivation {
     name = "cabal-freeze";
@@ -258,7 +256,13 @@ in rec {
       expected = cabal-freeze + /cabal.project.freeze;
       actual = ./cabal.project.freeze;
       shellHook = ''
-        dest=${toString ./cabal.project.freeze}
+        if ! diff -q $PWD/cabal.project.freeze ${toString ./cabal.project.freeze}
+        then
+          echo "$PWD/cabal.project.freeze and ${toString ./cabal.project.freeze} differ."
+          echo "Is this run from the right directory?"
+          exit 1
+        fi
+        dest=./cabal.project.freeze
         rm -f $dest
         cp -v $expected $dest
         chmod u-w $dest
