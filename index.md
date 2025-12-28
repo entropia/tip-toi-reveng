@@ -180,6 +180,8 @@ Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
 
 Das `tttool` ist ein Kommandozeilentool. Wer sich davon nicht abschrecken lässt kann tolle Sachen damit machen. Wer es einfacher haben will sollte sich folgende Projekte anschauen, die allesamt auf `tttool` aufbauen:
 
+ * Das [SoniqPen Studio](https://studio.soniqpen.com/) ist eine komfortable Rund-um-Lösung für den Tiptoi stift, in der man Grafiken direkt im Browser mit den Tiptoi-Codes befüllt, Audio-Dateien hochlädt oder per Text-to-Speech erzeugt und fertige PDF-Dateien zum Drucken sowie die GME-Dateien für den Tiptoi-Stift herunterladen kann.
+ * Das [EduTTTool](https://edutttool.access.kit.edu/) bietet vergleichbaren Komfort, mit Fokus auf der Erstellung von Unterrichtsmaterial durch Lehrkräfte.
  * Andreas Grimme hat mit [ttaudio](https://github.com/sidiandi/ttaudio#readme) eine Windows-GUI erstellt, falls man einfach nur ein paar Audio-Dateien auf den Stift laden will.
  * Till Korten hat mit [ttmp32gme](https://github.com/thawn/ttmp32gme) eine grafische Anwendung (Windows, OS X und Linux) erstellt, die ebenfalls Audio-Dateien auf den Stift lädt, und sehr schöne Übersichten zum antippen druckt. Auf [ScienceBlogs.de](http://scienceblogs.de/astrodicticum-simplex/2018/03/15/die-sternengeschichten-als-hoerbuch-auf-dem-tiptoi-stift/) beschreibt er detailliert, wie man mit ttmp32gme arbeitet.
 
