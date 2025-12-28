@@ -221,9 +221,11 @@ Ansonsten wird der Tiptoi-Stift auch im [Mikrocontroller-Forum] besprochen.
 
 [Mikrocontroller-Forum]: http://www.mikrocontroller.net/topic/214479
 
+<!--
 Falko Oldenburg hat eine Webseite erstellt, mit der sich die
 Ravensburger-GME-Dateien einfacher finden und herunterladen lassen:
 <http://tiptoi.vakat.de/>
+-->
 
 Cleracruza hat ein [Cheat-Sheet zum
 Debug-Modus](https://github.com/cleracruza/test-mode-cheat-sheet), mit dem man
