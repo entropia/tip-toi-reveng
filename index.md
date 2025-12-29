@@ -180,7 +180,7 @@ Zur Inspiration eine Sammlung von netten Tiptoi-Basteleien:
 
 Das `tttool` ist ein Kommandozeilentool. Wer sich davon nicht abschrecken lässt kann tolle Sachen damit machen. Wer es einfacher haben will sollte sich folgende Projekte anschauen, die allesamt auf `tttool` aufbauen:
 
- * Das [SoniqPen Studio](https://studio.soniqpen.com/) ist eine komfortable Rund-um-Lösung für den Tiptoi stift, in der man Grafiken direkt im Browser mit den Tiptoi-Codes befüllt, Audio-Dateien hochlädt oder per Text-to-Speech erzeugt und fertige PDF-Dateien zum Drucken sowie die GME-Dateien für den Tiptoi-Stift herunterladen kann.
+ * Das [SoniqPen Studio](https://soniqpen.com/) ist eine komfortable Rund-um-Lösung für den Tiptoi stift, in der man Grafiken direkt im Browser mit den Tiptoi-Codes befüllt, Audio-Dateien hochlädt oder per Text-to-Speech erzeugt und fertige PDF-Dateien zum Drucken sowie die GME-Dateien für den Tiptoi-Stift herunterladen kann.
  * Das [EduTTTool](https://edutttool.access.kit.edu/) bietet vergleichbaren Komfort, mit Fokus auf der Erstellung von Unterrichtsmaterial durch Lehrkräfte.
  * Auf [Soundolino](https://www.soundolino.ch/) kann man nicht nur viele schöne Tiptoi-Werke für den Bildungsbereich herunter laden, sondern auch generische Sticker bestellen und auf der deren Webseite einfach mit eigenem Audio befüllen.
  * Andreas Grimme hat mit [ttaudio](https://github.com/sidiandi/ttaudio#readme) eine Windows-GUI erstellt, falls man einfach nur ein paar Audio-Dateien auf den Stift laden will.
