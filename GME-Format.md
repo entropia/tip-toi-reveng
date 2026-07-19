@@ -193,15 +193,18 @@ The table is a 32bit count followed by that many 32bit offsets to *game records*
 
 A game record starts with a 16bit *game type*. The type selects which of the firmware's built-in game engines runs the record (WWW Bauernhof contains one game of each of the types 1–8):
 
- * types 1, 2, 3 and 5 run one shared question-and-answer engine: each round randomly draws a not-yet-played subgame, plays its announcement, and the player answers by tapping OIDs, with correct/decoy/hint feedback from the subgame's playlists (see below) and the score cascade at the end. The differences between these four types are small; the only one identified so far is that type 2 plays the hint playlist *sequentially* (an escalating hint chain), where the others pick randomly.
+ * types 1, 2, 3 and 5 run one shared question-and-answer engine: each round randomly draws a not-yet-played subgame, plays its announcement, and the player answers by tapping OIDs, with correct/decoy/hint feedback from the subgame's playlists (see below) and the score cascade at the end. Types 1, 3 and 5 are treated *identically* — the engine contains no code distinguishing them. The only variant is type 2, which plays the hint playlist *sequentially* (an escalating hint chain), where the others pick randomly.
  * type 4 is a memory-sequence game: the pen pre-draws *rounds* subgames as a sequence, each round appends one more step, and there is no scoring. Type 40 is the same game with a no-repeat draw.
  * type 6 is a game with a *bonus stage*: reaching the *bonus target* score in the main stage unlocks a second stage with its own subgames, rounds and playlists.
  * type 7 groups its subgames: each round plays one group, its subgames in listed order (no score cascade).
  * type 8 is a *game-select menu*: tapping a menu OID launches the game record listed for it (the same mechanism as the `G(m)` command).
  * type 9 dispatches to fully product-specific game code in the firmware, which keeps only the subgame count; its 75 extra playlist-lists are a cue pool whose individual roles are hard-coded per product in the firmware.
  * type 10 is an endless variant of the common engine: rounds never run out, and the round-complete jingle doubles as the per-answer feedback.
- * type 16 lets the player *choose* the subgame by tapping its selector OID (the record's extra OIDs), instead of the random draw.
+ * type 16 lets the player *choose* the subgame by tapping its selector OID (the record's extra OIDs), instead of the random draw. (For product id 2 only, the firmware runs a different engine on the same record layout — a fixed eight-question quiz.)
+ * types 17–23 each have their own dedicated engine in the firmware; their behaviour has not been studied yet. A few published products carry such records.
  * type 253 is an empty placeholder record (just the type, no further data).
+
+The dispatch uses only the low byte of the type word. Any type number not listed above is a silent no-op: entering such a game does nothing, not even an error sound. Published products do carry such records — type 0 (very common) as empty dummy entries, sporadically 11–15 and 30 — and they all belong to products that ship an embedded binary, which handles game taps before the built-in dispatch whenever the GME has a game binaries table at `0x0098`.
 
 After the type, the common layout continues with these 16bit words (type 6 differs, see below):
  * *subgame count*
