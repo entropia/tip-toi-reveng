@@ -103,6 +103,9 @@ putTipToiFile (TipToiFile {..}) = mdo
     putBS ttDate
     putBS ttLang
     putWord8 0
+    -- Note: the additional media file table offset (0x0060) is left at zero. The pen's
+    -- built-in games read their media through that table (the play scripts use the main
+    -- table at 0x0004), so assembled files with games may need it; see GME-Format.md.
     seek 0x0071 -- Just to be safe
     putWord32 ipllo
     seek 0x0094

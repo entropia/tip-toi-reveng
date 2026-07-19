@@ -139,6 +139,9 @@ indirections g1 prefix g2 =
 
 -- Parsers
 
+-- The script table starts with two 32-bit words holding the last and first OID code;
+-- the pen bounds-checks a tapped OID against them and reads the script offset from the
+-- table of 32-bit offsets that follows (one per OID in that range).
 getScripts :: SGet [(Word16, Maybe [Line ResReg])]
 getScripts = do
     last_code <- getWord16
@@ -191,6 +194,8 @@ lineParser = begin
         xs <- getArray getWord16 getWord16
         return $ Line offset conds cmds xs
 
+    -- This list is complete: the firmware knows no other comparison operators, and
+    -- treats any other opcode as an unsatisfied (false) condition.
     conditionals =
         [ (B.pack [0xF9,0xFF], Eq)
         , (B.pack [0xFA,0xFF], Gt)
@@ -292,7 +297,9 @@ getAudios rawXor = do
                    | otherwise = n_entries `div` 2
     decoded <- forM [0..n_entries'-1] $ \n -> do
         cypher x <$> indirectBS (show n)
-    -- pretend we read the rest too
+    -- The copy following the main table is the *additional media file table* (header
+    -- offset 0x0060): the pen's built-in games read their media through it, while the
+    -- play scripts use the main table. In all known files both tables are equal.
     unless (similarity == Absent) $ lookAhead $ getSeg "Audio table copy" $
         replicateM_ (fromIntegral n_entries') (getWord32 >> getWord32)
 
@@ -320,6 +327,8 @@ getXor = do
         [] -> error "Could not find magic hash"
         (x:_) -> return x
 
+-- The pen never verifies this checksum (when mounting a file it checks only the magic
+-- at 0x0008, the product id and the language) -- but tttool does.
 getChecksum :: SGet Word32
 getChecksum = do
     l <- getLength
@@ -451,6 +460,8 @@ getTipToiFile = getSegAt 0x00 "Header" $ do
     ttWelcome <- indirection "initial play lists" getPlayListList
 
     jumpTo 0x008C
+    -- One flag per media file; the pen consults it when playing a sample to suppress
+    -- playing the same one twice in a row (the firmware calls it "VoiceNumberNeedRep").
     ttMediaFlags <- maybeIndirection "Mediaflags" (getMediaFlags (length ttAudioFiles))
     ttBinaries1 <- fromMaybe [] <$> maybeIndirection "Binaries 1" getBinaries
     ttSpecialOIDs <- maybeIndirection "special symbols" getSpecials
