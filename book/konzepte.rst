@@ -45,10 +45,11 @@ Die Werte mit denen gerechnet wird sind dabei 16-bit natürliche Zahlen (also 0 
 Desweiteren kann eine GME-Datei noch folgendes enthalten:
 
  * Die Sprache der GME-Datei (Deutsch, Englisch usw.). Sollte die GME-Datei eine Sprache nennen, so wird sie nur abgespielt, wenn der Stift auf die gleiche Sprache eingestellt ist.
- * Spiele. Die Logik mancher komplizierteren Abläufe („Finde alle Mäuse!“) sind fest im Stift eingebaut, und die GME-Datei benennt nur die relevanten Felder und Audio-Dateien. Diese Spiele sind von uns zum Teil noch nicht vollständig verstanden.
- * Binäre Programme. Dies sind Maschinenprogramme, die direkt auf dem Prozessor des Stiftes ausgeführt werden. Auch diese sind von uns noch nicht vollständig verstanden.
+ * Spiele. Die Logik mancher komplizierteren Abläufe („Finde alle Mäuse!“) ist fest im Stift eingebaut, und die GME-Datei benennt nur die relevanten Felder, Audio-Dateien und Einstellungen dazu.
+ * Binäre Programme. Dies sind Maschinenprogramme, die direkt auf dem Prozessor des Stiftes ausgeführt werden und über eine Schnittstelle des Stiftes zum Beispiel Audio abspielen oder auf angetippte Felder reagieren können. Jede Stift-Generation führt dabei das für sie vorgesehene Programm aus der GME-Datei aus.
 
 Praktisch alle Elemente einer GME-Datei werden intern über schnöde Nummern statt über sprechende Namen angesteuert. Insbesondere kann man aus einer GME-Datei nicht mehr die Original-Dateinamen der (oft über hundert) Audio-Dateien rekonstruieren.
+
 
 Wozu das ``tttool``?
 --------------------

@@ -135,8 +135,6 @@ TODO
 ----
 
  * What are all the header fields? (See [wip/Header.md](wip/Header.md))
- * Finish decoding the games. (See [wip/games.txt](wip/games.txt))
- * What is the purpose of the additional script table?
 
 Other resources in this repository
 ----------------------------------

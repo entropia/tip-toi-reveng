@@ -5,6 +5,8 @@ import qualified Data.ByteString.Lazy as B
 
 import Types
 
+-- This pass-through XOR rule (leave 0x00, 0xFF, the key x and (x `xor` 0xFF) unchanged,
+-- XOR everything else) matches what the pen firmware applies to encrypted media.
 cypher :: Word8 -> B.ByteString -> B.ByteString
 cypher x = B.map go
     where go 0 = 0
