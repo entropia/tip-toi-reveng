@@ -367,6 +367,10 @@ putCommand CancelTimer = do
     putWord16 0
     mapM_ putWord8 [0xFF, 0xFE]
     putTVal (Const 0xFFFF)
+putCommand (SoundProfile p v) = do
+    putWord16 0
+    mapM_ putWord8 [0xE0 + p, 0xFE]
+    putTVal v
 putCommand (NamedJump s) = error "putCommand: Unresolved NamedJump"
 putCommand (Unknown b r v) = do
     putWord16 r

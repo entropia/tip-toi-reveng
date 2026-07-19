@@ -69,6 +69,11 @@ data Command r
       --   flag of this command -- so it is a plain number here. See GME-Format.md.
     | CancelTimer
       -- ^ opcode 0xFEFF, written CT. Cancels the timer armed by ArmTimer.
+    | SoundProfile Word8 (TVal r)
+      -- ^ opcodes 0xFEE0..0xFEE8, written SoundProfile(p). Selects one of the pen's
+      --   eight built-in sound profiles p = 0..7 (p = 8 encodes 0xFEE8, which the
+      --   firmware ignores). The operand is ignored by the firmware and only kept to
+      --   round-trip the bytes. Not seen in GME files so far. See GME-Format.md.
     deriving (Eq, Functor, Foldable)
 
 type PlayList = [Word16]

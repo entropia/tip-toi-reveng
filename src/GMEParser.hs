@@ -263,6 +263,12 @@ lineParser = begin
             _ <- getTVal
             return CancelTimer)
         ] ++
+        [ (B.pack [0xE0 + p,0xFE], \r -> do
+            unless (r == 0) $ error "Non-zero register for SoundProfile command"
+            v <- getTVal
+            return (SoundProfile p v))
+        | p <- [0..8]
+        ] ++
         [ (B.pack (arithOpCode o), \r -> do
             n <- getTVal
             return (ArithOp o r n))
