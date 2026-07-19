@@ -206,7 +206,7 @@ putGame g = mdo
             putWord32 gse2
 
             gso <- getAddress $ putOidList gGameSelectOIDs
-            gs  <- getAddress $ putArray putWord16 $ map putWord16 gGameSelect
+            gs  <- getAddress $ putGameIdList gGameSelect
             gse1 <- getAddress $ putPlayListList gGameSelectErrors1
             gse2 <- getAddress $ putPlayListList gGameSelectErrors2
 
