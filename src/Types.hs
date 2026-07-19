@@ -32,6 +32,11 @@ data CondOp
     | GEq
     | LEq
     | NEq
+    | EqAlias
+      -- ^ opcode 0xFFFC. The firmware treats it exactly like Eq (0xFFF9); it has not
+      --   been seen in GME files so far. Kept distinct so that re-writing a GME
+      --   preserves the original bytes. Any conditional opcode not listed here is
+      --   treated by the firmware as an unsatisfied (false) condition.
     | Unknowncond B.ByteString
     deriving (Eq)
 

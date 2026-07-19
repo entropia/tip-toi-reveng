@@ -307,6 +307,7 @@ putCondOp Lt  = mapM_ putWord8 [0xFB, 0xFF]
 putCondOp GEq = mapM_ putWord8 [0xFD, 0xFF]
 putCondOp LEq = mapM_ putWord8 [0xFE, 0xFF]
 putCondOp NEq = mapM_ putWord8 [0xFF, 0xFF]
+putCondOp EqAlias = mapM_ putWord8 [0xFC, 0xFF]
 putCondOp (Unknowncond b) = putBS b
 
 

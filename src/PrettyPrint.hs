@@ -73,6 +73,7 @@ ppCondOp Lt              = "< "
 ppCondOp Gt              = "> "
 ppCondOp GEq             = ">="
 ppCondOp LEq             = "<="
+ppCondOp EqAlias         = "==" -- 0xFFFC, same comparison as 0xFFF9 in the firmware
 ppCondOp (Unknowncond b) = printf "?%s?" (prettyHex b)
 
 ppTVal :: Reg r => TVal r -> String

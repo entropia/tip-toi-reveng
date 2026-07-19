@@ -80,6 +80,7 @@ condTrue s (Cond v1 o v2) = value s v1 =?= value s v2
         GEq -> (>=)
         Gt  -> (>)
         LEq -> (<=)
+        EqAlias -> (==)
         Unknowncond _ -> \_ _ -> False
 
 value :: Ord r => PlayState r -> TVal r -> Word16
