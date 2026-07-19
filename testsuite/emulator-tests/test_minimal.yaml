@@ -1,0 +1,20 @@
+product-id: 900
+comment: tt-emu behavioural test book (see the README)
+welcome: hello
+media-path: media/%s
+init: $mode:=0 $count:=0
+scriptcodes:
+  hello: 4716
+  counter: 4717
+  modeset: 4718
+  gate: 4719
+scripts:
+  hello:
+  - P(hello)
+  counter:
+  - $count += 1 P(tick)
+  modeset:
+  - $mode := 2 J(gate)
+  gate:
+  - $mode == 2? P(secret)
+  - P(hello)

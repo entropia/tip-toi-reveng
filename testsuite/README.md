@@ -1,6 +1,9 @@
 A small test suite for tttool
 -----------------------------
 
+(See also `emulator-tests/` in this directory: behavioural tests that run
+tttool-assembled GMEs on the emulated pen.)
+
 The script `download.sh` downloads a those GME files listed in
 `gme-files-test.txt` into the directory `downloaded/`. This is a subset of
 Ravensburger GMEs, useful for testing.

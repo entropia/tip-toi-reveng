@@ -1,0 +1,15 @@
+product-id: 901
+comment: tt-emu test book for the GME script timer (AT/CT)
+welcome: beep
+media-path: media/%s
+init: $t:=0
+scriptcodes:
+  arm: 4716
+  disarm: 4717
+scripts:
+  arm:
+  - $t := 0 AT(2) P(beep)
+  disarm:
+  - CT P(beep)
+timer:
+- $t += 1
