@@ -442,7 +442,7 @@ Beispiel:
     endlos:
     - P(endlose) P(kein_anschluss)
 Effekt:
-  Der Stift führt, _nach dem aktuellen Skript_, das Skript mit Code *oid-code* bzw. *code-name* (wenn :ref:`scriptcodes <code-namen>` verwendet wird) aus.
+  Der Stift führt, *nach dem aktuellen Skript*, das Skript mit Code *oid-code* bzw. *code-name* (wenn :ref:`scriptcodes <code-namen>` verwendet wird) aus.
 
 Es sollte nur ein ``J``-Befehl pro Zeile existieren (bei mehreren wird der letzte ausgeführt).
 
