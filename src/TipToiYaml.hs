@@ -1067,6 +1067,13 @@ parseCommands i =
          n <- P.parens lexer $ parseWord16
          (cmds, filenames) <- parseCommands i
          return (Game n : cmds, filenames)
+    , descP "Sound profile action" $
+      do P.lexeme lexer $ P.try (string "SP")
+         (p,v) <- P.parens lexer $
+            (,) <$> parseWord16 <*> option (Const 0) (P.comma lexer *> parseTVal)
+         unless (p <= 8) $ fail "sound profile out of range (0..8)"
+         (cmds, filenames) <- parseCommands i
+         return (SoundProfile (fromIntegral p) v : cmds, filenames)
     ]
 
 
