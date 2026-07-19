@@ -109,7 +109,9 @@ putTipToiFile (TipToiFile {..}) = mdo
     putWord32 sso
     seek 0x0200 -- Just to be safe
     sto <- getAddress $ putScriptTable ttScripts
-    ast <- getAddress $ putWord16 0x00 -- For now, no additional script table
+    -- The timer script (the GME's "additional script table") has the format of a play
+    -- script. putLines [] writes a single 0x0000 count word: no timer script.
+    ast <- getAddress $ putLines ttTimerScript
     gto <- getAddress $ putGameTable ttGames
     iro <- getAddress $ putInitialRegs ttInitialRegs
     mft <- getAddress $ putAudioTable ttAudioXor ttAudioFiles
@@ -349,10 +351,18 @@ putCommand (Jump v) = do
     putWord16 0
     mapM_ putWord8 [0xFF, 0xF8]
     putTVal v
-putCommand (Timer r v) = do
+putCommand (Rand r v) = do
     putWord16 r
     mapM_ putWord8 [0x00, 0xFF]
     putTVal v
+putCommand (ArmTimer m) = do
+    putWord16 0
+    mapM_ putWord8 [0x00, 0xFE]
+    putTVal (Const m)
+putCommand CancelTimer = do
+    putWord16 0
+    mapM_ putWord8 [0xFF, 0xFE]
+    putTVal (Const 0xFFFF)
 putCommand (NamedJump s) = error "putCommand: Unresolved NamedJump"
 putCommand (Unknown b r v) = do
     putWord16 r

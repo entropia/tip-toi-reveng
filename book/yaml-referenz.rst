@@ -180,6 +180,36 @@ Zweck:
 
   Die Skripte werden in Detail im Abschnitt „:ref:`yaml-skripte`“ erklärt.
 
+.. _yaml-timer:
+
+``timer``
+^^^^^^^^^
+
+Format:
+  Eine Liste von Skriptzeilen (wie ein Eintrag in ``scripts``)
+
+Beispiel:
+  .. code:: yaml
+
+    timer:
+    - $countdown==1? $countdown:=0 CT P(explosion)
+    - $countdown>1?  $countdown-=1 P(tick)
+
+Zweck:
+  Das Timer-Skript. Der Stift verfügt über einen mit dem Befehl ``AT``
+  startbaren, periodischen Timer. Immer wenn dieser abläuft — und der Stift
+  gerade nichts anderes tut — geht er die Zeilen des Timer-Skripts durch und
+  führt die *erste* Zeile aus, deren Bedingungen erfüllt sind.
+
+Zusammen mit den Befehlen ``AT`` (Timer starten) und ``CT`` (Timer abbrechen)
+lassen sich damit verzögerte oder sich wiederholende Aktionen umsetzen, etwa
+ein Countdown oder eine regelmäßige Erinnerung, wenn das Kind nichts mehr
+antippt. Im obigen Beispiel würde ein normales Skript mit
+``$countdown:=10 AT(10)`` einen zehnsekündigen Countdown starten.
+
+Das Timer-Skript teilt sich die Register mit den normalen Skripten. In den
+offiziellen Ravensburger-Produkten wird dieses Feld so gut wie nie verwendet.
+
 ``language``
 ^^^^^^^^^^^^
 
@@ -500,7 +530,33 @@ Beispiel:
 Effekt:
   Der Wert des Tiptoi-Zählers zu Beginn des Skriptes wird (modulo dem *modulus*) im Register *register* abgelegt.
 
-Der Tiptoi-Stift verfügt über einen Zähler, der während der Benutzung hochgezählt wird. Er wird schneller hochgezählt, wenn mit dem Stift interagiert wird, er ist also nicht zur Zeitmessung geeignet. Man kann damit aber (einfache) Zufallszahlen bekommen. Mehr dazu im Abschnitt :ref:`Zufallszahlen`.
+Der Tiptoi-Stift verfügt über einen Zähler, der während der Benutzung hochgezählt wird. Er wird schneller hochgezählt, wenn mit dem Stift interagiert wird, er ist also nicht zur Zeitmessung geeignet. Man kann damit aber (einfache) Zufallszahlen bekommen. Mehr dazu im Abschnitt :ref:`Zufallszahlen`. (Zur Zeitmessung dient stattdessen der mit ``AT`` gestartete Timer.)
+
+``AT``, ``CT`` – Timer starten und abbrechen
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Format:
+  | **AT(**\ *periode*\ **)**
+  | **CT**
+
+Beispiel:
+  .. code:: yaml
+
+    scripts:
+      bombe:
+      - $countdown:=10 AT(10) P(zischen)
+
+Effekt:
+  ``AT`` startet den periodischen Timer des Stiftes: Alle *periode* × 100
+  Millisekunden — im Beispiel also jede Sekunde — führt der Stift, sofern er
+  gerade nichts anderes tut, das Timer-Skript aus (siehe Feld
+  ":ref:`yaml-timer`"). Ein erneutes ``AT`` ersetzt den laufenden Timer;
+  ``CT`` bricht ihn ab.
+
+Die *periode* wird immer als Zahl interpretiert; ein Register (etwa
+``AT($p)``) ist hier nicht möglich. Der Timer läuft, bis er mit ``CT``
+abgebrochen wird, ein neues ``AT`` ihn ersetzt oder der Stift das Produkt
+verlässt.
 
 
 .. _conditionals:
