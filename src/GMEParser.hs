@@ -247,7 +247,15 @@ lineParser = begin
             return (Neg r))
         , (B.pack [0x00,0xFF], \r -> do
             v <- getTVal
-            return (Timer r v))
+            return (Rand r v))
+        , (B.pack [0x00,0xFE], \_ -> do
+            -- the pen takes the period literally, ignoring the register field and the
+            -- register/value flag of this command; read the file the same way
+            v <- getTVal
+            return (ArmTimer (case v of Const n -> n; Reg n -> n)))
+        , (B.pack [0xFF,0xFE], \_ -> do
+            _ <- getTVal
+            return CancelTimer)
         ] ++
         [ (B.pack (arithOpCode o), \r -> do
             n <- getTVal
@@ -428,7 +436,7 @@ getTipToiFile = getSegAt 0x00 "Header" $ do
     ttRawXor <- getAt 0x001C getWord32
     (ttAudioFiles, ttAudioFilesDoubles, ttAudioXor) <- indirection "Media" (getAudios ttRawXor)
     _ <- getWord32 -- Usually 0x0000238b
-    _ <- indirection "Additional script" getScript
+    ttTimerScript <- indirection "Timer script" getScript
     ttGames <- indirection "Games" $ indirections getWord32 "" getGame
     ttProductId <- getWord32
     ttInitialRegs <- indirection "Initial registers" getInitialRegs

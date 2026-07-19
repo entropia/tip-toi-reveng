@@ -1,5 +1,12 @@
 # Changelog for tttool
 
+## Unreleased
+
+ * New script commands `AT(m)` (arm the periodic script timer, opcode FE00)
+   and `CT` (cancel it, opcode FEFF), and a new top-level YAML field `timer`
+   for the timer script, which the pen runs whenever the armed timer fires
+   while the pen is idle.
+
 ## 1.11 (2023-02-11)
 
  * New command `set-product-id`

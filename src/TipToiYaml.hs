@@ -65,6 +65,7 @@ data TipToiYAML = TipToiYAML
     , ttySpeak       :: Maybe (OptArray SpeakSpec)
     , ttyLanguage    :: Maybe Language
     , ttyGames       :: Maybe [GameYaml]
+    , ttyTimer       :: Maybe (OptArray String)
     , ttyReplay      :: Maybe Word16
     , ttyStop        :: Maybe Word16
     }
@@ -313,6 +314,7 @@ tt2ttYaml path TipToiFile{..} = TipToiYAML
     , ttySpeak = Nothing
     , ttyLanguage = Nothing
     , ttyGames = list2Maybe $ map game2gameYaml ttGames
+    , ttyTimer = OptArray <$> list2Maybe (map exportLine ttTimerScript)
     , ttyReplay = fmap fst ttSpecialOIDs
     , ttyStop = fmap snd ttSpecialOIDs
     }
@@ -726,17 +728,21 @@ scriptCodes codes givenCodes productId
         Nothing -> error $ printf "Cannot jump to unknown script \"%s\"." s
         Just c -> c
 
+-- Resolves named registers to numbers across the initial registers, the OID scripts
+-- and the timer script (they all share one register namespace).
 resolveRegs ::
-    (M.Map Register Word16, [(a, Maybe [Line Register])]) ->
-    (M.Map ResReg Word16, [(a, Maybe [Line ResReg])])
-resolveRegs x = everywhere x
+    (M.Map Register Word16, [(a, Maybe [Line Register])], [Line Register]) ->
+    (M.Map ResReg Word16, [(a, Maybe [Line ResReg])], [Line ResReg])
+resolveRegs (initMap, scripts, timer) =
+    (M.mapKeys resolve initMap, mapScripts scripts, map (fmap resolve) timer)
   where
     -- Could use generics somehow
     regs = S.fromList $
-        M.keys (fst x) ++ concatMap (maybe [] (concatMap F.toList) . snd) (snd x)
+        M.keys initMap
+        ++ concatMap (maybe [] (concatMap F.toList) . snd) scripts
+        ++ concatMap F.toList timer
     -- Could use generics somehow
-    everywhere = M.mapKeys resolve *** map (second (fmap (map (fmap resolve))))
-
+    mapScripts = map (second (fmap (map (fmap resolve))))
 
     regNums = S.fromList [ n | RegPos n <- S.toList regs ]
     regNames = [ n | RegName n <- S.toList regs ]
@@ -744,13 +750,14 @@ resolveRegs x = everywhere x
     resolve (RegPos n) = n
     resolve (RegName n) = fromMaybe (error "resolveRegs broken") (M.lookup n mapping)
 
-resolveJumps :: (String -> Word16) -> [(a, Maybe [Line b])] -> [(a, Maybe [Line b])]
-resolveJumps m = everywhere
+resolveLineJumps :: (String -> Word16) -> Line b -> Line b
+resolveLineJumps m (Line o cond cmds acts) = Line o cond (map resolve cmds) acts
   where
-    everywhere = map (second (fmap (map resolveLine)))
-    resolveLine (Line o cond cmds acts) = (Line o cond (map resolve cmds) acts)
     resolve (NamedJump n) = Jump (Const (m n))
     resolve c = c
+
+resolveJumps :: (String -> Word16) -> [(a, Maybe [Line b])] -> [(a, Maybe [Line b])]
+resolveJumps m = map (second (fmap (map (resolveLineJumps m))))
 
 newtype WithFileNames a = WithFileNames
     { runWithFileNames :: ((String -> Word16) -> a, [String] -> [String])
@@ -798,8 +805,8 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
     welcome_names <- mapM (parseOneLine parsePlayList "welcome") (maybe [] unOptArray ttyWelcome)
 
 
-    let ((prescripts, welcome, games), filenames) = resolveFileNames $
-            (,,) <$>
+    let ((prescripts, welcome, games, timerPre), filenames) = resolveFileNames $
+            (,,,) <$>
             for [first ..last] (\oid ->
                 (oid ,) <$>
                 for (M.lookup oid m) (\(OptArray raw_lines) ->
@@ -811,20 +818,27 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
                 )
             ) <*>
             traverse (traverse recordFilename) welcome_names <*>
-            traverse gameYaml2Game (fromMaybe [] ttyGames)
+            traverse gameYaml2Game (fromMaybe [] ttyGames) <*>
+            forAn (maybe [] unOptArray ttyTimer) (\i raw_line ->
+                let d = printf "Timer line %d" i
+                    (l,s) = either error id $ parseOneLinePure parseLine d raw_line
+                in l <$> traverse recordFilename s
+            )
 
     preInitRegs <- M.fromList <$> parseOneLine parseInitRegs "init" (fromMaybe "" ttyInit)
 
-    -- resolve registers
-    let (initRegs, scripts) = resolveRegs (preInitRegs, prescripts)
+    -- resolve registers (scripts and timer script share one register namespace)
+    let (initRegs, scripts, timer) = resolveRegs (preInitRegs, prescripts, timerPre)
 
     -- resolve named jumps
     let scripts' = resolveJumps scriptMap scripts
+    let timerScript = map (resolveLineJumps scriptMap) timer
 
     let maxReg = maximum $ 0:
             [ r
-            | (_, Just ls) <- scripts'
-            , Line _ cs as _ <- ls
+            | ls <- map snd scripts' ++ [Just timerScript]
+            , Just ls' <- [ls]
+            , Line _ cs as _ <- ls'
             , r <- concatMap F.toList cs ++ concatMap F.toList as ]
 
     let ttySpeakMap = toSpeakMap (fromMaybe defaultLanguage ttyLanguage) ttySpeak
@@ -878,6 +892,7 @@ ttYaml2tt no_date dir (TipToiYAML {..}) extCodes = do
         , ttWelcome = welcome
         , ttInitialRegs = [fromMaybe 0 (M.lookup r initRegs) | r <- [0..maxReg]]
         , ttScripts = scripts'
+        , ttTimerScript = timerScript
         , ttGames = games
         , ttAudioFiles = files
         , ttAudioXor = knownXOR
@@ -1018,6 +1033,10 @@ parseCommands i =
                 (True,  True,  _)    -> PlayAllVariant playAllUnknownArgument
          (cmds, filenames) <- parseCommands (i+n)
          return (c : cmds, fns ++ filenames)
+    , descP "Cancel timer action" $
+      do P.lexeme lexer $ P.try (string "CT")
+         (cmds, filenames) <- parseCommands i
+         return (CancelTimer : cmds, filenames)
     , descP "Cancel" $
       do P.lexeme lexer $ char 'C'
          (cmds, filenames) <- parseCommands i
@@ -1035,7 +1054,14 @@ parseCommands i =
          (r,v) <- P.parens lexer $
             (,) <$> parseReg <* P.comma lexer <*> parseTVal
          (cmds, filenames) <- parseCommands i
-         return (Timer r v : cmds, filenames)
+         return (Rand r v : cmds, filenames)
+    , descP "Arm timer action" $
+      do P.lexeme lexer $ P.try (string "AT")
+         -- only a literal period: the firmware always takes the parameter of
+         -- 0xFE00 literally (the register/value flag is not checked)
+         n <- P.parens lexer parseWord16
+         (cmds, filenames) <- parseCommands i
+         return (ArmTimer n : cmds, filenames)
     , descP "Start Game" $
       do P.lexeme lexer $ char 'G'
          n <- P.parens lexer $ parseWord16
@@ -1094,6 +1120,7 @@ writeTipToiYaml out tty =
         , "gme-lang"
         , "init"
         , "scripts"
+        , "timer"
         , "language"
         , "speak"
         , "scriptcodes"
@@ -1160,6 +1187,7 @@ debugGame productID = do
             ]
         , ttyLanguage = Nothing
         , ttyGames = Nothing
+        , ttyTimer = Nothing
         , ttyReplay = Nothing
         , ttyStop = Nothing
         }

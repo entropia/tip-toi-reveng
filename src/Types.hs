@@ -52,7 +52,18 @@ data Command r
     | Unknown B.ByteString r (TVal r)
     | Jump (TVal r)
     | NamedJump String -- Only in YAML files, never read from GMEs
-    | Timer r (TVal r)
+    | Rand r (TVal r)
+      -- ^ opcode 0xFF00, written T($r,m) (that syntax predates knowing what the command
+      --   does, and is kept for compatibility). Sets $r to (tick counter) mod (m+1) --
+      --   the pen's random number source ("Rand" is the firmware's own name for it).
+      --   See GME-Format.md.
+    | ArmTimer Word16
+      -- ^ opcode 0xFE00, written AT(m). Arms the periodic script timer: every m*100ms
+      --   the pen, when idle, runs the timer script (ttTimerScript). The pen takes the
+      --   period literally -- it ignores both the register field and the register/value
+      --   flag of this command -- so it is a plain number here. See GME-Format.md.
+    | CancelTimer
+      -- ^ opcode 0xFEFF, written CT. Cancels the timer armed by ArmTimer.
     deriving (Eq, Functor, Foldable)
 
 type PlayList = [Word16]
@@ -73,6 +84,10 @@ data TipToiFile = TipToiFile
     , ttInitialRegs :: [Word16]
     , ttWelcome :: [PlayList]
     , ttScripts :: [(Word16, Maybe [Line ResReg])]
+    , ttTimerScript :: [Line ResReg]
+      -- ^ the timer script (the GME's "additional script table", header 0x0C). Run by
+      --   the pen when the timer armed via ArmTimer (0xFE00) expires: the first line
+      --   whose conditions hold is executed. Empty for most products. See GME-Format.md.
     , ttGames :: [Game]
     , ttAudioFiles :: [B.ByteString]
     , ttAudioFilesDoubles :: Similarity
