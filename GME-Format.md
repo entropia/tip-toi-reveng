@@ -128,7 +128,7 @@ The commands are:
  * `FE00` (written `AT(m)`): Arms the *script timer*, a periodic software timer that fires every `m`×100 ms. Every time it fires, and the pen is otherwise idle, the pen evaluates the *timer script* (header `0x000C`) and executes the first line whose conditions hold. The register field of this command is ignored, `m` is always taken literally, and arming replaces any previously armed timer.
  * `FEFF` (written `CT`): Cancels the script timer armed by `FE00`.
  * `FEE0`–`FEE7`: select one of eight built-in sound profiles (`FEE8` does nothing). Not seen in GME files so far.
- * `FFA1`: stores its parameter as a media index; when a later playlist contains the special entry `0xFFA1`, the stored index is played. Not seen in GME files so far.
+ * `FFA1` (deferred play): latches its parameter as a media index (literal, truncated to a byte, so 0..255; the register/value flag is ignored). Current hypothesis for the rest of the mechanism (this opcode is not fully understood — no published GME uses it, and its observed behaviour is odd): when a later `FFA1` action in the same run is reached, and the latch is set, the pen inserts a playback of the latched sample at that point. It does not appear to work as a playlist entry — putting `0xFFA1` into a playlist did not trigger it in emulator experiments. Observed quirk: whether the latch arms seems to depend on the parity of an internal dispatch counter, i.e. on timing. Not seen in GME files so far.
 
 This is the complete command set of the pen's script interpreter.
 
