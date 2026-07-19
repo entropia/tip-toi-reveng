@@ -195,6 +195,7 @@ lineParser = begin
         [ (B.pack [0xF9,0xFF], Eq)
         , (B.pack [0xFA,0xFF], Gt)
         , (B.pack [0xFB,0xFF], Lt)
+        , (B.pack [0xFC,0xFF], EqAlias)
         , (B.pack [0xFD,0xFF], GEq)
         , (B.pack [0xFE,0xFF], LEq)
         , (B.pack [0xFF,0xFF], NEq)
