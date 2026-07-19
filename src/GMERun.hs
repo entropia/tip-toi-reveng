@@ -81,6 +81,7 @@ condTrue s (Cond v1 o v2) = value s v1 =?= value s v2
         Gt  -> (>)
         LEq -> (<=)
         EqAlias -> (==)
+        -- like the pen: an unknown comparison operator never holds
         Unknowncond _ -> \_ _ -> False
 
 value :: Ord r => PlayState r -> TVal r -> Word16

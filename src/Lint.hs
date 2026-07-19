@@ -59,8 +59,8 @@ lintTipToi tt segments = do
 warnTipToi :: TipToiFile -> IO ()
 warnTipToi tt = do
     sequence_
-      [ printf "[Script %d line %d] Warning: More than 8 commands per line may cause problems\n"
-            c n
+      [ printf "[Script %d line %d] Warning: The pen executes only the first 8 commands of a line; the remaining %d will be ignored\n"
+            c n (length cmds - 8)
       | (c, Just lines) <- ttScripts tt
       , (n,Line _ _ cmds _) <- zip [(1::Int)..] lines
       , length cmds > 8
