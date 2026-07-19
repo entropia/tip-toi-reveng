@@ -1,0 +1,59 @@
+name: "Emulator tests"
+
+# Behavioural tests: assemble GMEs with tttool and run them on the emulated
+# pen (tt-emu, real firmware). See testsuite/emulator-tests/README.md.
+#
+# Deliberately self-contained (plain GHC/cabal instead of the nix setup of
+# build.yml, uv for the Python side), so it works on forks without any
+# secrets or caches.
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  emulator-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up GHC
+        uses: haskell-actions/setup@v2
+        id: setup-haskell
+        with:
+          ghc-version: '9.2.8'
+          cabal-version: 'latest'
+
+      - name: Cache cabal store
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ steps.setup-haskell.outputs.cabal-store }}
+            dist-newstyle
+          key: cabal-${{ runner.os }}-ghc-9.2.8-${{ hashFiles('tttool.cabal', 'cabal.project') }}
+          restore-keys: |
+            cabal-${{ runner.os }}-ghc-9.2.8-
+
+      - name: Build tttool
+        run: |
+          # The committed freeze file pins the haskell.nix toolchain's package
+          # set (e.g. ghc-bignum 1.3), which a vanilla GHC cannot satisfy.
+          rm -f cabal.project.freeze
+          cabal build exe:tttool
+          echo "TTTOOL=$(cabal list-bin tttool)" >> "$GITHUB_ENV"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Cache pen firmware
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/tt-emu
+          key: tt-emu-firmware-v1
+
+      - name: Run emulator tests
+        env:
+          TT_EMU_DOWNLOAD_FIRMWARE: "1"
+        run: uv run --project testsuite/emulator-tests pytest testsuite/emulator-tests -v

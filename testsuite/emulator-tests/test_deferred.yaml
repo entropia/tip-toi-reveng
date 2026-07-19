@@ -1,0 +1,15 @@
+product-id: 902
+# The assembled GME is byte-patched by test_deferred.py, since the 0xFFA1
+# deferred-play action cannot be written in YAML yet.
+comment: deferred play (0xFFA1) test book
+welcome: beep
+media-path: media/%s
+init: $sink:=0
+scriptcodes:
+  defer: 4716
+  trigger: 4717
+scripts:
+  defer:
+  - $sink := 2
+  trigger:
+  - P(hello) $sink := 1 P(tick)

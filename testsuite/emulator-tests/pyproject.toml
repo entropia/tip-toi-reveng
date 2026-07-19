@@ -1,0 +1,19 @@
+[project]
+name = "tttool-emulator-tests"
+version = "0"
+description = "Behavioural tests: tttool-assembled GMEs running on the emulated tiptoi pen"
+requires-python = ">=3.10"
+dependencies = [
+    "pytest>=8",
+    "tt-emu",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+tt-emu = { git = "https://github.com/nomeata/tt-emu" }
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+addopts = "-ra"

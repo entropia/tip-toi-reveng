@@ -1,0 +1,31 @@
+product-id: 903
+comment: tt-emu test book for J() jump timing and ordering
+welcome: beep
+media-path: media/%s
+init: $m:=0 $arrived:=0
+scriptcodes:
+  pj: 4716
+  jp: 4717
+  jonly: 4718
+  jshort: 4719
+  jplay: 4720
+  jsing: 4721
+  mark: 4730
+  sing: 4731
+scripts:
+  pj:
+  - $m:=1 P(long) J(mark)
+  jp:
+  - $m:=2 J(mark) P(long)
+  jonly:
+  - $m:=3 J(mark)
+  jshort:
+  - $m:=4 J(mark) P(beep)
+  jplay:
+  - $m:=5 P(long) J(sing)
+  jsing:
+  - $m:=6 J(sing)
+  mark:
+  - $arrived+=1
+  sing:
+  - $arrived+=1 P(tick)

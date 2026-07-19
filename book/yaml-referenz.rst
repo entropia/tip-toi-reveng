@@ -450,6 +450,18 @@ Nach dem ``J``-Befehl sollte mindests ein ``P``-Befehl stehen, der ein nicht zu 
 
 Eine stille, 5ms lange Audiodatei liegt dem ``tttool`` als ``example/5ms.ogg`` bei.
 
+.. note:: Messungen mit der emulierten Stift-Firmware (ZC3202N, tt-emu)
+   präzisieren das Verhalten: Der Stift merkt sich den Sprung nur vor und
+   führt ihn erst aus, wenn das gerade laufende Audio zu Ende ist. Die
+   bekannte Verzögerung beim Verketten von Skripten ist genau dieses Warten —
+   das Audio des Sprungziels beginnt erst, wenn das der aktuellen Zeile fertig
+   ist. Die Reihenfolge von ``J`` und ``P`` innerhalb der Zeile ist dabei
+   egal (``P(lang) J(ziel)`` und ``J(ziel) P(lang)`` verhalten sich
+   identisch; die Playlist der Zeile spielt vor dem Sprung). Ein ``J`` ganz
+   ohne laufendes Audio sprang in der Emulation dagegen sofort — die oben
+   erwähnte Zwei-Sekunden-Wartezeit ließ sich dort nicht reproduzieren.
+   Details und Messwerte: ``testsuite/emulator-tests/test_jump.py``.
+
 
 ``:=`` – Register setzen
 ^^^^^^^^^^^^^^^^^^^^^^^^
