@@ -117,13 +117,23 @@ data TipToiFile = TipToiFile
 type PlayListList = [PlayList]
 type GameId = Word16
 
+-- Game-record fields with meanings established by firmware analysis (they hold
+-- across all game types that use them):
+--   * gAllNeeded  : the find-all-targets flag: 0 = the first correct tap completes
+--                   the round, 1 = every target OID of the subgame must be found
+--                   (word "c" of the common layout, word "i" of the type-6 layout)
+--   * gRepeatOID  : a control OID that replays the current prompt or hint
+--   * gEarlyRounds / gBonusEarlyRounds : round number at which the round
+--                   announcement switches from the round-start to the
+--                   later-round-start playlists (0 = no announcements)
+-- See the game table section in GME-Format.md.
 data Game =
     CommonGame
         { gGameType                 :: Word16
         , gRounds                   :: Word16
-        , gUnknownC                 :: Word16
+        , gAllNeeded                :: Word16
         , gEarlyRounds              :: Word16
-        , gRepeatLastMedia          :: Word16
+        , gRepeatOID                :: Word16
         , gUnknownX                 :: Word16
         , gUnknownW                 :: Word16
         , gUnknownV                 :: Word16
@@ -141,10 +151,10 @@ data Game =
         , gBonusSubgameCount        :: Word16
         , gBonusRounds              :: Word16
         , gBonusTarget              :: Word16
-        , gUnknownI                 :: Word16
+        , gAllNeeded                :: Word16
         , gEarlyRounds              :: Word16
-        , gUnknownQ                 :: Word16
-        , gRepeatLastMedia          :: Word16
+        , gBonusEarlyRounds         :: Word16
+        , gRepeatOID                :: Word16
         , gUnknownX                 :: Word16
         , gUnknownW                 :: Word16
         , gUnknownV                 :: Word16
@@ -164,9 +174,9 @@ data Game =
         }
     | Game7
         { gRounds                   :: Word16
-        , gUnknownC                 :: Word16
+        , gAllNeeded                :: Word16
         , gEarlyRounds              :: Word16
-        , gRepeatLastMedia          :: Word16
+        , gRepeatOID                :: Word16
         , gUnknownX                 :: Word16
         , gUnknownW                 :: Word16
         , gUnknownV                 :: Word16
@@ -182,9 +192,9 @@ data Game =
         }
     | Game8
         { gRounds                   :: Word16
-        , gUnknownC                 :: Word16
+        , gAllNeeded                :: Word16
         , gEarlyRounds              :: Word16
-        , gRepeatLastMedia          :: Word16
+        , gRepeatOID                :: Word16
         , gUnknownX                 :: Word16
         , gUnknownW                 :: Word16
         , gUnknownV                 :: Word16
@@ -203,9 +213,9 @@ data Game =
         }
     | Game9
         { gRounds                   :: Word16
-        , gUnknownC                 :: Word16
+        , gAllNeeded                :: Word16
         , gEarlyRounds              :: Word16
-        , gRepeatLastMedia          :: Word16
+        , gRepeatOID                :: Word16
         , gUnknownX                 :: Word16
         , gUnknownW                 :: Word16
         , gUnknownV                 :: Word16
@@ -221,9 +231,9 @@ data Game =
         }
     | Game10
         { gRounds                   :: Word16
-        , gUnknownC                 :: Word16
+        , gAllNeeded                :: Word16
         , gEarlyRounds              :: Word16
-        , gRepeatLastMedia          :: Word16
+        , gRepeatOID                :: Word16
         , gUnknownX                 :: Word16
         , gUnknownW                 :: Word16
         , gUnknownV                 :: Word16
@@ -239,9 +249,9 @@ data Game =
         }
     | Game16
         { gRounds                   :: Word16
-        , gUnknownC                 :: Word16
+        , gAllNeeded                :: Word16
         , gEarlyRounds              :: Word16
-        , gRepeatLastMedia          :: Word16
+        , gRepeatOID                :: Word16
         , gUnknownX                 :: Word16
         , gUnknownW                 :: Word16
         , gUnknownV                 :: Word16
@@ -272,11 +282,15 @@ gameType Game253 {} = 253
 
 type OID = Word16
 
+-- sgTargetOids are the correct answers, sgDecoyOids known-wrong answers with
+-- dedicated feedback, sgAllOids the subgame's remaining active OIDs (hint
+-- feedback). sgHeader holds ten 16-bit words tuning feedback selection and
+-- wrong-tap limits. See the game table section in GME-Format.md.
 data SubGame = SubGame
-    { sgUnknown :: B.ByteString
-    , sgOids1 :: [OID]
-    , sgOids2 :: [OID]
-    , sgOids3 :: [OID]
+    { sgHeader :: B.ByteString
+    , sgTargetOids :: [OID]
+    , sgDecoyOids :: [OID]
+    , sgAllOids :: [OID]
     , sgPlaylist :: [PlayListList]
     }
     deriving Show

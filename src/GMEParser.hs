@@ -381,14 +381,14 @@ getRealGame 253 = return Game253
 getRealGame gGameType = do
     gSubgameCount             <- getWord16
     gRounds                   <- getWord16
-    gUnknownC                 <- getIf (/=6) getWord16
+    gAllNeededC               <- getIf (/=6) getWord16
     gBonusSubgameCount        <- getIf (==6) getWord16
     gBonusRounds              <- getIf (==6) getWord16
     gBonusTarget              <- getIf (==6) getWord16
-    gUnknownI                 <- getIf (==6) getWord16
+    gAllNeededI               <- getIf (==6) getWord16
     gEarlyRounds              <- getWord16
-    gUnknownQ                 <- getIf (==6) getWord16
-    gRepeatLastMedia          <- getWord16
+    gBonusEarlyRounds         <- getIf (==6) getWord16
+    gRepeatOID                <- getWord16
     gUnknownX                 <- getWord16
     gUnknownW                 <- getWord16
     gUnknownV                 <- getWord16
@@ -402,6 +402,10 @@ getRealGame gGameType = do
     let subgameCount | gGameType == 6 = gSubgameCount + gBonusSubgameCount
                      | otherwise      = gSubgameCount
     gSubgames                 <- indirections (return subgameCount) "subgame-" getSubGame
+    -- the find-all-targets flag sits at word "c" in the common layout, but at
+    -- word "i" in the type-6 layout
+    let gAllNeeded | gGameType == 6 = gAllNeededI
+                   | otherwise      = gAllNeededC
     gTargetScores             <- if gGameType == 6 then replicateM 2 getWord16
                                                    else replicateM 10 getWord16
     gBonusTargetScores        <- getIf (==6) $ replicateM 8 getWord16

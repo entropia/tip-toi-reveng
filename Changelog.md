@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+ * The game fields whose meanings firmware analysis established got
+   speaking names in the YAML format and the `explain`/`games` output:
+   the find-all-targets flag is a boolean `allneeded`, `repeatoid` is
+   the prompt-replay control OID, type 6 gains `bonusearlyrounds`, and
+   subgames have `header`/`targetoids`/`decoyoids`/`alloids`. The nine
+   subgame playlists are now individual named fields (`announce`,
+   `correct`, `wrong`, `notingame`, `alreadyfound`, `hints`,
+   `roundcomplete`, `solution`) plus an optional `unusedplaylist` for
+   the never-read ninth.
+
  * New script commands `AT(m)` (arm the periodic script timer, opcode FE00)
    and `CT` (cancel it, opcode FEFF), and a new top-level YAML field `timer`
    for the timer script, which the pen runs whenever the armed timer fires
