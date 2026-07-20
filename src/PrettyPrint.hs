@@ -156,9 +156,9 @@ ppCommonGame :: Transscript -> Game -> String
 ppCommonGame t g =
     printf (unlines ["  type: %d",
                      "  rounds: %d",
-                     "  unknown (c): %d",
+                     "  all needed (c): %d",
                      "  early rounds: %d",
-                     "  repeat last media OID: %d",
+                     "  repeat OID: %d",
                      "  unknown (x): %d",
                      "  unknown (w): %d",
                      "  unknown (v): %d",
@@ -173,9 +173,9 @@ ppCommonGame t g =
                      ])
     (gameType g)
     (gRounds g)
-    (gUnknownC g)
+    (gAllNeeded g)
     (gEarlyRounds g)
-    (gRepeatLastMedia g)
+    (gRepeatOID g)
     (gUnknownX g) (gUnknownW g) (gUnknownV g)
     (ppPlayListList t (gStartPlayList g))
     (ppPlayListList t (gRoundEndPlayList g))
@@ -195,10 +195,10 @@ ppGame t (Game6 {..}) =
                      "  rounds: %d",
                      "  bonus rounds: %d",
                      "  rounds target: %d",
-                     "  unknown (i): %d",
+                     "  all needed (i): %d",
                      "  early rounds: %d",
-                     "  unknown (q): %d",
-                     "  repeat last media OID: %d",
+                     "  bonus early rounds (q): %d",
+                     "  repeat OID: %d",
                      "  unknown (x): %d",
                      "  unknown (w): %d",
                      "  unknown (v): %d",
@@ -220,10 +220,10 @@ ppGame t (Game6 {..}) =
     gRounds
     gBonusRounds
     gBonusTarget
-    gUnknownI
+    gAllNeeded
     gEarlyRounds
-    gUnknownQ
-    gRepeatLastMedia
+    gBonusEarlyRounds
+    gRepeatOID
     gUnknownX gUnknownW gUnknownV
     (ppPlayListList t gStartPlayList)
     (ppPlayListList t gRoundEndPlayList)
@@ -283,10 +283,10 @@ ppSubGames t = concatMap (uncurry (ppSubGame t)) . zip [0..]
 ppSubGame :: Transscript -> Int -> SubGame -> String
 ppSubGame t n (SubGame u oids1 oids2 oids3 plls) = printf (unlines
     [ "    Subgame %d:"
-    , "      u: %s"
-    , "      oids1: %s"
-    , "      oids2: %s"
-    , "      oids3: %s"
+    , "      header: %s"
+    , "      target oids: %s"
+    , "      decoy oids: %s"
+    , "      all oids: %s"
     , "      playlist: (%d)" , "%s"
     ])
     n
