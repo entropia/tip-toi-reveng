@@ -63,7 +63,7 @@ let
    pkgs.stdenv.mkDerivation {
       name = "tttool-bundle";
 
-      buildInputs = [ pkgs.macdylibbundler ];
+      buildInputs = [ pkgs.macdylibbundler pkgs.darwin.sigtool ];
 
       builder = pkgs.writeScript "tttool-osx-bundler.sh" ''
         source ${pkgs.stdenv}/setup
