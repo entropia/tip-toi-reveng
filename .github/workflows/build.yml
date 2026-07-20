@@ -89,7 +89,7 @@ jobs:
     - run: nix-build -A release-zip
 
     - run: unzip -d upload ./result/*.zip
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v7
       with:
         name: Release zip file
         path: upload
