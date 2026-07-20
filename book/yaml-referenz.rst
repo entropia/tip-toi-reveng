@@ -428,6 +428,27 @@ Beispiel:
     haus:
     - P("Willkommen zu Hause")
 
+``P?`` – Audio vielleicht abspielen
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Format:
+  | **P?(**\ *audio-datei*\ **)**
+Beispiel:
+  .. code:: yaml
+
+    truhe:
+    - P(knarzen) P?(ueberraschung)
+
+Effekt:
+  Der Befehl spielt die angegebene Audio-Datei ab — aber nur ungefähr jedes
+  zweite Mal, zufällig; sonst tut er nichts.
+
+Der Stift wirft dabei keine echte Münze: Er schaut, ob ein interner Zähler,
+der etwa zehnmal pro Sekunde und bei jeder Interaktion weiterzählt, gerade
+eine gerade Zahl enthält. In der Praxis ist das Ergebnis damit zufällig, mit
+einer Wahrscheinlichkeit von etwa 50%. Für andere Wahrscheinlichkeiten
+kombiniere ``T`` (siehe Abschnitt :ref:`Zufallszahlen`) mit Bedingungen.
+
 .. _command-J:
 
 ``J`` – Sprung
@@ -617,10 +638,18 @@ Weitere Befehle
 
 (Befehle die der normale Tiptoi-Bastler nicht braucht, aber die das ``tttool`` ausspuckt)
 
-* ``P*()``
-* ``PA*()``
-* ``PA*()``
-* ``PA()``
-* ``G()``
-* ``C``
-* ``?() ()``
+* ``P*(…)``: Spielt eine der Audio-Dateien der Zeile ab, praktisch zufällig.
+  Anders als beim ``P``-Befehl mit mehreren Argumenten wählt der Stift dabei
+  aus *allen* Audio-Dateien der Zeile aus, auch aus denen der anderen
+  ``P``-Befehle derselben Zeile.
+* ``PA*(…)``: Spielt alle Audio-Dateien der Zeile ab, eine nach der anderen —
+  auch hier: alle Dateien der gesamten Zeile.
+* ``PA(…)``: Spielt die angegebenen Audio-Dateien ab, eine nach der anderen.
+* ``G(…)``: Startet ein *Spiel* der GME-Datei. Spiele sind in der GME-Datei
+  gespeicherte, von der Stift-Firmware ausgeführte Abläufe; sie werden im
+  ``games``-Feld der YAML-Datei definiert (das in diesem Buch bislang nicht
+  weiter beschrieben ist; ``tttool games`` zeigt die Spiele einer GME-Datei
+  an).
+* ``C``: Bricht ein laufendes Spiel ab.
+* ``?(…) (…)``: So gibt das ``tttool`` einen Befehl aus, den es nicht kennt,
+  zusammen mit seinen rohen Bytes.

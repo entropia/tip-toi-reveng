@@ -116,7 +116,7 @@ The commands are:
  * `FFF7` (written `$r^=m`): Bitwise xor to register `$r` the value of `m`
  * `FFF8` (written `Neg($r)`): Negate register `$r`.
  * `FFF9` (written `$r:=m`): Set register `$r` to `m` or value of `$m`
- * `FFE0` (written `P*`): play one sample of the media list. The pen plays `playlist[n mod length]`, where `n` counts the script dispatches — i.e. it deterministically cycles through the playlist.
+ * `FFE0` (written `P*`): play one sample of the media list. The pen plays `playlist[n mod length]`, where `n` is an internal event counter. The counter advances once per event the pen processes — which includes an idle poll firing about ten times a second, not just touches — so in practice the pick is timing-dependent, i.e. effectively random.
  * `FFE1` (written `PA*`: play all samples of the media list
  * `FFE8` (written `P(m)`): Play audio referenced by the `m`th entry in the indices list.
  * `FB00` (written `PA(b-a)`): Play all samples from that inclusive range. `a` := lowbyte(`m`), `b` := highbyte(`m`)
@@ -128,7 +128,7 @@ The commands are:
  * `FE00` (written `AT(m)`): Arms the *script timer*, a periodic software timer that fires every `m`×100 ms. Every time it fires, and the pen is otherwise idle, the pen evaluates the *timer script* (header `0x000C`) and executes the first line whose conditions hold. The register field of this command is ignored, `m` is always taken literally, and arming replaces any previously armed timer.
  * `FEFF` (written `CT`): Cancels the script timer armed by `FE00`.
  * `FEE0`–`FEE7`: select one of eight built-in sound profiles (`FEE8` does nothing). Not seen in GME files so far.
- * `FFA1` (deferred play): latches its parameter as a media index (literal, truncated to a byte, so 0..255; the register/value flag is ignored). Current hypothesis for the rest of the mechanism (this opcode is not fully understood — no published GME uses it, and its observed behaviour is odd): when a later `FFA1` action in the same run is reached, and the latch is set, the pen inserts a playback of the latched sample at that point. It does not appear to work as a playlist entry — putting `0xFFA1` into a playlist did not trigger it in emulator experiments. Observed quirk: whether the latch arms seems to depend on the parity of an internal dispatch counter, i.e. on timing. Not seen in GME files so far.
+ * `FFA1` (written `P?(m)`, "coin-flip play"): plays the `m`th entry of the indices list — exactly like `FFE8` — but only if the event counter (the same one `FFE0` uses) is even at the moment the action executes; otherwise the command does nothing. The counter's parity at that moment is effectively random, so the sample plays with probability ½. When the pen internally re-runs a line's actions (as happens around games and interrupted audio), the original outcome is repeated, not re-flipped. The register field and the register/value flag are ignored, `m` is always taken literally. Not seen in GME files so far.
 
 This is the complete command set of the pen's script interpreter.
 

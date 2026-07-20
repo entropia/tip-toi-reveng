@@ -11,9 +11,10 @@ Zufallszahlen
 -------------
 
 Für Spiele und Rätsel mit dem Tiptoi-Stift ist es häufig nötig, Aktionen
-zufallsgesteuert auszuführen. Auch wenn bisher die Fähigkeiten des
-Stifts in dieser Hinsicht noch nicht ganz verstanden sind, gibt es ein
-paar Techniken, die du hier einsetzen kannst.
+zufallsgesteuert auszuführen. Der Stift hat zwar keinen echten
+Zufallsgenerator, aber mehrere intern mitlaufende Zähler, deren Werte in
+der Praxis vom genauen Zeitpunkt des Antippens abhängen und damit
+zufällig sind. Es gibt ein paar Techniken, die du hier einsetzen kannst.
 
 Zufälliges Abspielen von Audio-Dateien
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -25,12 +26,17 @@ abzuspielen, genügt der ``P()``-Befehl mit mehreren Argumenten:
 
     - P(bing, plopp, peng)
 
-Es ist nicht bekannt, wie der Zufallsgenerator hier funktioniert und wie
-gleichmäßig die Verteilung ist. Manche Anwender haben beobachtet, dass
-die erste Datei häufiger abgespielt wird.
+Der Stift wählt die Datei anhand eines internen Zählers aus, der etwa
+zehnmal pro Sekunde weiterzählt — welche Datei erklingt, hängt also davon
+ab, wann genau du tippst. Auf Dauer sind damit alle Dateien ungefähr
+gleich häufig dran.
 
-(TODO: es wäre interessant zu dokumentieren, in welchen
-Ravensburger-Produkten das vorkommt und wie es dort angewendet wird.)
+Soll eine Audio-Datei nur *manchmal* abgespielt werden — mit einer
+Wahrscheinlichkeit von etwa 50% —, dann nimm den Befehl ``P?()``:
+
+::
+
+    - P(truhe_knarzt) P?(ueberraschung)
 
 Timer
 ~~~~~

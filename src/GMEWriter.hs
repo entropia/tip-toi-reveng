@@ -363,6 +363,10 @@ putCommand (ArmTimer m) = do
     putWord16 0
     mapM_ putWord8 [0x00, 0xFE]
     putTVal (Const m)
+putCommand (CoinFlipPlay n) = do
+    putWord16 0
+    mapM_ putWord8 [0xA1, 0xFF]
+    putTVal (Const n)
 putCommand CancelTimer = do
     putWord16 0
     mapM_ putWord8 [0xFF, 0xFE]

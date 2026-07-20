@@ -262,6 +262,12 @@ lineParser = begin
         , (B.pack [0xFF,0xFE], \_ -> do
             _ <- getTVal
             return CancelTimer)
+        , (B.pack [0xA1,0xFF], \r -> do
+            unless (r == 0) $ error "Non-zero register for CoinFlipPlay command"
+            -- the pen ignores the register/value flag of this command; read the
+            -- file the same way
+            v <- getTVal
+            return (CoinFlipPlay (case v of Const n -> n; Reg n -> n)))
         ] ++
         [ (B.pack [0xE0 + p,0xFE], \r -> do
             unless (r == 0) $ error "Non-zero register for SoundProfile command"

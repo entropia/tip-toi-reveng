@@ -110,6 +110,7 @@ ppCommand True t xs p
     | any (not . validIndex xs) (indices p) = ""
 
 ppCommand _ t xs (Play n)        = printf "P(%s)" $ ppPlayIndex t xs (fromIntegral n)
+ppCommand _ t xs (CoinFlipPlay n) = printf "P?(%s)" $ ppPlayIndex t xs (fromIntegral n)
 ppCommand _ t xs (Random a b)    = printf "P(%s)" $ ppPlayRange t xs [b..a]
 ppCommand _ t xs (PlayAll a b)   = printf "PA(%s)" $ ppPlayRange t xs [b..a]
 ppCommand _ t xs (PlayAllVariant (Const 0)) = printf "PA*(%s)"    (ppPlayAll t xs)
@@ -131,6 +132,7 @@ ppCommand _ t xs (Unknown b r n) = printf "?(%s,%s) (%s)" (ppReg r) (ppTVal n) (
 
 indices :: Command r -> [Int]
 indices (Play n)      = [fromIntegral n]
+indices (CoinFlipPlay n) = [fromIntegral n]
 indices (Random a b)  = map fromIntegral [b..a]
 indices (PlayAll a b) = map fromIntegral [b..a]
 indices _ = []
