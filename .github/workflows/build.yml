@@ -44,7 +44,7 @@ jobs:
 
     # work around https://github.com/actions/upload-artifact/issues/92
     - run: cp -RvL result upload
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v7
       with:
         name: tttool (${{ matrix.target }})
         path: upload/
