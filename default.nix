@@ -115,7 +115,6 @@ in rec {
     let
       sphinx-env = pkgs.python3.withPackages(ps: [
         ps.sphinx
-        ps.recommonmark
       ]);
       tex = pkgs.texlive.combine {
         inherit (pkgs.texlive)

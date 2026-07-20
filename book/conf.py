@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from recommonmark.parser import CommonMarkParser
-source_parsers = {
-    '.md': CommonMarkParser,
-}
-
 extensions = []
 templates_path = ['_templates']
-source_suffix = ['.rst', '.md']
+source_suffix = ['.rst']
 master_doc = 'index'
 
 # General information about the project.
