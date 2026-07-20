@@ -1041,20 +1041,24 @@ parseCommands i =
          return (Unknown h r v : cmds, filenames)
 
     , descP "Play action" $
-      do (withA, withStar) <- P.lexeme lexer $ do
+      do (withA, withStar, withFlip) <- P.lexeme lexer $ do
             char 'P'
             withA <- optionBool (char 'A')
             withStar <- optionBool (char '*')
-            return (withA, withStar)
+            withFlip <- optionBool (char '?')
+            return (withA, withStar, withFlip)
          fns <- P.parens lexer $ P.commaSep1 lexer parseAudioRef
          playAllUnknownArgument <- option (Const 0) $ P.parens lexer $ parseTVal
          let n = length fns
-         let c = case (withA, withStar, fns) of
-                (False, False, [fn]) -> Play (fromIntegral i)
-                (False, False, _)    -> Random (fromIntegral (i + n - 1)) (fromIntegral i)
-                (True,  False, _)    -> PlayAll (fromIntegral (i + n - 1)) (fromIntegral i)
-                (False, True,  _)    -> RandomVariant playAllUnknownArgument
-                (True,  True,  _)    -> PlayAllVariant playAllUnknownArgument
+         c <- case (withA, withStar, withFlip, fns) of
+                (False, False, False, [fn]) -> return $ Play (fromIntegral i)
+                (False, False, False, _)    -> return $ Random (fromIntegral (i + n - 1)) (fromIntegral i)
+                (False, False, True,  [fn]) -> return $ CoinFlipPlay (fromIntegral i)
+                (False, False, True,  _)    -> fail "P? plays a single audio file"
+                (True,  False, False, _)    -> return $ PlayAll (fromIntegral (i + n - 1)) (fromIntegral i)
+                (False, True,  False, _)    -> return $ RandomVariant playAllUnknownArgument
+                (True,  True,  False, _)    -> return $ PlayAllVariant playAllUnknownArgument
+                (_,     _,     True,  _)    -> fail "P? cannot be combined with A or *"
          (cmds, filenames) <- parseCommands (i+n)
          return (c : cmds, fns ++ filenames)
     , descP "Cancel timer action" $

@@ -69,6 +69,13 @@ data Command r
       --   flag of this command -- so it is a plain number here. See GME-Format.md.
     | CancelTimer
       -- ^ opcode 0xFEFF, written CT. Cancels the timer armed by ArmTimer.
+    | CoinFlipPlay Word16
+      -- ^ opcode 0xFFA1, written P?(m). Plays the m'th entry of the playlist -- like
+      --   Play -- but only if an internal event counter happens to be even when the
+      --   action executes; otherwise it does nothing. The parity is effectively
+      --   random, so the sample plays with probability 1/2. The pen ignores the
+      --   register field and the register/value flag of this command, so the index
+      --   is a plain number here. Not seen in GME files so far. See GME-Format.md.
     | SoundProfile Word8 (TVal r)
       -- ^ opcodes 0xFEE0..0xFEE8, written SoundProfile(p). Selects one of the pen's
       --   eight built-in sound profiles p = 0..7 (p = 8 encodes 0xFEE8, which the
