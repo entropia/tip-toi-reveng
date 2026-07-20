@@ -73,6 +73,7 @@ let
         chmod u+w $out/bin/osx/tttool
         dylibbundler \
           -b \
+          --no-codesign \
           -x $out/bin/osx/tttool \
           -d $out/bin/osx \
           -p '@executable_path' \

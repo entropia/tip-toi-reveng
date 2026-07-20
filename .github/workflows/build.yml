@@ -26,25 +26,22 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v3
-    - uses: cachix/install-nix-action@v22
+    - uses: cachix/install-nix-action@v31
       with:
         extra_nix_config: |
           trusted-public-keys = hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
-          substituters = https://hydra.iohk.io https://cache.nixos.org/
+          substituters = https://cache.iog.io https://cache.nixos.org/
     - name: "Cachix: tttool"
-      uses: cachix/cachix-action@v12
+      uses: cachix/cachix-action@v17
       with:
         name: tttool
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
-
-    # until https://github.com/cachix/cachix-action/issues/86 is fixed:
-    - run: cachix watch-store tttool &
 
     - run: nix-build --arg checkMaterialization true -A ${{ matrix.target }}
 
     # work around https://github.com/actions/upload-artifact/issues/92
     - run: cp -RvL result upload
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v7
       with:
         name: tttool (${{ matrix.target }})
         path: upload/
@@ -92,7 +89,7 @@ jobs:
     - run: nix-build -A release-zip
 
     - run: unzip -d upload ./result/*.zip
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v7
       with:
         name: Release zip file
         path: upload
