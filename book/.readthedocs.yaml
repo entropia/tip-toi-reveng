@@ -6,3 +6,7 @@ build:
     python: "3.12"
 sphinx:
   configuration: book/conf.py
+python:
+  install:
+    - method: pip
+      path: recommonmark
