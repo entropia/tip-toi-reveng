@@ -63,7 +63,7 @@ let
    pkgs.stdenv.mkDerivation {
       name = "tttool-bundle";
 
-      buildInputs = [ pkgs.macdylibbundler pkgs.darwin.sigtool ];
+      buildInputs = [ pkgs.macdylibbundler ];
 
       builder = pkgs.writeScript "tttool-osx-bundler.sh" ''
         source ${pkgs.stdenv}/setup
@@ -73,6 +73,7 @@ let
         chmod u+w $out/bin/osx/tttool
         dylibbundler \
           -b \
+          --no-codesign \
           -x $out/bin/osx/tttool \
           -d $out/bin/osx \
           -p '@executable_path' \
