@@ -3,6 +3,11 @@
 layout: default
 
 gallery:
+- title: SoniqPen Library
+  subtitle: Spiele und Lernmaterialien zum selber Drucken
+  link: https://soniqpen.com/
+  img: /img/soniqpen.jpg
+
 - title: Tami und der Schattenkönig
   subtitle: Komplexes Rollenspiel von Jens Georg
   link: https://github.com/JG55JG/Tami-und-der-Schattenkoenig
